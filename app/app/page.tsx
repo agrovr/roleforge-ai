@@ -244,69 +244,39 @@ export default function Page() {
             </div>
           )}
 
-          {downloadUrl && (
-  <div
-    style={{
-      marginTop: 14,
-      padding: 12,
-      borderRadius: 12,
-      border: "1px solid rgba(255,255,255,0.14)",
-      background: "rgba(0,0,0,0.25)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      gap: 12,
-      flexWrap: "wrap",
-    }}
-  >
-    <div>
-      <b>Download:</b>{" "}
-      <a
-        href={downloadUrl}
-        target="_blank"
-        rel="noreferrer"
-        style={{ color: "white", textDecoration: "underline" }}
-      >
-        tailored_resume.docx
-      </a>
-      <div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>
-        If clicking doesn’t download, use “Force download”.
-      </div>
-    </div>
+{downloadUrl && (
+  <div style={{
+    marginTop: 14,
+    padding: 12,
+    borderRadius: 12,
+    border: "1px solid rgba(255,255,255,0.14)"
+  }}>
+    <b>Download:</b>{" "}
+    <a
+      href={downloadUrl}
+      download
+      style={{ color: "white", textDecoration: "underline" }}
+    >
+      tailored_resume.docx
+    </a>
 
     <button
-      onClick={async () => {
-        try {
-          const res = await fetch(downloadUrl, { method: "GET" });
-          if (!res.ok) throw new Error(`Download failed: ${res.status}`);
-
-          const blob = await res.blob();
-          const blobUrl = window.URL.createObjectURL(blob);
-
-          const a = document.createElement("a");
-          a.href = blobUrl;
-          a.download = "tailored_resume.docx";
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-
-          window.URL.revokeObjectURL(blobUrl);
-        } catch (err) {
-          console.error(err);
-          window.open(downloadUrl, "_blank", "noopener,noreferrer");
-          alert(
-            "Force download failed in-browser. I opened the file in a new tab instead (check console for details)."
-          );
-        }
-      }}
       style={{
-        padding: "10px 14px",
-        borderRadius: 12,
-        border: "1px solid rgba(255,255,255,0.16)",
-        background: "rgba(99,102,241,0.28)",
-        color: "white",
-        cursor: "pointer",
-        fontWeight: 600,
+        marginLeft: 12,
+        padding: "6px 12px",
+        borderRadius: 8,
+        background: "#4ade80",
+        color: "black",
+        border: "none",
+        cursor: "pointer"
+      }}
+      onClick={() => {
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.download = "tailored_resume.docx";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       }}
     >
       Force download
