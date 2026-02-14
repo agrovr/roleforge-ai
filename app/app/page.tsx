@@ -247,7 +247,11 @@ export default function Page() {
           {downloadUrl && (
             <div style={{ marginTop: 14, padding: 12, borderRadius: 12, border: "1px solid rgba(255,255,255,0.14)", background: "rgba(0,0,0,0.25)" }}>
               <b>Download:</b>{" "}
-              <a href={downloadUrl} target="_blank" rel="noreferrer" style={{ color: "white", textDecoration: "underline" }}>
+              <a
+                href={downloadUrl}
+                download
+                style={{ color: "white", textDecoration: "underline" }}
+              >
                 tailored_resume.docx
               </a>
             </div>
