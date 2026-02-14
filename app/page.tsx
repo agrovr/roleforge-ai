@@ -252,7 +252,13 @@ export default function Page() {
           )}
         </header>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: 16 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            gap: 16,
+          }}
+        >
           <Card title="Inputs">
             <div style={{ display: "grid", gap: 12 }}>
               <div>
