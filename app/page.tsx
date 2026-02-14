@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 type AtsIssue = { severity: string; issue: string; fix: string };
 type AtsReport = { issues: AtsIssue[] };
