@@ -562,7 +562,7 @@ export default function Page() {
         <div className="rt-content-grid" style={styles.contentGrid}>
           <Card
             title="Resume + role input"
-            description="Everything needed to run the tailoring flow. This section is now more spaced out and easier to use on smaller screens."
+            description="Everything needed to run the tailoring flow."
             right={<span style={styles.chip}>{file ? "Resume selected" : "Upload a .docx"}</span>}
           >
             <div style={styles.fieldStack}>
