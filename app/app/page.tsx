@@ -30,26 +30,48 @@ type ExportResponse = { saved_to: string; download_filename: string };
 const styles = {
   page: {
     minHeight: "100vh",
-    padding: "clamp(18px, 3vw, 36px)",
+    padding: "clamp(14px, 3vw, 30px)",
     background:
       "radial-gradient(1200px 700px at 10% 0%, rgba(99,102,241,0.22), transparent 60%), radial-gradient(900px 540px at 100% 8%, rgba(14,165,233,0.16), transparent 55%), radial-gradient(900px 700px at 50% 100%, rgba(236,72,153,0.12), transparent 52%), linear-gradient(180deg, #07111f 0%, #060b16 100%)",
     color: "#f8fafc",
   } as React.CSSProperties,
 
   shell: {
-    maxWidth: 1240,
+    maxWidth: 1280,
     margin: "0 auto",
+    display: "grid",
+    gap: 18,
+  } as React.CSSProperties,
+
+  topbar: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    flexWrap: "wrap",
+    padding: "14px 16px",
+    borderRadius: 22,
+    border: "1px solid rgba(255,255,255,0.1)",
+    background: "rgba(8,15,30,0.65)",
+    backdropFilter: "blur(12px)",
   } as React.CSSProperties,
 
   hero: {
     position: "relative",
     overflow: "hidden",
-    borderRadius: 28,
-    padding: "clamp(20px, 4vw, 34px)",
+    borderRadius: 30,
+    padding: "clamp(18px, 4vw, 32px)",
     border: "1px solid rgba(255,255,255,0.12)",
-    background: "linear-gradient(180deg, rgba(10,18,35,0.9) 0%, rgba(11,18,32,0.72) 100%)",
+    background: "linear-gradient(180deg, rgba(10,18,35,0.92) 0%, rgba(11,18,32,0.75) 100%)",
     boxShadow: "0 30px 80px rgba(0,0,0,0.28)",
     backdropFilter: "blur(14px)",
+  } as React.CSSProperties,
+
+  heroGrid: {
+    display: "grid",
+    gap: 20,
+    alignItems: "end",
+    gridTemplateColumns: "minmax(0, 1.2fr) minmax(280px, 0.8fr)",
   } as React.CSSProperties,
 
   badge: {
@@ -61,39 +83,52 @@ const styles = {
     border: "1px solid rgba(255,255,255,0.14)",
     background: "rgba(255,255,255,0.06)",
     fontSize: 12,
-    fontWeight: 700,
+    fontWeight: 800,
     letterSpacing: 0.35,
     textTransform: "uppercase",
   } as React.CSSProperties,
 
   title: {
     margin: "16px 0 10px",
-    fontSize: "clamp(2rem, 5vw, 3.5rem)",
-    lineHeight: 1.02,
-    letterSpacing: -1.4,
+    fontSize: "clamp(2rem, 5vw, 4rem)",
+    lineHeight: 0.98,
+    letterSpacing: -1.8,
     maxWidth: 820,
   } as React.CSSProperties,
 
   subtitle: {
     margin: 0,
-    maxWidth: 720,
-    lineHeight: 1.7,
+    maxWidth: 760,
+    lineHeight: 1.75,
     color: "rgba(226,232,240,0.8)",
     fontSize: "clamp(0.96rem, 1.7vw, 1.08rem)",
   } as React.CSSProperties,
 
   heroStats: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
     gap: 12,
     marginTop: 24,
   } as React.CSSProperties,
 
   statCard: {
-    padding: "14px 16px",
+    padding: "15px 16px",
     borderRadius: 18,
     border: "1px solid rgba(255,255,255,0.1)",
     background: "rgba(255,255,255,0.04)",
+  } as React.CSSProperties,
+
+  spotlightStack: {
+    display: "grid",
+    gap: 12,
+  } as React.CSSProperties,
+
+  spotlightCard: {
+    padding: 16,
+    borderRadius: 20,
+    border: "1px solid rgba(255,255,255,0.1)",
+    background: "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.035))",
+    boxShadow: "0 20px 50px rgba(0,0,0,0.18)",
   } as React.CSSProperties,
 
   actionBar: {
@@ -102,7 +137,7 @@ const styles = {
     justifyContent: "space-between",
     gap: 14,
     flexWrap: "wrap",
-    marginTop: 28,
+    marginTop: 24,
     paddingTop: 18,
     borderTop: "1px solid rgba(255,255,255,0.08)",
   } as React.CSSProperties,
@@ -111,12 +146,12 @@ const styles = {
     border: "1px solid rgba(129,140,248,0.45)",
     background: disabled
       ? "rgba(255,255,255,0.08)"
-      : "linear-gradient(135deg, rgba(99,102,241,0.85), rgba(14,165,233,0.75))",
+      : "linear-gradient(135deg, rgba(99,102,241,0.92), rgba(14,165,233,0.82))",
     color: "white",
     borderRadius: 16,
     padding: "14px 18px",
     minHeight: 52,
-    minWidth: 230,
+    minWidth: 220,
     fontWeight: 800,
     letterSpacing: 0.2,
     cursor: disabled ? "not-allowed" : "pointer",
@@ -137,7 +172,6 @@ const styles = {
   contentGrid: {
     display: "grid",
     gap: 18,
-    marginTop: 18,
     gridTemplateColumns: "minmax(0, 1.1fr) minmax(320px, 0.9fr)",
   } as React.CSSProperties,
 
@@ -166,15 +200,15 @@ const styles = {
 
   cardTitle: {
     margin: 0,
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: 800,
-    letterSpacing: -0.3,
+    letterSpacing: -0.35,
   } as React.CSSProperties,
 
   cardText: {
     margin: "6px 0 0",
     color: "rgba(226,232,240,0.72)",
-    lineHeight: 1.55,
+    lineHeight: 1.6,
     fontSize: 14,
   } as React.CSSProperties,
 
@@ -236,7 +270,7 @@ const styles = {
     padding: "14px 14px",
     outline: "none",
     fontSize: 14,
-    lineHeight: 1.6,
+    lineHeight: 1.65,
     resize: "vertical",
     minHeight: 220,
   } as React.CSSProperties,
@@ -250,7 +284,7 @@ const styles = {
 
   helperText: {
     fontSize: 12,
-    lineHeight: 1.55,
+    lineHeight: 1.6,
     color: "rgba(226,232,240,0.68)",
   } as React.CSSProperties,
 
@@ -298,7 +332,6 @@ const styles = {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
     gap: 18,
-    marginTop: 18,
   } as React.CSSProperties,
 
   pre: {
@@ -390,6 +423,16 @@ function Metric({ label, value, hint }: { label: string; value: string; hint: st
       </div>
       <div style={{ fontSize: 28, fontWeight: 800, marginTop: 8 }}>{value}</div>
       <div style={{ ...styles.helperText, marginTop: 4 }}>{hint}</div>
+    </div>
+  );
+}
+
+function Spotlight({ title, text }: { title: string; text: string }) {
+  return (
+    <div style={styles.spotlightCard}>
+      <div style={{ width: 38, height: 38, borderRadius: 14, background: "rgba(255,255,255,0.08)", marginBottom: 12 }} />
+      <div style={{ fontWeight: 800 }}>{title}</div>
+      <div style={{ ...styles.helperText, marginTop: 6 }}>{text}</div>
     </div>
   );
 }
@@ -501,57 +544,97 @@ export default function Page() {
   return (
     <main style={styles.page}>
       <div style={styles.shell}>
-        <section style={styles.hero}>
-          <span style={styles.badge}>AI Resume Tailoring Studio</span>
-          <h1 style={styles.title}>Turn your resume into a cleaner, sharper, ATS-ready version.</h1>
-          <p style={styles.subtitle}>
-            Upload your resume, add a job description, and generate a tailored version with a clearer fit score,
-            stronger keyword coverage, and a much cleaner interface on desktop and mobile.
-          </p>
-
-          <div style={styles.heroStats}>
-            <div style={styles.statCard}>
-              <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 0.35, color: "rgba(191,219,254,0.85)" }}>
-                Resume
-              </div>
-              <div style={{ fontSize: 16, fontWeight: 800, marginTop: 8 }}>{file ? file.name : "No file selected"}</div>
+        <div style={styles.topbar}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <div
+              style={{
+                width: 42,
+                height: 42,
+                borderRadius: 14,
+                display: "grid",
+                placeItems: "center",
+                fontWeight: 900,
+                background: "linear-gradient(135deg, rgba(99,102,241,0.95), rgba(14,165,233,0.9))",
+              }}
+            >
+              RT
             </div>
-            <div style={styles.statCard}>
-              <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 0.35, color: "rgba(191,219,254,0.85)" }}>
-                Status
-              </div>
-              <div style={{ fontSize: 16, fontWeight: 800, marginTop: 8 }}>
-                {busy ? "Working..." : downloadUrl ? "Export ready" : result ? "Ready to download" : "Waiting for input"}
-              </div>
-            </div>
-            <div style={styles.statCard}>
-              <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 0.35, color: "rgba(191,219,254,0.85)" }}>
-                Fit score
-              </div>
-              <div style={{ fontSize: 16, fontWeight: 800, marginTop: 8 }}>{score !== null ? `${score}/100` : "Not generated yet"}</div>
+            <div>
+              <div style={{ fontWeight: 800 }}>Resume Tailor Studio</div>
+              <div style={{ ...styles.helperText, marginTop: 2 }}>Cleaner workflow for role-based resume optimization</div>
             </div>
           </div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <a href="/" style={{ ...styles.secondaryBtn, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
+              Landing page
+            </a>
+            <span style={styles.chip}>{baseUrl ? "Backend connected" : "Backend missing"}</span>
+          </div>
+        </div>
 
-          <div style={styles.actionBar}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-              <span style={styles.chip}>{baseUrl ? "Backend connected" : "Backend missing"}</span>
-              <span style={styles.chip}>{jdText.trim() || jdUrl.trim() ? "JD added" : "Add a job description"}</span>
-              {resumeId ? <span style={styles.chip}>Resume ID ready</span> : null}
+        <section style={styles.hero}>
+          <div className="rt-hero-grid" style={styles.heroGrid}>
+            <div>
+              <span style={styles.badge}>AI Resume Tailoring Studio</span>
+              <h1 style={styles.title}>A more polished resume tailoring workspace for desktop and mobile.</h1>
+              <p style={styles.subtitle}>
+                Upload your resume, add a job description, generate a tailored version, and review fit insights in a
+                cleaner interface with better spacing, stronger hierarchy, and easier scanning on smaller screens.
+              </p>
+
+              <div style={styles.heroStats}>
+                <div style={styles.statCard}>
+                  <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 0.35, color: "rgba(191,219,254,0.85)" }}>
+                    Resume
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 800, marginTop: 8, wordBreak: "break-word" }}>
+                    {file ? file.name : "No file selected"}
+                  </div>
+                </div>
+                <div style={styles.statCard}>
+                  <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 0.35, color: "rgba(191,219,254,0.85)" }}>
+                    Status
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 800, marginTop: 8 }}>
+                    {busy ? "Working..." : downloadUrl ? "Export ready" : result ? "Ready to download" : "Waiting for input"}
+                  </div>
+                </div>
+                <div style={styles.statCard}>
+                  <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 0.35, color: "rgba(191,219,254,0.85)" }}>
+                    Fit score
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 800, marginTop: 8 }}>{score !== null ? `${score}/100` : "Not generated yet"}</div>
+                </div>
+              </div>
+
+              <div style={styles.actionBar}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                  <span style={styles.chip}>{jdText.trim() || jdUrl.trim() ? "JD added" : "Add a job description"}</span>
+                  {resumeId ? <span style={styles.chip}>Resume ID ready</span> : null}
+                  {downloadUrl ? <span style={styles.chip}>Download prepared</span> : null}
+                </div>
+
+                <button
+                  onClick={onRun}
+                  disabled={busy || !baseUrl}
+                  style={styles.primaryBtn(busy || !baseUrl)}
+                  title={!baseUrl ? "Set NEXT_PUBLIC_BACKEND_URL in Vercel / .env.local" : ""}
+                >
+                  {busy ? "Tailoring resume..." : "Run tailor + export"}
+                </button>
+              </div>
             </div>
 
-            <button
-              onClick={onRun}
-              disabled={busy || !baseUrl}
-              style={styles.primaryBtn(busy || !baseUrl)}
-              title={!baseUrl ? "Set NEXT_PUBLIC_BACKEND_URL in Vercel / .env.local" : ""}
-            >
-              {busy ? "Tailoring resume..." : "Run tailor + export"}
-            </button>
+            <div style={styles.spotlightStack}>
+              <Spotlight title="Cleaner workflow" text="Input, scoring, ATS review, and export are organized into clearer cards." />
+              <Spotlight title="Better mobile feel" text="The layout collapses into a more readable single-column flow on phones." />
+              <Spotlight title="Stronger hierarchy" text="More contrast between primary actions, summary metrics, and detailed results." />
+            </div>
           </div>
         </section>
 
         {!baseUrl ? (
-          <div style={{ ...styles.card, marginTop: 18 }}>
+          <div style={styles.card}>
             <div style={{ fontWeight: 800, marginBottom: 6 }}>Backend URL missing</div>
             <div style={styles.helperText}>
               Add <code>NEXT_PUBLIC_BACKEND_URL</code> in <code>.env.local</code> or Vercel, then redeploy or restart your app.
@@ -562,7 +645,7 @@ export default function Page() {
         <div className="rt-content-grid" style={styles.contentGrid}>
           <Card
             title="Resume + role input"
-            description="Everything needed to run the tailoring flow."
+            description="Everything needed to run the tailoring flow, with cleaner spacing and a more guided layout."
             right={<span style={styles.chip}>{file ? "Resume selected" : "Upload a .docx"}</span>}
           >
             <div style={styles.fieldStack}>
@@ -576,7 +659,7 @@ export default function Page() {
                     onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                     style={{ color: "white" }}
                   />
-                  <div style={styles.helperText}>Keep formatting ATS-friendly when possible. Simple sections work best.</div>
+                  <div style={styles.helperText}>Keep formatting simple and ATS-friendly for better results.</div>
                   {file ? <span style={{ ...styles.chip, width: "fit-content" }}>{file.name}</span> : null}
                 </div>
               </div>
@@ -590,7 +673,7 @@ export default function Page() {
                   placeholder="https://company.com/job-posting"
                   style={styles.input}
                 />
-                <div style={styles.helperText}>Use this if the job posting is publicly accessible.</div>
+                <div style={styles.helperText}>Use this when the posting is public and easy for the backend to access.</div>
               </div>
 
               <div style={styles.fieldGroup}>
@@ -614,7 +697,7 @@ export default function Page() {
                   placeholder="https://company.com"
                   style={styles.input}
                 />
-                <div style={styles.helperText}>Optional, but useful for extra company context.</div>
+                <div style={styles.helperText}>Optional, but helpful if you want additional company context.</div>
               </div>
 
               {resumeId && !downloadUrl ? (
@@ -629,7 +712,7 @@ export default function Page() {
           <div style={styles.sideStack}>
             <Card
               title="Fit score overview"
-              description="A clearer summary of how well the tailored resume matches the role."
+              description="A cleaner summary of how well the tailored resume matches the role."
               right={
                 result?.fit_score ? (
                   <span style={styles.chip}>Coverage {coverage ?? "-"} · Bonus {bonus ?? "-"}</span>
@@ -650,9 +733,7 @@ export default function Page() {
                     <div style={styles.progressInner(score ?? 0)} />
                   </div>
 
-                  {result.fit_score.note ? (
-                    <div style={{ ...styles.helperText, marginTop: 10 }}>{result.fit_score.note}</div>
-                  ) : null}
+                  {result.fit_score.note ? <div style={{ ...styles.helperText, marginTop: 10 }}>{result.fit_score.note}</div> : null}
 
                   <div style={{ marginTop: 16 }}>
                     <div style={styles.label}>Matched keywords</div>
@@ -679,7 +760,7 @@ export default function Page() {
 
             <Card
               title="ATS warnings after tailoring"
-              description="A cleaner warning list that is easier to scan on mobile."
+              description="A clearer warning list that is easier to scan on mobile."
               right={result?.ats_after ? <span style={styles.chip}>Post-tailor</span> : <span style={styles.chip}>No results yet</span>}
             >
               {result?.ats_after ? (
