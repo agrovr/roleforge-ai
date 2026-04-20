@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import React, { useMemo, useState } from "react";
 
 type AtsIssue = { severity: string; issue: string; fix: string };
@@ -26,485 +27,196 @@ type TailorResult = {
 
 type UploadResponse = { resume_id: string; filename: string };
 type ExportResponse = { saved_to: string; download_filename: string };
-type IconName = "spark" | "mobile" | "workflow";
+type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error";
+type InputMode = "text" | "url";
+type ReviewTab = "score" | "ats" | "resume" | "changes";
+type IconName = "home" | "upload" | "target" | "scan" | "download" | "copy" | "spark" | "file" | "link" | "check";
 
-const styles = {
-  page: {
-    minHeight: "100vh",
-    padding: "clamp(14px, 3vw, 30px)",
-    background:
-      "radial-gradient(1200px 700px at 10% 0%, rgba(99,102,241,0.22), transparent 60%), radial-gradient(900px 540px at 100% 8%, rgba(14,165,233,0.16), transparent 55%), radial-gradient(900px 700px at 50% 100%, rgba(236,72,153,0.12), transparent 52%), linear-gradient(180deg, #07111f 0%, #060b16 100%)",
-    color: "#f8fafc",
-  } as React.CSSProperties,
+const stages: Array<{ key: Stage; label: string }> = [
+  { key: "idle", label: "Ready" },
+  { key: "uploading", label: "Upload" },
+  { key: "tailoring", label: "Tailor" },
+  { key: "exporting", label: "Export" },
+];
 
-  shell: {
-    maxWidth: 1280,
-    margin: "0 auto",
-    display: "grid",
-    gap: 18,
-  } as React.CSSProperties,
-
-  topbar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-    flexWrap: "wrap",
-    padding: "14px 16px",
-    borderRadius: 22,
-    border: "1px solid rgba(255,255,255,0.1)",
-    background: "rgba(8,15,30,0.65)",
-    backdropFilter: "blur(12px)",
-  } as React.CSSProperties,
-
-  hero: {
-    position: "relative",
-    overflow: "hidden",
-    borderRadius: 30,
-    padding: "clamp(18px, 4vw, 32px)",
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "linear-gradient(180deg, rgba(10,18,35,0.92) 0%, rgba(11,18,32,0.75) 100%)",
-    boxShadow: "0 30px 80px rgba(0,0,0,0.28)",
-    backdropFilter: "blur(14px)",
-  } as React.CSSProperties,
-
-  heroGrid: {
-    display: "grid",
-    gap: 20,
-    alignItems: "end",
-    gridTemplateColumns: "minmax(0, 1.2fr) minmax(280px, 0.8fr)",
-  } as React.CSSProperties,
-
-  badge: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "8px 12px",
-    borderRadius: 999,
-    border: "1px solid rgba(255,255,255,0.14)",
-    background: "rgba(255,255,255,0.06)",
-    fontSize: 12,
-    fontWeight: 800,
-    letterSpacing: 0.35,
-    textTransform: "uppercase",
-  } as React.CSSProperties,
-
-  title: {
-    margin: "16px 0 10px",
-    fontSize: "clamp(2rem, 5vw, 4rem)",
-    lineHeight: 0.98,
-    letterSpacing: -1.8,
-    maxWidth: 820,
-  } as React.CSSProperties,
-
-  subtitle: {
-    margin: 0,
-    maxWidth: 760,
-    lineHeight: 1.75,
-    color: "rgba(226,232,240,0.8)",
-    fontSize: "clamp(0.96rem, 1.7vw, 1.08rem)",
-  } as React.CSSProperties,
-
-  heroStats: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-    gap: 12,
-    marginTop: 24,
-  } as React.CSSProperties,
-
-  statCard: {
-    padding: "15px 16px",
-    borderRadius: 18,
-    border: "1px solid rgba(255,255,255,0.1)",
-    background: "rgba(255,255,255,0.04)",
-  } as React.CSSProperties,
-
-  spotlightStack: {
-    display: "grid",
-    gap: 12,
-  } as React.CSSProperties,
-
-  spotlightCard: {
-    padding: 16,
-    borderRadius: 20,
-    border: "1px solid rgba(255,255,255,0.1)",
-    background: "linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.035))",
-    boxShadow: "0 20px 50px rgba(0,0,0,0.18)",
-  } as React.CSSProperties,
-
-  actionBar: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 14,
-    flexWrap: "wrap",
-    marginTop: 24,
-    paddingTop: 18,
-    borderTop: "1px solid rgba(255,255,255,0.08)",
-  } as React.CSSProperties,
-
-  primaryBtn: (disabled: boolean): React.CSSProperties => ({
-    border: "1px solid rgba(129,140,248,0.45)",
-    background: disabled
-      ? "rgba(255,255,255,0.08)"
-      : "linear-gradient(135deg, rgba(99,102,241,0.92), rgba(14,165,233,0.82))",
-    color: "white",
-    borderRadius: 16,
-    padding: "14px 18px",
-    minHeight: 52,
-    minWidth: 220,
-    fontWeight: 800,
-    letterSpacing: 0.2,
-    cursor: disabled ? "not-allowed" : "pointer",
-    boxShadow: disabled ? "none" : "0 18px 40px rgba(37,99,235,0.22)",
-  }),
-
-  secondaryBtn: {
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(255,255,255,0.06)",
-    color: "white",
-    borderRadius: 14,
-    padding: "11px 14px",
-    minHeight: 44,
-    fontWeight: 700,
-    cursor: "pointer",
-  } as React.CSSProperties,
-
-  contentGrid: {
-    display: "grid",
-    gap: 18,
-    gridTemplateColumns: "minmax(0, 1.1fr) minmax(320px, 0.9fr)",
-  } as React.CSSProperties,
-
-  sideStack: {
-    display: "grid",
-    gap: 18,
-  } as React.CSSProperties,
-
-  card: {
-    borderRadius: 24,
-    padding: "clamp(16px, 2.2vw, 22px)",
-    border: "1px solid rgba(255,255,255,0.1)",
-    background: "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.035))",
-    boxShadow: "0 22px 60px rgba(0,0,0,0.18)",
-    backdropFilter: "blur(14px)",
-  } as React.CSSProperties,
-
-  cardHeader: {
-    display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    gap: 12,
-    marginBottom: 16,
-    flexWrap: "wrap",
-  } as React.CSSProperties,
-
-  cardTitle: {
-    margin: 0,
-    fontSize: 19,
-    fontWeight: 800,
-    letterSpacing: -0.35,
-  } as React.CSSProperties,
-
-  cardText: {
-    margin: "6px 0 0",
-    color: "rgba(226,232,240,0.72)",
-    lineHeight: 1.6,
-    fontSize: 14,
-  } as React.CSSProperties,
-
-  chip: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-    padding: "7px 11px",
-    borderRadius: 999,
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(2,6,23,0.32)",
-    fontSize: 12,
-    color: "rgba(241,245,249,0.9)",
-  } as React.CSSProperties,
-
-  sectionLabel: {
-    fontSize: 12,
-    fontWeight: 800,
-    letterSpacing: 0.45,
-    textTransform: "uppercase",
-    color: "rgba(191,219,254,0.85)",
-    marginBottom: 8,
-  } as React.CSSProperties,
-
-  fieldStack: {
-    display: "grid",
-    gap: 16,
-  } as React.CSSProperties,
-
-  fieldGroup: {
-    display: "grid",
-    gap: 8,
-  } as React.CSSProperties,
-
-  label: {
-    fontSize: 14,
-    fontWeight: 700,
-    color: "rgba(248,250,252,0.95)",
-  } as React.CSSProperties,
-
-  input: {
-    width: "100%",
-    borderRadius: 16,
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(2,6,23,0.38)",
-    color: "white",
-    padding: "13px 14px",
-    outline: "none",
-    fontSize: 14,
-    minHeight: 50,
-  } as React.CSSProperties,
-
-  textarea: {
-    width: "100%",
-    borderRadius: 18,
-    border: "1px solid rgba(255,255,255,0.12)",
-    background: "rgba(2,6,23,0.38)",
-    color: "white",
-    padding: "14px 14px",
-    outline: "none",
-    fontSize: 14,
-    lineHeight: 1.65,
-    resize: "vertical",
-    minHeight: 220,
-  } as React.CSSProperties,
-
-  uploadBox: {
-    borderRadius: 18,
-    padding: 16,
-    border: "1px dashed rgba(255,255,255,0.2)",
-    background: "rgba(255,255,255,0.03)",
-  } as React.CSSProperties,
-
-  helperText: {
-    fontSize: 12,
-    lineHeight: 1.6,
-    color: "rgba(226,232,240,0.68)",
-  } as React.CSSProperties,
-
-  infoGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-    gap: 12,
-  } as React.CSSProperties,
-
-  infoTile: {
-    borderRadius: 18,
-    padding: 14,
-    border: "1px solid rgba(255,255,255,0.1)",
-    background: "rgba(255,255,255,0.04)",
-  } as React.CSSProperties,
-
-  progressOuter: {
-    height: 12,
-    borderRadius: 999,
-    border: "1px solid rgba(255,255,255,0.12)",
-    overflow: "hidden",
-    background: "rgba(2,6,23,0.42)",
-    marginTop: 12,
-  } as React.CSSProperties,
-
-  progressInner: (pct: number): React.CSSProperties => ({
-    width: `${Math.max(0, Math.min(100, pct))}%`,
-    height: "100%",
-    background: "linear-gradient(90deg, rgba(52,211,153,0.92), rgba(59,130,246,0.92))",
-  }),
-
-  warningStack: {
-    display: "grid",
-    gap: 10,
-  } as React.CSSProperties,
-
-  warningCard: {
-    padding: 12,
-    borderRadius: 16,
-    border: "1px solid rgba(255,255,255,0.1)",
-    background: "rgba(2,6,23,0.34)",
-  } as React.CSSProperties,
-
-  resultGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-    gap: 18,
-  } as React.CSSProperties,
-
-  pre: {
-    whiteSpace: "pre-wrap",
-    margin: 0,
-    fontSize: 13,
-    lineHeight: 1.65,
-    background: "rgba(2,6,23,0.42)",
-    border: "1px solid rgba(255,255,255,0.08)",
-    borderRadius: 18,
-    padding: 14,
-    maxHeight: 460,
-    overflow: "auto",
-  } as React.CSSProperties,
-
-  linkBtn: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    minHeight: 46,
-    borderRadius: 14,
-    padding: "10px 14px",
-    fontWeight: 800,
-    color: "white",
-    textDecoration: "none",
-    border: "1px solid rgba(74,222,128,0.28)",
-    background: "linear-gradient(135deg, rgba(34,197,94,0.2), rgba(16,185,129,0.16))",
-  } as React.CSSProperties,
-};
-
-function Pill({ text, kind }: { text: string; kind: "good" | "bad" }) {
-  return (
-    <span
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        padding: "6px 10px",
-        margin: "0 8px 8px 0",
-        borderRadius: 999,
-        fontSize: 12,
-        fontWeight: 700,
-        border:
-          kind === "good"
-            ? "1px solid rgba(74,222,128,0.35)"
-            : "1px solid rgba(251,113,133,0.34)",
-        background:
-          kind === "good"
-            ? "rgba(22,163,74,0.12)"
-            : "rgba(225,29,72,0.12)",
-        color: "white",
-      }}
-    >
-      {text}
-    </span>
-  );
-}
-
-function Card({
-  title,
-  description,
-  right,
-  children,
-}: {
-  title: string;
-  description?: string;
-  right?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <section style={styles.card}>
-      <div style={styles.cardHeader}>
-        <div>
-          <h2 style={styles.cardTitle}>{title}</h2>
-          {description ? <p style={styles.cardText}>{description}</p> : null}
-        </div>
-        {right}
-      </div>
-      <div>{children}</div>
-    </section>
-  );
-}
-
-function Metric({ label, value, hint }: { label: string; value: string; hint: string }) {
-  return (
-    <div style={styles.infoTile}>
-      <div style={{ fontSize: 12, color: "rgba(191,219,254,0.82)", textTransform: "uppercase", letterSpacing: 0.35 }}>
-        {label}
-      </div>
-      <div style={{ fontSize: 28, fontWeight: 800, marginTop: 8 }}>{value}</div>
-      <div style={{ ...styles.helperText, marginTop: 4 }}>{hint}</div>
-    </div>
-  );
-}
-
-function Glyph({ name, size = 18 }: { name: IconName; size?: number }) {
-  const common: React.CSSProperties = { width: size, height: size, display: "block" };
-
-  if (name === "mobile") {
+function Icon({ name }: { name: IconName }) {
+  if (name === "home") {
     return (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" style={common}>
-        <rect x="7" y="2.5" width="10" height="19" rx="2.5" />
-        <path d="M10 5.5h4" />
-        <path d="M11 18.5h2" />
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="m3 11 9-8 9 8" />
+        <path d="M5 10v10h14V10" />
       </svg>
     );
   }
 
-  if (name === "workflow") {
+  if (name === "upload") {
     return (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" style={common}>
-        <path d="M6 6h12" />
-        <path d="M6 12h7" />
-        <path d="M6 18h10" />
-        <circle cx="16.5" cy="12" r="1.5" fill="currentColor" stroke="none" />
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M12 16V4" />
+        <path d="m7 9 5-5 5 5" />
+        <path d="M5 20h14" />
+      </svg>
+    );
+  }
+
+  if (name === "target") {
+    return (
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="8" />
+        <circle cx="12" cy="12" r="3" />
+        <path d="M12 2v3" />
+        <path d="M12 19v3" />
+        <path d="M2 12h3" />
+        <path d="M19 12h3" />
+      </svg>
+    );
+  }
+
+  if (name === "scan") {
+    return (
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M4 8V5a1 1 0 0 1 1-1h3" />
+        <path d="M16 4h3a1 1 0 0 1 1 1v3" />
+        <path d="M20 16v3a1 1 0 0 1-1 1h-3" />
+        <path d="M8 20H5a1 1 0 0 1-1-1v-3" />
+        <path d="M7 12h10" />
+      </svg>
+    );
+  }
+
+  if (name === "download") {
+    return (
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M12 4v12" />
+        <path d="m7 11 5 5 5-5" />
+        <path d="M5 20h14" />
+      </svg>
+    );
+  }
+
+  if (name === "copy") {
+    return (
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <rect x="9" y="9" width="11" height="11" rx="2" />
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+      </svg>
+    );
+  }
+
+  if (name === "file") {
+    return (
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+        <path d="M14 2v6h6" />
+        <path d="M8 13h8" />
+        <path d="M8 17h6" />
+      </svg>
+    );
+  }
+
+  if (name === "link") {
+    return (
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1" />
+        <path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1" />
+      </svg>
+    );
+  }
+
+  if (name === "check") {
+    return (
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="m5 12 4 4L19 6" />
       </svg>
     );
   }
 
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" style={common}>
+    <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z" />
     </svg>
   );
 }
 
-function IconBadge({ name }: { name: IconName }) {
+function StatusPill({ ok, text }: { ok: boolean; text: string }) {
   return (
-    <div
-      style={{
-        width: 38,
-        height: 38,
-        borderRadius: 14,
-        marginBottom: 12,
-        display: "grid",
-        placeItems: "center",
-        color: "rgba(255,255,255,0.96)",
-        background: "linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06))",
-        border: "1px solid rgba(255,255,255,0.12)",
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
-      }}
-    >
-      <Glyph name={name} />
+    <span className="status-pill">
+      <span className={ok ? "status-dot good" : "status-dot"} />
+      {text}
+    </span>
+  );
+}
+
+function Panel({
+  title,
+  description,
+  action,
+  children,
+}: {
+  title: string;
+  description?: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="panel">
+      <div className="panel-header">
+        <div>
+          <h2 className="panel-title">{title}</h2>
+          {description ? <p className="panel-copy">{description}</p> : null}
+        </div>
+        {action}
+      </div>
+      <div className="panel-body">{children}</div>
+    </section>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="metric">
+      <div className="metric-label">{label}</div>
+      <div className="metric-value">{value}</div>
     </div>
   );
 }
 
-function Spotlight({ icon, title, text }: { icon: IconName; title: string; text: string }) {
-  return (
-    <div style={styles.spotlightCard}>
-      <IconBadge name={icon} />
-      <div style={{ fontWeight: 800 }}>{title}</div>
-      <div style={{ ...styles.helperText, marginTop: 6 }}>{text}</div>
-    </div>
-  );
+function Pill({ text, kind }: { text: string; kind: "good" | "bad" }) {
+  return <span className={`pill ${kind}`}>{text}</span>;
 }
 
 export default function Page() {
   const baseUrl = useMemo(() => {
-    const v = process.env.NEXT_PUBLIC_BACKEND_URL;
-    return v && v.trim() ? v.trim() : "";
+    const value = process.env.NEXT_PUBLIC_BACKEND_URL;
+    return value && value.trim() ? value.trim() : "";
   }, []);
 
   const [file, setFile] = useState<File | null>(null);
+  const [inputMode, setInputMode] = useState<InputMode>("text");
   const [jdUrl, setJdUrl] = useState("");
   const [jdText, setJdText] = useState("");
   const [companyUrl, setCompanyUrl] = useState("");
   const [busy, setBusy] = useState(false);
+  const [stage, setStage] = useState<Stage>("idle");
+  const [dragActive, setDragActive] = useState(false);
+  const [activeTab, setActiveTab] = useState<ReviewTab>("score");
+  const [copyState, setCopyState] = useState("");
+  const [error, setError] = useState("");
 
   const [resumeId, setResumeId] = useState<string | null>(null);
   const [result, setResult] = useState<TailorResult | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+
+  const hasTarget = Boolean(jdUrl.trim() || jdText.trim());
+  const readyItems = [Boolean(baseUrl), Boolean(file), hasTarget];
+  const readiness = Math.round((readyItems.filter(Boolean).length / readyItems.length) * 100);
+  const canRun = Boolean(baseUrl && file && hasTarget && !busy);
+
+  const score = result?.fit_score?.score ?? 0;
+  const presentKeywords = result?.fit_score?.present ?? [];
+  const missingKeywords = result?.fit_score?.missing ?? [];
+  const topKeywords = result?.fit_score?.top_keywords ?? [];
+  const atsIssues = result?.ats_after?.issues ?? [];
 
   async function upload(): Promise<string> {
     if (!baseUrl) throw new Error("Missing NEXT_PUBLIC_BACKEND_URL in .env.local");
@@ -513,10 +225,10 @@ export default function Page() {
     const form = new FormData();
     form.append("file", file);
 
-    const r = await fetch(`${baseUrl}/upload`, { method: "POST", body: form });
-    if (!r.ok) throw new Error("Upload failed");
+    const response = await fetch(`${baseUrl}/upload`, { method: "POST", body: form });
+    if (!response.ok) throw new Error("Upload failed");
 
-    const data = (await r.json()) as UploadResponse;
+    const data = (await response.json()) as UploadResponse;
     setResumeId(data.resume_id);
     return data.resume_id;
   }
@@ -524,8 +236,7 @@ export default function Page() {
   async function tailor(resume_id: string): Promise<TailorResult> {
     if (!baseUrl) throw new Error("Missing NEXT_PUBLIC_BACKEND_URL in .env.local");
 
-    const isHttp = (s: string) => /^https?:\/\//i.test(s.trim());
-
+    const isHttp = (value: string) => /^https?:\/\//i.test(value.trim());
     const payload: {
       resume_id: string;
       jd_url?: string;
@@ -537,14 +248,14 @@ export default function Page() {
     if (jdText.trim()) payload.jd_text = jdText.trim();
     if (companyUrl.trim() && isHttp(companyUrl)) payload.company_url = companyUrl.trim();
 
-    const r = await fetch(`${baseUrl}/tailor`, {
+    const response = await fetch(`${baseUrl}/tailor`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    if (!r.ok) throw new Error("Tailor failed");
+    if (!response.ok) throw new Error("Tailor failed");
 
-    const data = (await r.json()) as TailorResult;
+    const data = (await response.json()) as TailorResult;
     setResult(data);
     return data;
   }
@@ -552,325 +263,429 @@ export default function Page() {
   async function exportDocx(tailoredText: string): Promise<string> {
     if (!baseUrl) throw new Error("Missing NEXT_PUBLIC_BACKEND_URL in .env.local");
 
-    const payload = {
-      filename: "tailored_resume.docx",
-      title: "TAILORED RESUME",
-      content: tailoredText,
-    };
-
-    const r = await fetch(`${baseUrl}/export`, {
+    const response = await fetch(`${baseUrl}/export`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        filename: "tailored_resume.docx",
+        title: "TAILORED RESUME",
+        content: tailoredText,
+      }),
     });
-    if (!r.ok) throw new Error("Export failed");
+    if (!response.ok) throw new Error("Export failed");
 
-    const data = (await r.json()) as ExportResponse;
+    const data = (await response.json()) as ExportResponse;
     const url = `${baseUrl}/download/${data.download_filename}`;
     setDownloadUrl(url);
     return url;
   }
 
   async function onRun() {
+    if (!canRun) return;
+
     setBusy(true);
+    setError("");
     setResult(null);
     setDownloadUrl(null);
+    setCopyState("");
 
     try {
+      setStage("uploading");
       const id = await upload();
-      const out = await tailor(id);
-      await exportDocx(out.tailored_text);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Error";
-      alert(msg);
+      setStage("tailoring");
+      const output = await tailor(id);
+      setStage("exporting");
+      await exportDocx(output.tailored_text);
+      setStage("ready");
+      setActiveTab("score");
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : "Something went wrong";
+      setError(message);
+      setStage("error");
     } finally {
       setBusy(false);
     }
   }
 
-  const score = result?.fit_score?.score ?? null;
-  const coverage = result?.fit_score?.coverage_ratio;
-  const bonus = result?.fit_score?.heading_bonus;
-  const presentCount = result?.fit_score?.present?.length ?? 0;
-  const missingCount = result?.fit_score?.missing?.length ?? 0;
+  function onDrop(event: React.DragEvent<HTMLLabelElement>) {
+    event.preventDefault();
+    setDragActive(false);
+    const droppedFile = event.dataTransfer.files?.[0];
+    if (droppedFile) setFile(droppedFile);
+  }
+
+  async function copyDownloadUrl() {
+    if (!downloadUrl) return;
+    try {
+      await navigator.clipboard.writeText(downloadUrl);
+      setCopyState("Copied");
+      window.setTimeout(() => setCopyState(""), 1600);
+    } catch {
+      setCopyState("Copy failed");
+    }
+  }
 
   return (
-    <main style={styles.page}>
-      <div style={styles.shell}>
-        <div style={styles.topbar}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-            <div
-              style={{
-                width: 42,
-                height: 42,
-                borderRadius: 14,
-                display: "grid",
-                placeItems: "center",
-                fontWeight: 900,
-                background: "linear-gradient(135deg, rgba(99,102,241,0.95), rgba(14,165,233,0.9))",
-              }}
-            >
-              RT
+    <main className="page-shell">
+      <div className="app-shell">
+        <header className="app-topbar">
+          <Link className="brand" href="/" aria-label="Resume Tailor home">
+            <span className="brand-mark">RT</span>
+            <span>
+              <span className="brand-name">Resume Tailor Studio</span>
+              <span className="brand-kicker">Document-first AI workflow</span>
+            </span>
+          </Link>
+
+          <div className="readiness" aria-label="Workspace readiness">
+            <div className="readiness-meta">
+              <span>Run readiness</span>
+              <span>{readiness}%</span>
             </div>
-            <div>
-              <div style={{ fontWeight: 800 }}>Resume Tailor Studio</div>
-              <div style={{ ...styles.helperText, marginTop: 2 }}>Cleaner workflow for role-based resume optimization</div>
+            <div className="meter">
+              <div className="meter-fill" style={{ width: `${readiness}%` }} />
             </div>
           </div>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <a href="/" style={{ ...styles.secondaryBtn, textDecoration: "none", display: "inline-flex", alignItems: "center" }}>
-              Landing page
+
+          <div className="nav-links">
+            <Link className="icon-button" href="/" aria-label="Landing page" title="Landing page">
+              <Icon name="home" />
+            </Link>
+            <StatusPill ok={Boolean(baseUrl)} text={baseUrl ? "Backend connected" : "Backend missing"} />
+          </div>
+        </header>
+
+        <div className="workspace">
+          <aside className="rail" aria-label="Workspace sections">
+            <a className="rail-item" href="#input">
+              <Icon name="upload" /> Input
             </a>
-            <span style={styles.chip}>{baseUrl ? "Backend connected" : "Backend missing"}</span>
-          </div>
-        </div>
+            <a className="rail-item" href="#target">
+              <Icon name="target" /> Target
+            </a>
+            <a className="rail-item" href="#review">
+              <Icon name="scan" /> Review
+            </a>
+            <a className="rail-item" href="#export">
+              <Icon name="download" /> Export
+            </a>
+          </aside>
 
-        <section style={styles.hero}>
-          <div className="rt-hero-grid" style={styles.heroGrid}>
-            <div>
-              <span style={styles.badge}>AI Resume Tailoring Studio</span>
-              <h1 style={styles.title}>A more polished resume tailoring workspace for desktop and mobile.</h1>
-              <p style={styles.subtitle}>
-                Upload your resume, add a job description, generate a tailored version, and review fit insights in a
-                cleaner interface with better spacing, stronger hierarchy, and easier scanning on smaller screens.
-              </p>
-
-              <div style={styles.heroStats}>
-                <div style={styles.statCard}>
-                  <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 0.35, color: "rgba(191,219,254,0.85)" }}>
-                    Resume
-                  </div>
-                  <div style={{ fontSize: 16, fontWeight: 800, marginTop: 8, wordBreak: "break-word" }}>
-                    {file ? file.name : "No file selected"}
-                  </div>
-                </div>
-                <div style={styles.statCard}>
-                  <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 0.35, color: "rgba(191,219,254,0.85)" }}>
-                    Status
-                  </div>
-                  <div style={{ fontSize: 16, fontWeight: 800, marginTop: 8 }}>
-                    {busy ? "Working..." : downloadUrl ? "Export ready" : result ? "Ready to download" : "Waiting for input"}
-                  </div>
-                </div>
-                <div style={styles.statCard}>
-                  <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 0.35, color: "rgba(191,219,254,0.85)" }}>
-                    Fit score
-                  </div>
-                  <div style={{ fontSize: 16, fontWeight: 800, marginTop: 8 }}>{score !== null ? `${score}/100` : "Not generated yet"}</div>
+          <div className="input-stack">
+            {!baseUrl ? (
+              <div className="panel">
+                <div className="panel-body">
+                  <StatusPill ok={false} text="Backend URL missing" />
+                  <p className="panel-copy">
+                    Add <code>NEXT_PUBLIC_BACKEND_URL</code> in <code>.env.local</code> or Vercel, then restart the app so the workflow can call your API.
+                  </p>
                 </div>
               </div>
+            ) : null}
 
-              <div style={styles.actionBar}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                  <span style={styles.chip}>{jdText.trim() || jdUrl.trim() ? "JD added" : "Add a job description"}</span>
-                  {resumeId ? <span style={styles.chip}>Resume ID ready</span> : null}
-                  {downloadUrl ? <span style={styles.chip}>Download prepared</span> : null}
-                </div>
-
-                <button
-                  onClick={onRun}
-                  disabled={busy || !baseUrl}
-                  style={styles.primaryBtn(busy || !baseUrl)}
-                  title={!baseUrl ? "Set NEXT_PUBLIC_BACKEND_URL in Vercel / .env.local" : ""}
-                >
-                  {busy ? "Tailoring resume..." : "Run tailor + export"}
-                </button>
-              </div>
-            </div>
-
-            <div style={styles.spotlightStack}>
-              <Spotlight icon="workflow" title="Cleaner workflow" text="Input, scoring, ATS review, and export are organized into clearer cards." />
-              <Spotlight icon="mobile" title="Better mobile feel" text="The layout collapses into a more readable single-column flow on phones." />
-              <Spotlight icon="spark" title="Stronger hierarchy" text="More contrast between primary actions, summary metrics, and detailed results." />
-            </div>
-          </div>
-        </section>
-
-        {!baseUrl ? (
-          <div style={styles.card}>
-            <div style={{ fontWeight: 800, marginBottom: 6 }}>Backend URL missing</div>
-            <div style={styles.helperText}>
-              Add <code>NEXT_PUBLIC_BACKEND_URL</code> in <code>.env.local</code> or Vercel, then redeploy or restart your app.
-            </div>
-          </div>
-        ) : null}
-
-        <div className="rt-content-grid" style={styles.contentGrid}>
-          <Card
-            title="Resume + role input"
-            description="Everything needed to run the tailoring flow."
-            right={<span style={styles.chip}>{file ? "Resume selected" : "Upload a .docx"}</span>}
-          >
-            <div style={styles.fieldStack}>
-              <div style={styles.uploadBox}>
-                <div style={styles.sectionLabel}>Step 1</div>
-                <div style={styles.fieldGroup}>
-                  <label style={styles.label}>Upload your resume (.docx)</label>
-                  <input
-                    type="file"
-                    accept=".docx"
-                    onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                    style={{ color: "white" }}
-                  />
-                  <div style={styles.helperText}>Keep formatting simple and ATS-friendly for better results.</div>
-                  {file ? <span style={{ ...styles.chip, width: "fit-content" }}>{file.name}</span> : null}
-                </div>
-              </div>
-
-              <div style={styles.fieldGroup}>
-                <div style={styles.sectionLabel}>Step 2</div>
-                <label style={styles.label}>Job description URL</label>
+            <Panel
+              title="Resume intake"
+              description="Drop in a DOCX resume and confirm the file before running the agent workflow."
+              action={<StatusPill ok={Boolean(file)} text={file ? "File selected" : "Needs file"} />}
+            >
+              <label
+                id="input"
+                className={dragActive ? "dropzone active" : "dropzone"}
+                onDragEnter={() => setDragActive(true)}
+                onDragOver={(event) => event.preventDefault()}
+                onDragLeave={() => setDragActive(false)}
+                onDrop={onDrop}
+              >
                 <input
-                  value={jdUrl}
-                  onChange={(e) => setJdUrl(e.target.value)}
-                  placeholder="https://company.com/job-posting"
-                  style={styles.input}
+                  type="file"
+                  accept=".docx"
+                  onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+                  aria-label="Upload resume DOCX"
                 />
-                <div style={styles.helperText}>Use this when the posting is public and easy for the backend to access.</div>
-              </div>
+                <span className="drop-main">
+                  <span className="drop-icon">
+                    <Icon name="file" />
+                  </span>
+                  <span>
+                    <span className="drop-title">{file ? file.name : "Drop your resume here"}</span>
+                    <span className="drop-hint">{file ? "Ready for upload. Choose another file to replace it." : "DOCX files work best with the current backend export flow."}</span>
+                  </span>
+                </span>
+              </label>
 
-              <div style={styles.fieldGroup}>
-                <div style={styles.sectionLabel}>Step 3</div>
-                <label style={styles.label}>Paste the job description instead</label>
-                <textarea
-                  value={jdText}
-                  onChange={(e) => setJdText(e.target.value)}
-                  rows={10}
-                  placeholder="Paste the job description here for a more direct tailoring pass..."
-                  style={styles.textarea}
-                />
-              </div>
-
-              <div style={styles.fieldGroup}>
-                <div style={styles.sectionLabel}>Step 4</div>
-                <label style={styles.label}>Company URL</label>
-                <input
-                  value={companyUrl}
-                  onChange={(e) => setCompanyUrl(e.target.value)}
-                  placeholder="https://company.com"
-                  style={styles.input}
-                />
-                <div style={styles.helperText}>Optional, but helpful if you want additional company context.</div>
-              </div>
-
-              {resumeId && !downloadUrl ? (
-                <div style={{ ...styles.infoTile, padding: 12 }}>
-                  <div style={{ fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.35 }}>Current resume ID</div>
-                  <div style={{ marginTop: 6, wordBreak: "break-word", fontSize: 13 }}>{resumeId}</div>
+              <div className="quick-grid" aria-label="Input checklist">
+                <div className="quick-card">
+                  <strong>Formatting</strong>
+                  <span>Simple headings and clean bullets improve ATS parsing.</span>
                 </div>
-              ) : null}
-            </div>
-          </Card>
+                <div className="quick-card">
+                  <strong>Targeting</strong>
+                  <span>Use the pasted job description when a job page is gated or dynamic.</span>
+                </div>
+              </div>
+            </Panel>
 
-          <div style={styles.sideStack}>
-            <Card
-              title="Fit score overview"
-              description="A cleaner summary of how well the tailored resume matches the role."
-              right={
-                result?.fit_score ? (
-                  <span style={styles.chip}>Coverage {coverage ?? "-"} · Bonus {bonus ?? "-"}</span>
+            <Panel
+              title="Role target"
+              description="Give the agent a clear target role, then add company context when it matters."
+              action={<StatusPill ok={hasTarget} text={hasTarget ? "Target ready" : "Needs target"} />}
+            >
+              <div id="target" className="input-stack">
+                <div className="segment" role="tablist" aria-label="Job description input mode">
+                  <button className={inputMode === "text" ? "active" : ""} type="button" onClick={() => setInputMode("text")}>
+                    Paste text
+                  </button>
+                  <button className={inputMode === "url" ? "active" : ""} type="button" onClick={() => setInputMode("url")}>
+                    Use URL
+                  </button>
+                </div>
+
+                {inputMode === "text" ? (
+                  <div className="field">
+                    <label htmlFor="jdText">Job description</label>
+                    <textarea
+                      id="jdText"
+                      value={jdText}
+                      onChange={(event) => setJdText(event.target.value)}
+                      placeholder="Paste the full job description here..."
+                    />
+                    <p className="field-hint">Pasted text gives the backend the most reliable role signal.</p>
+                  </div>
                 ) : (
-                  <span style={styles.chip}>Run tailoring first</span>
+                  <div className="field">
+                    <label htmlFor="jdUrl">Job posting URL</label>
+                    <input
+                      id="jdUrl"
+                      value={jdUrl}
+                      onChange={(event) => setJdUrl(event.target.value)}
+                      placeholder="https://company.com/careers/job"
+                    />
+                    <p className="field-hint">Use public URLs that your backend can access without signing in.</p>
+                  </div>
+                )}
+
+                <div className="field">
+                  <label htmlFor="companyUrl">Company URL</label>
+                  <input
+                    id="companyUrl"
+                    value={companyUrl}
+                    onChange={(event) => setCompanyUrl(event.target.value)}
+                    placeholder="https://company.com"
+                  />
+                  <p className="field-hint">Optional context for company voice, product focus, and industry language.</p>
+                </div>
+              </div>
+            </Panel>
+
+            <section className="panel" id="export">
+              <div className="run-panel">
+                <div className="stage-row" aria-label="Run progress">
+                  {stages.map((item) => (
+                    <span key={item.key} className={stage === item.key ? "stage-chip active" : "stage-chip"}>
+                      {item.label}
+                    </span>
+                  ))}
+                </div>
+
+                {error ? (
+                  <div className="issue-card">
+                    <strong>Workflow stopped</strong>
+                    <p>{error}</p>
+                  </div>
+                ) : null}
+
+                <button className="primary-button" type="button" onClick={onRun} disabled={!canRun}>
+                  {busy ? "Agent is tailoring..." : "Run tailor + export"} <Icon name="spark" />
+                </button>
+
+                {!canRun ? (
+                  <p className="field-hint">
+                    Add a backend URL, a DOCX resume, and a job target to enable the workflow.
+                  </p>
+                ) : null}
+
+                {downloadUrl ? (
+                  <div className="download-row">
+                    <a className="primary-button" href={downloadUrl} download>
+                      Download DOCX <Icon name="download" />
+                    </a>
+                    <button className="ghost-button" type="button" onClick={copyDownloadUrl}>
+                      Copy link <Icon name="copy" />
+                    </button>
+                    {copyState ? <span className="copy-state">{copyState}</span> : null}
+                  </div>
+                ) : null}
+              </div>
+            </section>
+          </div>
+
+          <div className="analysis-grid">
+            <Panel
+              title="Agent review"
+              description="Switch between the score, ATS notes, generated resume, and change log without losing your place."
+              action={
+                resumeId ? (
+                  <span className="status-pill">
+                    <Icon name="check" /> Resume ID ready
+                  </span>
+                ) : (
+                  <span className="status-pill">
+                    <Icon name="link" /> Waiting
+                  </span>
                 )
               }
             >
-              {result?.fit_score ? (
-                <>
-                  <div style={styles.infoGrid}>
-                    <Metric label="Score" value={`${score}/100`} hint="Overall resume-role match" />
-                    <Metric label="Present" value={`${presentCount}`} hint="Detected matched terms" />
-                    <Metric label="Missing" value={`${missingCount}`} hint="Terms to strengthen" />
-                  </div>
-
-                  <div style={styles.progressOuter}>
-                    <div style={styles.progressInner(score ?? 0)} />
-                  </div>
-
-                  {result.fit_score.note ? <div style={{ ...styles.helperText, marginTop: 10 }}>{result.fit_score.note}</div> : null}
-
-                  <div style={{ marginTop: 16 }}>
-                    <div style={styles.label}>Matched keywords</div>
-                    <div>
-                      {(result.fit_score.present || []).slice(0, 16).map((k) => (
-                        <Pill key={`p-${k}`} text={k} kind="good" />
-                      ))}
-                    </div>
-                  </div>
-
-                  <div style={{ marginTop: 12 }}>
-                    <div style={styles.label}>Missing keywords</div>
-                    <div>
-                      {(result.fit_score.missing || []).slice(0, 16).map((k) => (
-                        <Pill key={`m-${k}`} text={k} kind="bad" />
-                      ))}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div style={styles.helperText}>Run the workflow to see score, keyword match coverage, and missing terms.</div>
-              )}
-            </Card>
-
-            <Card
-              title="ATS warnings after tailoring"
-              description="A clearer warning list that is easier to scan on mobile."
-              right={result?.ats_after ? <span style={styles.chip}>Post-tailor</span> : <span style={styles.chip}>No results yet</span>}
-            >
-              {result?.ats_after ? (
-                <div style={styles.warningStack}>
-                  {result.ats_after.issues.length === 0 ? (
-                    <div style={styles.helperText}>No issues detected.</div>
-                  ) : (
-                    result.ats_after.issues.slice(0, 8).map((x, idx) => (
-                      <div key={idx} style={styles.warningCard}>
-                        <div style={{ fontWeight: 800, fontSize: 13, letterSpacing: 0.1 }}>
-                          {x.severity.toUpperCase()}: {x.issue}
-                        </div>
-                        <div style={{ ...styles.helperText, marginTop: 6 }}>{x.fix}</div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              ) : (
-                <div style={styles.helperText}>Run tailoring to review the ATS warning summary.</div>
-              )}
-            </Card>
-
-            {downloadUrl ? (
-              <Card title="Export ready" description="Your tailored file is ready to download or share.">
-                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                  <a href={downloadUrl} download style={styles.linkBtn}>
-                    Download .docx
-                  </a>
-                  <button
-                    style={styles.secondaryBtn}
-                    onClick={async () => {
-                      try {
-                        await navigator.clipboard.writeText(downloadUrl);
-                      } catch {
-                        // ignore
-                      }
-                    }}
-                  >
-                    Copy download link
+              <div id="review" className="input-stack">
+                <div className="tabs" role="tablist" aria-label="Review sections">
+                  <button className={activeTab === "score" ? "active" : ""} type="button" onClick={() => setActiveTab("score")}>
+                    Fit score
+                  </button>
+                  <button className={activeTab === "ats" ? "active" : ""} type="button" onClick={() => setActiveTab("ats")}>
+                    ATS
+                  </button>
+                  <button className={activeTab === "resume" ? "active" : ""} type="button" onClick={() => setActiveTab("resume")}>
+                    Resume
+                  </button>
+                  <button className={activeTab === "changes" ? "active" : ""} type="button" onClick={() => setActiveTab("changes")}>
+                    Changes
                   </button>
                 </div>
-              </Card>
-            ) : null}
+
+                {activeTab === "score" ? (
+                  result?.fit_score ? (
+                    <div className="analysis-grid">
+                      <div className="score-panel">
+                        <div className="big-score" style={{ "--score": score } as React.CSSProperties}>
+                          <span>{score}/100</span>
+                        </div>
+                        <div className="metric-grid">
+                          <Metric label="Present" value={`${presentKeywords.length}`} />
+                          <Metric label="Missing" value={`${missingKeywords.length}`} />
+                          <Metric label="Top terms" value={`${topKeywords.length}`} />
+                        </div>
+                      </div>
+
+                      {result.fit_score.note ? <p className="panel-copy">{result.fit_score.note}</p> : null}
+
+                      <div>
+                        <h3 className="panel-title">Matched keywords</h3>
+                        <div className="keyword-cloud">
+                          {presentKeywords.slice(0, 18).map((keyword) => (
+                            <Pill key={`present-${keyword}`} text={keyword} kind="good" />
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <h3 className="panel-title">Missing keywords</h3>
+                        <div className="keyword-cloud">
+                          {missingKeywords.slice(0, 18).map((keyword) => (
+                            <Pill key={`missing-${keyword}`} text={keyword} kind="bad" />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <div>
+                        <strong>No fit score yet</strong>
+                        <p>Run the workflow and the score panel will turn into a keyword coverage dashboard.</p>
+                      </div>
+                    </div>
+                  )
+                ) : null}
+
+                {activeTab === "ats" ? (
+                  atsIssues.length ? (
+                    <div className="issue-list">
+                      {atsIssues.slice(0, 10).map((issue, index) => (
+                        <article className="issue-card" key={`${issue.issue}-${index}`}>
+                          <strong>{issue.severity.toUpperCase()}: {issue.issue}</strong>
+                          <p>{issue.fix}</p>
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <div>
+                        <strong>{result ? "No ATS issues detected" : "ATS review is waiting"}</strong>
+                        <p>{result ? "The tailored version came back clean based on the current backend report." : "After tailoring, this tab will list parser risks and suggested fixes."}</p>
+                      </div>
+                    </div>
+                  )
+                ) : null}
+
+                {activeTab === "resume" ? (
+                  result?.tailored_text ? (
+                    <pre className="result-box">{result.tailored_text}</pre>
+                  ) : (
+                    <div className="empty-state">
+                      <div>
+                        <strong>Generated resume preview</strong>
+                        <p>The tailored resume text will appear here before you download the DOCX.</p>
+                      </div>
+                    </div>
+                  )
+                ) : null}
+
+                {activeTab === "changes" ? (
+                  result?.change_log?.length ? (
+                    <div className="change-list">
+                      {result.change_log.map((change, index) => (
+                        <article className="change-item" key={`${change}-${index}`}>
+                          <strong>Change {index + 1}</strong>
+                          <p>{change}</p>
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <div>
+                        <strong>No change log yet</strong>
+                        <p>Once the backend returns a tailored resume, this view will explain what changed.</p>
+                      </div>
+                    </div>
+                  )
+                ) : null}
+              </div>
+            </Panel>
+
+            <section className="preview-doc">
+              <div className="document">
+                <div className="doc-toolbar">
+                  <StatusPill ok={stage === "ready"} text={stage === "ready" ? "Export ready" : "Live preview"} />
+                  <span className="status-pill">{file ? file.name : "No resume selected"}</span>
+                </div>
+                <div className="doc-body">
+                  <div className="doc-title">Tailored Resume</div>
+                  <div className="doc-subtitle">{hasTarget ? "Role target loaded" : "Add a role target to start shaping the draft"}</div>
+                  <div className="doc-rule" />
+                  <div className="doc-section">
+                    <h3>Profile</h3>
+                    <div className="doc-line" />
+                    <div className="doc-line medium" />
+                    <div className="doc-line short" />
+                  </div>
+                  <div className="doc-section">
+                    <h3>Role keywords</h3>
+                    <div className="keyword-row">
+                      {(presentKeywords.length ? presentKeywords : ["leadership", "analytics", "strategy", "delivery"]).slice(0, 6).map((keyword) => (
+                        <span className="mini-keyword" key={`preview-${keyword}`}>{keyword}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="doc-section">
+                    <h3>Impact bullets</h3>
+                    <div className="doc-line medium" />
+                    <div className="doc-line" />
+                    <div className="doc-line short" />
+                  </div>
+                  <div className="doc-watermark">{score || readiness}%</div>
+                </div>
+              </div>
+            </section>
           </div>
         </div>
-
-        {result ? (
-          <div style={styles.resultGrid}>
-            <Card title="Change log" description="The backend notes what changed during the tailoring step.">
-              <pre style={styles.pre}>{JSON.stringify(result.change_log, null, 2)}</pre>
-            </Card>
-
-            <Card title="Tailored resume preview" description="A quick in-app preview before downloading the generated document.">
-              <pre style={styles.pre}>{result.tailored_text}</pre>
-            </Card>
-          </div>
-        ) : null}
       </div>
     </main>
   );
