@@ -16,21 +16,66 @@ type FitScore = {
   note?: string;
 };
 
+type TailoringMode = "conservative" | "balanced" | "aggressive";
+type GapAnalysis = {
+  matched_requirements: string[];
+  partial_matches: string[];
+  missing_requirements: string[];
+  evidence_to_add: string[];
+  cautions: string[];
+};
+type InterviewItem = { question: string; answer_bullets: string[] };
+type ScoreSummary = {
+  fit_before: number;
+  fit_after: number;
+  fit_delta: number;
+  ats_before: number;
+  ats_after: number;
+  ats_delta: number;
+  issues_before: number;
+  issues_after: number;
+  issues_resolved: number;
+  added_keywords: string[];
+  remaining_missing_keywords: string[];
+};
 type TailorResult = {
+  run_id?: string;
+  generated_at?: string;
+  tailoring_mode?: TailoringMode;
   tailored_text: string;
   change_log: string[];
   suggestions: string[];
+  gap_analysis?: GapAnalysis;
+  cover_letter?: string;
+  interview_prep?: InterviewItem[];
+  recruiter_summary?: string;
   ats_before: AtsReport;
   ats_after: AtsReport;
   fit_score?: FitScore;
+  fit_score_after?: FitScore;
+  score_summary?: ScoreSummary;
+  warnings?: string[];
+  request_id?: string;
 };
 
 type UploadResponse = { resume_id: string; filename: string };
 type ExportResponse = { saved_to: string; download_filename: string };
 type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error";
 type InputMode = "text" | "url";
-type ReviewTab = "score" | "ats" | "resume" | "changes";
+type ReviewTab = "score" | "gap" | "ats" | "resume" | "cover" | "interview" | "changes" | "history";
 type IconName = "home" | "upload" | "target" | "scan" | "download" | "copy" | "spark" | "file" | "link" | "check";
+type HistoryItem = {
+  id: string;
+  createdAt: string;
+  filename: string;
+  mode: TailoringMode;
+  score: number;
+  downloadUrl: string;
+  roleHint: string;
+};
+type ApiErrorPayload = { error?: { code?: string; message?: string; request_id?: string; details?: unknown } };
+
+const HISTORY_KEY = "resume-tailor-history-v1";
 
 const stages: Array<{ key: Stage; label: string }> = [
   { key: "idle", label: "Ready" },
@@ -185,6 +230,39 @@ function Pill({ text, kind }: { text: string; kind: "good" | "bad" }) {
   return <span className={`pill ${kind}`}>{text}</span>;
 }
 
+function loadHistory(): HistoryItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(HISTORY_KEY);
+    return raw ? (JSON.parse(raw) as HistoryItem[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory(items: HistoryItem[]) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, 12)));
+}
+
+async function readApiError(response: Response, fallback: string): Promise<string> {
+  try {
+    const data = (await response.json()) as ApiErrorPayload;
+    const message = data.error?.message;
+    const code = data.error?.code;
+    const requestId = data.error?.request_id;
+    if (message) return [message, code ? `Code: ${code}` : "", requestId ? `Request: ${requestId}` : ""].filter(Boolean).join(" ");
+  } catch {
+    // Keep the interaction moving with the fallback below.
+  }
+  return fallback;
+}
+
+function formatDelta(value: number | undefined) {
+  if (!value) return "0";
+  return value > 0 ? `+${value}` : `${value}`;
+}
+
 export default function Page() {
   const baseUrl = useMemo(() => {
     const value = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -193,6 +271,7 @@ export default function Page() {
 
   const [file, setFile] = useState<File | null>(null);
   const [inputMode, setInputMode] = useState<InputMode>("text");
+  const [tailoringMode, setTailoringMode] = useState<TailoringMode>("balanced");
   const [jdUrl, setJdUrl] = useState("");
   const [jdText, setJdText] = useState("");
   const [companyUrl, setCompanyUrl] = useState("");
@@ -206,17 +285,20 @@ export default function Page() {
   const [resumeId, setResumeId] = useState<string | null>(null);
   const [result, setResult] = useState<TailorResult | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [history, setHistory] = useState<HistoryItem[]>(() => loadHistory());
 
   const hasTarget = Boolean(jdUrl.trim() || jdText.trim());
   const readyItems = [Boolean(baseUrl), Boolean(file), hasTarget];
   const readiness = Math.round((readyItems.filter(Boolean).length / readyItems.length) * 100);
   const canRun = Boolean(baseUrl && file && hasTarget && !busy);
 
-  const score = result?.fit_score?.score ?? 0;
-  const presentKeywords = result?.fit_score?.present ?? [];
-  const missingKeywords = result?.fit_score?.missing ?? [];
-  const topKeywords = result?.fit_score?.top_keywords ?? [];
+  const score = result?.score_summary?.fit_after ?? result?.fit_score_after?.score ?? result?.fit_score?.score ?? 0;
+  const presentKeywords = result?.fit_score_after?.present ?? result?.fit_score?.present ?? [];
+  const missingKeywords = result?.fit_score_after?.missing ?? result?.fit_score?.missing ?? [];
   const atsIssues = result?.ats_after?.issues ?? [];
+  const gap = result?.gap_analysis;
+  const interviewPrep = result?.interview_prep ?? [];
+  const warnings = result?.warnings ?? [];
 
   async function upload(): Promise<string> {
     if (!baseUrl) throw new Error("Missing NEXT_PUBLIC_BACKEND_URL in .env.local");
@@ -226,7 +308,7 @@ export default function Page() {
     form.append("file", file);
 
     const response = await fetch(`${baseUrl}/upload`, { method: "POST", body: form });
-    if (!response.ok) throw new Error("Upload failed");
+    if (!response.ok) throw new Error(await readApiError(response, "Upload failed"));
 
     const data = (await response.json()) as UploadResponse;
     setResumeId(data.resume_id);
@@ -242,7 +324,8 @@ export default function Page() {
       jd_url?: string;
       jd_text?: string;
       company_url?: string;
-    } = { resume_id };
+      tailoring_mode: TailoringMode;
+    } = { resume_id, tailoring_mode: tailoringMode };
 
     if (jdUrl.trim() && isHttp(jdUrl)) payload.jd_url = jdUrl.trim();
     if (jdText.trim()) payload.jd_text = jdText.trim();
@@ -253,7 +336,7 @@ export default function Page() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
-    if (!response.ok) throw new Error("Tailor failed");
+    if (!response.ok) throw new Error(await readApiError(response, "Tailor failed"));
 
     const data = (await response.json()) as TailorResult;
     setResult(data);
@@ -272,7 +355,7 @@ export default function Page() {
         content: tailoredText,
       }),
     });
-    if (!response.ok) throw new Error("Export failed");
+    if (!response.ok) throw new Error(await readApiError(response, "Export failed"));
 
     const data = (await response.json()) as ExportResponse;
     const url = `${baseUrl}/download/${data.download_filename}`;
@@ -295,7 +378,19 @@ export default function Page() {
       setStage("tailoring");
       const output = await tailor(id);
       setStage("exporting");
-      await exportDocx(output.tailored_text);
+      const url = await exportDocx(output.tailored_text);
+      const item: HistoryItem = {
+        id: output.run_id ?? id,
+        createdAt: output.generated_at ?? new Date().toISOString(),
+        filename: file?.name ?? "resume.docx",
+        mode: output.tailoring_mode ?? tailoringMode,
+        score: output.score_summary?.fit_after ?? output.fit_score_after?.score ?? output.fit_score?.score ?? 0,
+        downloadUrl: url,
+        roleHint: (jdText || jdUrl || "Role target").slice(0, 90),
+      };
+      const nextHistory = [item, ...history.filter((entry) => entry.id !== item.id)].slice(0, 12);
+      setHistory(nextHistory);
+      saveHistory(nextHistory);
       setStage("ready");
       setActiveTab("score");
     } catch (caught) {
@@ -465,6 +560,21 @@ export default function Page() {
                 )}
 
                 <div className="field">
+                  <label>Tailoring mode</label>
+                  <div className="segment mode-segment" role="tablist" aria-label="Tailoring mode">
+                    <button className={tailoringMode === "conservative" ? "active" : ""} type="button" onClick={() => setTailoringMode("conservative")}>
+                      Conservative
+                    </button>
+                    <button className={tailoringMode === "balanced" ? "active" : ""} type="button" onClick={() => setTailoringMode("balanced")}>
+                      Balanced
+                    </button>
+                    <button className={tailoringMode === "aggressive" ? "active" : ""} type="button" onClick={() => setTailoringMode("aggressive")}>
+                      Aggressive
+                    </button>
+                  </div>
+                </div>
+
+                <div className="field">
                   <label htmlFor="companyUrl">Company URL</label>
                   <input
                     id="companyUrl"
@@ -522,7 +632,7 @@ export default function Page() {
           <div className="analysis-grid">
             <Panel
               title="Agent review"
-              description="Switch between the score, ATS notes, generated resume, and change log without losing your place."
+              description="Review score movement, gaps, ATS notes, generated writing, interview prep, and local run history."
               action={
                 resumeId ? (
                   <span className="status-pill">
@@ -540,14 +650,26 @@ export default function Page() {
                   <button className={activeTab === "score" ? "active" : ""} type="button" onClick={() => setActiveTab("score")}>
                     Fit score
                   </button>
+                  <button className={activeTab === "gap" ? "active" : ""} type="button" onClick={() => setActiveTab("gap")}>
+                    Gaps
+                  </button>
                   <button className={activeTab === "ats" ? "active" : ""} type="button" onClick={() => setActiveTab("ats")}>
                     ATS
                   </button>
                   <button className={activeTab === "resume" ? "active" : ""} type="button" onClick={() => setActiveTab("resume")}>
                     Resume
                   </button>
+                  <button className={activeTab === "cover" ? "active" : ""} type="button" onClick={() => setActiveTab("cover")}>
+                    Letter
+                  </button>
+                  <button className={activeTab === "interview" ? "active" : ""} type="button" onClick={() => setActiveTab("interview")}>
+                    Prep
+                  </button>
                   <button className={activeTab === "changes" ? "active" : ""} type="button" onClick={() => setActiveTab("changes")}>
                     Changes
+                  </button>
+                  <button className={activeTab === "history" ? "active" : ""} type="button" onClick={() => setActiveTab("history")}>
+                    History
                   </button>
                 </div>
 
@@ -559,13 +681,29 @@ export default function Page() {
                           <span>{score}/100</span>
                         </div>
                         <div className="metric-grid">
+                          <Metric label="Fit delta" value={formatDelta(result.score_summary?.fit_delta)} />
+                          <Metric label="ATS delta" value={formatDelta(result.score_summary?.ats_delta)} />
                           <Metric label="Present" value={`${presentKeywords.length}`} />
                           <Metric label="Missing" value={`${missingKeywords.length}`} />
-                          <Metric label="Top terms" value={`${topKeywords.length}`} />
+                          <Metric label="Resolved" value={`${result.score_summary?.issues_resolved ?? 0}`} />
+                          <Metric label="Mode" value={result.tailoring_mode ?? tailoringMode} />
                         </div>
                       </div>
 
                       {result.fit_score.note ? <p className="panel-copy">{result.fit_score.note}</p> : null}
+                      {result.recruiter_summary ? (
+                        <article className="summary-strip">
+                          <strong>Recruiter summary</strong>
+                          <p>{result.recruiter_summary}</p>
+                        </article>
+                      ) : null}
+                      {warnings.length ? (
+                        <div className="warning-list">
+                          {warnings.map((warning) => (
+                            <span key={warning}>{warning}</span>
+                          ))}
+                        </div>
+                      ) : null}
 
                       <div>
                         <h3 className="panel-title">Matched keywords</h3>
@@ -584,6 +722,17 @@ export default function Page() {
                           ))}
                         </div>
                       </div>
+
+                      {result.score_summary?.added_keywords?.length ? (
+                        <div>
+                          <h3 className="panel-title">Keywords added by agent</h3>
+                          <div className="keyword-cloud">
+                            {result.score_summary.added_keywords.slice(0, 18).map((keyword) => (
+                              <Pill key={`added-${keyword}`} text={keyword} kind="good" />
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
                     </div>
                   ) : (
                     <div className="empty-state">
@@ -595,9 +744,52 @@ export default function Page() {
                   )
                 ) : null}
 
+                {activeTab === "gap" ? (
+                  gap ? (
+                    <div className="insight-grid">
+                      <article className="change-item">
+                        <strong>Matched requirements</strong>
+                        <ul>{gap.matched_requirements.slice(0, 8).map((item) => <li key={`matched-${item}`}>{item}</li>)}</ul>
+                      </article>
+                      <article className="change-item">
+                        <strong>Partial matches</strong>
+                        <ul>{gap.partial_matches.slice(0, 8).map((item) => <li key={`partial-${item}`}>{item}</li>)}</ul>
+                      </article>
+                      <article className="issue-card">
+                        <strong>Missing requirements</strong>
+                        <ul>{gap.missing_requirements.slice(0, 8).map((item) => <li key={`missing-req-${item}`}>{item}</li>)}</ul>
+                      </article>
+                      <article className="change-item">
+                        <strong>Evidence to add</strong>
+                        <ul>{gap.evidence_to_add.slice(0, 8).map((item) => <li key={`evidence-${item}`}>{item}</li>)}</ul>
+                      </article>
+                      {gap.cautions.length ? (
+                        <article className="issue-card">
+                          <strong>Truth guardrails</strong>
+                          <ul>{gap.cautions.slice(0, 6).map((item) => <li key={`caution-${item}`}>{item}</li>)}</ul>
+                        </article>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <div>
+                        <strong>No gap analysis yet</strong>
+                        <p>Run the workflow and the agent will separate proven matches from missing evidence.</p>
+                      </div>
+                    </div>
+                  )
+                ) : null}
+
                 {activeTab === "ats" ? (
                   atsIssues.length ? (
                     <div className="issue-list">
+                      {result?.score_summary ? (
+                        <div className="metric-grid">
+                          <Metric label="ATS before" value={`${result.score_summary.ats_before}`} />
+                          <Metric label="ATS after" value={`${result.score_summary.ats_after}`} />
+                          <Metric label="Issues left" value={`${result.score_summary.issues_after}`} />
+                        </div>
+                      ) : null}
                       {atsIssues.slice(0, 10).map((issue, index) => (
                         <article className="issue-card" key={`${issue.issue}-${index}`}>
                           <strong>{issue.severity.toUpperCase()}: {issue.issue}</strong>
@@ -628,13 +820,60 @@ export default function Page() {
                   )
                 ) : null}
 
-                {activeTab === "changes" ? (
-                  result?.change_log?.length ? (
+                {activeTab === "cover" ? (
+                  result?.cover_letter ? (
+                    <div className="analysis-grid">
+                      <pre className="result-box compact">{result.cover_letter}</pre>
+                      {result.recruiter_summary ? (
+                        <article className="summary-strip">
+                          <strong>Positioning note</strong>
+                          <p>{result.recruiter_summary}</p>
+                        </article>
+                      ) : null}
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <div>
+                        <strong>No cover letter yet</strong>
+                        <p>The agent will draft a grounded letter from the same resume and job target.</p>
+                      </div>
+                    </div>
+                  )
+                ) : null}
+
+                {activeTab === "interview" ? (
+                  interviewPrep.length ? (
                     <div className="change-list">
-                      {result.change_log.map((change, index) => (
+                      {interviewPrep.map((item, index) => (
+                        <article className="change-item" key={`${item.question}-${index}`}>
+                          <strong>{item.question}</strong>
+                          <ul>{item.answer_bullets.map((bullet) => <li key={`${item.question}-${bullet}`}>{bullet}</li>)}</ul>
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <div>
+                        <strong>No interview prep yet</strong>
+                        <p>After tailoring, this tab will turn the resume and job target into answer prompts.</p>
+                      </div>
+                    </div>
+                  )
+                ) : null}
+
+                {activeTab === "changes" ? (
+                  result?.change_log?.length || result?.suggestions?.length ? (
+                    <div className="change-list">
+                      {(result.change_log ?? []).map((change, index) => (
                         <article className="change-item" key={`${change}-${index}`}>
                           <strong>Change {index + 1}</strong>
                           <p>{change}</p>
+                        </article>
+                      ))}
+                      {(result.suggestions ?? []).map((suggestion, index) => (
+                        <article className="issue-card" key={`${suggestion}-${index}`}>
+                          <strong>Suggestion {index + 1}</strong>
+                          <p>{suggestion}</p>
                         </article>
                       ))}
                     </div>
@@ -643,6 +882,42 @@ export default function Page() {
                       <div>
                         <strong>No change log yet</strong>
                         <p>Once the backend returns a tailored resume, this view will explain what changed.</p>
+                      </div>
+                    </div>
+                  )
+                ) : null}
+
+                {activeTab === "history" ? (
+                  history.length ? (
+                    <div className="change-list">
+                      {history.map((entry) => (
+                        <article className="history-item" key={entry.id}>
+                          <div>
+                            <strong>{entry.filename}</strong>
+                            <p>{entry.roleHint}</p>
+                            <span>{new Date(entry.createdAt).toLocaleString()} | {entry.mode} | {entry.score}/100</span>
+                          </div>
+                          <a className="ghost-button" href={entry.downloadUrl} download>
+                            Download <Icon name="download" />
+                          </a>
+                        </article>
+                      ))}
+                      <button
+                        className="ghost-button"
+                        type="button"
+                        onClick={() => {
+                          setHistory([]);
+                          saveHistory([]);
+                        }}
+                      >
+                        Clear history
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="empty-state">
+                      <div>
+                        <strong>No local history yet</strong>
+                        <p>Completed runs will appear here on this browser with their score and download link.</p>
                       </div>
                     </div>
                   )

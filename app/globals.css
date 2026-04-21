@@ -946,6 +946,10 @@ input::file-selector-button {
   background: var(--panel);
 }
 
+.mode-segment {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .segment button {
   min-height: 42px;
   border-radius: 6px;
@@ -1191,14 +1195,60 @@ input::file-selector-button {
   line-height: 1.75;
 }
 
+.result-box.compact {
+  min-height: 260px;
+}
+
+.summary-strip {
+  padding: 14px;
+  border: 1px solid rgba(0, 166, 118, 0.24);
+  border-left: 4px solid var(--teal);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(0, 166, 118, 0.08), rgba(54, 87, 255, 0.06)), white;
+}
+
+.summary-strip strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.summary-strip p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.warning-list {
+  display: grid;
+  gap: 8px;
+}
+
+.warning-list span {
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 176, 46, 0.45);
+  border-left: 4px solid var(--gold);
+  border-radius: var(--radius);
+  background: rgba(255, 176, 46, 0.12);
+  color: #7a5200;
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
 .issue-list,
 .change-list {
   display: grid;
   gap: 10px;
 }
 
+.insight-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
 .issue-card,
-.change-item {
+.change-item,
+.history-item {
   padding: 13px;
   border: 1px solid var(--line);
   border-left: 4px solid var(--coral);
@@ -1211,23 +1261,56 @@ input::file-selector-button {
   border-left-color: var(--teal);
 }
 
+.history-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  border-left-color: var(--blue);
+}
+
 .issue-card:hover,
-.change-item:hover {
+.change-item:hover,
+.history-item:hover {
   transform: translateX(4px);
   box-shadow: 0 14px 30px rgba(20, 35, 64, 0.1);
 }
 
 .issue-card strong,
-.change-item strong {
+.change-item strong,
+.history-item strong {
   display: block;
   margin-bottom: 6px;
 }
 
 .issue-card p,
-.change-item p {
+.change-item p,
+.history-item p {
   margin: 0;
   color: var(--muted);
   line-height: 1.55;
+}
+
+.history-item span {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.issue-card ul,
+.change-item ul {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.issue-card li + li,
+.change-item li + li {
+  margin-top: 6px;
 }
 
 .empty-state {
@@ -1491,10 +1574,16 @@ input::file-selector-button {
   .hero-proof,
   .quick-grid,
   .metric-grid,
+  .insight-grid,
   .stage-row,
   .score-panel,
+  .history-item,
   .cta-strip,
   .section-head {
+    grid-template-columns: 1fr;
+  }
+
+  .mode-segment {
     grid-template-columns: 1fr;
   }
 
