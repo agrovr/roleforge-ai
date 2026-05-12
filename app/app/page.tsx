@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Brand } from "../components/Brand";
+import { RoleForgeIcon } from "../components/RoleForgeIcons";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 type AtsIssue = { severity: string; issue: string; fix: string };
 type AtsReport = { issues: AtsIssue[] };
@@ -63,7 +66,6 @@ type ExportResponse = { saved_to: string; download_filename: string };
 type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error";
 type InputMode = "text" | "url";
 type ReviewTab = "score" | "gap" | "ats" | "resume" | "cover" | "interview" | "changes" | "history";
-type IconName = "home" | "upload" | "target" | "scan" | "download" | "copy" | "spark" | "file" | "link" | "check";
 type HistoryItem = {
   id: string;
   createdAt: string;
@@ -74,160 +76,111 @@ type HistoryItem = {
   roleHint: string;
 };
 type ApiErrorPayload = { error?: { code?: string; message?: string; request_id?: string; details?: unknown } };
+type StudioSuggestion = { label: string; meta: string; before?: string; after: string; tone?: "good" | "warn" | "neutral" };
 
 const HISTORY_KEY = "resume-tailor-history-v1";
 
-const stages: Array<{ key: Stage; label: string }> = [
-  { key: "idle", label: "Ready" },
-  { key: "uploading", label: "Upload" },
-  { key: "tailoring", label: "Tailor" },
-  { key: "exporting", label: "Export" },
-];
-
-function Icon({ name }: { name: IconName }) {
-  if (name === "home") {
-    return (
-      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="m3 11 9-8 9 8" />
-        <path d="M5 10v10h14V10" />
-      </svg>
-    );
-  }
-
-  if (name === "upload") {
-    return (
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M12 16V4" />
-        <path d="m7 9 5-5 5 5" />
-        <path d="M5 20h14" />
-      </svg>
-    );
-  }
-
-  if (name === "target") {
-    return (
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="8" />
-        <circle cx="12" cy="12" r="3" />
-        <path d="M12 2v3" />
-        <path d="M12 19v3" />
-        <path d="M2 12h3" />
-        <path d="M19 12h3" />
-      </svg>
-    );
-  }
-
-  if (name === "scan") {
-    return (
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M4 8V5a1 1 0 0 1 1-1h3" />
-        <path d="M16 4h3a1 1 0 0 1 1 1v3" />
-        <path d="M20 16v3a1 1 0 0 1-1 1h-3" />
-        <path d="M8 20H5a1 1 0 0 1-1-1v-3" />
-        <path d="M7 12h10" />
-      </svg>
-    );
-  }
-
-  if (name === "download") {
-    return (
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M12 4v12" />
-        <path d="m7 11 5 5 5-5" />
-        <path d="M5 20h14" />
-      </svg>
-    );
-  }
-
-  if (name === "copy") {
-    return (
-      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <rect x="9" y="9" width="11" height="11" rx="2" />
-        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-      </svg>
-    );
-  }
-
-  if (name === "file") {
-    return (
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
-        <path d="M14 2v6h6" />
-        <path d="M8 13h8" />
-        <path d="M8 17h6" />
-      </svg>
-    );
-  }
-
-  if (name === "link") {
-    return (
-      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1" />
-        <path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1" />
-      </svg>
-    );
-  }
-
-  if (name === "check") {
-    return (
-      <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <path d="m5 12 4 4L19 6" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z" />
-    </svg>
-  );
-}
-
-function StatusPill({ ok, text }: { ok: boolean; text: string }) {
-  return (
-    <span className="status-pill">
-      <span className={ok ? "status-dot good" : "status-dot"} />
-      {text}
-    </span>
-  );
-}
-
-function Panel({
-  title,
-  description,
-  action,
-  children,
-}: {
-  title: string;
-  description?: string;
-  action?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="panel">
-      <div className="panel-header">
-        <div>
-          <h2 className="panel-title">{title}</h2>
-          {description ? <p className="panel-copy">{description}</p> : null}
-        </div>
-        {action}
-      </div>
-      <div className="panel-body">{children}</div>
-    </section>
-  );
-}
-
-function Metric({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="metric">
-      <div className="metric-label">{label}</div>
-      <div className="metric-value">{value}</div>
-    </div>
-  );
-}
-
 function Pill({ text, kind }: { text: string; kind: "good" | "bad" }) {
   return <span className={`pill ${kind}`}>{text}</span>;
+}
+
+function StudioMetric({
+  label,
+  value,
+  unit,
+  detail,
+  progress,
+  tone = "brand",
+}: {
+  label: string;
+  value: string;
+  unit?: string;
+  detail: string;
+  progress: number;
+  tone?: "brand" | "good" | "accent" | "sky";
+}) {
+  return (
+    <article className="rf-studio-stat">
+      <div className="rf-studio-stat-label">{label}</div>
+      <div className="rf-studio-stat-row">
+        <span>{value}</span>
+        {unit ? <small>{unit}</small> : null}
+      </div>
+      <div className="rf-studio-stat-track">
+        <div className={`rf-studio-stat-fill ${tone}`} style={{ width: `${Math.max(0, Math.min(100, progress))}%` }} />
+      </div>
+      <p>{detail}</p>
+    </article>
+  );
+}
+
+function MiniResumeDocument({
+  text,
+  keywords,
+}: {
+  text?: string;
+  keywords: string[];
+}) {
+  return (
+    <div className="rf-resume-paper">
+      <div className="rf-resume-head">
+        <h3>Sarah Chen</h3>
+        <p>Senior Product Manager</p>
+        <span>sarah.chen@email.com · +1 415-555-0118 · San Francisco, CA · linkedin.com/in/schen</span>
+      </div>
+      <section>
+        <h4>Professional summary</h4>
+        {text ? (
+          <pre className="rf-resume-generated">{text}</pre>
+        ) : (
+          <p>
+            Operations-minded product leader with 8 years building <mark>cross-functional roadmaps</mark>, leading{" "}
+            <mark>operational reviews</mark>, and translating <mark className="good">analytics</mark> into the kinds of
+            decisions that actually move quarters.
+          </p>
+        )}
+      </section>
+      <section>
+        <h4>Experience</h4>
+        <div className="rf-resume-role">
+          <div>
+            <strong>Senior Product Manager</strong>
+            <em>Lattice · San Francisco, CA</em>
+          </div>
+          <span>Mar 2023 — present</span>
+        </div>
+        <ul>
+          <li>Owned <mark>cross-functional roadmap</mark> delivery for 3 product pods (28 engineers)</li>
+          <li>Cut release cycle from 18 days to 9 via process redesign and clearer ownership</li>
+          <li>SQL-backed weekly KPI reviews across 12 stakeholders</li>
+          <li>Led migration of legacy planning tool · zero downtime deploy</li>
+        </ul>
+        <div className="rf-resume-role secondary-role">
+          <div>
+            <strong>Product Lead, Operations</strong>
+            <em>Notion · Remote</em>
+          </div>
+          <span>Jun 2020 — Mar 2023</span>
+        </div>
+        <ul>
+          <li>Stood up the first operations function · hired and mentored 3 ICs</li>
+          <li>Designed quarterly planning ritual now used company-wide</li>
+          <li>Drove NPS instrumentation · +14 points in 2 quarters</li>
+        </ul>
+      </section>
+      <section>
+        <h4>Skills</h4>
+        <div className="rf-resume-keywords">
+          {(keywords.length
+            ? keywords
+            : ["Roadmapping", "SQL", "A/B testing", "Analytics", "Stakeholder mgmt", "Quarterly planning"]
+          ).slice(0, 8).map((keyword) => (
+            <span key={`resume-keyword-${keyword}`}>{keyword}</span>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
 }
 
 function loadHistory(): HistoryItem[] {
@@ -263,6 +216,12 @@ function formatDelta(value: number | undefined) {
   return value > 0 ? `+${value}` : `${value}`;
 }
 
+function compactLabel(value: string, maxLength = 46) {
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxLength) return normalized;
+  return `${normalized.slice(0, maxLength - 1).trimEnd()}...`;
+}
+
 export default function Page() {
   const baseUrl = useMemo(() => {
     const value = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -282,10 +241,14 @@ export default function Page() {
   const [copyState, setCopyState] = useState("");
   const [error, setError] = useState("");
 
-  const [resumeId, setResumeId] = useState<string | null>(null);
+  const [, setResumeId] = useState<string | null>(null);
   const [result, setResult] = useState<TailorResult | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
-  const [history, setHistory] = useState<HistoryItem[]>(() => loadHistory());
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+
+  useEffect(() => {
+    setHistory(loadHistory());
+  }, []);
 
   const hasTarget = Boolean(jdUrl.trim() || jdText.trim());
   const readyItems = [Boolean(baseUrl), Boolean(file), hasTarget];
@@ -296,12 +259,12 @@ export default function Page() {
   const presentKeywords = result?.fit_score_after?.present ?? result?.fit_score?.present ?? [];
   const missingKeywords = result?.fit_score_after?.missing ?? result?.fit_score?.missing ?? [];
   const atsIssues = result?.ats_after?.issues ?? [];
-  const gap = result?.gap_analysis;
+  const gapEvidence = result?.gap_analysis?.evidence_to_add ?? [];
   const interviewPrep = result?.interview_prep ?? [];
   const warnings = result?.warnings ?? [];
 
   async function upload(): Promise<string> {
-    if (!baseUrl) throw new Error("Missing NEXT_PUBLIC_BACKEND_URL in .env.local");
+    if (!baseUrl) throw new Error("The resume workflow is not available yet.");
     if (!file) throw new Error("Select a resume .docx first");
 
     const form = new FormData();
@@ -316,7 +279,7 @@ export default function Page() {
   }
 
   async function tailor(resume_id: string): Promise<TailorResult> {
-    if (!baseUrl) throw new Error("Missing NEXT_PUBLIC_BACKEND_URL in .env.local");
+    if (!baseUrl) throw new Error("The resume workflow is not available yet.");
 
     const isHttp = (value: string) => /^https?:\/\//i.test(value.trim());
     const payload: {
@@ -344,7 +307,7 @@ export default function Page() {
   }
 
   async function exportDocx(tailoredText: string): Promise<string> {
-    if (!baseUrl) throw new Error("Missing NEXT_PUBLIC_BACKEND_URL in .env.local");
+    if (!baseUrl) throw new Error("Export is not available yet.");
 
     const response = await fetch(`${baseUrl}/export`, {
       method: "POST",
@@ -420,546 +383,357 @@ export default function Page() {
     }
   }
 
+  const firstTargetLine = (jdText || jdUrl).split(/\r?\n/).map((line) => line.trim()).find(Boolean);
+  const activeResumeName = file?.name?.replace(/\.docx$/i, "") || "Resume studio";
+  const activeRole = firstTargetLine || (hasTarget ? "Role target loaded" : "Add a role target");
+  const topbarLabel = compactLabel(hasTarget ? activeRole : activeResumeName, 36);
+  const heroLabel = compactLabel(hasTarget ? activeRole : activeResumeName, 58);
+  const targetLabel = compactLabel(activeRole, 62);
+  const atsScore = result?.score_summary?.ats_after ?? result?.fit_score_after?.score ?? score;
+  const keywordTotal = presentKeywords.length + missingKeywords.length;
+  const readSeconds = result?.tailored_text ? Math.max(20, Math.round((result.tailored_text.split(/\s+/).length / 220) * 60)) : 0;
+  const scoreDetail = result?.score_summary?.fit_delta ? `${formatDelta(result.score_summary.fit_delta)} from baseline` : result ? "Run complete" : "Run needed";
+  const atsDetail = result?.score_summary?.issues_resolved ? `${result.score_summary.issues_resolved} issues fixed` : result ? "Parser notes returned" : "Waiting for run";
+  const keywordDetail = keywordTotal ? `${missingKeywords.length} missing` : "Target terms pending";
+  const runLabel = busy ? "Tailoring..." : result ? "Re-tailor" : "Run Tailor";
+  const exportLabel = downloadUrl ? "Download DOCX" : "Export DOCX";
+
+  const suggestionCards: StudioSuggestion[] = result
+    ? [
+        ...(result.change_log ?? []).slice(0, 2).map((change, index) => ({
+          label: index === 0 ? "Keyword" : "Quantify",
+          meta: `Change ${index + 1}`,
+          before: "Original wording",
+          after: change,
+          tone: index === 0 ? "good" as const : "neutral" as const,
+        })),
+        ...(result.suggestions ?? []).slice(0, 4).map((suggestion, index) => ({
+          label: index % 2 ? "ATS" : "Add keyword",
+          meta: `Suggestion ${index + 1}`,
+          after: suggestion,
+          tone: index % 2 ? "warn" as const : "good" as const,
+        })),
+      ].slice(0, 4)
+    : [];
+
   return (
-    <main className="page-shell">
-      <div className="app-shell">
-        <header className="app-topbar">
-          <Link className="brand" href="/" aria-label="RoleForge AI home">
-            <span className="brand-mark">RF</span>
-            <span>
-              <span className="brand-name">RoleForge AI</span>
-              <span className="brand-kicker">Agentic application workflow</span>
-            </span>
-          </Link>
-
-          <div className="readiness" aria-label="Workspace readiness">
-            <div className="readiness-meta">
-              <span>Run readiness</span>
-              <span>{readiness}%</span>
-            </div>
-            <div className="meter">
-              <div className="meter-fill" style={{ width: `${readiness}%` }} />
-            </div>
+    <main className="page-shell rf-studio-page">
+      <div className="rf-studio-shell">
+        <header className="rf-studio-topbar" aria-label="Studio controls">
+          <div className="rf-studio-breadcrumb">
+            <Brand href="/" label="RoleForge AI home" />
+            <span className="breadcrumb-current">Resumes</span>
+            <span className="breadcrumb-separator" aria-hidden="true">/</span>
+            <strong title={hasTarget ? activeRole : activeResumeName}>{topbarLabel}</strong>
           </div>
-
-          <div className="nav-links">
-            <Link className="icon-button" href="/" aria-label="Landing page" title="Landing page">
-              <Icon name="home" />
-            </Link>
-            <StatusPill ok={Boolean(baseUrl)} text={baseUrl ? "Backend connected" : "Backend missing"} />
+          <div className="rf-studio-top-actions">
+            <button className="ghost-button studio-top-button" type="button" disabled={!result}>
+              <RoleForgeIcon name="copy" size={16} /> Duplicate
+            </button>
+            {downloadUrl ? (
+              <a className="ghost-button studio-top-button" href={downloadUrl} download>
+                <RoleForgeIcon name="download" size={16} /> Export
+              </a>
+            ) : (
+              <button className="ghost-button studio-top-button" type="button" disabled>
+                <RoleForgeIcon name="download" size={16} /> Export
+              </button>
+            )}
+            <ThemeToggle />
+            <button className="studio-account-button" type="button" disabled aria-label="Sign in coming soon">
+              SC
+            </button>
           </div>
         </header>
-
-        <div className="workspace">
-          <aside className="rail" aria-label="Workspace sections">
-            <a className="rail-item" href="#input">
-              <Icon name="upload" /> Input
-            </a>
-            <a className="rail-item" href="#target">
-              <Icon name="target" /> Target
-            </a>
-            <a className="rail-item" href="#review">
-              <Icon name="scan" /> Review
-            </a>
-            <a className="rail-item" href="#export">
-              <Icon name="download" /> Export
-            </a>
+        <div className="rf-studio-layout">
+          <aside className="rf-studio-rail" aria-label="Studio sections">
+            <div className="rail-section-title">Build</div>
+            <a className="rail-item active" href="#editor"><RoleForgeIcon name="doc" size={15} /> Editor</a>
+            <a className="rail-item" href="#target"><RoleForgeIcon name="target" size={15} /> Job target</a>
+            <a className="rail-item" href="#suggestions"><RoleForgeIcon name="sparkle" size={15} /> AI tailor <span className="rail-pill">{suggestionCards.length || 0}</span></a>
+            <a className="rail-item" href="#ats"><RoleForgeIcon name="scan" size={15} /> ATS check</a>
+            <a className="rail-item" href="#assets"><RoleForgeIcon name="mail" size={15} /> Cover letter</a>
+            <a className="rail-item" href="#assets"><RoleForgeIcon name="briefcase" size={15} /> Interview prep</a>
+            <div className="rail-divider" />
+            <div className="rail-section-title">Workspace</div>
+            <Link className="rail-item" href="/#templates"><RoleForgeIcon name="layers" size={15} /> Templates</Link>
+            <button className="rail-item" type="button" onClick={() => setActiveTab("history")}><RoleForgeIcon name="chart" size={15} /> History</button>
+            <span className="rail-item disabled" aria-disabled="true"><RoleForgeIcon name="settings" size={15} /> Settings</span>
+            <div className="rf-rail-upgrade">
+              <strong><RoleForgeIcon name="sparkle" size={14} /> Premium coming soon</strong>
+              <p>Templates, saved projects, account settings, and premium features are coming soon.</p>
+              <button className="primary-button" type="button" disabled>Coming soon</button>
+            </div>
           </aside>
 
-          <div className="input-stack">
-            {!baseUrl ? (
-              <div className="panel">
-                <div className="panel-body">
-                  <StatusPill ok={false} text="Backend URL missing" />
-                  <p className="panel-copy">
-                    Add <code>NEXT_PUBLIC_BACKEND_URL</code> in <code>.env.local</code> or Vercel, then restart the app so the workflow can call your API.
-                  </p>
-                </div>
+          <section className="rf-studio-main" id="editor">
+            <div className="rf-studio-hero">
+              <div>
+                <div className="eyebrow">Active resume</div>
+                <h1 title={hasTarget ? activeRole : activeResumeName}>{heroLabel}</h1>
+                <p>
+                  {result ? "Tailored and exported from the current workflow" : file ? "Resume selected · add a target and run the workflow" : "Upload a resume, add a job target, then run the workflow"}
+                </p>
               </div>
-            ) : null}
-
-            <Panel
-              title="Resume intake"
-              description="Drop in a DOCX resume and confirm the file before running the agent workflow."
-              action={<StatusPill ok={Boolean(file)} text={file ? "File selected" : "Needs file"} />}
-            >
-              <label
-                id="input"
-                className={dragActive ? "dropzone active" : "dropzone"}
-                onDragEnter={() => setDragActive(true)}
-                onDragOver={(event) => event.preventDefault()}
-                onDragLeave={() => setDragActive(false)}
-                onDrop={onDrop}
-              >
-                <input
-                  type="file"
-                  accept=".docx"
-                  onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-                  aria-label="Upload resume DOCX"
-                />
-                <span className="drop-main">
-                  <span className="drop-icon">
-                    <Icon name="file" />
-                  </span>
-                  <span>
-                    <span className="drop-title">{file ? file.name : "Drop your resume here"}</span>
-                    <span className="drop-hint">{file ? "Ready for upload. Choose another file to replace it." : "DOCX files work best with the current backend export flow."}</span>
-                  </span>
-                </span>
-              </label>
-
-              <div className="quick-grid" aria-label="Input checklist">
-                <div className="quick-card">
-                  <strong>Formatting</strong>
-                  <span>Simple headings and clean bullets improve ATS parsing.</span>
-                </div>
-                <div className="quick-card">
-                  <strong>Targeting</strong>
-                  <span>Use the pasted job description when a job page is gated or dynamic.</span>
-                </div>
-              </div>
-            </Panel>
-
-            <Panel
-              title="Role target"
-              description="Give the agent a clear target role, then add company context when it matters."
-              action={<StatusPill ok={hasTarget} text={hasTarget ? "Target ready" : "Needs target"} />}
-            >
-              <div id="target" className="input-stack">
-                <div className="segment" role="tablist" aria-label="Job description input mode">
-                  <button className={inputMode === "text" ? "active" : ""} type="button" onClick={() => setInputMode("text")}>
-                    Paste text
-                  </button>
-                  <button className={inputMode === "url" ? "active" : ""} type="button" onClick={() => setInputMode("url")}>
-                    Use URL
-                  </button>
-                </div>
-
-                {inputMode === "text" ? (
-                  <div className="field">
-                    <label htmlFor="jdText">Job description</label>
-                    <textarea
-                      id="jdText"
-                      value={jdText}
-                      onChange={(event) => setJdText(event.target.value)}
-                      placeholder="Paste the full job description here..."
-                    />
-                    <p className="field-hint">Pasted text gives the backend the most reliable role signal.</p>
-                  </div>
+              <div className="studio-hero-actions">
+                <button className="ghost-button" type="button" onClick={onRun} disabled={!canRun}>{runLabel}</button>
+                {downloadUrl ? (
+                  <a className="primary-button" href={downloadUrl} download>{exportLabel} <RoleForgeIcon name="download" size={14} /></a>
                 ) : (
-                  <div className="field">
-                    <label htmlFor="jdUrl">Job posting URL</label>
-                    <input
-                      id="jdUrl"
-                      value={jdUrl}
-                      onChange={(event) => setJdUrl(event.target.value)}
-                      placeholder="https://company.com/careers/job"
-                    />
-                    <p className="field-hint">Use public URLs that your backend can access without signing in.</p>
-                  </div>
+                  <button className="primary-button" type="button" disabled>{exportLabel} <RoleForgeIcon name="download" size={14} /></button>
                 )}
+              </div>
+            </div>
 
-                <div className="field">
-                  <label>Tailoring mode</label>
-                  <div className="segment mode-segment" role="tablist" aria-label="Tailoring mode">
-                    <button className={tailoringMode === "conservative" ? "active" : ""} type="button" onClick={() => setTailoringMode("conservative")}>
-                      Conservative
-                    </button>
-                    <button className={tailoringMode === "balanced" ? "active" : ""} type="button" onClick={() => setTailoringMode("balanced")}>
-                      Balanced
-                    </button>
-                    <button className={tailoringMode === "aggressive" ? "active" : ""} type="button" onClick={() => setTailoringMode("aggressive")}>
-                      Aggressive
-                    </button>
+            <div className="rf-studio-stats">
+              <StudioMetric label="Fit score" value={score ? `${score}` : "Run"} unit={score ? "/100" : "needed"} detail={scoreDetail} progress={score || readiness} tone="brand" />
+              <StudioMetric label="ATS readability" value={atsScore ? `${atsScore}` : "Review"} unit={atsScore ? "/100" : "notes"} detail={atsDetail} progress={atsScore || readiness} tone="good" />
+              <StudioMetric label="Keyword match" value={keywordTotal ? `${presentKeywords.length}` : "Terms"} unit={keywordTotal ? `/${keywordTotal} matched` : "pending"} detail={keywordDetail} progress={keywordTotal ? (presentKeywords.length / keywordTotal) * 100 : readiness} tone="accent" />
+              <StudioMetric label="Read time" value={readSeconds ? `${readSeconds}` : "Draft"} unit={readSeconds ? "seconds" : "waiting"} detail={result ? "Review before export" : "Generated after run"} progress={readSeconds ? 72 : readiness} tone="sky" />
+            </div>
+
+            <div className="rf-studio-grid">
+              <section className="studio-card rf-live-card">
+                <div className="studio-card-head">
+                  <div>
+                    <div className="eyebrow">Live preview</div>
+                    <h2 className="panel-title">Your resume · with AI edits applied</h2>
+                  </div>
+                  <div className="studio-tabs-mini" role="tablist" aria-label="Preview mode">
+                    <button className={activeTab === "resume" ? "active" : ""} type="button" onClick={() => setActiveTab("resume")}>Tailored</button>
+                    <button type="button" onClick={() => setActiveTab("history")}>Original</button>
+                    <button type="button" onClick={() => setActiveTab("changes")}>Diff</button>
                   </div>
                 </div>
+                <div className="rf-preview-wrap">
+                  <MiniResumeDocument text={activeTab === "resume" ? result?.tailored_text : undefined} keywords={presentKeywords} />
+                </div>
+              </section>
 
-                <div className="field">
-                  <label htmlFor="companyUrl">Company URL</label>
-                  <input
-                    id="companyUrl"
-                    value={companyUrl}
-                    onChange={(event) => setCompanyUrl(event.target.value)}
-                    placeholder="https://company.com"
-                  />
-                  <p className="field-hint">Optional context for company voice, product focus, and industry language.</p>
+              <section className="studio-card" id="suggestions">
+                <div className="studio-card-head">
+                  <div>
+                    <div className="eyebrow">AI suggestions</div>
+                    <h2 className="panel-title">{suggestionCards.length || "No"} changes for your review</h2>
+                  </div>
+                </div>
+                <div className="suggestion-list">
+                  {suggestionCards.length ? suggestionCards.map((suggestion, index) => (
+                    <article className="suggestion" key={`${suggestion.label}-${suggestion.meta}-${index}`}>
+                      <div className="suggestion-head">
+                        <span className={`suggestion-tag ${suggestion.tone === "good" ? "good" : suggestion.tone === "warn" ? "warn" : ""}`}>{suggestion.label}</span>
+                        <span className="suggestion-meta">{suggestion.meta}</span>
+                      </div>
+                      <div className="suggestion-body">
+                        {suggestion.before ? <div className="suggestion-before">{suggestion.before}</div> : null}
+                        <div className="suggestion-after">{suggestion.after}</div>
+                      </div>
+                      <div className="suggestion-actions">
+                        <button className="btn btn-brand btn-sm" type="button" onClick={() => setActiveTab("changes")}><RoleForgeIcon name="check" size={12} />Review</button>
+                        <button className="btn btn-soft btn-sm" type="button" onClick={() => setActiveTab("resume")}>Open</button>
+                        <button className="btn btn-ghost btn-sm" type="button" disabled>Skip</button>
+                      </div>
+                    </article>
+                  )) : (
+                    <div className="empty-state">
+                      <strong>Suggestions are waiting</strong>
+                      <p>Run the workflow and generated change notes will appear here.</p>
+                    </div>
+                  )}
+                  {warnings.length ? <div className="warning-list">{warnings.map((warning) => <span key={warning}>{warning}</span>)}</div> : null}
+                </div>
+              </section>
+            </div>
+
+            <div className="rf-studio-grid two">
+              <section className="studio-card">
+                <div className="studio-card-head">
+                  <div>
+                    <div className="eyebrow">Job target</div>
+                    <h2 className="panel-title" title={activeRole}>{targetLabel}</h2>
+                  </div>
+                  <button className="btn btn-soft btn-sm" type="button" onClick={() => document.getElementById("target")?.scrollIntoView({ behavior: "smooth" })}><RoleForgeIcon name="edit" size={12} />Change</button>
+                </div>
+                <div className="studio-jd">
+                  <div className="studio-jd-meta">
+                    <span><RoleForgeIcon name="briefcase" size={12} />{companyUrl ? "Company context added" : "Company optional"}</span>
+                    <span><RoleForgeIcon name="globe" size={12} />{jdUrl ? "Public URL target" : "Pasted text target"}</span>
+                    <span><RoleForgeIcon name="sparkle" size={12} />{tailoringMode} mode</span>
+                  </div>
+                  <p>{jdText || jdUrl || "Add a job description or public posting URL to give RoleForge a role target."}</p>
+                </div>
+                <div className="kw-section">
+                  <div className="kw-label">Matched <span className="kw-count">{presentKeywords.length}</span></div>
+                  <div className="kw-row">{presentKeywords.length ? presentKeywords.slice(0, 16).map((keyword) => <Pill key={`matched-${keyword}`} text={keyword} kind="good" />) : <span className="field-hint">Matched keywords appear after tailoring.</span>}</div>
+                </div>
+                <div className="kw-section">
+                  <div className="kw-label">Missing <span className="kw-count miss">{missingKeywords.length}</span></div>
+                  <div className="kw-row">{missingKeywords.length ? missingKeywords.slice(0, 16).map((keyword) => <Pill key={`missing-${keyword}`} text={keyword} kind="bad" />) : <span className="field-hint">Missing keywords appear after tailoring.</span>}</div>
+                </div>
+                {gapEvidence.length ? (
+                  <div className="kw-section">
+                    <div className="kw-label">Evidence to add <span className="kw-count">{gapEvidence.length}</span></div>
+                    <div className="studio-evidence-list">
+                      {gapEvidence.slice(0, 4).map((item) => <span key={`gap-${item}`}>{item}</span>)}
+                    </div>
+                  </div>
+                ) : null}
+              </section>
+
+              <section className="studio-card" id="ats">
+                <div className="studio-card-head">
+                  <div>
+                    <div className="eyebrow">ATS check</div>
+                    <h2 className="panel-title">Recruiter parser preview</h2>
+                  </div>
+                  <span className="ats-score">{atsScore ? `${atsScore}/100` : "Waiting"}</span>
+                </div>
+                <div className="ats-list">
+                  {atsIssues.length ? atsIssues.slice(0, 6).map((issue, index) => (
+                    <article className={`ats-item ${issue.severity?.toLowerCase().includes("high") ? "warn" : "good"}`} key={`${issue.issue}-${index}`}>
+                      <div className="ats-dot"><RoleForgeIcon name={issue.severity?.toLowerCase().includes("high") ? "sparkle" : "check"} size={11} /></div>
+                      <div><strong>{issue.issue}</strong><p>{issue.fix}</p></div>
+                    </article>
+                  )) : (
+                    <>
+                      <article className="ats-item good"><div className="ats-dot"><RoleForgeIcon name="check" size={11} /></div><div><strong>Headings ready for review</strong><p>Run the workflow to surface parser notes.</p></div></article>
+                      <article className="ats-item good"><div className="ats-dot"><RoleForgeIcon name="check" size={11} /></div><div><strong>Single-column check</strong><p>Formatting notes will appear when the run completes.</p></div></article>
+                      <article className="ats-item warn"><div className="ats-dot"><RoleForgeIcon name="sparkle" size={11} /></div><div><strong>Keyword coverage pending</strong><p>Matched and missing terms need a resume and target.</p></div></article>
+                    </>
+                  )}
+                </div>
+              </section>
+            </div>
+
+            <section className="studio-card" id="assets">
+              <div className="studio-card-head">
+                <div>
+                  <div className="eyebrow">Generated assets</div>
+                  <h2 className="panel-title">Cover letter · interview prep</h2>
                 </div>
               </div>
-            </Panel>
+              <div className="generated-grid rf-generated-grid">
+                <article className="generated-card">
+                  <div className="generated-head"><RoleForgeIcon name="mail" size={14} /> Cover letter</div>
+                  <div className="generated-body">
+                    {result?.cover_letter ? result.cover_letter : "After tailoring, the generated cover letter will appear here for review."}
+                  </div>
+                  <div className="suggestion-actions">
+                    <button className="btn btn-soft btn-sm" type="button" onClick={() => setActiveTab("cover")}><RoleForgeIcon name="edit" size={12} />Open</button>
+                    <button className="btn btn-soft btn-sm" type="button" onClick={copyDownloadUrl} disabled={!downloadUrl}><RoleForgeIcon name="copy" size={12} />Copy link</button>
+                  </div>
+                </article>
+                <article className="generated-card">
+                  <div className="generated-head"><RoleForgeIcon name="briefcase" size={14} /> Likely interview questions</div>
+                  {interviewPrep.length ? (
+                    <ul className="generated-list">
+                      {interviewPrep.slice(0, 5).map((item, index) => (
+                        <li key={`${item.question}-${index}`}><strong>{item.question}</strong><span>{item.answer_bullets.slice(0, 3).join(" · ")}</span></li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="generated-body">Interview prompts will appear here when preparation notes are ready.</div>
+                  )}
+                </article>
+              </div>
+            </section>
 
-            <section className="panel" id="export">
-              <div className="run-panel">
-                <div className="stage-row" aria-label="Run progress">
-                  {stages.map((item) => (
-                    <span key={item.key} className={stage === item.key ? "stage-chip active" : "stage-chip"}>
-                      {item.label}
-                    </span>
-                  ))}
+            <section className="studio-card rf-workflow-card">
+              <div className="studio-card-head">
+                <div>
+                  <div className="eyebrow">New run</div>
+                  <h2 className="panel-title">Resume intake · role target</h2>
                 </div>
+              </div>
+              <div className="rf-workflow-panel rf-intake-grid" aria-label="Workflow controls">
+                <article className="rf-intake-card rf-intake-resume">
+                  <h3 className="rf-intake-card-header">Select Resume</h3>
+                  <div className="rf-intake-card-body">
+                    <label
+                      id="input"
+                      className={file || dragActive ? "rf-file-drop active" : "rf-file-drop"}
+                      onDragEnter={() => setDragActive(true)}
+                      onDragOver={(event) => event.preventDefault()}
+                      onDragLeave={() => setDragActive(false)}
+                      onDrop={onDrop}
+                    >
+                      <input className="rf-file-input" type="file" accept=".docx" onChange={(event) => setFile(event.target.files?.[0] ?? null)} aria-label="Upload resume DOCX" />
+                      <span className="rf-file-icon"><RoleForgeIcon name="file" size={24} /></span>
+                      <span className="rf-file-copy">
+                        <strong>{file ? file.name : "Choose a DOCX resume"}</strong>
+                        <small>{file ? "Ready for tailoring" : "Drop your file here or browse from your computer."}</small>
+                      </span>
+                      <span className="rf-file-action">{file ? "Replace file" : "Choose File"}</span>
+                    </label>
+                  </div>
+                </article>
 
+                <article className="rf-intake-card rf-intake-target-card">
+                  <h3 className="rf-intake-card-header">Job Target</h3>
+                  <div className="rf-intake-card-body">
+                    <div className="rf-target-editor" id="target">
+                      <div className="segment rf-target-segment" role="tablist" aria-label="Job description input mode">
+                        <button className={inputMode === "text" ? "active" : ""} type="button" onClick={() => setInputMode("text")}>Paste text</button>
+                        <button className={inputMode === "url" ? "active" : ""} type="button" onClick={() => setInputMode("url")}>Job URL</button>
+                      </div>
+                      {inputMode === "text" ? (
+                        <textarea id="jdText" value={jdText} onChange={(event) => setJdText(event.target.value)} placeholder="Paste the full job description here..." aria-label="Job description" />
+                      ) : (
+                        <input id="jdUrl" value={jdUrl} onChange={(event) => setJdUrl(event.target.value)} placeholder="https://company.com/careers/job" aria-label="Job posting URL" />
+                      )}
+                    </div>
+                  </div>
+                </article>
+
+                <article className="rf-intake-card rf-intake-config">
+                  <h3 className="rf-intake-card-header">Configuration</h3>
+                  <div className="rf-intake-card-body">
+                    <div className="rf-run-controls">
+                      <div className="rf-config-label">Tailoring mode</div>
+                      <div className="segment mode-segment" role="tablist" aria-label="Tailoring mode">
+                        <button className={tailoringMode === "conservative" ? "active" : ""} type="button" onClick={() => setTailoringMode("conservative")}>Conservative</button>
+                        <button className={tailoringMode === "balanced" ? "active" : ""} type="button" onClick={() => setTailoringMode("balanced")}>Balanced</button>
+                        <button className={tailoringMode === "aggressive" ? "active" : ""} type="button" onClick={() => setTailoringMode("aggressive")}>Aggressive</button>
+                      </div>
+                      <label className="rf-company-field">
+                        <span>Company context</span>
+                        <input value={companyUrl} onChange={(event) => setCompanyUrl(event.target.value)} placeholder="Optional company URL" aria-label="Company URL" />
+                      </label>
+                      <span className="sr-only" aria-live="polite">Workflow status: {stage}</span>
+                      <button className="primary-button" type="button" onClick={onRun} disabled={!canRun}>{runLabel} <RoleForgeIcon name="sparkle" size={14} /></button>
+                      {copyState ? <span className="copy-state">{copyState}</span> : null}
+                    </div>
+                  </div>
+                </article>
                 {error ? (
-                  <div className="issue-card">
+                  <div className="rf-callout danger">
                     <strong>Workflow stopped</strong>
                     <p>{error}</p>
                   </div>
                 ) : null}
-
-                <button className="primary-button" type="button" onClick={onRun} disabled={!canRun}>
-                  {busy ? "RoleForge is working..." : "Run RoleForge + export"} <Icon name="spark" />
-                </button>
-
-                {!canRun ? (
-                  <p className="field-hint">
-                    Add a backend URL, a DOCX resume, and a job target to enable the workflow.
-                  </p>
-                ) : null}
-
-                {downloadUrl ? (
-                  <div className="download-row">
-                    <a className="primary-button" href={downloadUrl} download>
-                      Download DOCX <Icon name="download" />
-                    </a>
-                    <button className="ghost-button" type="button" onClick={copyDownloadUrl}>
-                      Copy link <Icon name="copy" />
-                    </button>
-                    {copyState ? <span className="copy-state">{copyState}</span> : null}
-                  </div>
-                ) : null}
               </div>
             </section>
-          </div>
 
-          <div className="analysis-grid">
-            <Panel
-              title="Agent review"
-              description="Review score movement, gaps, ATS notes, generated writing, interview prep, and local run history."
-              action={
-                resumeId ? (
-                  <span className="status-pill">
-                    <Icon name="check" /> Resume ID ready
-                  </span>
-                ) : (
-                  <span className="status-pill">
-                    <Icon name="link" /> Waiting
-                  </span>
-                )
-              }
-            >
-              <div id="review" className="input-stack">
-                <div className="tabs" role="tablist" aria-label="Review sections">
-                  <button className={activeTab === "score" ? "active" : ""} type="button" onClick={() => setActiveTab("score")}>
-                    Fit score
-                  </button>
-                  <button className={activeTab === "gap" ? "active" : ""} type="button" onClick={() => setActiveTab("gap")}>
-                    Gaps
-                  </button>
-                  <button className={activeTab === "ats" ? "active" : ""} type="button" onClick={() => setActiveTab("ats")}>
-                    ATS
-                  </button>
-                  <button className={activeTab === "resume" ? "active" : ""} type="button" onClick={() => setActiveTab("resume")}>
-                    Resume
-                  </button>
-                  <button className={activeTab === "cover" ? "active" : ""} type="button" onClick={() => setActiveTab("cover")}>
-                    Letter
-                  </button>
-                  <button className={activeTab === "interview" ? "active" : ""} type="button" onClick={() => setActiveTab("interview")}>
-                    Prep
-                  </button>
-                  <button className={activeTab === "changes" ? "active" : ""} type="button" onClick={() => setActiveTab("changes")}>
-                    Changes
-                  </button>
-                  <button className={activeTab === "history" ? "active" : ""} type="button" onClick={() => setActiveTab("history")}>
-                    History
-                  </button>
-                </div>
-
-                {activeTab === "score" ? (
-                  result?.fit_score ? (
-                    <div className="analysis-grid">
-                      <div className="score-panel">
-                        <div className="big-score" style={{ "--score": score } as React.CSSProperties}>
-                          <span>{score}/100</span>
-                        </div>
-                        <div className="metric-grid">
-                          <Metric label="Fit delta" value={formatDelta(result.score_summary?.fit_delta)} />
-                          <Metric label="ATS delta" value={formatDelta(result.score_summary?.ats_delta)} />
-                          <Metric label="Present" value={`${presentKeywords.length}`} />
-                          <Metric label="Missing" value={`${missingKeywords.length}`} />
-                          <Metric label="Resolved" value={`${result.score_summary?.issues_resolved ?? 0}`} />
-                          <Metric label="Mode" value={result.tailoring_mode ?? tailoringMode} />
-                        </div>
-                      </div>
-
-                      {result.fit_score.note ? <p className="panel-copy">{result.fit_score.note}</p> : null}
-                      {result.recruiter_summary ? (
-                        <article className="summary-strip">
-                          <strong>Recruiter summary</strong>
-                          <p>{result.recruiter_summary}</p>
-                        </article>
-                      ) : null}
-                      {warnings.length ? (
-                        <div className="warning-list">
-                          {warnings.map((warning) => (
-                            <span key={warning}>{warning}</span>
-                          ))}
-                        </div>
-                      ) : null}
-
-                      <div>
-                        <h3 className="panel-title">Matched keywords</h3>
-                        <div className="keyword-cloud">
-                          {presentKeywords.slice(0, 18).map((keyword) => (
-                            <Pill key={`present-${keyword}`} text={keyword} kind="good" />
-                          ))}
-                        </div>
-                      </div>
-
-                      <div>
-                        <h3 className="panel-title">Missing keywords</h3>
-                        <div className="keyword-cloud">
-                          {missingKeywords.slice(0, 18).map((keyword) => (
-                            <Pill key={`missing-${keyword}`} text={keyword} kind="bad" />
-                          ))}
-                        </div>
-                      </div>
-
-                      {result.score_summary?.added_keywords?.length ? (
-                        <div>
-                          <h3 className="panel-title">Keywords added by agent</h3>
-                          <div className="keyword-cloud">
-                            {result.score_summary.added_keywords.slice(0, 18).map((keyword) => (
-                              <Pill key={`added-${keyword}`} text={keyword} kind="good" />
-                            ))}
-                          </div>
-                        </div>
-                      ) : null}
-                    </div>
-                  ) : (
-                    <div className="empty-state">
-                      <div>
-                        <strong>No fit score yet</strong>
-                        <p>Run the workflow and the score panel will turn into a keyword coverage dashboard.</p>
-                      </div>
-                    </div>
-                  )
-                ) : null}
-
-                {activeTab === "gap" ? (
-                  gap ? (
-                    <div className="insight-grid">
-                      <article className="change-item">
-                        <strong>Matched requirements</strong>
-                        <ul>{gap.matched_requirements.slice(0, 8).map((item) => <li key={`matched-${item}`}>{item}</li>)}</ul>
-                      </article>
-                      <article className="change-item">
-                        <strong>Partial matches</strong>
-                        <ul>{gap.partial_matches.slice(0, 8).map((item) => <li key={`partial-${item}`}>{item}</li>)}</ul>
-                      </article>
-                      <article className="issue-card">
-                        <strong>Missing requirements</strong>
-                        <ul>{gap.missing_requirements.slice(0, 8).map((item) => <li key={`missing-req-${item}`}>{item}</li>)}</ul>
-                      </article>
-                      <article className="change-item">
-                        <strong>Evidence to add</strong>
-                        <ul>{gap.evidence_to_add.slice(0, 8).map((item) => <li key={`evidence-${item}`}>{item}</li>)}</ul>
-                      </article>
-                      {gap.cautions.length ? (
-                        <article className="issue-card">
-                          <strong>Truth guardrails</strong>
-                          <ul>{gap.cautions.slice(0, 6).map((item) => <li key={`caution-${item}`}>{item}</li>)}</ul>
-                        </article>
-                      ) : null}
-                    </div>
-                  ) : (
-                    <div className="empty-state">
-                      <div>
-                        <strong>No gap analysis yet</strong>
-                        <p>Run the workflow and the agent will separate proven matches from missing evidence.</p>
-                      </div>
-                    </div>
-                  )
-                ) : null}
-
-                {activeTab === "ats" ? (
-                  atsIssues.length ? (
-                    <div className="issue-list">
-                      {result?.score_summary ? (
-                        <div className="metric-grid">
-                          <Metric label="ATS before" value={`${result.score_summary.ats_before}`} />
-                          <Metric label="ATS after" value={`${result.score_summary.ats_after}`} />
-                          <Metric label="Issues left" value={`${result.score_summary.issues_after}`} />
-                        </div>
-                      ) : null}
-                      {atsIssues.slice(0, 10).map((issue, index) => (
-                        <article className="issue-card" key={`${issue.issue}-${index}`}>
-                          <strong>{issue.severity.toUpperCase()}: {issue.issue}</strong>
-                          <p>{issue.fix}</p>
-                        </article>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="empty-state">
-                      <div>
-                        <strong>{result ? "No ATS issues detected" : "ATS review is waiting"}</strong>
-                        <p>{result ? "The tailored version came back clean based on the current backend report." : "After tailoring, this tab will list parser risks and suggested fixes."}</p>
-                      </div>
-                    </div>
-                  )
-                ) : null}
-
-                {activeTab === "resume" ? (
-                  result?.tailored_text ? (
-                    <pre className="result-box">{result.tailored_text}</pre>
-                  ) : (
-                    <div className="empty-state">
-                      <div>
-                        <strong>Generated resume preview</strong>
-                        <p>The tailored resume text will appear here before you download the DOCX.</p>
-                      </div>
-                    </div>
-                  )
-                ) : null}
-
-                {activeTab === "cover" ? (
-                  result?.cover_letter ? (
-                    <div className="analysis-grid">
-                      <pre className="result-box compact">{result.cover_letter}</pre>
-                      {result.recruiter_summary ? (
-                        <article className="summary-strip">
-                          <strong>Positioning note</strong>
-                          <p>{result.recruiter_summary}</p>
-                        </article>
-                      ) : null}
-                    </div>
-                  ) : (
-                    <div className="empty-state">
-                      <div>
-                        <strong>No cover letter yet</strong>
-                        <p>The agent will draft a grounded letter from the same resume and job target.</p>
-                      </div>
-                    </div>
-                  )
-                ) : null}
-
-                {activeTab === "interview" ? (
-                  interviewPrep.length ? (
-                    <div className="change-list">
-                      {interviewPrep.map((item, index) => (
-                        <article className="change-item" key={`${item.question}-${index}`}>
-                          <strong>{item.question}</strong>
-                          <ul>{item.answer_bullets.map((bullet) => <li key={`${item.question}-${bullet}`}>{bullet}</li>)}</ul>
-                        </article>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="empty-state">
-                      <div>
-                        <strong>No interview prep yet</strong>
-                        <p>After tailoring, this tab will turn the resume and job target into answer prompts.</p>
-                      </div>
-                    </div>
-                  )
-                ) : null}
-
-                {activeTab === "changes" ? (
-                  result?.change_log?.length || result?.suggestions?.length ? (
-                    <div className="change-list">
-                      {(result.change_log ?? []).map((change, index) => (
-                        <article className="change-item" key={`${change}-${index}`}>
-                          <strong>Change {index + 1}</strong>
-                          <p>{change}</p>
-                        </article>
-                      ))}
-                      {(result.suggestions ?? []).map((suggestion, index) => (
-                        <article className="issue-card" key={`${suggestion}-${index}`}>
-                          <strong>Suggestion {index + 1}</strong>
-                          <p>{suggestion}</p>
-                        </article>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="empty-state">
-                      <div>
-                        <strong>No change log yet</strong>
-                        <p>Once the backend returns a tailored resume, this view will explain what changed.</p>
-                      </div>
-                    </div>
-                  )
-                ) : null}
-
-                {activeTab === "history" ? (
-                  history.length ? (
-                    <div className="change-list">
-                      {history.map((entry) => (
-                        <article className="history-item" key={entry.id}>
-                          <div>
-                            <strong>{entry.filename}</strong>
-                            <p>{entry.roleHint}</p>
-                            <span>{new Date(entry.createdAt).toLocaleString()} | {entry.mode} | {entry.score}/100</span>
-                          </div>
-                          <a className="ghost-button" href={entry.downloadUrl} download>
-                            Download <Icon name="download" />
-                          </a>
-                        </article>
-                      ))}
-                      <button
-                        className="ghost-button"
-                        type="button"
-                        onClick={() => {
-                          setHistory([]);
-                          saveHistory([]);
-                        }}
-                      >
-                        Clear history
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="empty-state">
-                      <div>
-                        <strong>No local history yet</strong>
-                        <p>Completed runs will appear here on this browser with their score and download link.</p>
-                      </div>
-                    </div>
-                  )
-                ) : null}
-              </div>
-            </Panel>
-
-            <section className="preview-doc">
-              <div className="document">
-                <div className="doc-toolbar">
-                  <StatusPill ok={stage === "ready"} text={stage === "ready" ? "Export ready" : "Live preview"} />
-                  <span className="status-pill">{file ? file.name : "No resume selected"}</span>
-                </div>
-                <div className="doc-body">
-                  <div className="doc-title">RoleForge Draft</div>
-                  <div className="doc-subtitle">{hasTarget ? "Role target loaded" : "Add a role target to start shaping the draft"}</div>
-                  <div className="doc-rule" />
-                  <div className="doc-section">
-                    <h3>Profile</h3>
-                    <div className="doc-line" />
-                    <div className="doc-line medium" />
-                    <div className="doc-line short" />
+            {activeTab === "history" ? (
+              <section className="studio-card">
+                <div className="studio-card-head">
+                  <div>
+                    <div className="eyebrow">Local history</div>
+                    <h2 className="panel-title">Recent runs</h2>
                   </div>
-                  <div className="doc-section">
-                    <h3>Role keywords</h3>
-                    <div className="keyword-row">
-                      {(presentKeywords.length ? presentKeywords : ["leadership", "analytics", "strategy", "delivery"]).slice(0, 6).map((keyword) => (
-                        <span className="mini-keyword" key={`preview-${keyword}`}>{keyword}</span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="doc-section">
-                    <h3>Impact bullets</h3>
-                    <div className="doc-line medium" />
-                    <div className="doc-line" />
-                    <div className="doc-line short" />
-                  </div>
-                  <div className="doc-watermark">{score || readiness}%</div>
+                  <button className="btn btn-soft btn-sm" type="button" onClick={() => { setHistory([]); saveHistory([]); }}>Clear</button>
                 </div>
-              </div>
-            </section>
-          </div>
+                <div className="change-list panel-body">
+                  {history.length ? history.map((entry) => (
+                    <article className="history-item" key={entry.id}>
+                      <div><strong>{entry.filename}</strong><p>{entry.roleHint}</p><span>{new Date(entry.createdAt).toLocaleString()} · {entry.mode} · {entry.score}/100</span></div>
+                      <a className="ghost-button" href={entry.downloadUrl} download>Download <RoleForgeIcon name="download" size={14} /></a>
+                    </article>
+                  )) : <div className="empty-state"><strong>No local history yet</strong><p>Completed runs will appear here in this browser.</p></div>}
+                </div>
+              </section>
+            ) : null}
+          </section>
         </div>
       </div>
     </main>
