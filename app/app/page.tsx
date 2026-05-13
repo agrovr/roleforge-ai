@@ -500,6 +500,40 @@ function compactLabel(value: string, maxLength = 46) {
   return `${normalized.slice(0, maxLength - 1).trimEnd()}...`;
 }
 
+function isUrlTarget(value: string) {
+  return /^(https?:\/\/|www\.)/i.test(value.trim());
+}
+
+function readableDomainName(hostname: string) {
+  const clean = hostname.replace(/^www\./i, "");
+  const firstSegment = clean.split(".").find(Boolean) || clean;
+  return firstSegment
+    .split(/[-_]+/)
+    .filter(Boolean)
+    .map((part) => (part.length <= 3 ? part.toUpperCase() : `${part.charAt(0).toUpperCase()}${part.slice(1)}`))
+    .join(" ");
+}
+
+function parseTargetUrl(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed || !isUrlTarget(trimmed)) return null;
+
+  try {
+    const url = new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
+    const host = url.hostname.replace(/^www\./i, "");
+
+    return {
+      host,
+      label: `${readableDomainName(host)} job target`,
+    };
+  } catch {
+    return {
+      host: "Job URL",
+      label: "Job URL target",
+    };
+  }
+}
+
 export default function Page() {
   const baseUrl = useMemo(() => {
     const value = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -711,11 +745,20 @@ export default function Page() {
     }
   }
 
-  const firstTargetLine = (jdText || jdUrl).split(/\r?\n/).map((line) => line.trim()).find(Boolean);
+  const firstTargetLine = (jdText || jdUrl).split(/\r?\n/).map((line) => line.trim()).find(Boolean) || "";
   const activeResumeName = file?.name?.replace(/\.(docx|pdf|txt)$/i, "") || "Resume studio";
-  const activeRole = firstTargetLine || (hasTarget ? "Role target loaded" : "Add a role target");
+  const targetUrlInfo = parseTargetUrl(firstTargetLine);
+  const activeRole = targetUrlInfo?.label || firstTargetLine || (hasTarget ? "Role target loaded" : "Add a role target");
+  const activeTitle = hasTarget && firstTargetLine ? firstTargetLine : activeResumeName;
+  const activeDetail = result
+    ? targetUrlInfo?.host
+      ? `Tailored and exported for ${targetUrlInfo.host}`
+      : "Tailored and exported from the current workflow"
+    : file
+      ? "Resume selected · add a target and run the workflow"
+      : "Upload a resume, add a job target, then run the workflow";
   const topbarLabel = compactLabel(hasTarget ? activeRole : activeResumeName, 36);
-  const heroLabel = compactLabel(hasTarget ? activeRole : activeResumeName, 58);
+  const heroLabel = compactLabel(hasTarget ? activeRole : activeResumeName, 44);
   const targetLabel = compactLabel(activeRole, 62);
   const atsScore = result?.score_summary?.ats_after ?? result?.fit_score_after?.score ?? score;
   const keywordTotal = presentKeywords.length + missingKeywords.length;
@@ -761,7 +804,7 @@ export default function Page() {
             <Brand href="/" label="RoleForge AI home" />
             <span className="breadcrumb-current">Resumes</span>
             <span className="breadcrumb-separator" aria-hidden="true">/</span>
-            <strong title={hasTarget ? activeRole : activeResumeName}>{topbarLabel}</strong>
+            <strong title={activeTitle}>{topbarLabel}</strong>
           </div>
           <div className="rf-studio-top-actions">
             <button className="ghost-button studio-top-button" type="button" disabled={!result}>
@@ -807,10 +850,8 @@ export default function Page() {
             <div className="rf-studio-hero">
               <div>
                 <div className="eyebrow">Active resume</div>
-                <h1 title={hasTarget ? activeRole : activeResumeName}>{heroLabel}</h1>
-                <p>
-                  {result ? "Tailored and exported from the current workflow" : file ? "Resume selected · add a target and run the workflow" : "Upload a resume, add a job target, then run the workflow"}
-                </p>
+                <h1 title={activeTitle}>{heroLabel}</h1>
+                <p>{activeDetail}</p>
               </div>
               <div className="studio-hero-actions">
                 <button className="ghost-button" type="button" onClick={onRun} disabled={!canRun}>{runLabel}</button>
@@ -911,7 +952,7 @@ export default function Page() {
                 <div className="studio-card-head">
                   <div>
                     <div className="eyebrow">Job target</div>
-                    <h2 className="panel-title" title={activeRole}>{targetLabel}</h2>
+                    <h2 className="panel-title" title={activeTitle}>{targetLabel}</h2>
                   </div>
                   <button className="btn btn-soft btn-sm" type="button" onClick={() => document.getElementById("target")?.scrollIntoView({ behavior: "smooth" })}><RoleForgeIcon name="edit" size={12} />Change</button>
                 </div>
