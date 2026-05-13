@@ -63,6 +63,9 @@ type TailorResult = {
 
 type UploadFormat = "docx" | "pdf" | "txt";
 type ExportFormat = "pdf" | "docx" | "txt";
+type UploadCapability = { format: UploadFormat; label: string; enabled: boolean };
+type ExportCapability = { format: ExportFormat; label: string; enabled: boolean; plan?: "free" | "premium"; reason?: string };
+type CapabilitiesResponse = { upload_formats?: UploadCapability[]; export_formats?: ExportCapability[] };
 type UploadResponse = { resume_id: string; filename: string; format?: UploadFormat; character_count?: number };
 type ExportResponse = { saved_to: string; download_filename: string };
 type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error";
@@ -85,6 +88,16 @@ type ParsedResumeSection = { title: string; lines: string[] };
 type ParsedResume = { name: string; role: string; contact: string; sections: ParsedResumeSection[] };
 
 const HISTORY_KEY = "resume-tailor-history-v1";
+const DEFAULT_UPLOAD_FORMATS: UploadCapability[] = [
+  { format: "docx", label: "DOCX", enabled: true },
+  { format: "pdf", label: "PDF", enabled: true },
+  { format: "txt", label: "TXT", enabled: true },
+];
+const DEFAULT_EXPORT_FORMATS: ExportCapability[] = [
+  { format: "pdf", label: "PDF", enabled: true, plan: "free" },
+  { format: "docx", label: "DOCX", enabled: false, plan: "premium", reason: "Premium coming soon" },
+  { format: "txt", label: "TXT", enabled: false, plan: "premium", reason: "Premium coming soon" },
+];
 
 function Pill({ text, kind }: { text: string; kind: "good" | "bad" }) {
   return <span className={`pill ${kind}`}>{text}</span>;
@@ -427,10 +440,31 @@ export default function Page() {
   const [result, setResult] = useState<TailorResult | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [capabilities, setCapabilities] = useState<CapabilitiesResponse | null>(null);
 
   useEffect(() => {
     setHistory(loadHistory());
   }, []);
+
+  useEffect(() => {
+    if (!baseUrl) {
+      setCapabilities(null);
+      return;
+    }
+
+    const controller = new AbortController();
+    fetch(`${baseUrl}/capabilities`, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Capability check failed");
+        return (await response.json()) as CapabilitiesResponse;
+      })
+      .then((data) => setCapabilities(data))
+      .catch((caught) => {
+        if ((caught as Error).name !== "AbortError") setCapabilities(null);
+      });
+
+    return () => controller.abort();
+  }, [baseUrl]);
 
   useEffect(() => {
     let cancelled = false;
@@ -605,6 +639,15 @@ export default function Page() {
   const keywordDetail = keywordTotal ? `${missingKeywords.length} missing` : "Target terms pending";
   const runLabel = busy ? "Tailoring..." : result ? "Re-tailor" : "Run Tailor";
   const exportLabel = downloadUrl ? "Download PDF" : "Export PDF";
+  const uploadFormats = capabilities?.upload_formats?.length ? capabilities.upload_formats : DEFAULT_UPLOAD_FORMATS;
+  const exportFormats = capabilities?.export_formats?.length ? capabilities.export_formats : DEFAULT_EXPORT_FORMATS;
+  const enabledUploadFormats = uploadFormats.filter((format) => format.enabled);
+  const uploadAccept = enabledUploadFormats.length
+    ? enabledUploadFormats.map((format) => `.${format.format}`).join(",")
+    : ".docx,.pdf,.txt";
+  const uploadFormatHint = enabledUploadFormats.length
+    ? `${enabledUploadFormats.map((format) => format.label).join(", ")}. Drop your file here or browse from your computer.`
+    : "DOCX, PDF, or TXT. Drop your file here or browse from your computer.";
 
   const suggestionCards: StudioSuggestion[] = result
     ? [
@@ -691,9 +734,20 @@ export default function Page() {
                   <button className="primary-button" type="button" disabled>{exportLabel} <RoleForgeIcon name="download" size={14} /></button>
                 )}
                 <div className="export-format-strip" aria-label="Export format availability">
-                  <span className="export-format-chip active">PDF <small>Free</small></span>
-                  <span className="export-format-chip">DOCX <small>Premium</small></span>
-                  <span className="export-format-chip">TXT <small>Premium</small></span>
+                  {exportFormats.map((format) => {
+                    const isPdf = format.format === "pdf";
+                    const planLabel = format.plan === "premium" ? "Premium" : "Free";
+                    return (
+                      <span
+                        key={format.format}
+                        className={`export-format-chip${isPdf ? " active" : ""}${format.enabled ? "" : " disabled"}`}
+                        aria-disabled={!format.enabled}
+                        title={!format.enabled ? format.reason || "Coming soon" : `${format.label} export available`}
+                      >
+                        {format.label} <small>{format.enabled ? planLabel : format.reason || planLabel}</small>
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -878,11 +932,11 @@ export default function Page() {
                       onDragLeave={() => setDragActive(false)}
                       onDrop={onDrop}
                     >
-                      <input className="rf-file-input" type="file" accept=".docx,.pdf,.txt" onChange={(event) => setFile(event.target.files?.[0] ?? null)} aria-label="Upload resume file" />
+                      <input className="rf-file-input" type="file" accept={uploadAccept} onChange={(event) => setFile(event.target.files?.[0] ?? null)} aria-label="Upload resume file" />
                       <span className="rf-file-icon"><RoleForgeIcon name="file" size={24} /></span>
                       <span className="rf-file-copy">
                         <strong>{file ? file.name : "Choose a resume file"}</strong>
-                        <small>{file ? "Ready for tailoring" : "DOCX, PDF, or TXT. Drop your file here or browse from your computer."}</small>
+                        <small>{file ? "Ready for tailoring" : uploadFormatHint}</small>
                       </span>
                       <span className="rf-file-action">{file ? "Replace file" : "Choose File"}</span>
                     </label>

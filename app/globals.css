@@ -3490,6 +3490,16 @@ html[data-theme="dark"] .result-box {
   color: #2f6842;
 }
 
+.export-format-chip.disabled {
+  border-style: dashed;
+  background: rgba(255, 255, 255, 0.48);
+  color: var(--ink-3);
+}
+
+.export-format-chip.disabled small {
+  color: var(--muted);
+}
+
 .studio-stat-label,
 .dash-stat-label {
   color: var(--ink-3);
@@ -5441,6 +5451,16 @@ html[data-theme="dark"] .export-format-chip.active {
   border-color: rgba(142, 217, 156, 0.24);
   background: rgba(64, 118, 78, 0.22);
   color: #bfe7c5;
+}
+
+html[data-theme="dark"] .export-format-chip.disabled {
+  border-color: rgba(255, 247, 233, 0.14);
+  background: rgba(255, 247, 233, 0.035);
+  color: rgba(224, 228, 241, 0.66);
+}
+
+html[data-theme="dark"] .export-format-chip.disabled small {
+  color: rgba(224, 228, 241, 0.54);
 }
 
 html[data-theme="dark"] .stage-chip {
