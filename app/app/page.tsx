@@ -61,7 +61,9 @@ type TailorResult = {
   request_id?: string;
 };
 
-type UploadResponse = { resume_id: string; filename: string };
+type UploadFormat = "docx" | "pdf" | "txt";
+type ExportFormat = "pdf" | "docx" | "txt";
+type UploadResponse = { resume_id: string; filename: string; format?: UploadFormat };
 type ExportResponse = { saved_to: string; download_filename: string };
 type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error";
 type InputMode = "text" | "url";
@@ -73,6 +75,7 @@ type HistoryItem = {
   mode: TailoringMode;
   score: number;
   downloadUrl: string;
+  downloadFormat?: ExportFormat;
   roleHint: string;
 };
 type ApiErrorPayload = { error?: { code?: string; message?: string; request_id?: string; details?: unknown } };
@@ -265,7 +268,7 @@ export default function Page() {
 
   async function upload(): Promise<string> {
     if (!baseUrl) throw new Error("The resume workflow is not available yet.");
-    if (!file) throw new Error("Select a resume .docx first");
+    if (!file) throw new Error("Select a resume file first.");
 
     const form = new FormData();
     form.append("file", file);
@@ -306,16 +309,17 @@ export default function Page() {
     return data;
   }
 
-  async function exportDocx(tailoredText: string): Promise<string> {
+  async function exportResume(tailoredText: string, format: ExportFormat = "pdf"): Promise<string> {
     if (!baseUrl) throw new Error("Export is not available yet.");
 
     const response = await fetch(`${baseUrl}/export`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        filename: "tailored_resume.docx",
+        filename: `tailored_resume.${format}`,
         title: "TAILORED RESUME",
         content: tailoredText,
+        format,
       }),
     });
     if (!response.ok) throw new Error(await readApiError(response, "Export failed"));
@@ -341,14 +345,15 @@ export default function Page() {
       setStage("tailoring");
       const output = await tailor(id);
       setStage("exporting");
-      const url = await exportDocx(output.tailored_text);
+      const url = await exportResume(output.tailored_text, "pdf");
       const item: HistoryItem = {
         id: output.run_id ?? id,
         createdAt: output.generated_at ?? new Date().toISOString(),
-        filename: file?.name ?? "resume.docx",
+        filename: file?.name ?? "resume",
         mode: output.tailoring_mode ?? tailoringMode,
         score: output.score_summary?.fit_after ?? output.fit_score_after?.score ?? output.fit_score?.score ?? 0,
         downloadUrl: url,
+        downloadFormat: "pdf",
         roleHint: (jdText || jdUrl || "Role target").slice(0, 90),
       };
       const nextHistory = [item, ...history.filter((entry) => entry.id !== item.id)].slice(0, 12);
@@ -384,7 +389,7 @@ export default function Page() {
   }
 
   const firstTargetLine = (jdText || jdUrl).split(/\r?\n/).map((line) => line.trim()).find(Boolean);
-  const activeResumeName = file?.name?.replace(/\.docx$/i, "") || "Resume studio";
+  const activeResumeName = file?.name?.replace(/\.(docx|pdf|txt)$/i, "") || "Resume studio";
   const activeRole = firstTargetLine || (hasTarget ? "Role target loaded" : "Add a role target");
   const topbarLabel = compactLabel(hasTarget ? activeRole : activeResumeName, 36);
   const heroLabel = compactLabel(hasTarget ? activeRole : activeResumeName, 58);
@@ -396,7 +401,7 @@ export default function Page() {
   const atsDetail = result?.score_summary?.issues_resolved ? `${result.score_summary.issues_resolved} issues fixed` : result ? "Parser notes returned" : "Waiting for run";
   const keywordDetail = keywordTotal ? `${missingKeywords.length} missing` : "Target terms pending";
   const runLabel = busy ? "Tailoring..." : result ? "Re-tailor" : "Run Tailor";
-  const exportLabel = downloadUrl ? "Download DOCX" : "Export DOCX";
+  const exportLabel = downloadUrl ? "Download PDF" : "Export PDF";
 
   const suggestionCards: StudioSuggestion[] = result
     ? [
@@ -482,6 +487,11 @@ export default function Page() {
                 ) : (
                   <button className="primary-button" type="button" disabled>{exportLabel} <RoleForgeIcon name="download" size={14} /></button>
                 )}
+                <div className="export-format-strip" aria-label="Export format availability">
+                  <span className="export-format-chip active">PDF <small>Free</small></span>
+                  <span className="export-format-chip">DOCX <small>Premium</small></span>
+                  <span className="export-format-chip">TXT <small>Premium</small></span>
+                </div>
               </div>
             </div>
 
@@ -657,11 +667,11 @@ export default function Page() {
                       onDragLeave={() => setDragActive(false)}
                       onDrop={onDrop}
                     >
-                      <input className="rf-file-input" type="file" accept=".docx" onChange={(event) => setFile(event.target.files?.[0] ?? null)} aria-label="Upload resume DOCX" />
+                      <input className="rf-file-input" type="file" accept=".docx,.pdf,.txt" onChange={(event) => setFile(event.target.files?.[0] ?? null)} aria-label="Upload resume file" />
                       <span className="rf-file-icon"><RoleForgeIcon name="file" size={24} /></span>
                       <span className="rf-file-copy">
-                        <strong>{file ? file.name : "Choose a DOCX resume"}</strong>
-                        <small>{file ? "Ready for tailoring" : "Drop your file here or browse from your computer."}</small>
+                        <strong>{file ? file.name : "Choose a resume file"}</strong>
+                        <small>{file ? "Ready for tailoring" : "DOCX, PDF, or TXT. Drop your file here or browse from your computer."}</small>
                       </span>
                       <span className="rf-file-action">{file ? "Replace file" : "Choose File"}</span>
                     </label>
@@ -727,7 +737,7 @@ export default function Page() {
                   {history.length ? history.map((entry) => (
                     <article className="history-item" key={entry.id}>
                       <div><strong>{entry.filename}</strong><p>{entry.roleHint}</p><span>{new Date(entry.createdAt).toLocaleString()} · {entry.mode} · {entry.score}/100</span></div>
-                      <a className="ghost-button" href={entry.downloadUrl} download>Download <RoleForgeIcon name="download" size={14} /></a>
+                      <a className="ghost-button" href={entry.downloadUrl} download>Download {entry.downloadFormat?.toUpperCase() ?? "PDF"} <RoleForgeIcon name="download" size={14} /></a>
                     </article>
                   )) : <div className="empty-state"><strong>No local history yet</strong><p>Completed runs will appear here in this browser.</p></div>}
                 </div>

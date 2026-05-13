@@ -3454,6 +3454,42 @@ html[data-theme="dark"] .result-box {
   flex-wrap: wrap;
 }
 
+.export-format-strip {
+  flex: 1 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 2px;
+}
+
+.export-format-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 88%, var(--bg-alt));
+  color: var(--ink-2);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.export-format-chip small {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 850;
+}
+
+.export-format-chip.active {
+  border-color: rgba(73, 135, 90, 0.22);
+  background: rgba(211, 232, 212, 0.74);
+  color: #2f6842;
+}
+
 .studio-stat-label,
 .dash-stat-label {
   color: var(--ink-3);
@@ -5358,6 +5394,22 @@ html[data-theme="dark"] .rf-workflow-panel .segment button.active {
   background: #fff7e9;
   color: #0b0f1f;
   box-shadow: 0 10px 24px -18px rgba(255, 247, 233, 0.85);
+}
+
+html[data-theme="dark"] .export-format-chip {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: rgba(255, 247, 233, 0.06);
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .export-format-chip small {
+  color: rgba(224, 228, 241, 0.72);
+}
+
+html[data-theme="dark"] .export-format-chip.active {
+  border-color: rgba(142, 217, 156, 0.24);
+  background: rgba(64, 118, 78, 0.22);
+  color: #bfe7c5;
 }
 
 html[data-theme="dark"] .stage-chip {
