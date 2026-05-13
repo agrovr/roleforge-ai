@@ -1,18 +1,24 @@
 # RoleForge AI Frontend
 
-A Next.js frontend for an AI-assisted resume tailoring workflow.
+Production frontend for RoleForge AI, an AI-assisted resume workflow for uploading a resume, targeting a role, reviewing generated guidance, and exporting a cleaner draft.
 
-The app helps users upload a DOCX resume, add a job target, review backend-returned guidance, and export a tailored draft. Marketing copy intentionally avoids unsupported customer proof, performance statistics, third-party brand proof, vendor-specific ATS claims, and manual-review claims.
+- Live app: https://resume-tailor-ui-eta.vercel.app/
+- Frontend repo: https://github.com/agrovr/resume-tailor-ui
+- Production backend: `https://roleforge-api-224015900616.us-central1.run.app`
+- Private backend repo: `agrovr/roleforge-ai-backend`
+
+The public-facing copy intentionally avoids unsupported customer proof, performance statistics, third-party logos, vendor-specific ATS claims, and human-review claims until those are legally approved and backed by real product behavior.
 
 ## Features
 
-- Resume upload flow
+- RoleForge AI landing page and resume studio UI
+- DOCX, PDF, and TXT resume upload support through the backend
 - Job description text or public URL targeting
 - Optional company URL context
-- Fit, gap, formatting, generated resume, cover letter, interview prep, change log, warning, and history views when returned by the backend
-- DOCX export flow
-- Responsive RoleForge AI landing page and studio UI
-- Disabled/coming-soon states for auth, premium billing, account settings, and feature gating
+- Fit, gap, formatting, generated resume, cover letter, interview prep, change log, warning, and local history views when returned by the backend
+- PDF export for the launch flow
+- Disabled or coming-soon states for auth, premium billing, account settings, and premium feature gating
+- Light and dark visual themes
 
 ## Tech Stack
 
@@ -25,7 +31,7 @@ The app helps users upload a DOCX resume, add a job target, review backend-retur
 
 ```text
 app/
-  app/page.tsx                    # Main app workflow UI
+  app/page.tsx                    # Studio workflow UI
   components/Brand.tsx            # RoleForge brand component
   components/ResumePreview.tsx    # Safe generic resume preview mockups
   components/RoleForgeIcons.tsx   # Inline UI icon set
@@ -34,7 +40,7 @@ app/
   layout.tsx                      # Root layout and metadata
 ```
 
-## Getting Started
+## Local Development
 
 ```bash
 npm install
@@ -51,8 +57,17 @@ Configure the public backend URL in local and deployed environments:
 NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
 ```
 
+For production, Vercel should point to:
+
+```env
+NEXT_PUBLIC_BACKEND_URL=https://roleforge-api-224015900616.us-central1.run.app
+```
+
 The studio expects the backend to provide:
 
+- `GET /health`
+- `GET /ready`
+- `GET /capabilities`
 - `POST /upload`
 - `POST /tailor`
 - `POST /export`
@@ -66,4 +81,4 @@ npx tsc --noEmit
 npm run build
 ```
 
-Before enabling auth or billing, provide the auth provider, payment provider, price IDs, redirect URLs, backend endpoints, and entitlement rules.
+Before enabling auth or billing, provide the auth provider, payment provider, Stripe price IDs or billing model, redirect URLs, backend endpoints, and entitlement rules.
