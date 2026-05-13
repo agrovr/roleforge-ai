@@ -63,10 +63,11 @@ type TailorResult = {
 
 type UploadFormat = "docx" | "pdf" | "txt";
 type ExportFormat = "pdf" | "docx" | "txt";
-type UploadResponse = { resume_id: string; filename: string; format?: UploadFormat };
+type UploadResponse = { resume_id: string; filename: string; format?: UploadFormat; character_count?: number };
 type ExportResponse = { saved_to: string; download_filename: string };
 type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error";
 type InputMode = "text" | "url";
+type PreviewMode = "tailored" | "original" | "diff";
 type ReviewTab = "score" | "gap" | "ats" | "resume" | "cover" | "interview" | "changes" | "history";
 type HistoryItem = {
   id: string;
@@ -80,6 +81,8 @@ type HistoryItem = {
 };
 type ApiErrorPayload = { error?: { code?: string; message?: string; request_id?: string; details?: unknown } };
 type StudioSuggestion = { label: string; meta: string; before?: string; after: string; tone?: "good" | "warn" | "neutral" };
+type ParsedResumeSection = { title: string; lines: string[] };
+type ParsedResume = { name: string; role: string; contact: string; sections: ParsedResumeSection[] };
 
 const HISTORY_KEY = "resume-tailor-history-v1";
 
@@ -117,13 +120,186 @@ function StudioMetric({
   );
 }
 
+function normalizeResumeLine(line: string) {
+  return line.replace(/^#{1,4}\s*/, "").replace(/\*\*/g, "").trim();
+}
+
+function isResumeSectionHeading(line: string) {
+  const cleaned = normalizeResumeLine(line).replace(/:$/, "").trim().toLowerCase();
+  return [
+    "professional summary",
+    "summary",
+    "experience",
+    "work experience",
+    "professional experience",
+    "skills",
+    "technical skills",
+    "education",
+    "projects",
+    "certifications",
+    "awards",
+  ].includes(cleaned);
+}
+
+function formatResumeHeading(line: string) {
+  const cleaned = normalizeResumeLine(line).replace(/:$/, "").trim().toLowerCase();
+  if (cleaned === "summary") return "Professional summary";
+  if (cleaned === "work experience" || cleaned === "professional experience") return "Experience";
+  return cleaned.replace(/\b\w/g, (match) => match.toUpperCase());
+}
+
+function parseResumeText(text?: string): ParsedResume | null {
+  const lines = (text ?? "")
+    .replace(/\r/g, "")
+    .split("\n")
+    .map(normalizeResumeLine)
+    .filter(Boolean);
+
+  if (!lines.length) return null;
+
+  const firstHeadingIndex = lines.findIndex(isResumeSectionHeading);
+  const headerLines = firstHeadingIndex >= 0 ? lines.slice(0, firstHeadingIndex) : lines.slice(0, 3);
+  const contentLines = firstHeadingIndex >= 0 ? lines.slice(firstHeadingIndex) : lines.slice(3);
+  const sections: ParsedResumeSection[] = [];
+
+  for (const line of contentLines) {
+    if (isResumeSectionHeading(line)) {
+      sections.push({ title: formatResumeHeading(line), lines: [] });
+    } else if (sections.length) {
+      sections[sections.length - 1].lines.push(line);
+    } else {
+      sections.push({ title: "Professional summary", lines: [line] });
+    }
+  }
+
+  return {
+    name: headerLines[0] || "Tailored Resume",
+    role: headerLines[1] || "Role-targeted draft",
+    contact: headerLines.slice(2).join(" · "),
+    sections: sections.filter((section) => section.lines.length),
+  };
+}
+
+function isBulletLine(line: string) {
+  return /^[-•*]\s+/.test(line);
+}
+
+function cleanBulletLine(line: string) {
+  return line.replace(/^[-•*]\s+/, "");
+}
+
+function ResumeSection({ section }: { section: ParsedResumeSection }) {
+  const isSkills = /skills/i.test(section.title);
+  const skills = section.lines
+    .flatMap((line) => line.split(/[,;|]/))
+    .map((skill) => cleanBulletLine(skill).trim())
+    .filter(Boolean);
+  const bulletLines = section.lines.filter(isBulletLine);
+  const paragraphLines = section.lines.filter((line) => !isBulletLine(line));
+
+  return (
+    <section>
+      <h4>{section.title}</h4>
+      {isSkills && skills.length > 1 ? (
+        <div className="rf-resume-keywords">
+          {skills.slice(0, 12).map((skill) => (
+            <span key={`${section.title}-${skill}`}>{skill}</span>
+          ))}
+        </div>
+      ) : (
+        <>
+          {paragraphLines.map((line, index) => (
+            <p key={`${section.title}-p-${index}`}>{line}</p>
+          ))}
+          {bulletLines.length ? (
+            <ul>
+              {bulletLines.map((line, index) => (
+                <li key={`${section.title}-li-${index}`}>{cleanBulletLine(line)}</li>
+              ))}
+            </ul>
+          ) : null}
+        </>
+      )}
+    </section>
+  );
+}
+
 function MiniResumeDocument({
   text,
   keywords,
+  mode,
+  filename,
+  uploadFormat,
+  characterCount,
+  changeLog,
 }: {
   text?: string;
   keywords: string[];
+  mode: PreviewMode;
+  filename?: string;
+  uploadFormat?: UploadFormat;
+  characterCount?: number;
+  changeLog?: string[];
 }) {
+  const parsed = parseResumeText(text);
+
+  if (mode === "original" && !parsed) {
+    return (
+      <div className="rf-resume-paper rf-resume-paper-empty">
+        <div className="rf-resume-head">
+          <h3>{filename ? filename.replace(/\.(docx|pdf|txt)$/i, "") : "Original resume"}</h3>
+          <p>{uploadFormat ? `${uploadFormat.toUpperCase()} upload` : "Source document"}</p>
+          <span>{characterCount ? `${characterCount.toLocaleString()} characters processed` : "Upload a resume to preview source details"}</span>
+        </div>
+        <section>
+          <h4>Original preview</h4>
+          <p>
+            Original visual preview is not available for DOCX/PDF files yet. The tailored preview renders here after
+            the workflow returns a generated draft.
+          </p>
+        </section>
+      </div>
+    );
+  }
+
+  if (mode === "diff") {
+    return (
+      <div className="rf-resume-paper rf-resume-paper-diff">
+        <div className="rf-resume-head">
+          <h3>{parsed?.name || "Change review"}</h3>
+          <p>{parsed?.role || "Generated edits"}</p>
+          <span>{parsed?.contact || "Review the changes returned by the AI workflow before export"}</span>
+        </div>
+        <section>
+          <h4>Change notes</h4>
+          {changeLog?.length ? (
+            <ul className="rf-resume-change-list">
+              {changeLog.slice(0, 10).map((change, index) => (
+                <li key={`preview-change-${index}`}>{change}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>Run the workflow and the change log will appear here.</p>
+          )}
+        </section>
+        {parsed?.sections.slice(0, 2).map((section) => <ResumeSection key={`diff-${section.title}`} section={section} />)}
+      </div>
+    );
+  }
+
+  if (parsed) {
+    return (
+      <div className="rf-resume-paper">
+        <div className="rf-resume-head">
+          <h3>{parsed.name}</h3>
+          <p>{parsed.role}</p>
+          {parsed.contact ? <span>{parsed.contact}</span> : null}
+        </div>
+        {parsed.sections.map((section) => <ResumeSection key={section.title} section={section} />)}
+      </div>
+    );
+  }
+
   return (
     <div className="rf-resume-paper">
       <div className="rf-resume-head">
@@ -241,10 +417,13 @@ export default function Page() {
   const [stage, setStage] = useState<Stage>("idle");
   const [dragActive, setDragActive] = useState(false);
   const [activeTab, setActiveTab] = useState<ReviewTab>("score");
+  const [previewMode, setPreviewMode] = useState<PreviewMode>("tailored");
   const [copyState, setCopyState] = useState("");
   const [error, setError] = useState("");
 
   const [, setResumeId] = useState<string | null>(null);
+  const [uploadMeta, setUploadMeta] = useState<UploadResponse | null>(null);
+  const [sourcePreviewText, setSourcePreviewText] = useState("");
   const [result, setResult] = useState<TailorResult | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -252,6 +431,28 @@ export default function Page() {
   useEffect(() => {
     setHistory(loadHistory());
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    setUploadMeta(null);
+    setSourcePreviewText("");
+    setPreviewMode("tailored");
+    if (!file) return;
+
+    if (/\.txt$/i.test(file.name)) {
+      file.text()
+        .then((value) => {
+          if (!cancelled) setSourcePreviewText(value.slice(0, 30000));
+        })
+        .catch(() => {
+          if (!cancelled) setSourcePreviewText("");
+        });
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [file]);
 
   const hasTarget = Boolean(jdUrl.trim() || jdText.trim());
   const readyItems = [Boolean(baseUrl), Boolean(file), hasTarget];
@@ -278,6 +479,7 @@ export default function Page() {
 
     const data = (await response.json()) as UploadResponse;
     setResumeId(data.resume_id);
+    setUploadMeta(data);
     return data.resume_id;
   }
 
@@ -361,6 +563,7 @@ export default function Page() {
       saveHistory(nextHistory);
       setStage("ready");
       setActiveTab("score");
+      setPreviewMode("tailored");
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "Something went wrong";
       setError(message);
@@ -510,13 +713,21 @@ export default function Page() {
                     <h2 className="panel-title">Your resume · with AI edits applied</h2>
                   </div>
                   <div className="studio-tabs-mini" role="tablist" aria-label="Preview mode">
-                    <button className={activeTab === "resume" ? "active" : ""} type="button" onClick={() => setActiveTab("resume")}>Tailored</button>
-                    <button type="button" onClick={() => setActiveTab("history")}>Original</button>
-                    <button type="button" onClick={() => setActiveTab("changes")}>Diff</button>
+                    <button className={previewMode === "tailored" ? "active" : ""} type="button" onClick={() => setPreviewMode("tailored")}>Tailored</button>
+                    <button className={previewMode === "original" ? "active" : ""} type="button" onClick={() => setPreviewMode("original")}>Original</button>
+                    <button className={previewMode === "diff" ? "active" : ""} type="button" onClick={() => setPreviewMode("diff")}>Diff</button>
                   </div>
                 </div>
                 <div className="rf-preview-wrap">
-                  <MiniResumeDocument text={activeTab === "resume" ? result?.tailored_text : undefined} keywords={presentKeywords} />
+                  <MiniResumeDocument
+                    text={previewMode === "original" ? sourcePreviewText : result?.tailored_text}
+                    keywords={presentKeywords}
+                    mode={previewMode}
+                    filename={uploadMeta?.filename ?? file?.name}
+                    uploadFormat={uploadMeta?.format}
+                    characterCount={uploadMeta?.character_count}
+                    changeLog={result?.change_log}
+                  />
                 </div>
               </section>
 
@@ -540,7 +751,7 @@ export default function Page() {
                       </div>
                       <div className="suggestion-actions">
                         <button className="btn btn-brand btn-sm" type="button" onClick={() => setActiveTab("changes")}><RoleForgeIcon name="check" size={12} />Review</button>
-                        <button className="btn btn-soft btn-sm" type="button" onClick={() => setActiveTab("resume")}>Open</button>
+                        <button className="btn btn-soft btn-sm" type="button" onClick={() => setPreviewMode("tailored")}>Open</button>
                         <button className="btn btn-ghost btn-sm" type="button" disabled>Skip</button>
                       </div>
                     </article>

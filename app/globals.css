@@ -4263,6 +4263,10 @@ html[data-theme="dark"] input::file-selector-button {
   line-height: 1.52;
 }
 
+.rf-resume-paper p {
+  margin: 0 0 10px;
+}
+
 .rf-resume-paper mark {
   background: rgba(232, 149, 56, 0.18);
   color: inherit;
@@ -4279,6 +4283,33 @@ html[data-theme="dark"] input::file-selector-button {
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(0.95rem, 1.15vw, 1.08rem);
   line-height: 1.52;
+}
+
+.rf-resume-paper-empty {
+  min-height: 420px;
+}
+
+.rf-resume-paper-empty section p {
+  max-width: 700px;
+  color: #555;
+}
+
+.rf-resume-paper-diff {
+  min-height: 560px;
+}
+
+.rf-resume-change-list {
+  display: grid;
+  gap: 9px;
+  margin-top: 0;
+}
+
+.rf-resume-change-list li {
+  padding: 10px 12px;
+  border: 1px solid #e4dbc9;
+  border-radius: 10px;
+  background: #f8f3ea;
+  list-style-position: inside;
 }
 
 .rf-resume-role {
