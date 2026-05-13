@@ -133,32 +133,79 @@ function StudioMetric({
   );
 }
 
+const RESUME_SECTION_TITLES: Record<string, string> = {
+  "professional summary": "Professional summary",
+  summary: "Professional summary",
+  profile: "Professional summary",
+  objective: "Professional summary",
+  "career summary": "Professional summary",
+  experience: "Experience",
+  "work experience": "Experience",
+  "professional experience": "Experience",
+  "relevant experience": "Experience",
+  "employment history": "Experience",
+  "work history": "Experience",
+  "selected experience": "Experience",
+  skills: "Skills",
+  "technical skills": "Skills",
+  "core skills": "Skills",
+  "key skills": "Skills",
+  competencies: "Skills",
+  "tools and technologies": "Skills",
+  projects: "Projects",
+  "selected projects": "Projects",
+  education: "Education",
+  certifications: "Certifications",
+  awards: "Awards",
+  achievements: "Achievements",
+};
+
 function normalizeResumeLine(line: string) {
-  return line.replace(/^#{1,4}\s*/, "").replace(/\*\*/g, "").trim();
+  return line
+    .replace(/\r/g, "")
+    .replace(/^```[a-z]*$/i, "")
+    .replace(/^#{1,4}\s*/, "")
+    .replace(/\*\*/g, "")
+    .replace(/^\s*[•●]\s*/, "- ")
+    .trim();
 }
 
-function isResumeSectionHeading(line: string) {
-  const cleaned = normalizeResumeLine(line).replace(/:$/, "").trim().toLowerCase();
-  return [
-    "professional summary",
-    "summary",
-    "experience",
-    "work experience",
-    "professional experience",
-    "skills",
-    "technical skills",
-    "education",
-    "projects",
-    "certifications",
-    "awards",
-  ].includes(cleaned);
+function normalizeHeadingKey(line: string) {
+  return normalizeResumeLine(line)
+    .replace(/^[\s:.-]+/, "")
+    .replace(/[\s:.-]+$/, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
 }
 
-function formatResumeHeading(line: string) {
-  const cleaned = normalizeResumeLine(line).replace(/:$/, "").trim().toLowerCase();
-  if (cleaned === "summary") return "Professional summary";
-  if (cleaned === "work experience" || cleaned === "professional experience") return "Experience";
-  return cleaned.replace(/\b\w/g, (match) => match.toUpperCase());
+function getSectionMarker(line: string): { title: string; rest?: string } | null {
+  const cleaned = normalizeResumeLine(line);
+  const exactTitle = RESUME_SECTION_TITLES[normalizeHeadingKey(cleaned)];
+  if (exactTitle) return { title: exactTitle };
+
+  const inlineMatch = cleaned.match(/^([A-Za-z][A-Za-z /&+-]{2,42})(?:\:|\s[-–—]\s)(.+)$/);
+  if (!inlineMatch) return null;
+
+  const inlineTitle = RESUME_SECTION_TITLES[normalizeHeadingKey(inlineMatch[1])];
+  if (!inlineTitle) return null;
+
+  return { title: inlineTitle, rest: inlineMatch[2].trim() };
+}
+
+function looksLikeContactLine(line: string) {
+  return /@|\+?\d[\d\s().-]{6,}|linkedin|github|portfolio|https?:\/\/|www\.|[A-Z][a-z]+,\s*[A-Z]{2}/i.test(line);
+}
+
+function splitHeaderParts(line: string) {
+  return normalizeResumeLine(line)
+    .split(/\s+\|\s+|\s+•\s+|\s+·\s+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function isDocumentLabel(line: string) {
+  return ["tailored resume", "resume", "generated resume", "role-targeted draft"].includes(normalizeHeadingKey(line));
 }
 
 function parseResumeText(text?: string): ParsedResume | null {
@@ -166,18 +213,41 @@ function parseResumeText(text?: string): ParsedResume | null {
     .replace(/\r/g, "")
     .split("\n")
     .map(normalizeResumeLine)
-    .filter(Boolean);
+    .filter((line) => line && !line.startsWith("```") && !isDocumentLabel(line));
 
   if (!lines.length) return null;
 
-  const firstHeadingIndex = lines.findIndex(isResumeSectionHeading);
-  const headerLines = firstHeadingIndex >= 0 ? lines.slice(0, firstHeadingIndex) : lines.slice(0, 3);
-  const contentLines = firstHeadingIndex >= 0 ? lines.slice(firstHeadingIndex) : lines.slice(3);
+  const firstHeadingIndex = lines.findIndex((line) => Boolean(getSectionMarker(line)));
+  const headerLines = firstHeadingIndex >= 0 ? lines.slice(0, firstHeadingIndex) : lines.slice(0, Math.min(4, lines.length));
+  const headerParts = headerLines.flatMap(splitHeaderParts);
+  let name = "Tailored Resume";
+  let role = "Role-targeted draft";
+  const contactParts: string[] = [];
+
+  for (const part of headerParts) {
+    if (name === "Tailored Resume" && !looksLikeContactLine(part)) {
+      name = part;
+    } else if (role === "Role-targeted draft" && !looksLikeContactLine(part)) {
+      role = part;
+    } else {
+      contactParts.push(part);
+    }
+  }
+
+  if (name === "Tailored Resume" && lines[0] && !getSectionMarker(lines[0])) {
+    const [firstPart, secondPart, ...restParts] = splitHeaderParts(lines[0]);
+    name = firstPart || name;
+    if (secondPart && !looksLikeContactLine(secondPart)) role = secondPart;
+    contactParts.push(...restParts);
+  }
+
+  const contentLines = firstHeadingIndex >= 0 ? lines.slice(firstHeadingIndex) : lines.slice(headerLines.length);
   const sections: ParsedResumeSection[] = [];
 
   for (const line of contentLines) {
-    if (isResumeSectionHeading(line)) {
-      sections.push({ title: formatResumeHeading(line), lines: [] });
+    const marker = getSectionMarker(line);
+    if (marker) {
+      sections.push({ title: marker.title, lines: marker.rest ? [marker.rest] : [] });
     } else if (sections.length) {
       sections[sections.length - 1].lines.push(line);
     } else {
@@ -185,10 +255,26 @@ function parseResumeText(text?: string): ParsedResume | null {
     }
   }
 
+  if (name === "Tailored Resume" && sections[0]?.title === "Professional summary") {
+    const summaryHeaderParts = splitHeaderParts(sections[0].lines[0] ?? "");
+    if (summaryHeaderParts.length >= 2 && !looksLikeContactLine(summaryHeaderParts[0])) {
+      name = summaryHeaderParts[0];
+      const rolePart = summaryHeaderParts.find((part, index) => index > 0 && !looksLikeContactLine(part));
+      if (rolePart) role = rolePart;
+      contactParts.push(...summaryHeaderParts.filter((part) => part !== name && part !== rolePart));
+      sections[0].lines = sections[0].lines.slice(1);
+
+      while (sections[0]?.lines[0] && looksLikeContactLine(sections[0].lines[0])) {
+        contactParts.push(sections[0].lines[0]);
+        sections[0].lines = sections[0].lines.slice(1);
+      }
+    }
+  }
+
   return {
-    name: headerLines[0] || "Tailored Resume",
-    role: headerLines[1] || "Role-targeted draft",
-    contact: headerLines.slice(2).join(" · "),
+    name,
+    role,
+    contact: Array.from(new Set(contactParts)).join(" · "),
     sections: sections.filter((section) => section.lines.length),
   };
 }
