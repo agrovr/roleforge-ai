@@ -21,7 +21,8 @@ export type RoleForgeIconName =
   | "sparkle"
   | "sun"
   | "target"
-  | "upload";
+  | "upload"
+  | "x";
 
 export function RoleForgeIcon({
   name,
@@ -90,5 +91,7 @@ export function RoleForgeIcon({
       return <svg {...common}><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3" /><path d="M12 2v3" /><path d="M12 19v3" /><path d="M2 12h3" /><path d="M19 12h3" /></svg>;
     case "upload":
       return <svg {...common}><path d="M12 16V4" /><path d="m7 9 5-5 5 5" /><path d="M5 20h14" /></svg>;
+    case "x":
+      return <svg {...common}><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>;
   }
 }

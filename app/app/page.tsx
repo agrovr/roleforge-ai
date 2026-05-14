@@ -825,6 +825,7 @@ export default function Page() {
   const [dragActive, setDragActive] = useState(false);
   const [activeTab, setActiveTab] = useState<ReviewTab>("score");
   const [previewMode, setPreviewMode] = useState<PreviewMode>("tailored");
+  const [accountPanelOpen, setAccountPanelOpen] = useState(false);
   const [copyState, setCopyState] = useState("");
   const [error, setError] = useState("");
 
@@ -1058,6 +1059,11 @@ export default function Page() {
       : previewMode === "diff"
         ? "Change notes · before export"
         : "Your resume · with AI edits applied";
+  const accountItems = [
+    { label: "Sign in", detail: "Requires an auth provider and redirect URLs." },
+    { label: "Saved projects", detail: "Needs account storage before it can sync across devices." },
+    { label: "Billing", detail: "Requires Stripe products, price IDs, and entitlement checks." },
+  ];
 
   const suggestionCards: StudioSuggestion[] = result
     ? [
@@ -1101,9 +1107,38 @@ export default function Page() {
               </button>
             )}
             <ThemeToggle />
-            <button className="studio-account-button" type="button" disabled aria-label="Sign in coming soon">
-              SC
-            </button>
+            <div className="studio-account-menu">
+              <button
+                className="studio-account-button"
+                type="button"
+                aria-label="Open account options"
+                aria-expanded={accountPanelOpen}
+                aria-controls="studio-account-popover"
+                onClick={() => setAccountPanelOpen((open) => !open)}
+              >
+                SC
+              </button>
+              {accountPanelOpen ? (
+                <div className="studio-account-popover" id="studio-account-popover" role="dialog" aria-label="Account options">
+                  <div className="studio-account-popover-head">
+                    <span>Account</span>
+                    <button type="button" aria-label="Close account options" onClick={() => setAccountPanelOpen(false)}>
+                      <RoleForgeIcon name="x" size={14} />
+                    </button>
+                  </div>
+                  <strong>Account features are coming soon</strong>
+                  <p>Sign-in, saved projects, and billing stay disabled until real auth and entitlement support are connected.</p>
+                  <div className="studio-account-list">
+                    {accountItems.map((item) => (
+                      <div key={item.label}>
+                        <span>{item.label}</span>
+                        <small>{item.detail}</small>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
           </div>
         </header>
         <div className="rf-studio-layout">
@@ -1176,12 +1211,48 @@ export default function Page() {
                     <h2 className="panel-title">{previewTitle}</h2>
                   </div>
                   <div className="studio-tabs-mini" role="tablist" aria-label="Preview mode">
-                    <button className={previewMode === "tailored" ? "active" : ""} type="button" onClick={() => setPreviewMode("tailored")}>Tailored</button>
-                    <button className={previewMode === "original" ? "active" : ""} type="button" onClick={() => setPreviewMode("original")}>Original</button>
-                    <button className={previewMode === "diff" ? "active" : ""} type="button" onClick={() => setPreviewMode("diff")}>Diff</button>
+                    <button
+                      className={previewMode === "tailored" ? "active" : ""}
+                      id="preview-tab-tailored"
+                      type="button"
+                      role="tab"
+                      aria-selected={previewMode === "tailored"}
+                      aria-controls="preview-panel"
+                      onClick={() => setPreviewMode("tailored")}
+                    >
+                      Tailored
+                    </button>
+                    <button
+                      className={previewMode === "original" ? "active" : ""}
+                      id="preview-tab-original"
+                      type="button"
+                      role="tab"
+                      aria-selected={previewMode === "original"}
+                      aria-controls="preview-panel"
+                      onClick={() => setPreviewMode("original")}
+                    >
+                      Original
+                    </button>
+                    <button
+                      className={previewMode === "diff" ? "active" : ""}
+                      id="preview-tab-diff"
+                      type="button"
+                      role="tab"
+                      aria-selected={previewMode === "diff"}
+                      aria-controls="preview-panel"
+                      onClick={() => setPreviewMode("diff")}
+                    >
+                      Diff
+                    </button>
                   </div>
                 </div>
-                <div className="rf-preview-wrap">
+                <div
+                  className="rf-preview-wrap"
+                  id="preview-panel"
+                  role="tabpanel"
+                  aria-labelledby={`preview-tab-${previewMode}`}
+                  aria-live="polite"
+                >
                   <MiniResumeDocument
                     text={previewMode === "original" ? sourcePreviewText : result?.tailored_text}
                     sourceText={sourcePreviewText}

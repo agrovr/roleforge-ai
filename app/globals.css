@@ -3682,9 +3682,111 @@ html[data-theme="dark"] input::file-selector-button {
   box-shadow: 0 14px 28px -20px rgba(14, 20, 48, 0.55);
 }
 
-.studio-account-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.92;
+.studio-account-button:hover,
+.studio-account-button:focus-visible {
+  background: #8f592b;
+  transform: translateY(-1px);
+}
+
+.studio-account-menu {
+  position: relative;
+  display: inline-flex;
+}
+
+.studio-account-popover {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 30;
+  width: min(340px, calc(100vw - 36px));
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(232, 149, 56, 0.12), transparent 10rem),
+    var(--surface);
+  color: var(--ink-0);
+  box-shadow: 0 24px 54px -28px rgba(14, 20, 48, 0.35);
+}
+
+.studio-account-popover::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  right: 18px;
+  width: 12px;
+  height: 12px;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+  transform: rotate(45deg);
+}
+
+.studio-account-popover-head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.studio-account-popover-head span {
+  color: var(--brand-dark);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.studio-account-popover-head button {
+  width: 30px;
+  height: 30px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-1);
+}
+
+.studio-account-popover > strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.08;
+}
+
+.studio-account-popover > p {
+  margin: 8px 0 14px;
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+
+.studio-account-list {
+  display: grid;
+  gap: 8px;
+}
+
+.studio-account-list div {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-2) 82%, white);
+}
+
+.studio-account-list span {
+  display: block;
+  color: var(--ink-0);
+  font-weight: 900;
+}
+
+.studio-account-list small {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink-3);
+  line-height: 1.35;
 }
 
 .rf-studio-layout {
@@ -5965,6 +6067,46 @@ html[data-theme="dark"] .rf-intake-grid .rf-run-controls input {
 html[data-theme="dark"] .rf-intake-grid .rf-run-controls .primary-button:disabled {
   background: linear-gradient(135deg, rgba(222, 162, 79, 0.45), rgba(222, 162, 79, 0.28));
   color: rgba(255, 247, 233, 0.7);
+}
+
+html[data-theme="dark"] .studio-account-button {
+  background: linear-gradient(145deg, #d09343, #a7652d);
+  color: #fffdf8;
+  box-shadow: 0 16px 32px -20px rgba(222, 162, 79, 0.95);
+}
+
+html[data-theme="dark"] .studio-account-button:hover,
+html[data-theme="dark"] .studio-account-button:focus-visible {
+  background: linear-gradient(145deg, #efb863, #bb7736);
+}
+
+html[data-theme="dark"] .studio-account-popover {
+  background:
+    radial-gradient(circle at 88% 0%, rgba(222, 162, 79, 0.16), transparent 10rem),
+    #111725;
+  border-color: rgba(255, 247, 233, 0.18);
+  color: var(--ink-0);
+  box-shadow: 0 24px 54px -28px rgba(0, 0, 0, 0.86);
+}
+
+html[data-theme="dark"] .studio-account-popover::before {
+  background: #111725;
+  border-color: rgba(255, 247, 233, 0.18);
+}
+
+html[data-theme="dark"] .studio-account-popover-head span {
+  color: #efb863;
+}
+
+html[data-theme="dark"] .studio-account-popover-head button,
+html[data-theme="dark"] .studio-account-list div {
+  background: rgba(255, 247, 233, 0.06);
+  border-color: rgba(255, 247, 233, 0.16);
+}
+
+html[data-theme="dark"] .studio-account-popover > p,
+html[data-theme="dark"] .studio-account-list small {
+  color: var(--ink-2);
 }
 
 @media (max-width: 1120px) {

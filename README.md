@@ -73,6 +73,18 @@ The studio expects the backend to provide:
 - `POST /export`
 - `GET /download/{filename}`
 
+## Auth, Account, and Billing Readiness
+
+The studio includes a visible account menu so the interface has a stable place for future sign-in, saved projects, settings, and billing controls. These remain non-functional by design until real backend support exists.
+
+Needed before enabling these areas:
+
+- Auth provider selection, such as Clerk, Auth0, Supabase, Firebase, or custom backend auth
+- Production and preview redirect URLs
+- Server-side user/project storage model for saved resumes and history
+- Stripe products, price IDs, checkout/customer portal endpoints, and entitlement checks
+- Plan rules for premium exports, templates, and feature limits
+
 ## Production Checks
 
 ```bash
