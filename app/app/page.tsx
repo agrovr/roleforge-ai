@@ -66,7 +66,13 @@ type ExportFormat = "pdf" | "docx" | "txt";
 type UploadCapability = { format: UploadFormat; label: string; enabled: boolean };
 type ExportCapability = { format: ExportFormat; label: string; enabled: boolean; plan?: "free" | "premium"; reason?: string };
 type CapabilitiesResponse = { upload_formats?: UploadCapability[]; export_formats?: ExportCapability[] };
-type UploadResponse = { resume_id: string; filename: string; format?: UploadFormat; character_count?: number };
+type UploadResponse = {
+  resume_id: string;
+  filename: string;
+  format?: UploadFormat;
+  character_count?: number;
+  text_preview?: string;
+};
 type ExportResponse = { saved_to: string; download_filename: string };
 type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error";
 type InputMode = "text" | "url";
@@ -287,7 +293,36 @@ function cleanBulletLine(line: string) {
   return line.replace(/^[-•*]\s+/, "");
 }
 
-function ResumeSection({ section }: { section: ParsedResumeSection }) {
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function HighlightedText({ text, keywords }: { text: string; keywords: string[] }) {
+  const terms = Array.from(
+    new Set(keywords.map((keyword) => keyword.trim()).filter((keyword) => keyword.length >= 3)),
+  ).slice(0, 18);
+  if (!terms.length) return <>{text}</>;
+
+  const matcher = new RegExp(`(${terms.map(escapeRegExp).join("|")})`, "gi");
+  const parts = text.split(matcher);
+
+  return (
+    <>
+      {parts.map((part, index) => {
+        const isMatch = terms.some((term) => term.toLowerCase() === part.toLowerCase());
+        return isMatch ? (
+          <mark key={`${part}-${index}`} className="good">
+            {part}
+          </mark>
+        ) : (
+          <React.Fragment key={`${part}-${index}`}>{part}</React.Fragment>
+        );
+      })}
+    </>
+  );
+}
+
+function ResumeSection({ section, keywords }: { section: ParsedResumeSection; keywords: string[] }) {
   const isSkills = /skills/i.test(section.title);
   const skills = section.lines
     .flatMap((line) => line.split(/[,;|]/))
@@ -308,12 +343,16 @@ function ResumeSection({ section }: { section: ParsedResumeSection }) {
       ) : (
         <>
           {paragraphLines.map((line, index) => (
-            <p key={`${section.title}-p-${index}`}>{line}</p>
+            <p key={`${section.title}-p-${index}`}>
+              <HighlightedText text={line} keywords={keywords} />
+            </p>
           ))}
           {bulletLines.length ? (
             <ul>
               {bulletLines.map((line, index) => (
-                <li key={`${section.title}-li-${index}`}>{cleanBulletLine(line)}</li>
+                <li key={`${section.title}-li-${index}`}>
+                  <HighlightedText text={cleanBulletLine(line)} keywords={keywords} />
+                </li>
               ))}
             </ul>
           ) : null}
@@ -381,7 +420,9 @@ function MiniResumeDocument({
             <p>Run the workflow and the change log will appear here.</p>
           )}
         </section>
-        {parsed?.sections.slice(0, 2).map((section) => <ResumeSection key={`diff-${section.title}`} section={section} />)}
+        {parsed?.sections.slice(0, 2).map((section) => (
+          <ResumeSection key={`diff-${section.title}`} section={section} keywords={keywords} />
+        ))}
       </div>
     );
   }
@@ -394,7 +435,9 @@ function MiniResumeDocument({
           <p>{parsed.role}</p>
           {parsed.contact ? <span>{parsed.contact}</span> : null}
         </div>
-        {parsed.sections.map((section) => <ResumeSection key={section.title} section={section} />)}
+        {parsed.sections.map((section) => (
+          <ResumeSection key={section.title} section={section} keywords={keywords} />
+        ))}
       </div>
     );
   }
@@ -634,6 +677,7 @@ export default function Page() {
     const data = (await response.json()) as UploadResponse;
     setResumeId(data.resume_id);
     setUploadMeta(data);
+    if (typeof data.text_preview === "string") setSourcePreviewText(data.text_preview);
     return data.resume_id;
   }
 
