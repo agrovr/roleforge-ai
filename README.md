@@ -85,20 +85,19 @@ The first Supabase-ready frontend foundation is in place:
 
 - `GET /api/auth/status` reports whether public Supabase environment variables are configured.
 - `app/lib/supabase/client.ts` creates a browser client only when config exists.
-- `docs/supabase-account-foundation.sql` defines a starting RLS-backed profile, project, and run-history schema.
+- `docs/supabase-account-foundation.sql` defines the RLS-backed profile, project, and run-history schema applied to the `roleforge-ai` Supabase project.
 
-Add these public environment variables when a Supabase project is ready:
+Add these public environment variables in Vercel before enabling account-backed UI:
 
 ```env
-NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_URL=https://ijdspodwpkuhwszmvqip.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
 
 Needed before enabling these areas:
 
-- Supabase project creation and approved auth method selection
+- Approved auth method selection
 - Production and preview redirect URLs
-- Applied saved-project schema with RLS policies
 - Stripe products, price IDs, checkout/customer portal endpoints, and entitlement checks
 - Plan rules for premium exports, templates, and feature limits
 
