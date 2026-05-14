@@ -31,13 +31,17 @@ The public-facing copy intentionally avoids unsupported customer proof, performa
 
 ```text
 app/
+  api/auth/status/route.ts        # Safe account readiness endpoint
   app/page.tsx                    # Studio workflow UI
   components/Brand.tsx            # RoleForge brand component
   components/ResumePreview.tsx    # Safe generic resume preview mockups
   components/RoleForgeIcons.tsx   # Inline UI icon set
+  lib/supabase/                   # Supabase-ready browser config
   page.tsx                        # Landing page
   globals.css                     # Global styles and responsive layout
   layout.tsx                      # Root layout and metadata
+docs/
+  supabase-account-foundation.sql # Draft RLS schema for saved projects
 ```
 
 ## Local Development
@@ -77,11 +81,24 @@ The studio expects the backend to provide:
 
 The studio includes a visible account menu so the interface has a stable place for future sign-in, saved projects, settings, and billing controls. These remain non-functional by design until real backend support exists.
 
+The first Supabase-ready frontend foundation is in place:
+
+- `GET /api/auth/status` reports whether public Supabase environment variables are configured.
+- `app/lib/supabase/client.ts` creates a browser client only when config exists.
+- `docs/supabase-account-foundation.sql` defines a starting RLS-backed profile, project, and run-history schema.
+
+Add these public environment variables when a Supabase project is ready:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+```
+
 Needed before enabling these areas:
 
-- Auth provider selection, such as Clerk, Auth0, Supabase, Firebase, or custom backend auth
+- Supabase project creation and approved auth method selection
 - Production and preview redirect URLs
-- Server-side user/project storage model for saved resumes and history
+- Applied saved-project schema with RLS policies
 - Stripe products, price IDs, checkout/customer portal endpoints, and entitlement checks
 - Plan rules for premium exports, templates, and feature limits
 

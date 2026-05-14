@@ -1060,9 +1060,9 @@ export default function Page() {
         ? "Change notes · before export"
         : "Your resume · with AI edits applied";
   const accountItems = [
-    { label: "Sign in", detail: "Requires an auth provider and redirect URLs." },
-    { label: "Saved projects", detail: "Needs account storage before it can sync across devices." },
-    { label: "Billing", detail: "Requires Stripe products, price IDs, and entitlement checks." },
+    { label: "Sign in", detail: "Create an account and keep your work synced." },
+    { label: "Saved projects", detail: "Return to resumes, targets, exports, and run history." },
+    { label: "Billing", detail: "Manage premium options when billing is live." },
   ];
 
   const suggestionCards: StudioSuggestion[] = result
@@ -1127,7 +1127,7 @@ export default function Page() {
                     </button>
                   </div>
                   <strong>Account features are coming soon</strong>
-                  <p>Sign-in, saved projects, and billing stay disabled until real auth and entitlement support are connected.</p>
+                  <p>Sign-in, saved projects, and billing stay disabled until the account workspace is ready.</p>
                   <div className="studio-account-list">
                     {accountItems.map((item) => (
                       <div key={item.label}>

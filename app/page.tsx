@@ -387,7 +387,7 @@ function Pricing() {
             <div className="eyebrow">Pricing</div>
             <h2 className="display h2">Launch with honest plan states.</h2>
           </div>
-          <p className="lede">Billing stays clearly marked as coming soon until real plans, entitlements, and checkout are configured.</p>
+          <p className="lede">Billing stays clearly marked as coming soon until real plan and account support are ready.</p>
         </div>
         <div className="pricing-grid two">
           <article className="price-card">
@@ -404,11 +404,11 @@ function Pricing() {
           <article className="price-card featured">
             <div className="price-name">Premium</div>
             <div className="price-amount"><span className="v">Coming soon</span></div>
-            <div className="price-desc">Auth, billing, saved projects, and premium gating are planned but not live yet.</div>
+            <div className="price-desc">Account sync, saved projects, and premium options are planned but not live yet.</div>
             <ul className="price-list">
-              <li><RoleForgeIcon name="lock" size={14} />Requires auth provider selection</li>
-              <li><RoleForgeIcon name="lock" size={14} />Requires Stripe configuration</li>
-              <li><RoleForgeIcon name="lock" size={14} />Requires entitlement rules</li>
+              <li><RoleForgeIcon name="lock" size={14} />Account workspace coming soon</li>
+              <li><RoleForgeIcon name="lock" size={14} />Premium billing coming soon</li>
+              <li><RoleForgeIcon name="lock" size={14} />Saved project sync coming soon</li>
             </ul>
             <button className="btn btn-brand btn-lg" type="button" disabled>Premium not live</button>
           </article>
