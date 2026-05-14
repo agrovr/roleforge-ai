@@ -92,6 +92,7 @@ type ApiErrorPayload = { error?: { code?: string; message?: string; request_id?:
 type StudioSuggestion = { label: string; meta: string; before?: string; after: string; tone?: "good" | "warn" | "neutral" };
 type ParsedResumeSection = { title: string; lines: string[] };
 type ParsedResume = { name: string; role: string; contact: string; sections: ParsedResumeSection[] };
+type ParsedResumeEntry = { title: string; meta?: string; date?: string; details: string[]; bullets: string[] };
 
 const HISTORY_KEY = "resume-tailor-history-v1";
 const DEFAULT_UPLOAD_FORMATS: UploadCapability[] = [
@@ -293,6 +294,94 @@ function cleanBulletLine(line: string) {
   return line.replace(/^[-•*]\s+/, "");
 }
 
+function looksLikeDateRange(line: string) {
+  return /\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|present|current|\d{4})\b/i.test(line);
+}
+
+function splitResumeDetailParts(line: string) {
+  return normalizeResumeLine(line)
+    .split(/\s+\|\s+|\s+•\s+|\s+·\s+|\s+-\s+/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+}
+
+function isStructuredResumeSection(title: string) {
+  return /experience|project|education|certification|award|achievement/i.test(title);
+}
+
+function looksLikeResumeEntryStart(line: string, nextLine?: string) {
+  if (!line || isBulletLine(line) || looksLikeContactLine(line) || getSectionMarker(line)) return false;
+  if (line.length > 120) return false;
+  if (looksLikeDateRange(line) && line.length < 24) return false;
+
+  const roleWords =
+    /engineer|developer|manager|lead|analyst|designer|director|consultant|specialist|coordinator|architect|product|project|program|operations|marketing|sales|founder|intern|assistant|associate|researcher|student|certified|certificate|degree|bachelor|master/i;
+  const organizationWords = /remote|hybrid|onsite|company|inc\.?|llc|corp|university|college|school|bootcamp|ltd\.?/i;
+
+  return (
+    roleWords.test(line) ||
+    splitResumeDetailParts(line).some(looksLikeDateRange) ||
+    Boolean(nextLine && !isBulletLine(nextLine) && nextLine.length < 90 && (looksLikeDateRange(nextLine) || organizationWords.test(nextLine)))
+  );
+}
+
+function parseResumeEntryHeader(line: string) {
+  const parts = splitResumeDetailParts(line);
+  const dateParts = parts.filter(looksLikeDateRange);
+  const contentParts = parts.filter((part) => !looksLikeDateRange(part));
+  const title = contentParts[0] || line;
+  const meta = contentParts.slice(1).join(" · ") || undefined;
+  const date = dateParts.join(" · ") || undefined;
+
+  return { title, meta, date };
+}
+
+function buildResumeEntries(lines: string[]) {
+  const entries: ParsedResumeEntry[] = [];
+  let current: ParsedResumeEntry | null = null;
+
+  const pushCurrent = () => {
+    if (!current) return;
+    if (current.title || current.details.length || current.bullets.length) entries.push(current);
+    current = null;
+  };
+
+  lines.forEach((line, index) => {
+    const nextLine = lines[index + 1];
+
+    if (isBulletLine(line)) {
+      if (!current) current = { title: "Selected work", details: [], bullets: [] };
+      current.bullets.push(cleanBulletLine(line));
+      return;
+    }
+
+    if (looksLikeDateRange(line) && line.length < 36 && current && !current.date) {
+      current.date = line;
+      return;
+    }
+
+    if (looksLikeResumeEntryStart(line, nextLine)) {
+      pushCurrent();
+      current = { ...parseResumeEntryHeader(line), details: [], bullets: [] };
+      return;
+    }
+
+    if (current) {
+      if (!current.meta && current.bullets.length === 0 && line.length < 90) {
+        current.meta = line;
+      } else {
+        current.details.push(line);
+      }
+      return;
+    }
+
+    current = { title: "Overview", details: [line], bullets: [] };
+  });
+
+  pushCurrent();
+  return entries;
+}
+
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -324,6 +413,7 @@ function HighlightedText({ text, keywords }: { text: string; keywords: string[] 
 
 function ResumeSection({ section, keywords }: { section: ParsedResumeSection; keywords: string[] }) {
   const isSkills = /skills/i.test(section.title);
+  const structuredEntries = isStructuredResumeSection(section.title) ? buildResumeEntries(section.lines) : [];
   const skills = section.lines
     .flatMap((line) => line.split(/[,;|]/))
     .map((skill) => cleanBulletLine(skill).trim())
@@ -338,6 +428,40 @@ function ResumeSection({ section, keywords }: { section: ParsedResumeSection; ke
         <div className="rf-resume-keywords">
           {skills.slice(0, 12).map((skill) => (
             <span key={`${section.title}-${skill}`}>{skill}</span>
+          ))}
+        </div>
+      ) : structuredEntries.length ? (
+        <div className="rf-resume-entries">
+          {structuredEntries.map((entry, entryIndex) => (
+            <div className="rf-resume-entry" key={`${section.title}-entry-${entryIndex}`}>
+              <div className="rf-resume-role">
+                <div>
+                  <strong>
+                    <HighlightedText text={entry.title} keywords={keywords} />
+                  </strong>
+                  {entry.meta ? (
+                    <em>
+                      <HighlightedText text={entry.meta} keywords={keywords} />
+                    </em>
+                  ) : null}
+                </div>
+                {entry.date ? <span>{entry.date}</span> : null}
+              </div>
+              {entry.details.map((line, index) => (
+                <p className="rf-resume-detail" key={`${section.title}-entry-${entryIndex}-detail-${index}`}>
+                  <HighlightedText text={line} keywords={keywords} />
+                </p>
+              ))}
+              {entry.bullets.length ? (
+                <ul>
+                  {entry.bullets.map((line, index) => (
+                    <li key={`${section.title}-entry-${entryIndex}-li-${index}`}>
+                      <HighlightedText text={line} keywords={keywords} />
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
           ))}
         </div>
       ) : (

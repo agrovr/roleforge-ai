@@ -4352,6 +4352,24 @@ html[data-theme="dark"] input::file-selector-button {
   white-space: nowrap;
 }
 
+.rf-resume-entries {
+  display: grid;
+  gap: 17px;
+}
+
+.rf-resume-entry {
+  break-inside: avoid;
+}
+
+.rf-resume-entry .rf-resume-role {
+  margin-bottom: 6px;
+}
+
+.rf-resume-detail {
+  margin: 4px 0 0;
+  color: #333;
+}
+
 .secondary-role {
   margin-top: 18px;
 }
@@ -5508,6 +5526,7 @@ html[data-theme="dark"] .rf-resume-paper p,
 html[data-theme="dark"] .rf-resume-paper li,
 html[data-theme="dark"] .rf-resume-head p,
 html[data-theme="dark"] .rf-resume-head span,
+html[data-theme="dark"] .rf-resume-detail,
 html[data-theme="dark"] .rf-resume-role em,
 html[data-theme="dark"] .rf-resume-role span,
 html[data-theme="dark"] .rf-resume-generated {
