@@ -69,6 +69,15 @@ alter table public.roleforge_profiles enable row level security;
 alter table public.resume_projects enable row level security;
 alter table public.resume_runs enable row level security;
 
+revoke all on table public.roleforge_profiles from anon;
+revoke all on table public.resume_projects from anon;
+revoke all on table public.resume_runs from anon;
+
+grant usage on schema public to authenticated;
+grant select, insert, update on table public.roleforge_profiles to authenticated;
+grant select, insert, update, delete on table public.resume_projects to authenticated;
+grant select, insert, delete on table public.resume_runs to authenticated;
+
 drop policy if exists "Users can read their profile" on public.roleforge_profiles;
 create policy "Users can read their profile"
 on public.roleforge_profiles for select
