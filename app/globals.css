@@ -4295,6 +4295,47 @@ html[data-theme="dark"] input::file-selector-button {
   line-height: 1.52;
 }
 
+.rf-resume-paper-plain {
+  min-height: 600px;
+}
+
+.rf-resume-plain-lines {
+  display: grid;
+  gap: 9px;
+}
+
+.rf-resume-plain-lines h5 {
+  margin: 18px 0 4px;
+  padding-bottom: 7px;
+  border-bottom: 2px solid #222;
+  color: #1f1f1f;
+  font-size: clamp(0.96rem, 1.16vw, 1.08rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.rf-resume-plain-lines h5:first-child {
+  margin-top: 0;
+}
+
+.rf-resume-plain-lines p {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.rf-resume-plain-lines .plain-bullet {
+  position: relative;
+  padding-left: 18px;
+}
+
+.rf-resume-plain-lines .plain-bullet::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #222;
+}
+
 .rf-resume-paper-empty {
   min-height: 420px;
 }

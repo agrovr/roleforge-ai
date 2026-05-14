@@ -93,6 +93,7 @@ type StudioSuggestion = { label: string; meta: string; before?: string; after: s
 type ParsedResumeSection = { title: string; lines: string[] };
 type ParsedResume = { name: string; role: string; contact: string; sections: ParsedResumeSection[] };
 type ParsedResumeEntry = { title: string; meta?: string; date?: string; details: string[]; bullets: string[] };
+type PlainResumeLine = { text: string; kind: "heading" | "bullet" | "body" };
 
 const HISTORY_KEY = "resume-tailor-history-v1";
 const DEFAULT_UPLOAD_FORMATS: UploadCapability[] = [
@@ -391,6 +392,81 @@ function buildResumeEntries(lines: string[]) {
   return entries;
 }
 
+function buildPlainResumeLines(text?: string): PlainResumeLine[] {
+  return (text ?? "")
+    .replace(/\r/g, "")
+    .split("\n")
+    .map(normalizeResumeLine)
+    .filter(Boolean)
+    .slice(0, 90)
+    .map((line) => {
+      if (getSectionMarker(line) || (/^[A-Z][A-Z\s/&+-]{3,34}$/.test(line) && line.length <= 36)) {
+        return { text: getSectionMarker(line)?.title ?? line, kind: "heading" };
+      }
+      if (isBulletLine(line)) return { text: cleanBulletLine(line), kind: "bullet" };
+      return { text: line, kind: "body" };
+    });
+}
+
+function PlainResumeDocument({
+  text,
+  keywords,
+  mode,
+  filename,
+  uploadFormat,
+  characterCount,
+}: {
+  text?: string;
+  keywords: string[];
+  mode: PreviewMode;
+  filename?: string;
+  uploadFormat?: UploadFormat;
+  characterCount?: number;
+}) {
+  const lines = buildPlainResumeLines(text);
+  const documentName = filename ? filename.replace(/\.(docx|pdf|txt)$/i, "") : mode === "original" ? "Original resume" : "Generated draft";
+  const meta = [
+    uploadFormat ? `${uploadFormat.toUpperCase()} source` : mode === "original" ? "Source preview" : "Generated resume",
+    characterCount ? `${characterCount.toLocaleString()} characters processed` : "",
+  ].filter(Boolean).join(" · ");
+
+  return (
+    <div className="rf-resume-paper rf-resume-paper-plain">
+      <div className="rf-resume-head">
+        <h3>{documentName}</h3>
+        <p>{mode === "original" ? "Before tailoring" : "Role-targeted draft"}</p>
+        {meta ? <span>{meta}</span> : null}
+      </div>
+      <section>
+        <h4>{mode === "original" ? "Source text" : "Generated content"}</h4>
+        {lines.length ? (
+          <div className="rf-resume-plain-lines">
+            {lines.map((line, index) => {
+              if (line.kind === "heading") {
+                return <h5 key={`plain-${index}`}>{line.text}</h5>;
+              }
+              if (line.kind === "bullet") {
+                return (
+                  <p className="plain-bullet" key={`plain-${index}`}>
+                    <HighlightedText text={line.text} keywords={mode === "original" ? [] : keywords} />
+                  </p>
+                );
+              }
+              return (
+                <p key={`plain-${index}`}>
+                  <HighlightedText text={line.text} keywords={mode === "original" ? [] : keywords} />
+                </p>
+              );
+            })}
+          </div>
+        ) : (
+          <p>{mode === "original" ? "Upload a resume to preview extracted source text." : "Run the workflow to render the generated draft here."}</p>
+        )}
+      </section>
+    </div>
+  );
+}
+
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -512,9 +588,24 @@ function MiniResumeDocument({
   characterCount?: number;
   changeLog?: string[];
 }) {
+  const hasText = Boolean(text?.trim());
+
+  if (mode === "original" && hasText) {
+    return (
+      <PlainResumeDocument
+        text={text}
+        keywords={[]}
+        mode={mode}
+        filename={filename}
+        uploadFormat={uploadFormat}
+        characterCount={characterCount}
+      />
+    );
+  }
+
   const parsed = parseResumeText(text);
 
-  if (mode === "original" && !parsed) {
+  if (mode === "original" && !parsed && !hasText) {
     return (
       <div className="rf-resume-paper rf-resume-paper-empty">
         <div className="rf-resume-head">
@@ -524,10 +615,7 @@ function MiniResumeDocument({
         </div>
         <section>
           <h4>Original preview</h4>
-          <p>
-            Original visual preview is not available for DOCX/PDF files yet. The tailored preview renders here after
-            the workflow returns a generated draft.
-          </p>
+          <p>Upload a resume to show the source text extracted from the document.</p>
         </section>
       </div>
     );
@@ -575,66 +663,7 @@ function MiniResumeDocument({
     );
   }
 
-  return (
-    <div className="rf-resume-paper">
-      <div className="rf-resume-head">
-        <h3>Sarah Chen</h3>
-        <p>Senior Product Manager</p>
-        <span>sarah.chen@email.com · +1 415-555-0118 · San Francisco, CA · linkedin.com/in/schen</span>
-      </div>
-      <section>
-        <h4>Professional summary</h4>
-        {text ? (
-          <pre className="rf-resume-generated">{text}</pre>
-        ) : (
-          <p>
-            Operations-minded product leader with 8 years building <mark>cross-functional roadmaps</mark>, leading{" "}
-            <mark>operational reviews</mark>, and translating <mark className="good">analytics</mark> into the kinds of
-            decisions that actually move quarters.
-          </p>
-        )}
-      </section>
-      <section>
-        <h4>Experience</h4>
-        <div className="rf-resume-role">
-          <div>
-            <strong>Senior Product Manager</strong>
-            <em>Lattice · San Francisco, CA</em>
-          </div>
-          <span>Mar 2023 — present</span>
-        </div>
-        <ul>
-          <li>Owned <mark>cross-functional roadmap</mark> delivery for 3 product pods (28 engineers)</li>
-          <li>Cut release cycle from 18 days to 9 via process redesign and clearer ownership</li>
-          <li>SQL-backed weekly KPI reviews across 12 stakeholders</li>
-          <li>Led migration of legacy planning tool · zero downtime deploy</li>
-        </ul>
-        <div className="rf-resume-role secondary-role">
-          <div>
-            <strong>Product Lead, Operations</strong>
-            <em>Notion · Remote</em>
-          </div>
-          <span>Jun 2020 — Mar 2023</span>
-        </div>
-        <ul>
-          <li>Stood up the first operations function · hired and mentored 3 ICs</li>
-          <li>Designed quarterly planning ritual now used company-wide</li>
-          <li>Drove NPS instrumentation · +14 points in 2 quarters</li>
-        </ul>
-      </section>
-      <section>
-        <h4>Skills</h4>
-        <div className="rf-resume-keywords">
-          {(keywords.length
-            ? keywords
-            : ["Roadmapping", "SQL", "A/B testing", "Analytics", "Stakeholder mgmt", "Quarterly planning"]
-          ).slice(0, 8).map((keyword) => (
-            <span key={`resume-keyword-${keyword}`}>{keyword}</span>
-          ))}
-        </div>
-      </section>
-    </div>
-  );
+  return <PlainResumeDocument text={text} keywords={keywords} mode={mode} filename={filename} uploadFormat={uploadFormat} characterCount={characterCount} />;
 }
 
 function loadHistory(): HistoryItem[] {
@@ -954,6 +983,12 @@ export default function Page() {
   const uploadFormatHint = enabledUploadFormats.length
     ? `${enabledUploadFormats.map((format) => format.label).join(", ")}. Drop your file here or browse from your computer.`
     : "DOCX, PDF, or TXT. Drop your file here or browse from your computer.";
+  const previewTitle =
+    previewMode === "original"
+      ? "Original resume · before tailoring"
+      : previewMode === "diff"
+        ? "Change notes · before export"
+        : "Your resume · with AI edits applied";
 
   const suggestionCards: StudioSuggestion[] = result
     ? [
@@ -1069,7 +1104,7 @@ export default function Page() {
                 <div className="studio-card-head">
                   <div>
                     <div className="eyebrow">Live preview</div>
-                    <h2 className="panel-title">Your resume · with AI edits applied</h2>
+                    <h2 className="panel-title">{previewTitle}</h2>
                   </div>
                   <div className="studio-tabs-mini" role="tablist" aria-label="Preview mode">
                     <button className={previewMode === "tailored" ? "active" : ""} type="button" onClick={() => setPreviewMode("tailored")}>Tailored</button>
@@ -1080,7 +1115,7 @@ export default function Page() {
                 <div className="rf-preview-wrap">
                   <MiniResumeDocument
                     text={previewMode === "original" ? sourcePreviewText : result?.tailored_text}
-                    keywords={presentKeywords}
+                    keywords={previewMode === "original" ? [] : presentKeywords}
                     mode={previewMode}
                     filename={uploadMeta?.filename ?? file?.name}
                     uploadFormat={uploadMeta?.format}
