@@ -467,6 +467,88 @@ function PlainResumeDocument({
   );
 }
 
+function PreviewLineList({
+  lines,
+  keywords,
+  empty,
+}: {
+  lines: PlainResumeLine[];
+  keywords: string[];
+  empty: string;
+}) {
+  if (!lines.length) return <p className="rf-diff-empty">{empty}</p>;
+
+  return (
+    <div className="rf-diff-lines">
+      {lines.slice(0, 14).map((line, index) => {
+        if (line.kind === "heading") return <h5 key={`diff-line-${index}`}>{line.text}</h5>;
+        if (line.kind === "bullet") {
+          return (
+            <p className="plain-bullet" key={`diff-line-${index}`}>
+              <HighlightedText text={line.text} keywords={keywords} />
+            </p>
+          );
+        }
+        return (
+          <p key={`diff-line-${index}`}>
+            <HighlightedText text={line.text} keywords={keywords} />
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+function DiffResumeDocument({
+  sourceText,
+  tailoredText,
+  keywords,
+  changeLog,
+  filename,
+}: {
+  sourceText?: string;
+  tailoredText?: string;
+  keywords: string[];
+  changeLog?: string[];
+  filename?: string;
+}) {
+  const beforeLines = buildPlainResumeLines(sourceText).slice(0, 18);
+  const afterLines = buildPlainResumeLines(tailoredText).slice(0, 18);
+  const documentName = filename ? filename.replace(/\.(docx|pdf|txt)$/i, "") : "Resume";
+
+  return (
+    <div className="rf-resume-paper rf-resume-paper-diff">
+      <div className="rf-resume-head">
+        <h3>Change review</h3>
+        <p>{documentName}</p>
+        <span>Compare the source text with the tailored draft before export.</span>
+      </div>
+      <section>
+        <h4>Generated change notes</h4>
+        {changeLog?.length ? (
+          <ul className="rf-resume-change-list">
+            {changeLog.slice(0, 8).map((change, index) => (
+              <li key={`preview-change-${index}`}>{change}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>Run the workflow and generated change notes will appear here.</p>
+        )}
+      </section>
+      <div className="rf-diff-grid" aria-label="Original and tailored resume comparison">
+        <article className="rf-diff-column before">
+          <div className="rf-diff-kicker">Original</div>
+          <PreviewLineList lines={beforeLines} keywords={[]} empty="Upload a resume to show the extracted source text." />
+        </article>
+        <article className="rf-diff-column after">
+          <div className="rf-diff-kicker">Tailored</div>
+          <PreviewLineList lines={afterLines} keywords={keywords} empty="Run the workflow to show the tailored draft." />
+        </article>
+      </div>
+    </div>
+  );
+}
+
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -573,6 +655,7 @@ function ResumeSection({ section, keywords }: { section: ParsedResumeSection; ke
 
 function MiniResumeDocument({
   text,
+  sourceText,
   keywords,
   mode,
   filename,
@@ -581,6 +664,7 @@ function MiniResumeDocument({
   changeLog,
 }: {
   text?: string;
+  sourceText?: string;
   keywords: string[];
   mode: PreviewMode;
   filename?: string;
@@ -623,28 +707,13 @@ function MiniResumeDocument({
 
   if (mode === "diff") {
     return (
-      <div className="rf-resume-paper rf-resume-paper-diff">
-        <div className="rf-resume-head">
-          <h3>{parsed?.name || "Change review"}</h3>
-          <p>{parsed?.role || "Generated edits"}</p>
-          <span>{parsed?.contact || "Review the changes returned by the AI workflow before export"}</span>
-        </div>
-        <section>
-          <h4>Change notes</h4>
-          {changeLog?.length ? (
-            <ul className="rf-resume-change-list">
-              {changeLog.slice(0, 10).map((change, index) => (
-                <li key={`preview-change-${index}`}>{change}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>Run the workflow and the change log will appear here.</p>
-          )}
-        </section>
-        {parsed?.sections.slice(0, 2).map((section) => (
-          <ResumeSection key={`diff-${section.title}`} section={section} keywords={keywords} />
-        ))}
-      </div>
+      <DiffResumeDocument
+        sourceText={sourceText}
+        tailoredText={text}
+        keywords={keywords}
+        changeLog={changeLog}
+        filename={filename}
+      />
     );
   }
 
@@ -1115,6 +1184,7 @@ export default function Page() {
                 <div className="rf-preview-wrap">
                   <MiniResumeDocument
                     text={previewMode === "original" ? sourcePreviewText : result?.tailored_text}
+                    sourceText={sourcePreviewText}
                     keywords={previewMode === "original" ? [] : presentKeywords}
                     mode={previewMode}
                     filename={uploadMeta?.filename ?? file?.name}
