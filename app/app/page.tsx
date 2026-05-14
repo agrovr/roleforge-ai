@@ -106,6 +106,15 @@ const DEFAULT_EXPORT_FORMATS: ExportCapability[] = [
   { format: "txt", label: "TXT", enabled: false, plan: "premium", reason: "Premium coming soon" },
 ];
 
+function customerExportFormats(formats?: ExportCapability[]) {
+  const pdfCapability = formats?.find((format) => format.format === "pdf");
+  return DEFAULT_EXPORT_FORMATS.map((format) =>
+    format.format === "pdf"
+      ? { ...format, enabled: pdfCapability?.enabled ?? format.enabled, reason: pdfCapability?.reason }
+      : { ...format, enabled: false, plan: "premium" as const, reason: "Coming soon" },
+  );
+}
+
 function Pill({ text, kind }: { text: string; kind: "good" | "bad" }) {
   return <span className={`pill ${kind}`}>{text}</span>;
 }
@@ -937,7 +946,7 @@ export default function Page() {
   const runLabel = busy ? "Tailoring..." : result ? "Re-tailor" : "Run Tailor";
   const exportLabel = downloadUrl ? "Download PDF" : "Export PDF";
   const uploadFormats = capabilities?.upload_formats?.length ? capabilities.upload_formats : DEFAULT_UPLOAD_FORMATS;
-  const exportFormats = capabilities?.export_formats?.length ? capabilities.export_formats : DEFAULT_EXPORT_FORMATS;
+  const exportFormats = customerExportFormats(capabilities?.export_formats);
   const enabledUploadFormats = uploadFormats.filter((format) => format.enabled);
   const uploadAccept = enabledUploadFormats.length
     ? enabledUploadFormats.map((format) => `.${format.format}`).join(",")
@@ -1031,14 +1040,15 @@ export default function Page() {
                 <div className="export-format-strip" aria-label="Export format availability">
                   {exportFormats.map((format) => {
                     const isPdf = format.format === "pdf";
-                    const planLabel = format.plan === "premium" ? "Premium" : "Free";
+                    const planLabel = format.plan === "premium" ? "Coming soon" : "Free";
                     return (
                       <span
                         key={format.format}
-                        className={`export-format-chip${isPdf ? " active" : ""}${format.enabled ? "" : " disabled"}`}
+                        className={`export-format-chip${format.enabled && isPdf ? " active" : ""}${format.enabled ? "" : " disabled"}`}
                         aria-disabled={!format.enabled}
-                        title={!format.enabled ? format.reason || "Coming soon" : `${format.label} export available`}
+                        title={!format.enabled ? "Premium exports are coming soon" : `${format.label} export available`}
                       >
+                        {!format.enabled ? <RoleForgeIcon name="lock" size={12} /> : null}
                         {format.label} <small>{format.enabled ? planLabel : format.reason || planLabel}</small>
                       </span>
                     );
