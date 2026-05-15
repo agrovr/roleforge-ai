@@ -792,7 +792,9 @@ function accountInitials(user: AccountUser | null) {
   return (parts[0]?.[0] ?? "R").toUpperCase() + (parts[1]?.[0] ?? "F").toUpperCase();
 }
 
-function accountNoticeLabel(value: string) {
+function accountNoticeLabel(value: string, detail = "") {
+  const safeDetail = detail.replace(/\+/g, " ").trim();
+
   switch (value) {
     case "check-email":
       return "Check your email for the secure sign-in link.";
@@ -803,6 +805,7 @@ function accountNoticeLabel(value: string) {
     case "account-not-configured":
       return "Account sign-in needs Supabase environment variables.";
     case "signin-error":
+      if (safeDetail) return `Sign-in could not finish: ${safeDetail}`;
       return "Sign-in could not start. Check the email and try again.";
     default:
       return "";
@@ -908,12 +911,13 @@ export default function Page() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const account = params.get("account");
-    const notice = accountNoticeLabel(account ?? "");
+    const notice = accountNoticeLabel(account ?? "", params.get("auth_error") ?? "");
 
     if (notice) {
       setAccountNotice(notice);
       setAccountPanelOpen(true);
       params.delete("account");
+      params.delete("auth_error");
       const nextUrl = `${window.location.pathname}${params.toString() ? `?${params}` : ""}${window.location.hash}`;
       window.history.replaceState(null, "", nextUrl);
     } else if (account === "signin") {
