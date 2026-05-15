@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { safeRedirectPath } from "@/app/lib/safeRedirect";
-import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
+import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl;
@@ -22,13 +24,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(redirectTo);
   }
 
-  const supabase = await createRoleForgeServerClient();
-  if (!supabase) {
+  const routeClient = await createRoleForgeRouteClient();
+  if (!routeClient) {
     redirectTo.searchParams.set("account", "account-not-configured");
     return NextResponse.redirect(redirectTo);
   }
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  const { error } = await routeClient.supabase.auth.exchangeCodeForSession(code);
   if (error) {
     redirectTo.searchParams.set("account", "signin-error");
     redirectTo.searchParams.set("auth_error", error.message);
@@ -36,5 +38,5 @@ export async function GET(request: NextRequest) {
     redirectTo.searchParams.set("account", "connected");
   }
 
-  return NextResponse.redirect(redirectTo);
+  return withSupabaseCookies(NextResponse.redirect(redirectTo), routeClient.cookiesToSet);
 }

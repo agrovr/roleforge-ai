@@ -3,9 +3,11 @@ import type { Provider } from "@supabase/supabase-js";
 
 import { safeRedirectPath } from "@/app/lib/safeRedirect";
 import { getRequestOrigin } from "@/app/lib/siteUrl";
-import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
+import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
 
 const supportedOAuthProviders = new Set<Provider>(["google"]);
+
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl;
@@ -18,15 +20,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(fallback);
   }
 
-  const supabase = await createRoleForgeServerClient();
-  if (!supabase) {
+  const routeClient = await createRoleForgeRouteClient();
+  if (!routeClient) {
     fallback.searchParams.set("account", "account-not-configured");
     return NextResponse.redirect(fallback);
   }
 
   const origin = getRequestOrigin(request.url);
   const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(next)}`;
-  const { data, error } = await supabase.auth.signInWithOAuth({
+  const { data, error } = await routeClient.supabase.auth.signInWithOAuth({
     provider,
     options: {
       redirectTo,
@@ -38,5 +40,5 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(fallback);
   }
 
-  return NextResponse.redirect(data.url);
+  return withSupabaseCookies(NextResponse.redirect(data.url), routeClient.cookiesToSet);
 }
