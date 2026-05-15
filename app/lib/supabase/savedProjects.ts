@@ -10,6 +10,8 @@ export type SavedHistoryItem = {
   downloadFormat?: "pdf" | "docx" | "txt";
   roleHint: string;
   saved?: boolean;
+  source?: "account" | "local";
+  snapshot?: Record<string, unknown>;
 };
 
 export type CompletedRunSaveInput = SavedHistoryItem & {
@@ -32,6 +34,7 @@ type TailorRunRow = {
   fit_score: number | null;
   download_format: "pdf" | "docx" | "txt" | null;
   download_url: string | null;
+  payload: Record<string, unknown> | null;
 };
 
 function titleFromTarget(value: string | undefined) {
@@ -43,7 +46,7 @@ function titleFromTarget(value: string | undefined) {
 export async function loadSavedRuns(client: SupabaseClient): Promise<SavedHistoryItem[]> {
   const { data, error } = await client
     .from("tailor_runs")
-    .select("id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url")
+    .select("id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url, payload")
     .order("created_at", { ascending: false })
     .limit(12);
 
@@ -59,6 +62,8 @@ export async function loadSavedRuns(client: SupabaseClient): Promise<SavedHistor
     downloadFormat: run.download_format || "pdf",
     roleHint: titleFromTarget(run.job_target ?? undefined),
     saved: true,
+    source: "account",
+    snapshot: (run.payload?.studioSnapshot as Record<string, unknown> | undefined) ?? undefined,
   }));
 }
 

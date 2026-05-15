@@ -3341,6 +3341,11 @@ html[data-theme="dark"] .result-box {
   gap: 14px;
 }
 
+.history-item.active {
+  border-color: color-mix(in srgb, var(--brand) 42%, var(--line));
+  background: color-mix(in srgb, var(--brand) 8%, var(--surface));
+}
+
 .history-title-row {
   display: flex;
   align-items: center;
@@ -3383,6 +3388,36 @@ html[data-theme="dark"] .result-box {
   font-weight: 950;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+}
+
+.history-sync-badge.local {
+  border-color: color-mix(in srgb, var(--ink-3) 34%, var(--line));
+  background: color-mix(in srgb, var(--ink-3) 8%, var(--surface));
+  color: var(--ink-2);
+}
+
+.history-sync-badge.restore {
+  border-color: color-mix(in srgb, var(--brand) 36%, var(--line));
+  background: color-mix(in srgb, var(--brand) 10%, var(--surface));
+  color: var(--brand-strong);
+}
+
+.history-sync-badge.legacy {
+  border-color: color-mix(in srgb, var(--warn) 34%, var(--line));
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.history-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.history-actions .ghost-button {
+  min-height: 38px;
 }
 
 .preview-doc {
@@ -6299,6 +6334,29 @@ html[data-theme="dark"] .history-sync-badge {
   border-color: rgba(146, 191, 160, 0.34);
   background: rgba(95, 132, 109, 0.18);
   color: #b7e5c4;
+}
+
+html[data-theme="dark"] .history-item.active {
+  border-color: rgba(237, 127, 105, 0.38);
+  background: rgba(237, 127, 105, 0.12);
+}
+
+html[data-theme="dark"] .history-sync-badge.local {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: rgba(255, 247, 233, 0.06);
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .history-sync-badge.restore {
+  border-color: rgba(237, 127, 105, 0.38);
+  background: rgba(237, 127, 105, 0.14);
+  color: #ffbaaa;
+}
+
+html[data-theme="dark"] .history-sync-badge.legacy {
+  border-color: rgba(222, 162, 79, 0.34);
+  background: rgba(222, 162, 79, 0.14);
+  color: #f3c16d;
 }
 
 html[data-theme="dark"] .studio-account-sync {

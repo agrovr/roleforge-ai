@@ -80,6 +80,18 @@ type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error
 type InputMode = "text" | "url";
 type PreviewMode = "tailored" | "original" | "diff";
 type ReviewTab = "score" | "gap" | "ats" | "resume" | "cover" | "interview" | "changes" | "history";
+type SavedRunSnapshot = {
+  result: TailorResult;
+  sourcePreviewText?: string;
+  uploadMeta?: UploadResponse | null;
+  jdText?: string;
+  jdUrl?: string;
+  companyUrl?: string;
+  inputMode?: InputMode;
+  tailoringMode?: TailoringMode;
+  downloadUrl?: string;
+  downloadFormat?: ExportFormat;
+};
 type AccountUser = { id: string; email?: string; name?: string };
 type AccountStatus = {
   configured: boolean;
@@ -98,6 +110,8 @@ type HistoryItem = {
   downloadFormat?: ExportFormat;
   roleHint: string;
   saved?: boolean;
+  source?: "local" | "account";
+  snapshot?: SavedRunSnapshot;
 };
 type ApiErrorPayload = { error?: { code?: string; message?: string; request_id?: string; details?: unknown } };
 type StudioSuggestion = { label: string; meta: string; before?: string; after: string; tone?: "good" | "warn" | "neutral" };
@@ -777,12 +791,26 @@ function saveSyncedHistoryIds(ids: string[]) {
   window.localStorage.setItem(SYNCED_HISTORY_KEY, JSON.stringify([...new Set(ids)].slice(0, 40)));
 }
 
+function hasRestorableSnapshot(item: HistoryItem) {
+  return Boolean(item.snapshot?.result?.tailored_text?.trim());
+}
+
 function mergeHistory(localItems: HistoryItem[], savedItems: HistoryItem[]) {
   const merged = new Map<string, HistoryItem>();
 
   [...savedItems, ...localItems].forEach((item) => {
     const existing = merged.get(item.id);
-    merged.set(item.id, existing ? { ...item, saved: Boolean(existing.saved || item.saved) } : item);
+    merged.set(
+      item.id,
+      existing
+        ? {
+            ...item,
+            saved: Boolean(existing.saved || item.saved),
+            source: existing.source === "account" || item.source === "account" ? "account" : "local",
+            snapshot: existing.snapshot ?? item.snapshot,
+          }
+        : item,
+    );
   });
 
   return [...merged.values()]
@@ -911,6 +939,7 @@ export default function Page() {
   const [historySyncState, setHistorySyncState] = useState<"local" | "loading" | "synced" | "saving" | "error">("local");
   const [historySyncMessage, setHistorySyncMessage] = useState("Local browser history");
   const [syncedHistoryIds, setSyncedHistoryIds] = useState<string[]>([]);
+  const [restoredHistoryId, setRestoredHistoryId] = useState<string | null>(null);
   const [capabilities, setCapabilities] = useState<CapabilitiesResponse | null>(null);
   const historySectionRef = useRef<HTMLElement | null>(null);
 
@@ -943,9 +972,14 @@ export default function Page() {
     loadSavedRuns(supabaseClient)
       .then((savedRuns) => {
         if (cancelled) return;
+        const savedHistory = savedRuns.map((run) => ({
+          ...run,
+          source: "account" as const,
+          snapshot: run.snapshot as SavedRunSnapshot | undefined,
+        }));
 
         setHistory((current) => {
-          const merged = mergeHistory(current.length ? current : loadHistory(), savedRuns);
+          const merged = mergeHistory(current.length ? current : loadHistory(), savedHistory);
           saveHistory(merged);
           return merged;
         });
@@ -1048,10 +1082,12 @@ export default function Page() {
 
   useEffect(() => {
     let cancelled = false;
+    if (!file) return;
+
     setUploadMeta(null);
     setSourcePreviewText("");
     setPreviewMode("tailored");
-    if (!file) return;
+    setRestoredHistoryId(null);
 
     if (/\.txt$/i.test(file.name)) {
       file.text()
@@ -1081,7 +1117,7 @@ export default function Page() {
   const interviewPrep = result?.interview_prep ?? [];
   const warnings = result?.warnings ?? [];
 
-  async function upload(): Promise<string> {
+  async function upload(): Promise<UploadResponse> {
     if (!baseUrl) throw new Error("The resume workflow is not available yet.");
     if (!file) throw new Error("Select a resume file first.");
 
@@ -1095,7 +1131,7 @@ export default function Page() {
     setResumeId(data.resume_id);
     setUploadMeta(data);
     if (typeof data.text_preview === "string") setSourcePreviewText(data.text_preview);
-    return data.resume_id;
+    return data;
   }
 
   async function tailor(resume_id: string): Promise<TailorResult> {
@@ -1173,6 +1209,7 @@ export default function Page() {
         readTimeSeconds: outputReadSeconds,
         downloadFilename: url.split("/").pop(),
         payload: {
+          studioSnapshot: item.snapshot,
           runId: output.run_id,
           generatedAt: output.generated_at,
           warnings: output.warnings ?? [],
@@ -1185,7 +1222,7 @@ export default function Page() {
       setSyncedHistoryIds(nextIds);
       saveSyncedHistoryIds(nextIds);
       setHistory((current) => {
-        const next = current.map((entry) => (entry.id === item.id ? { ...entry, saved: true } : entry));
+        const next = current.map((entry) => (entry.id === item.id ? { ...entry, saved: true, source: "account" as const } : entry));
         saveHistory(next);
         return next;
       });
@@ -1195,6 +1232,62 @@ export default function Page() {
       setHistorySyncState("error");
       setHistorySyncMessage("Could not sync this run. It is still saved locally.");
     }
+  }
+
+  function buildRunSnapshot(output: TailorResult, uploadData: UploadResponse, url: string): SavedRunSnapshot {
+    return {
+      result: output,
+      sourcePreviewText: typeof uploadData.text_preview === "string" ? uploadData.text_preview : sourcePreviewText,
+      uploadMeta: uploadData,
+      jdText,
+      jdUrl,
+      companyUrl,
+      inputMode,
+      tailoringMode: output.tailoring_mode ?? tailoringMode,
+      downloadUrl: url,
+      downloadFormat: "pdf",
+    };
+  }
+
+  function restoreHistoryItem(entry: HistoryItem) {
+    const snapshot = entry.snapshot;
+    if (!snapshot?.result?.tailored_text?.trim()) {
+      setHistorySyncState("error");
+      setHistorySyncMessage("This older run has a download link, but no restorable studio snapshot.");
+      return;
+    }
+
+    setFile(null);
+    setResumeId(snapshot.uploadMeta?.resume_id ?? snapshot.result.run_id ?? entry.id);
+    setUploadMeta(snapshot.uploadMeta ?? {
+      resume_id: snapshot.result.run_id ?? entry.id,
+      filename: entry.filename,
+      format: entry.downloadFormat,
+    });
+    setSourcePreviewText(snapshot.sourcePreviewText ?? "");
+    setResult(snapshot.result);
+    setDownloadUrl(snapshot.downloadUrl || entry.downloadUrl || null);
+    setJdText(snapshot.jdText ?? "");
+    setJdUrl(snapshot.jdUrl ?? "");
+    setCompanyUrl(snapshot.companyUrl ?? "");
+    setInputMode(snapshot.inputMode ?? (snapshot.jdUrl ? "url" : "text"));
+    setTailoringMode(snapshot.tailoringMode ?? entry.mode);
+    setStage("ready");
+    setError("");
+    setCopyState("");
+    setActiveTab("score");
+    setPreviewMode("tailored");
+    setRestoredHistoryId(entry.id);
+    setHistorySyncState(entry.saved || entry.source === "account" ? "synced" : "local");
+    setHistorySyncMessage(`Restored ${entry.filename} into the studio`);
+    window.setTimeout(() => document.getElementById("editor")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+  }
+
+  function clearLocalHistory() {
+    const next = signedIn ? history.filter((entry) => Boolean(entry.saved || syncedHistoryIds.includes(entry.id))) : [];
+    setHistory(next);
+    saveHistory(next);
+    setRestoredHistoryId((current) => (current && next.some((entry) => entry.id === current) ? current : null));
   }
 
   async function onRun() {
@@ -1208,21 +1301,25 @@ export default function Page() {
 
     try {
       setStage("uploading");
-      const id = await upload();
+      const uploadData = await upload();
+      const id = uploadData.resume_id;
       setStage("tailoring");
       const output = await tailor(id);
       setStage("exporting");
       const url = await exportResume(output.tailored_text, "pdf");
+      const snapshot = buildRunSnapshot(output, uploadData, url);
       const item: HistoryItem = {
         id: output.run_id ?? id,
         createdAt: output.generated_at ?? new Date().toISOString(),
-        filename: file?.name ?? "resume",
+        filename: uploadData.filename ?? file?.name ?? "resume",
         mode: output.tailoring_mode ?? tailoringMode,
         score: output.score_summary?.fit_after ?? output.fit_score_after?.score ?? output.fit_score?.score ?? 0,
         downloadUrl: url,
         downloadFormat: "pdf",
         roleHint: (jdText || jdUrl || "Role target").slice(0, 90),
         saved: false,
+        source: "local",
+        snapshot,
       };
       const nextHistory = [item, ...history.filter((entry) => entry.id !== item.id)].slice(0, 12);
       setHistory(nextHistory);
@@ -1231,6 +1328,7 @@ export default function Page() {
       setStage("ready");
       setActiveTab("score");
       setPreviewMode("tailored");
+      setRestoredHistoryId(null);
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "Something went wrong";
       setError(message);
@@ -1259,7 +1357,7 @@ export default function Page() {
   }
 
   const firstTargetLine = (jdText || jdUrl).split(/\r?\n/).map((line) => line.trim()).find(Boolean) || "";
-  const activeResumeName = file?.name?.replace(/\.(docx|pdf|txt)$/i, "") || "Resume studio";
+  const activeResumeName = (file?.name || uploadMeta?.filename)?.replace(/\.(docx|pdf|txt)$/i, "") || "Resume studio";
   const targetUrlInfo = parseTargetUrl(firstTargetLine);
   const activeRole = targetUrlInfo?.label || firstTargetLine || (hasTarget ? "Role target loaded" : "Add a role target");
   const activeTitle = hasTarget && firstTargetLine ? firstTargetLine : activeResumeName;
@@ -1267,7 +1365,7 @@ export default function Page() {
     ? targetUrlInfo?.host
       ? `Tailored and exported for ${targetUrlInfo.host}`
       : "Tailored and exported from the current workflow"
-    : file
+    : (file || uploadMeta)
       ? "Resume selected · add a target and run the workflow"
       : "Upload a resume, add a job target, then run the workflow";
   const topbarLabel = compactLabel(hasTarget ? activeRole : activeResumeName, 36);
@@ -1753,28 +1851,36 @@ export default function Page() {
                     <h2 className="panel-title">{signedIn ? "Saved projects" : "Recent runs"}</h2>
                     <p className="history-sync-note">{historySyncMessage}</p>
                   </div>
-                  <button className="btn btn-soft btn-sm" type="button" onClick={() => { setHistory([]); saveHistory([]); }}>Clear local</button>
+                  <button className="btn btn-soft btn-sm" type="button" onClick={clearLocalHistory} disabled={!history.length}>Clear local</button>
                 </div>
                 <div className="change-list panel-body">
                   {history.length ? history.map((entry) => {
                     const saved = Boolean(entry.saved || syncedHistoryIds.includes(entry.id));
+                    const accountRun = saved || entry.source === "account";
+                    const restorable = hasRestorableSnapshot(entry);
                     return (
-                      <article className="history-item" key={entry.id}>
+                      <article className={`history-item${restoredHistoryId === entry.id ? " active" : ""}`} key={entry.id}>
                         <div>
                           <div className="history-title-row">
                             <strong>{entry.filename}</strong>
-                            {saved ? <small className="history-sync-badge">Saved</small> : null}
+                            <small className={`history-sync-badge ${accountRun ? "account" : "local"}`}>{accountRun ? "Account" : "Local"}</small>
+                            <small className={`history-sync-badge ${restorable ? "restore" : "legacy"}`}>{restorable ? "Restorable" : "Download only"}</small>
                           </div>
                           <p>{entry.roleHint}</p>
                           <span>{new Date(entry.createdAt).toLocaleString()} · {entry.mode} · {entry.score}/100</span>
                         </div>
-                        <a className="ghost-button" href={entry.downloadUrl} download>Download {entry.downloadFormat?.toUpperCase() ?? "PDF"} <RoleForgeIcon name="download" size={14} /></a>
+                        <div className="history-actions">
+                          <button className="ghost-button" type="button" onClick={() => restoreHistoryItem(entry)} disabled={!restorable}>
+                            Restore <RoleForgeIcon name="upload" size={14} />
+                          </button>
+                          <a className="ghost-button" href={entry.downloadUrl} download>Download {entry.downloadFormat?.toUpperCase() ?? "PDF"} <RoleForgeIcon name="download" size={14} /></a>
+                        </div>
                       </article>
                     );
                   }) : (
                     <div className="empty-state">
                       <strong>{signedIn ? "No saved runs yet" : "No local history yet"}</strong>
-                      <p>{signedIn ? "Complete a tailor run and it will sync to your account when available." : "Completed runs will appear here in this browser."}</p>
+                      <p>{signedIn ? "Complete a tailor run and it will appear here with a restore button for the full studio state." : "Completed runs stay in this browser with resume preview, target, scores, and download link ready to reopen."}</p>
                     </div>
                   )}
                 </div>
