@@ -96,6 +96,7 @@ The Supabase-ready frontend foundation is in place:
 Add these public environment variables in Vercel:
 
 ```env
+NEXT_PUBLIC_SITE_URL=https://resume-tailor-ui-eta.vercel.app
 NEXT_PUBLIC_SUPABASE_URL=https://ijdspodwpkuhwszmvqip.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
@@ -107,6 +108,8 @@ In the Supabase dashboard, configure Auth URLs before testing production email l
 - Site URL: `https://resume-tailor-ui-eta.vercel.app`
 - Redirect URL: `https://resume-tailor-ui-eta.vercel.app/auth/callback`
 - Local redirect URL: `http://localhost:3000/auth/callback`
+
+For email magic links, confirm the email template uses Supabase's confirmation link token that respects the request `redirectTo` value. Old links can expire or keep pointing at an older Site URL, so generate a fresh link after changing Auth URL settings.
 
 For Google OAuth, enable the Google provider in Supabase and use this provider callback URL in the Google Cloud OAuth client:
 

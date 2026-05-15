@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import type { Provider } from "@supabase/supabase-js";
 
 import { safeRedirectPath } from "@/app/lib/safeRedirect";
+import { getRequestOrigin } from "@/app/lib/siteUrl";
 import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
 
 const supportedOAuthProviders = new Set<Provider>(["google"]);
@@ -23,7 +24,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(fallback);
   }
 
-  const redirectTo = `${url.origin}/auth/callback?next=${encodeURIComponent(next)}`;
+  const origin = getRequestOrigin(request.url);
+  const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(next)}`;
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {

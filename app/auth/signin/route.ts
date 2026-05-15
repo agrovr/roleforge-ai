@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { safeRedirectPath } from "@/app/lib/safeRedirect";
+import { getRequestOrigin } from "@/app/lib/siteUrl";
 import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
 
 export async function POST(request: Request) {
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
     redirect(`${next}?account=account-not-configured`);
   }
 
-  const origin = new URL(request.url).origin;
+  const origin = getRequestOrigin(request.url);
   const emailRedirectTo = `${origin}/auth/callback?next=${encodeURIComponent(next)}`;
   const { error } = await supabase.auth.signInWithOtp({
     email,
