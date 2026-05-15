@@ -4090,6 +4090,7 @@ html[data-theme="dark"] input::file-selector-button {
   color: rgba(255, 247, 233, 0.74);
   font-size: 0.82rem;
   line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .rf-rail-upgrade .primary-button {
@@ -5303,7 +5304,55 @@ html[data-theme="dark"] .rf-rail-upgrade p {
 
 @media (max-width: 720px) {
   .rf-studio-shell {
-    width: min(100% - 22px, 1340px);
+    width: 100vw;
+    padding-inline: 22px;
+  }
+
+  .rf-studio-topbar {
+    position: static;
+    gap: 12px;
+    padding: 10px;
+    max-width: 100%;
+  }
+
+  .rf-studio-breadcrumb {
+    max-width: 100%;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+  }
+
+  .breadcrumb-current,
+  .breadcrumb-separator {
+    display: none;
+  }
+
+  .rf-studio-breadcrumb strong {
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .rf-studio-top-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+  }
+
+  .studio-top-button {
+    width: 100%;
+    min-height: 42px;
+    padding-inline: 10px;
+  }
+
+  .studio-account-menu {
+    justify-self: start;
+  }
+
+  .rf-studio-rail,
+  .rf-rail-upgrade,
+  .rail-item {
+    max-width: 100%;
+    overflow: hidden;
   }
 
   .rf-studio-top-actions,

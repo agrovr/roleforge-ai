@@ -1109,6 +1109,7 @@ export default function Page() {
     const currentFileKey = fileUploadKey(file);
 
     if (!file) {
+      if (restoredHistoryId) return;
       setResumeId(null);
       setUploadMeta(null);
       setUploadFileKey("");
@@ -1170,7 +1171,7 @@ export default function Page() {
     return () => {
       controller.abort();
     };
-  }, [baseUrl, file]);
+  }, [baseUrl, file, restoredHistoryId]);
 
   useEffect(() => {
     if (!downloadUrl) {
@@ -1522,21 +1523,42 @@ export default function Page() {
         : "Your resume · with AI edits applied";
   const sourceLineCount = countReadableLines(sourcePreviewText);
   const tailoredLineCount = countReadableLines(result?.tailored_text);
-  const previewStatusItems = [
-    previewUploadState === "ready"
-      ? `${sourceLineCount || 1} source line${sourceLineCount === 1 ? "" : "s"} extracted`
-      : previewUploadState === "reading"
-        ? "Reading source document"
-        : previewUploadState === "error"
-          ? "Source preview needs another try"
-          : file
-            ? "Source preview pending"
-            : "Choose a resume to preview",
-    result
-      ? `${tailoredLineCount || 1} tailored line${tailoredLineCount === 1 ? "" : "s"} generated`
-      : "Tailored draft appears after a run",
-    keywordTotal ? `${presentKeywords.length}/${keywordTotal} keywords matched` : "Keywords pending",
-  ];
+  const hasSourcePreview = Boolean(sourcePreviewText.trim());
+  const hasTailoredPreview = Boolean(result?.tailored_text?.trim());
+  const previewStatusItems =
+    previewMode === "original"
+      ? [
+          hasSourcePreview
+            ? `${sourceLineCount || 1} source line${sourceLineCount === 1 ? "" : "s"} extracted`
+            : previewUploadState === "reading"
+              ? "Reading source document"
+              : previewUploadState === "error"
+                ? "Source preview needs another try"
+                : "Upload a resume to see the original",
+          uploadMeta?.filename ?? file?.name ?? "No source file selected",
+          restoredHistoryId ? "Restored run source" : "Before AI edits",
+        ]
+      : previewMode === "diff"
+        ? [
+            hasSourcePreview ? "Original side ready" : "Original side waiting",
+            hasTailoredPreview ? "Tailored side ready" : "Tailored side waiting",
+            result?.change_log?.length ? `${result.change_log.length} change note${result.change_log.length === 1 ? "" : "s"}` : "Change notes appear after a run",
+          ]
+        : [
+            hasTailoredPreview
+              ? `${tailoredLineCount || 1} tailored line${tailoredLineCount === 1 ? "" : "s"} generated`
+              : "Run the tailor to generate a draft",
+            keywordTotal ? `${presentKeywords.length}/${keywordTotal} keywords matched` : "Keywords pending",
+            restoredHistoryId ? "Restored run open" : downloadReady ? "PDF export ready" : "Review before export",
+          ];
+  const previewStatusTone = (item: string, index: number) =>
+    (previewUploadState === "error" && previewMode === "original" && index === 0) ||
+    item.includes("waiting") ||
+    item.includes("pending") ||
+    item.includes("Upload a resume") ||
+    item.includes("Run the tailor")
+      ? "warn"
+      : "";
   const accountButtonLabel = signedIn ? accountInitials(accountUser) : "IN";
   const accountItems = [
     {
@@ -1767,7 +1789,7 @@ export default function Page() {
                       aria-controls="preview-panel"
                       onClick={() => setPreviewMode("diff")}
                     >
-                      Diff
+                      Changes
                     </button>
                   </div>
                 </div>
@@ -1780,7 +1802,7 @@ export default function Page() {
                 >
                   <div className="rf-preview-status" aria-label="Preview status">
                     {previewStatusItems.map((item, index) => (
-                      <span className={previewUploadState === "error" && index === 0 ? "warn" : ""} key={`${item}-${index}`}>
+                      <span className={previewStatusTone(item, index)} key={`${item}-${index}`}>
                         {item}
                       </span>
                     ))}
