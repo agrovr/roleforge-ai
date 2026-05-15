@@ -78,6 +78,14 @@ type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error
 type InputMode = "text" | "url";
 type PreviewMode = "tailored" | "original" | "diff";
 type ReviewTab = "score" | "gap" | "ats" | "resume" | "cover" | "interview" | "changes" | "history";
+type AccountUser = { id: string; email?: string; name?: string };
+type AccountStatus = {
+  configured: boolean;
+  enabled: boolean;
+  provider: "supabase";
+  user: AccountUser | null;
+  next: string;
+};
 type HistoryItem = {
   id: string;
   createdAt: string;
@@ -774,6 +782,33 @@ function compactLabel(value: string, maxLength = 46) {
   return `${normalized.slice(0, maxLength - 1).trimEnd()}...`;
 }
 
+function accountInitials(user: AccountUser | null) {
+  const label = user?.name || user?.email || "RF";
+  const parts = label
+    .replace(/@.*/, "")
+    .split(/[\s._-]+/)
+    .filter(Boolean);
+
+  return (parts[0]?.[0] ?? "R").toUpperCase() + (parts[1]?.[0] ?? "F").toUpperCase();
+}
+
+function accountNoticeLabel(value: string) {
+  switch (value) {
+    case "check-email":
+      return "Check your email for the secure sign-in link.";
+    case "connected":
+      return "You are signed in. Saved project sync comes next.";
+    case "signed-out":
+      return "You are signed out.";
+    case "account-not-configured":
+      return "Account sign-in needs Supabase environment variables.";
+    case "signin-error":
+      return "Sign-in could not start. Check the email and try again.";
+    default:
+      return "";
+  }
+}
+
 function isUrlTarget(value: string) {
   return /^(https?:\/\/|www\.)/i.test(value.trim());
 }
@@ -826,6 +861,8 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState<ReviewTab>("score");
   const [previewMode, setPreviewMode] = useState<PreviewMode>("tailored");
   const [accountPanelOpen, setAccountPanelOpen] = useState(false);
+  const [accountStatus, setAccountStatus] = useState<AccountStatus | null>(null);
+  const [accountNotice, setAccountNotice] = useState("");
   const [copyState, setCopyState] = useState("");
   const [error, setError] = useState("");
 
@@ -839,6 +876,52 @@ export default function Page() {
 
   useEffect(() => {
     setHistory(loadHistory());
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch("/api/auth/status", {
+      credentials: "include",
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Account status failed");
+        return (await response.json()) as AccountStatus;
+      })
+      .then((data) => setAccountStatus(data))
+      .catch((caught) => {
+        if ((caught as Error).name !== "AbortError") {
+          setAccountStatus({
+            configured: false,
+            enabled: false,
+            provider: "supabase",
+            user: null,
+            next: "Account status is unavailable.",
+          });
+        }
+      });
+
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const account = params.get("account");
+    const notice = accountNoticeLabel(account ?? "");
+
+    if (notice) {
+      setAccountNotice(notice);
+      setAccountPanelOpen(true);
+      params.delete("account");
+      const nextUrl = `${window.location.pathname}${params.toString() ? `?${params}` : ""}${window.location.hash}`;
+      window.history.replaceState(null, "", nextUrl);
+    } else if (account === "signin") {
+      setAccountPanelOpen(true);
+      params.delete("account");
+      const nextUrl = `${window.location.pathname}${params.toString() ? `?${params}` : ""}${window.location.hash}`;
+      window.history.replaceState(null, "", nextUrl);
+    }
   }, []);
 
   useEffect(() => {
@@ -1059,10 +1142,16 @@ export default function Page() {
       : previewMode === "diff"
         ? "Change notes · before export"
         : "Your resume · with AI edits applied";
+  const accountUser = accountStatus?.user ?? null;
+  const accountReady = Boolean(accountStatus?.configured && accountStatus.enabled);
+  const signedIn = Boolean(accountUser);
+  const accountButtonLabel = signedIn ? accountInitials(accountUser) : "IN";
   const accountItems = [
-    { label: "Sign in", detail: "Create an account and keep your work synced." },
-    { label: "Saved projects", detail: "Return to resumes, targets, exports, and run history." },
-    { label: "Billing", detail: "Manage premium options when billing is live." },
+    {
+      label: "Saved projects",
+      detail: signedIn ? "Next: sync local runs to the Supabase project workspace." : "Sign in first, then saved project sync can be connected.",
+    },
+    { label: "Billing", detail: "Premium plans still wait on Stripe products and entitlement checks." },
   ];
 
   const suggestionCards: StudioSuggestion[] = result
@@ -1111,12 +1200,12 @@ export default function Page() {
               <button
                 className="studio-account-button"
                 type="button"
-                aria-label="Open account options"
+                aria-label={signedIn ? "Open account options" : "Open sign-in options"}
                 aria-expanded={accountPanelOpen}
                 aria-controls="studio-account-popover"
                 onClick={() => setAccountPanelOpen((open) => !open)}
               >
-                SC
+                {accountButtonLabel}
               </button>
               {accountPanelOpen ? (
                 <div className="studio-account-popover" id="studio-account-popover" role="dialog" aria-label="Account options">
@@ -1126,8 +1215,37 @@ export default function Page() {
                       <RoleForgeIcon name="x" size={14} />
                     </button>
                   </div>
-                  <strong>Account features are coming soon</strong>
-                  <p>Sign-in, saved projects, and billing stay disabled until the account workspace is ready.</p>
+                  {accountNotice ? <div className="studio-account-notice">{accountNotice}</div> : null}
+                  {signedIn ? (
+                    <>
+                      <strong>{accountUser?.email || "Signed in"}</strong>
+                      <p>Your session is active. Saved projects and billing controls are the next account pieces to wire.</p>
+                      <form className="studio-account-form" action="/auth/signout" method="post">
+                        <input type="hidden" name="next" value="/app" />
+                        <button className="ghost-button studio-account-submit" type="submit">
+                          Sign out
+                        </button>
+                      </form>
+                    </>
+                  ) : accountReady ? (
+                    <>
+                      <strong>Sign in with email</strong>
+                      <p>We will send a secure magic link. No password screen, no fake account state.</p>
+                      <form className="studio-account-form" action="/auth/signin" method="post">
+                        <input type="hidden" name="next" value="/app" />
+                        <label htmlFor="account-email">Email address</label>
+                        <input id="account-email" name="email" type="email" autoComplete="email" required placeholder="you@example.com" />
+                        <button className="primary-button studio-account-submit" type="submit">
+                          Send sign-in link
+                        </button>
+                      </form>
+                    </>
+                  ) : (
+                    <>
+                      <strong>Account setup needed</strong>
+                      <p>Add Supabase public URL and publishable key in Vercel before sign-in can run.</p>
+                    </>
+                  )}
                   <div className="studio-account-list">
                     {accountItems.map((item) => (
                       <div key={item.label}>

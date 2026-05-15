@@ -1,17 +1,40 @@
 import { NextResponse } from "next/server";
 
 import { getSupabaseConfig } from "@/app/lib/supabase/config";
+import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
 
-export function GET() {
+export async function GET() {
   const config = getSupabaseConfig();
 
+  if (!config.configured) {
+    return NextResponse.json({
+      configured: false,
+      enabled: false,
+      provider: "supabase",
+      user: null,
+      next: "Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY before enabling account features.",
+    });
+  }
+
+  const supabase = await createRoleForgeServerClient();
+  const { data, error } = supabase
+    ? await supabase.auth.getUser()
+    : { data: { user: null }, error: null };
+  const user = !error && data.user
+    ? {
+        id: data.user.id,
+        email: data.user.email ?? "",
+        name: typeof data.user.user_metadata?.name === "string" ? data.user.user_metadata.name : "",
+      }
+    : null;
+
   return NextResponse.json({
-    configured: config.configured,
-    enabled: false,
+    configured: true,
+    enabled: true,
     provider: "supabase",
-    user: null,
-    next: config.configured
-      ? "Account routes, callback handling, row-level security, and project sync can be wired next."
-      : "Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY before enabling account features.",
+    user,
+    next: user
+      ? "Saved projects, row-level security policies, and account settings can be wired next."
+      : "Use email sign-in to start an account session. Saved projects remain local until database sync is wired.",
   });
 }

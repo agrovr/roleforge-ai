@@ -17,7 +17,7 @@ function Nav() {
           <a className="nav-link" href="#pricing">Pricing</a>
           <span className="nav-divider" aria-hidden="true" />
           <ThemeToggle />
-          <span className="nav-link disabled-link" aria-disabled="true">Sign in</span>
+          <Link className="nav-link" href="/app?account=signin">Sign in</Link>
           <Link className="btn btn-brand" href="/app">
             Build my resume <RoleForgeIcon name="arrow" size={14} />
           </Link>
@@ -404,9 +404,9 @@ function Pricing() {
           <article className="price-card featured">
             <div className="price-name">Premium</div>
             <div className="price-amount"><span className="v">Coming soon</span></div>
-            <div className="price-desc">Account sync, saved projects, and premium options are planned but not live yet.</div>
+            <div className="price-desc">Sign-in is available. Saved projects and premium options are planned but not live yet.</div>
             <ul className="price-list">
-              <li><RoleForgeIcon name="lock" size={14} />Account workspace coming soon</li>
+              <li><RoleForgeIcon name="check" size={14} />Email sign-in available</li>
               <li><RoleForgeIcon name="lock" size={14} />Premium billing coming soon</li>
               <li><RoleForgeIcon name="lock" size={14} />Saved project sync coming soon</li>
             </ul>
@@ -424,7 +424,7 @@ function FAQ() {
     ["Can I use a job posting URL?", "Yes, if the posting is public and RoleForge can access it. Pasted text is the most reliable target input."],
     ["What file formats can I export?", "The current workflow exports DOCX. Additional export formats should stay hidden until implemented."],
     ["Can I use templates?", "Templates are visual examples for now. A selectable template library needs product rules before launch."],
-    ["Is sign-in available?", "Not yet. Account creation, saved projects, and settings are planned but not live."],
+    ["Is sign-in available?", "Yes. Email magic-link sign-in is available. Saved projects, account settings, and billing still need backend product rules."],
     ["Is premium billing live?", "No. Premium areas are intentionally marked as coming soon until real payment configuration exists."],
   ] as const;
 

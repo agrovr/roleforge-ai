@@ -17,7 +17,8 @@ The public-facing copy intentionally avoids unsupported customer proof, performa
 - Optional company URL context
 - Fit, gap, formatting, generated resume, cover letter, interview prep, change log, warning, and local history views when returned by the backend
 - PDF export for the launch flow
-- Disabled or coming-soon states for auth, premium billing, account settings, and premium feature gating
+- Supabase email sign-in foundation for account sessions
+- Disabled or coming-soon states for premium billing, account settings, saved projects, and premium feature gating
 - Light and dark visual themes
 
 ## Tech Stack
@@ -79,27 +80,38 @@ The studio expects the backend to provide:
 
 ## Auth, Account, and Billing Readiness
 
-The studio includes a visible account menu so the interface has a stable place for future sign-in, saved projects, settings, and billing controls. These remain non-functional by design until real backend support exists.
+The studio includes a visible account menu so the interface has a stable place for sign-in, saved projects, settings, and billing controls. Email magic-link sign-in is wired through Supabase Auth. Saved projects, billing, account settings, and premium entitlements still remain disabled until the product rules and backend storage flows are complete.
 
-The first Supabase-ready frontend foundation is in place:
+The Supabase-ready frontend foundation is in place:
 
-- `GET /api/auth/status` reports whether public Supabase environment variables are configured.
+- `GET /api/auth/status` reports whether public Supabase environment variables are configured and whether a user session exists.
+- `POST /auth/signin` sends an email magic-link sign-in request.
+- `GET /auth/callback` exchanges the Supabase callback code for a session.
+- `POST /auth/signout` clears the current session.
+- `proxy.ts` refreshes the Supabase SSR session cookies for app routes.
 - `app/lib/supabase/client.ts` creates a browser client only when config exists.
 - `docs/supabase-account-foundation.sql` defines the RLS-backed profile, project, and run-history schema applied to the `roleforge-ai` Supabase project.
 
-Add these public environment variables in Vercel before enabling account-backed UI:
+Add these public environment variables in Vercel:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://ijdspodwpkuhwszmvqip.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
 
+Do not add a Supabase `service_role` key or secret key to any `NEXT_PUBLIC_*` variable.
+
+In the Supabase dashboard, configure Auth URLs before testing production email links:
+
+- Site URL: `https://resume-tailor-ui-eta.vercel.app`
+- Redirect URL: `https://resume-tailor-ui-eta.vercel.app/auth/callback`
+- Local redirect URL: `http://localhost:3000/auth/callback`
+
 Needed before enabling these areas:
 
-- Approved auth method selection
-- Production and preview redirect URLs
 - Stripe products, price IDs, checkout/customer portal endpoints, and entitlement checks
 - Plan rules for premium exports, templates, and feature limits
+- Saved-project sync rules and UI states
 
 ## Production Checks
 
