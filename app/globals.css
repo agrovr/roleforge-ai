@@ -3782,6 +3782,64 @@ html[data-theme="dark"] input::file-selector-button {
   margin: 12px 0 14px;
 }
 
+.studio-oauth-button {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 12px 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 90%, white);
+  color: var(--ink-0);
+  font-size: 0.95rem;
+  font-weight: 950;
+  text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.studio-oauth-button:hover,
+.studio-oauth-button:focus-visible {
+  border-color: rgba(188, 113, 47, 0.45);
+  box-shadow: 0 16px 32px rgba(46, 38, 25, 0.12);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.studio-oauth-mark {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 999px;
+  background: conic-gradient(from 90deg, #4285f4, #34a853, #fbbc05, #ea4335, #4285f4);
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.studio-account-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 2px;
+  color: var(--ink-3);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.studio-account-divider::before,
+.studio-account-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--line);
+}
+
 .studio-account-form label {
   color: var(--ink-2);
   font-size: 0.76rem;
@@ -6165,6 +6223,22 @@ html[data-theme="dark"] .studio-account-notice {
 
 html[data-theme="dark"] .studio-account-form label {
   color: #c7ccdf;
+}
+
+html[data-theme="dark"] .studio-oauth-button {
+  background: rgba(255, 247, 233, 0.08);
+  border-color: rgba(255, 247, 233, 0.18);
+  color: #fff8ea;
+}
+
+html[data-theme="dark"] .studio-oauth-button:hover,
+html[data-theme="dark"] .studio-oauth-button:focus-visible {
+  border-color: rgba(221, 164, 75, 0.58);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.32);
+}
+
+html[data-theme="dark"] .studio-account-divider {
+  color: rgba(231, 226, 214, 0.6);
 }
 
 html[data-theme="dark"] .studio-account-form input {

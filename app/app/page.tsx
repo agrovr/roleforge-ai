@@ -1229,8 +1229,13 @@ export default function Page() {
                     </>
                   ) : accountReady ? (
                     <>
-                      <strong>Sign in with email</strong>
-                      <p>We will send a secure magic link. No password screen, no fake account state.</p>
+                      <strong>Sign in</strong>
+                      <p>Use Google for the quickest path, or send a secure email magic link.</p>
+                      <a className="studio-oauth-button" href="/auth/oauth?provider=google&next=/app">
+                        <span className="studio-oauth-mark" aria-hidden="true">G</span>
+                        Continue with Google
+                      </a>
+                      <div className="studio-account-divider"><span>Email fallback</span></div>
                       <form className="studio-account-form" action="/auth/signin" method="post">
                         <input type="hidden" name="next" value="/app" />
                         <label htmlFor="account-email">Email address</label>

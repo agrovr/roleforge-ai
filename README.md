@@ -85,6 +85,7 @@ The studio includes a visible account menu so the interface has a stable place f
 The Supabase-ready frontend foundation is in place:
 
 - `GET /api/auth/status` reports whether public Supabase environment variables are configured and whether a user session exists.
+- `GET /auth/oauth?provider=google` starts Google OAuth when the Google provider is configured in Supabase.
 - `POST /auth/signin` sends an email magic-link sign-in request.
 - `GET /auth/callback` exchanges the Supabase callback code for a session.
 - `POST /auth/signout` clears the current session.
@@ -106,6 +107,12 @@ In the Supabase dashboard, configure Auth URLs before testing production email l
 - Site URL: `https://resume-tailor-ui-eta.vercel.app`
 - Redirect URL: `https://resume-tailor-ui-eta.vercel.app/auth/callback`
 - Local redirect URL: `http://localhost:3000/auth/callback`
+
+For Google OAuth, enable the Google provider in Supabase and use this provider callback URL in the Google Cloud OAuth client:
+
+```text
+https://ijdspodwpkuhwszmvqip.supabase.co/auth/v1/callback
+```
 
 Needed before enabling these areas:
 
