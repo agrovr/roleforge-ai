@@ -4129,6 +4129,10 @@ html[data-theme="dark"] input::file-selector-button {
   box-shadow: var(--shadow-sm);
 }
 
+.studio-history-panel {
+  scroll-margin-top: 128px;
+}
+
 .rf-studio-stat-label {
   color: var(--ink-3);
   font-size: 0.72rem;

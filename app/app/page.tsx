@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
@@ -912,6 +912,7 @@ export default function Page() {
   const [historySyncMessage, setHistorySyncMessage] = useState("Local browser history");
   const [syncedHistoryIds, setSyncedHistoryIds] = useState<string[]>([]);
   const [capabilities, setCapabilities] = useState<CapabilitiesResponse | null>(null);
+  const historySectionRef = useRef<HTMLElement | null>(null);
 
   const accountUser = accountStatus?.user ?? null;
   const accountReady = Boolean(accountStatus?.configured && accountStatus.enabled);
@@ -969,6 +970,14 @@ export default function Page() {
       cancelled = true;
     };
   }, [signedIn, supabaseClient]);
+
+  function openHistoryPanel() {
+    setActiveTab("history");
+    setAccountPanelOpen(false);
+    window.setTimeout(() => {
+      historySectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
+  }
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1410,7 +1419,7 @@ export default function Page() {
         <div className="rf-studio-layout">
           <aside className="rf-studio-rail" aria-label="Studio sections">
             <div className="rail-section-title">Build</div>
-            <a className="rail-item active" href="#editor"><RoleForgeIcon name="doc" size={15} /> Editor</a>
+            <a className={`rail-item ${activeTab === "history" ? "" : "active"}`} href="#editor"><RoleForgeIcon name="doc" size={15} /> Editor</a>
             <a className="rail-item" href="#target"><RoleForgeIcon name="target" size={15} /> Job target</a>
             <a className="rail-item" href="#suggestions"><RoleForgeIcon name="sparkle" size={15} /> AI tailor <span className="rail-pill">{suggestionCards.length || 0}</span></a>
             <a className="rail-item" href="#ats"><RoleForgeIcon name="scan" size={15} /> ATS check</a>
@@ -1419,7 +1428,7 @@ export default function Page() {
             <div className="rail-divider" />
             <div className="rail-section-title">Workspace</div>
             <Link className="rail-item" href="/#templates"><RoleForgeIcon name="layers" size={15} /> Templates</Link>
-            <button className="rail-item" type="button" onClick={() => setActiveTab("history")}><RoleForgeIcon name="chart" size={15} /> History</button>
+            <button className={`rail-item ${activeTab === "history" ? "active" : ""}`} type="button" aria-pressed={activeTab === "history"} onClick={openHistoryPanel}><RoleForgeIcon name="chart" size={15} /> History</button>
             <span className="rail-item disabled" aria-disabled="true"><RoleForgeIcon name="settings" size={15} /> Settings</span>
             <div className="rf-rail-upgrade">
               <strong><RoleForgeIcon name="sparkle" size={14} /> Premium coming soon</strong>
@@ -1737,7 +1746,7 @@ export default function Page() {
             </section>
 
             {activeTab === "history" ? (
-              <section className="studio-card">
+              <section className="studio-card studio-history-panel" id="history" ref={historySectionRef}>
                 <div className="studio-card-head">
                   <div>
                     <div className="eyebrow">{signedIn ? "Saved history" : "Local history"}</div>
