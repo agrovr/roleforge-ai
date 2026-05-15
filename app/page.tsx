@@ -50,7 +50,7 @@ function Hero() {
           <a className="btn btn-ghost btn-lg" href="#how">See how it works</a>
         </div>
         <div className="hero-meta safe-meta" aria-label="Product capabilities">
-          <div className="hero-meta-item"><span className="v">Upload</span><span className="l">Start from DOCX.</span></div>
+          <div className="hero-meta-item"><span className="v">Upload</span><span className="l">Start from DOCX, PDF, or TXT.</span></div>
           <div className="hero-meta-item"><span className="v">Target</span><span className="l">Use text or URL.</span></div>
           <div className="hero-meta-item"><span className="v">Review</span><span className="l">Check before export.</span></div>
         </div>
@@ -114,10 +114,10 @@ function RoleStrip() {
 
 function HowItWorks() {
   const steps = [
-    ["upload", "Upload your resume", "Drop in a DOCX resume. RoleForge reads the current structure, headings, and content before generating changes."],
+    ["upload", "Upload your resume", "Drop in a DOCX, PDF, or TXT resume. RoleForge reads the current structure, headings, and content before generating changes."],
     ["target", "Paste the job", "Drop in the role description or use a public posting URL, then add optional company context when useful."],
     ["sparkle", "Review & tailor", "See fit signals, missing terms, formatting notes, and generated changes in a single review flow."],
-    ["download", "Export & apply", "Download a clean DOCX after the generated result and notes look ready for your own review."],
+    ["download", "Export & apply", "Download a clean PDF after the generated result and notes look ready for your own review."],
   ] as const;
 
   return (
@@ -395,7 +395,8 @@ function Pricing() {
             <div className="price-amount"><span className="v">Available</span></div>
             <div className="price-desc">Use the current resume tailoring workflow for upload, targeting, review, and export.</div>
             <ul className="price-list">
-              <li><RoleForgeIcon name="check" size={14} />DOCX upload and export</li>
+              <li><RoleForgeIcon name="check" size={14} />DOCX, PDF, and TXT upload</li>
+              <li><RoleForgeIcon name="check" size={14} />PDF export</li>
               <li><RoleForgeIcon name="check" size={14} />Job description or public URL targeting</li>
               <li><RoleForgeIcon name="check" size={14} />Review tabs for generated results</li>
             </ul>
@@ -404,11 +405,11 @@ function Pricing() {
           <article className="price-card featured">
             <div className="price-name">Premium</div>
             <div className="price-amount"><span className="v">Coming soon</span></div>
-            <div className="price-desc">Sign-in is available. Saved projects and premium options are planned but not live yet.</div>
+            <div className="price-desc">Sign-in and saved projects are available. Premium options are planned but not live yet.</div>
             <ul className="price-list">
               <li><RoleForgeIcon name="check" size={14} />Email sign-in available</li>
               <li><RoleForgeIcon name="lock" size={14} />Premium billing coming soon</li>
-              <li><RoleForgeIcon name="lock" size={14} />Saved project sync coming soon</li>
+              <li><RoleForgeIcon name="check" size={14} />Saved project sync available</li>
             </ul>
             <button className="btn btn-brand btn-lg" type="button" disabled>Premium not live</button>
           </article>
@@ -422,9 +423,9 @@ function FAQ() {
   const items = [
     ["Does RoleForge replace my judgment?", "No. The app surfaces generated guidance and exports a draft for your review."],
     ["Can I use a job posting URL?", "Yes, if the posting is public and RoleForge can access it. Pasted text is the most reliable target input."],
-    ["What file formats can I export?", "The current workflow exports DOCX. Additional export formats should stay hidden until implemented."],
+    ["What file formats can I export?", "The current free workflow exports PDF. DOCX and TXT exports should stay hidden or locked until premium billing is real."],
     ["Can I use templates?", "Templates are visual examples for now. A selectable template library needs product rules before launch."],
-    ["Is sign-in available?", "Yes. Email magic-link sign-in is available. Saved projects, account settings, and billing still need backend product rules."],
+    ["Is sign-in available?", "Yes. Google and email magic-link sign-in are available. Saved projects can sync after sign-in; account settings and billing still need product rules."],
     ["Is premium billing live?", "No. Premium areas are intentionally marked as coming soon until real payment configuration exists."],
   ] as const;
 

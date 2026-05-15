@@ -2,8 +2,8 @@
 
 Production frontend for RoleForge AI, an AI-assisted resume workflow for uploading a resume, targeting a role, reviewing generated guidance, and exporting a cleaner draft.
 
-- Live app: https://resume-tailor-ui-eta.vercel.app/
-- Frontend repo: https://github.com/agrovr/resume-tailor-ui
+- Live app: https://roleforgeai.vercel.app/
+- Frontend repo: https://github.com/agrovr/roleforge-ai
 - Production backend: `https://roleforge-api-224015900616.us-central1.run.app`
 - Private backend repo: `agrovr/roleforge-ai-backend`
 
@@ -18,7 +18,7 @@ The public-facing copy intentionally avoids unsupported customer proof, performa
 - Fit, gap, formatting, generated resume, cover letter, interview prep, change log, warning, and local history views when returned by the backend
 - PDF export for the launch flow
 - Supabase email sign-in foundation for account sessions
-- Disabled or coming-soon states for premium billing, account settings, saved projects, and premium feature gating
+- Saved project restore/sync states, with coming-soon states for premium billing, account settings, and premium feature gating
 - Light and dark visual themes
 
 ## Tech Stack
@@ -77,10 +77,11 @@ The studio expects the backend to provide:
 - `POST /tailor`
 - `POST /export`
 - `GET /download/{filename}`
+- `HEAD /download/{filename}`
 
 ## Auth, Account, and Billing Readiness
 
-The studio includes a visible account menu so the interface has a stable place for sign-in, saved projects, settings, and billing controls. Email magic-link sign-in and Google OAuth are wired through Supabase Auth. Completed runs can sync into account-backed saved projects when the user is signed in. Billing, account settings, and premium entitlements still remain disabled until the product rules and backend storage flows are complete.
+The studio includes a visible account menu so the interface has a stable place for sign-in, saved projects, settings, and billing controls. Email magic-link sign-in and Google OAuth are wired through Supabase Auth. Completed runs can sync into account-backed saved projects when the user is signed in. Saved runs can restore the studio state when they include a snapshot, while billing, account settings, and premium entitlements remain disabled until the product rules and backend storage flows are complete.
 
 The Supabase-ready frontend foundation is in place:
 

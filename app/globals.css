@@ -3577,6 +3577,21 @@ html[data-theme="dark"] .result-box {
   color: var(--muted);
 }
 
+.export-status-note {
+  flex: 1 0 100%;
+  color: var(--ink-3);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.export-status-note.ready {
+  color: #3d7a51;
+}
+
+.export-status-note.expired {
+  color: #9a4a37;
+}
+
 .studio-stat-label,
 .dash-stat-label {
   color: var(--ink-3);

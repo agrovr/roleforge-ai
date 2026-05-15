@@ -80,6 +80,7 @@ type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error
 type InputMode = "text" | "url";
 type PreviewMode = "tailored" | "original" | "diff";
 type PreviewUploadState = "idle" | "reading" | "ready" | "error";
+type DownloadState = "idle" | "checking" | "ready" | "expired";
 type ReviewTab = "score" | "gap" | "ats" | "resume" | "cover" | "interview" | "changes" | "history";
 type SavedRunSnapshot = {
   result: TailorResult;
@@ -961,6 +962,8 @@ export default function Page() {
   const [sourcePreviewText, setSourcePreviewText] = useState("");
   const [result, setResult] = useState<TailorResult | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [downloadState, setDownloadState] = useState<DownloadState>("idle");
+  const [downloadMessage, setDownloadMessage] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [historySyncState, setHistorySyncState] = useState<"local" | "loading" | "synced" | "saving" | "error">("local");
   const [historySyncMessage, setHistorySyncMessage] = useState("Local browser history");
@@ -1169,6 +1172,40 @@ export default function Page() {
     };
   }, [baseUrl, file]);
 
+  useEffect(() => {
+    if (!downloadUrl) {
+      setDownloadState("idle");
+      setDownloadMessage("");
+      return;
+    }
+
+    const controller = new AbortController();
+    setDownloadState("checking");
+    setDownloadMessage("Checking PDF download...");
+
+    fetch(downloadUrl, {
+      method: "HEAD",
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (controller.signal.aborted) return;
+        if (response.ok) {
+          setDownloadState("ready");
+          setDownloadMessage("PDF download is ready");
+        } else {
+          setDownloadState("expired");
+          setDownloadMessage("This PDF link expired. Run the tailor again to create a fresh export.");
+        }
+      })
+      .catch((caught) => {
+        if ((caught as Error).name === "AbortError") return;
+        setDownloadState("expired");
+        setDownloadMessage("This PDF link could not be checked. Run the tailor again if the download does not open.");
+      });
+
+    return () => controller.abort();
+  }, [downloadUrl]);
+
   const hasTarget = Boolean(jdUrl.trim() || jdText.trim());
   const readyItems = [Boolean(baseUrl), Boolean(file), hasTarget];
   const readiness = Math.round((readyItems.filter(Boolean).length / readyItems.length) * 100);
@@ -1253,6 +1290,8 @@ export default function Page() {
     const data = (await response.json()) as ExportResponse;
     const url = `${baseUrl}/download/${data.download_filename}`;
     setDownloadUrl(url);
+    setDownloadState("checking");
+    setDownloadMessage("Checking PDF download...");
     return url;
   }
 
@@ -1426,7 +1465,7 @@ export default function Page() {
   }
 
   async function copyDownloadUrl() {
-    if (!downloadUrl) return;
+    if (!downloadUrl || downloadState !== "ready") return;
     try {
       await navigator.clipboard.writeText(downloadUrl);
       setCopyState("Copied");
@@ -1458,7 +1497,14 @@ export default function Page() {
   const atsDetail = result?.score_summary?.issues_resolved ? `${result.score_summary.issues_resolved} issues fixed` : result ? "Parser notes returned" : "Waiting for run";
   const keywordDetail = keywordTotal ? `${missingKeywords.length} missing` : "Target terms pending";
   const runLabel = busy ? "Tailoring..." : previewUploadState === "reading" ? "Reading resume..." : result ? "Re-tailor" : "Run Tailor";
-  const exportLabel = downloadUrl ? "Download PDF" : "Export PDF";
+  const downloadReady = Boolean(downloadUrl && downloadState === "ready");
+  const exportLabel = downloadUrl
+    ? downloadState === "checking"
+      ? "Checking PDF"
+      : downloadState === "expired"
+        ? "PDF expired"
+        : "Download PDF"
+    : "Export PDF";
   const uploadFormats = capabilities?.upload_formats?.length ? capabilities.upload_formats : DEFAULT_UPLOAD_FORMATS;
   const exportFormats = customerExportFormats(capabilities?.export_formats);
   const enabledUploadFormats = uploadFormats.filter((format) => format.enabled);
@@ -1497,6 +1543,7 @@ export default function Page() {
       label: "Saved projects",
       detail: signedIn ? "Completed runs sync here and reopen in the studio." : "Sign in first, then completed runs can sync across browsers.",
     },
+    { label: "Exports", detail: "PDF is live for the free workflow. DOCX and TXT stay locked until premium is real." },
     { label: "Billing", detail: "Premium plans still wait on Stripe products and entitlement checks." },
   ];
   const localHistoryCount = history.filter((entry) => !isAccountHistoryItem(entry, syncedHistoryIds)).length;
@@ -1535,7 +1582,7 @@ export default function Page() {
             <button className="ghost-button studio-top-button" type="button" disabled={!result}>
               <RoleForgeIcon name="copy" size={16} /> Duplicate
             </button>
-            {downloadUrl ? (
+            {downloadReady && downloadUrl ? (
               <a className="ghost-button studio-top-button" href={downloadUrl} download>
                 <RoleForgeIcon name="download" size={16} /> Export
               </a>
@@ -1627,10 +1674,10 @@ export default function Page() {
             <div className="rail-section-title">Workspace</div>
             <Link className="rail-item" href="/#templates"><RoleForgeIcon name="layers" size={15} /> Templates</Link>
             <button className={`rail-item ${activeTab === "history" ? "active" : ""}`} type="button" aria-pressed={activeTab === "history"} onClick={openHistoryPanel}><RoleForgeIcon name="chart" size={15} /> History</button>
-            <span className="rail-item disabled" aria-disabled="true"><RoleForgeIcon name="settings" size={15} /> Settings</span>
+            <button className="rail-item" type="button" onClick={() => setAccountPanelOpen(true)}><RoleForgeIcon name="settings" size={15} /> Settings</button>
             <div className="rf-rail-upgrade">
               <strong><RoleForgeIcon name="sparkle" size={14} /> Premium coming soon</strong>
-              <p>Templates, account settings, and premium features are coming soon.</p>
+              <p>Template controls, billing, and premium exports are coming soon.</p>
               <button className="primary-button" type="button" disabled>Coming soon</button>
             </div>
           </aside>
@@ -1644,7 +1691,7 @@ export default function Page() {
               </div>
               <div className="studio-hero-actions">
                 <button className="ghost-button" type="button" onClick={onRun} disabled={!canRun}>{runLabel}</button>
-                {downloadUrl ? (
+                {downloadReady && downloadUrl ? (
                   <a className="primary-button" href={downloadUrl} download>{exportLabel} <RoleForgeIcon name="download" size={14} /></a>
                 ) : (
                   <button className="primary-button" type="button" disabled>{exportLabel} <RoleForgeIcon name="download" size={14} /></button>
@@ -1666,6 +1713,11 @@ export default function Page() {
                     );
                   })}
                 </div>
+                {downloadMessage ? (
+                  <span className={`export-status-note ${downloadState}`} role="status">
+                    {downloadMessage}
+                  </span>
+                ) : null}
               </div>
             </div>
 
@@ -1857,7 +1909,7 @@ export default function Page() {
                   </div>
                   <div className="suggestion-actions">
                     <button className="btn btn-soft btn-sm" type="button" onClick={() => setActiveTab("cover")}><RoleForgeIcon name="edit" size={12} />Open</button>
-                    <button className="btn btn-soft btn-sm" type="button" onClick={copyDownloadUrl} disabled={!downloadUrl}><RoleForgeIcon name="copy" size={12} />Copy link</button>
+                    <button className="btn btn-soft btn-sm" type="button" onClick={copyDownloadUrl} disabled={!downloadReady}><RoleForgeIcon name="copy" size={12} />Copy link</button>
                   </div>
                 </article>
                 <article className="generated-card">
