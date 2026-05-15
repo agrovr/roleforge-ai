@@ -3376,6 +3376,14 @@ html[data-theme="dark"] .result-box {
   font-size: 0.9rem;
 }
 
+.history-panel-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .history-sync-badge {
   display: inline-flex;
   align-items: center;

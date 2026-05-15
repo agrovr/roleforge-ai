@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
@@ -102,6 +102,7 @@ type AccountStatus = {
 };
 type HistoryItem = {
   id: string;
+  accountRunId?: string;
   createdAt: string;
   filename: string;
   mode: TailoringMode;
@@ -795,6 +796,18 @@ function hasRestorableSnapshot(item: HistoryItem) {
   return Boolean(item.snapshot?.result?.tailored_text?.trim());
 }
 
+function isAccountHistoryItem(item: HistoryItem, syncedIds: string[] = []) {
+  return Boolean(item.saved || item.source === "account" || syncedIds.includes(item.id) || (item.accountRunId && syncedIds.includes(item.accountRunId)));
+}
+
+function historyStatusLabel(item: HistoryItem, syncedIds: string[] = []) {
+  return isAccountHistoryItem(item, syncedIds) ? "Saved to account" : "This browser";
+}
+
+function historyRestoreLabel(item: HistoryItem) {
+  return hasRestorableSnapshot(item) ? "Opens in studio" : "PDF only";
+}
+
 function mergeHistory(localItems: HistoryItem[], savedItems: HistoryItem[]) {
   const merged = new Map<string, HistoryItem>();
 
@@ -805,6 +818,7 @@ function mergeHistory(localItems: HistoryItem[], savedItems: HistoryItem[]) {
       existing
         ? {
             ...item,
+            accountRunId: existing.accountRunId ?? item.accountRunId,
             saved: Boolean(existing.saved || item.saved),
             source: existing.source === "account" || item.source === "account" ? "account" : "local",
             snapshot: existing.snapshot ?? item.snapshot,
@@ -952,7 +966,7 @@ export default function Page() {
     setSyncedHistoryIds(loadSyncedHistoryIds());
   }, []);
 
-  useEffect(() => {
+  const refreshSavedRuns = useCallback(async (options: { quiet?: boolean } = {}) => {
     if (!signedIn) {
       setHistorySyncState("local");
       setHistorySyncMessage("Sign in to sync completed runs");
@@ -961,49 +975,45 @@ export default function Page() {
 
     if (!supabaseClient) {
       setHistorySyncState("error");
-      setHistorySyncMessage("Saved project sync needs Supabase configuration");
+      setHistorySyncMessage("Account sync is not ready yet. Local history still works.");
       return;
     }
 
-    let cancelled = false;
     setHistorySyncState("loading");
-    setHistorySyncMessage("Loading saved projects...");
+    if (!options.quiet) setHistorySyncMessage("Loading saved projects...");
 
-    loadSavedRuns(supabaseClient)
-      .then((savedRuns) => {
-        if (cancelled) return;
-        const savedHistory = savedRuns.map((run) => ({
-          ...run,
-          source: "account" as const,
-          snapshot: run.snapshot as SavedRunSnapshot | undefined,
-        }));
+    try {
+      const savedRuns = await loadSavedRuns(supabaseClient);
+      const savedHistory = savedRuns.map((run) => ({
+        ...run,
+        source: "account" as const,
+        snapshot: run.snapshot as SavedRunSnapshot | undefined,
+      }));
 
-        setHistory((current) => {
-          const merged = mergeHistory(current.length ? current : loadHistory(), savedHistory);
-          saveHistory(merged);
-          return merged;
-        });
-
-        const savedIds = savedRuns.map((run) => run.id);
-        setSyncedHistoryIds(savedIds);
-        saveSyncedHistoryIds(savedIds);
-        setHistorySyncState("synced");
-        setHistorySyncMessage(
-          savedRuns.length
-            ? `${savedRuns.length} saved run${savedRuns.length === 1 ? "" : "s"} loaded`
-            : "Signed in. New completed runs will sync.",
-        );
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setHistorySyncState("error");
-        setHistorySyncMessage("Saved project sync is unavailable. Local history still works.");
+      setHistory((current) => {
+        const merged = mergeHistory(current.length ? current : loadHistory(), savedHistory);
+        saveHistory(merged);
+        return merged;
       });
 
-    return () => {
-      cancelled = true;
-    };
+      const savedIds = savedRuns.flatMap((run) => [run.id, run.accountRunId].filter(Boolean) as string[]);
+      setSyncedHistoryIds(savedIds);
+      saveSyncedHistoryIds(savedIds);
+      setHistorySyncState("synced");
+      setHistorySyncMessage(
+        savedRuns.length
+          ? `${savedRuns.length} saved project${savedRuns.length === 1 ? "" : "s"} ready to restore`
+          : "Signed in. Completed runs will save here.",
+      );
+    } catch {
+      setHistorySyncState("error");
+      setHistorySyncMessage("Account history could not refresh. Local history still works.");
+    }
   }, [signedIn, supabaseClient]);
+
+  useEffect(() => {
+    void refreshSavedRuns();
+  }, [refreshSavedRuns]);
 
   function openHistoryPanel() {
     setActiveTab("history");
@@ -1186,7 +1196,7 @@ export default function Page() {
   async function syncCompletedRun(item: HistoryItem, output: TailorResult, url: string) {
     if (!signedIn || !supabaseClient) {
       setHistorySyncState("local");
-      setHistorySyncMessage(signedIn ? "Saved project sync needs Supabase configuration" : "Sign in to sync completed runs");
+      setHistorySyncMessage(signedIn ? "Account sync is not ready yet. Local history still works." : "Sign in to sync completed runs");
       return;
     }
 
@@ -1199,7 +1209,7 @@ export default function Page() {
     setHistorySyncMessage("Saving completed run...");
 
     try {
-      await saveCompletedRun(supabaseClient, {
+      const savedRun = await saveCompletedRun(supabaseClient, {
         ...item,
         sourceResumeName: file?.name,
         jobTarget: jdText.trim() || jdUrl.trim() || item.roleHint,
@@ -1218,16 +1228,20 @@ export default function Page() {
         },
       });
 
-      const nextIds = [item.id, ...syncedHistoryIds.filter((id) => id !== item.id)].slice(0, 40);
+      const nextIds = [item.id, savedRun.runId, ...syncedHistoryIds.filter((id) => id !== item.id && id !== savedRun.runId)].slice(0, 40);
       setSyncedHistoryIds(nextIds);
       saveSyncedHistoryIds(nextIds);
       setHistory((current) => {
-        const next = current.map((entry) => (entry.id === item.id ? { ...entry, saved: true, source: "account" as const } : entry));
+        const next = current.map((entry) =>
+          entry.id === item.id
+            ? { ...entry, accountRunId: savedRun.runId, saved: true, source: "account" as const }
+            : entry,
+        );
         saveHistory(next);
         return next;
       });
       setHistorySyncState("synced");
-      setHistorySyncMessage("Completed run saved to your account");
+      setHistorySyncMessage("Saved to your account and ready to restore");
     } catch {
       setHistorySyncState("error");
       setHistorySyncMessage("Could not sync this run. It is still saved locally.");
@@ -1258,9 +1272,9 @@ export default function Page() {
     }
 
     setFile(null);
-    setResumeId(snapshot.uploadMeta?.resume_id ?? snapshot.result.run_id ?? entry.id);
+    setResumeId(snapshot.uploadMeta?.resume_id ?? snapshot.result.run_id ?? entry.accountRunId ?? entry.id);
     setUploadMeta(snapshot.uploadMeta ?? {
-      resume_id: snapshot.result.run_id ?? entry.id,
+      resume_id: snapshot.result.run_id ?? entry.accountRunId ?? entry.id,
       filename: entry.filename,
       format: entry.downloadFormat,
     });
@@ -1278,13 +1292,13 @@ export default function Page() {
     setActiveTab("score");
     setPreviewMode("tailored");
     setRestoredHistoryId(entry.id);
-    setHistorySyncState(entry.saved || entry.source === "account" ? "synced" : "local");
-    setHistorySyncMessage(`Restored ${entry.filename} into the studio`);
+    setHistorySyncState(isAccountHistoryItem(entry, syncedHistoryIds) ? "synced" : "local");
+    setHistorySyncMessage(`${entry.filename} is open in the studio`);
     window.setTimeout(() => document.getElementById("editor")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   }
 
   function clearLocalHistory() {
-    const next = signedIn ? history.filter((entry) => Boolean(entry.saved || syncedHistoryIds.includes(entry.id))) : [];
+    const next = signedIn ? history.filter((entry) => isAccountHistoryItem(entry, syncedHistoryIds)) : [];
     setHistory(next);
     saveHistory(next);
     setRestoredHistoryId((current) => (current && next.some((entry) => entry.id === current) ? current : null));
@@ -1398,10 +1412,13 @@ export default function Page() {
   const accountItems = [
     {
       label: "Saved projects",
-      detail: signedIn ? "Completed runs can sync to your account history." : "Sign in first, then completed runs can sync across browsers.",
+      detail: signedIn ? "Completed runs sync here and reopen in the studio." : "Sign in first, then completed runs can sync across browsers.",
     },
     { label: "Billing", detail: "Premium plans still wait on Stripe products and entitlement checks." },
   ];
+  const localHistoryCount = history.filter((entry) => !isAccountHistoryItem(entry, syncedHistoryIds)).length;
+  const savedProjectCount = history.filter((entry) => isAccountHistoryItem(entry, syncedHistoryIds)).length;
+  const clearHistoryLabel = signedIn && savedProjectCount ? `Clear local${localHistoryCount ? ` (${localHistoryCount})` : ""}` : "Clear history";
 
   const suggestionCards: StudioSuggestion[] = result
     ? [
@@ -1468,7 +1485,7 @@ export default function Page() {
                   {signedIn ? (
                     <>
                       <strong className="studio-account-email" title={accountUser?.email || "Signed in"}>{accountUser?.email || "Signed in"}</strong>
-                      <p>Your session is active. Completed runs can sync to saved projects.</p>
+                      <p>Your session is active. Completed runs sync to saved projects.</p>
                       <small className={`studio-account-sync ${historySyncState}`}>{historySyncMessage}</small>
                       <form className="studio-account-form" action="/auth/signout" method="post">
                         <input type="hidden" name="next" value="/app" />
@@ -1530,7 +1547,7 @@ export default function Page() {
             <span className="rail-item disabled" aria-disabled="true"><RoleForgeIcon name="settings" size={15} /> Settings</span>
             <div className="rf-rail-upgrade">
               <strong><RoleForgeIcon name="sparkle" size={14} /> Premium coming soon</strong>
-              <p>Templates, saved projects, account settings, and premium features are coming soon.</p>
+              <p>Templates, account settings, and premium features are coming soon.</p>
               <button className="primary-button" type="button" disabled>Coming soon</button>
             </div>
           </aside>
@@ -1847,40 +1864,51 @@ export default function Page() {
               <section className="studio-card studio-history-panel" id="history" ref={historySectionRef}>
                 <div className="studio-card-head">
                   <div>
-                    <div className="eyebrow">{signedIn ? "Saved history" : "Local history"}</div>
-                    <h2 className="panel-title">{signedIn ? "Saved projects" : "Recent runs"}</h2>
+                    <div className="eyebrow">{signedIn ? "Saved projects" : "Local history"}</div>
+                    <h2 className="panel-title">{signedIn && savedProjectCount ? `${savedProjectCount} saved project${savedProjectCount === 1 ? "" : "s"}` : signedIn ? "Saved projects" : "Recent runs"}</h2>
                     <p className="history-sync-note">{historySyncMessage}</p>
                   </div>
-                  <button className="btn btn-soft btn-sm" type="button" onClick={clearLocalHistory} disabled={!history.length}>Clear local</button>
+                  <div className="history-panel-actions">
+                    {signedIn ? (
+                      <button className="btn btn-soft btn-sm" type="button" onClick={() => void refreshSavedRuns()} disabled={historySyncState === "loading"}>
+                        Refresh
+                      </button>
+                    ) : null}
+                    <button className="btn btn-soft btn-sm" type="button" onClick={clearLocalHistory} disabled={signedIn ? !localHistoryCount : !history.length}>{clearHistoryLabel}</button>
+                  </div>
                 </div>
                 <div className="change-list panel-body">
                   {history.length ? history.map((entry) => {
-                    const saved = Boolean(entry.saved || syncedHistoryIds.includes(entry.id));
-                    const accountRun = saved || entry.source === "account";
+                    const accountRun = isAccountHistoryItem(entry, syncedHistoryIds);
                     const restorable = hasRestorableSnapshot(entry);
+                    const canDownload = Boolean(entry.downloadUrl && entry.downloadUrl !== "#");
                     return (
                       <article className={`history-item${restoredHistoryId === entry.id ? " active" : ""}`} key={entry.id}>
                         <div>
                           <div className="history-title-row">
                             <strong>{entry.filename}</strong>
-                            <small className={`history-sync-badge ${accountRun ? "account" : "local"}`}>{accountRun ? "Account" : "Local"}</small>
+                            <small className={`history-sync-badge ${accountRun ? "account" : "local"}`}>{historyStatusLabel(entry, syncedHistoryIds)}</small>
                             <small className={`history-sync-badge ${restorable ? "restore" : "legacy"}`}>{restorable ? "Restorable" : "Download only"}</small>
                           </div>
                           <p>{entry.roleHint}</p>
-                          <span>{new Date(entry.createdAt).toLocaleString()} · {entry.mode} · {entry.score}/100</span>
+                          <span>{new Date(entry.createdAt).toLocaleString()} · {entry.mode} · {entry.score}/100 · {historyRestoreLabel(entry)}</span>
                         </div>
                         <div className="history-actions">
                           <button className="ghost-button" type="button" onClick={() => restoreHistoryItem(entry)} disabled={!restorable}>
-                            Restore <RoleForgeIcon name="upload" size={14} />
+                            Restore <RoleForgeIcon name="edit" size={14} />
                           </button>
-                          <a className="ghost-button" href={entry.downloadUrl} download>Download {entry.downloadFormat?.toUpperCase() ?? "PDF"} <RoleForgeIcon name="download" size={14} /></a>
+                          {canDownload ? (
+                            <a className="ghost-button" href={entry.downloadUrl} download>Download {entry.downloadFormat?.toUpperCase() ?? "PDF"} <RoleForgeIcon name="download" size={14} /></a>
+                          ) : (
+                            <button className="ghost-button" type="button" disabled>Download {entry.downloadFormat?.toUpperCase() ?? "PDF"} <RoleForgeIcon name="download" size={14} /></button>
+                          )}
                         </div>
                       </article>
                     );
                   }) : (
                     <div className="empty-state">
-                      <strong>{signedIn ? "No saved runs yet" : "No local history yet"}</strong>
-                      <p>{signedIn ? "Complete a tailor run and it will appear here with a restore button for the full studio state." : "Completed runs stay in this browser with resume preview, target, scores, and download link ready to reopen."}</p>
+                      <strong>{signedIn ? "No saved projects yet" : "No local runs yet"}</strong>
+                      <p>{signedIn ? "Complete a tailor run and it will save here with resume preview, target details, scores, and a one-click studio restore." : "Complete a tailor run and it will stay in this browser with the preview, target, scores, and download ready to reopen."}</p>
                     </div>
                   )}
                 </div>

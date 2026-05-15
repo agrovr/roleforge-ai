@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type SavedHistoryItem = {
   id: string;
+  accountRunId?: string;
   createdAt: string;
   filename: string;
   mode: "conservative" | "balanced" | "aggressive";
@@ -27,6 +28,8 @@ export type CompletedRunSaveInput = SavedHistoryItem & {
 
 type TailorRunRow = {
   id: string;
+  client_history_id: string | null;
+  project_id: string;
   created_at: string;
   source_resume_name: string | null;
   job_target: string | null;
@@ -46,14 +49,15 @@ function titleFromTarget(value: string | undefined) {
 export async function loadSavedRuns(client: SupabaseClient): Promise<SavedHistoryItem[]> {
   const { data, error } = await client
     .from("tailor_runs")
-    .select("id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url, payload")
+    .select("id, client_history_id, project_id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url, payload")
     .order("created_at", { ascending: false })
     .limit(12);
 
   if (error) throw error;
 
   return ((data ?? []) as TailorRunRow[]).map((run) => ({
-    id: run.id,
+    id: run.client_history_id || run.id,
+    accountRunId: run.id,
     createdAt: run.created_at,
     filename: run.source_resume_name || "Saved resume",
     mode: run.mode || "balanced",
@@ -94,6 +98,60 @@ export async function saveCompletedRun(client: SupabaseClient, input: CompletedR
   if (profileError) throw profileError;
 
   const projectTitle = titleFromTarget(input.jobTarget || input.roleHint || input.filename);
+  const runPayload = {
+    source_resume_name: input.sourceResumeName || input.filename,
+    job_target: input.jobTarget || input.roleHint,
+    company_url: input.companyUrl || null,
+    mode: input.mode,
+    fit_score: input.score,
+    ats_score: input.atsScore ?? null,
+    keyword_match_count: input.keywordMatchCount ?? null,
+    read_time_seconds: input.readTimeSeconds ?? null,
+    download_format: input.downloadFormat || "pdf",
+    download_url: input.downloadUrl,
+    download_filename: input.downloadFilename || null,
+    payload: input.payload ?? {},
+    created_at: input.createdAt,
+  };
+
+  const { data: existingRun, error: existingRunError } = await client
+    .from("tailor_runs")
+    .select("id, project_id")
+    .eq("user_id", user.id)
+    .eq("client_history_id", input.id)
+    .maybeSingle();
+
+  if (existingRunError) throw existingRunError;
+
+  if (existingRun) {
+    const runRecord = existingRun as { id: string; project_id: string };
+    const { error: updateRunError } = await client
+      .from("tailor_runs")
+      .update(runPayload)
+      .eq("id", runRecord.id)
+      .eq("user_id", user.id);
+
+    if (updateRunError) throw updateRunError;
+
+    const { error: updateProjectError } = await client
+      .from("resume_projects")
+      .update({
+        title: projectTitle,
+        source_filename: input.filename,
+        source_name: input.sourceResumeName || input.filename,
+        target_title: projectTitle,
+        target_source: input.jobTarget || input.roleHint,
+        last_target_summary: input.roleHint,
+        latest_run_id: runRecord.id,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", runRecord.project_id)
+      .eq("user_id", user.id);
+
+    if (updateProjectError) throw updateProjectError;
+    return { projectId: runRecord.project_id, runId: runRecord.id };
+  }
+
   const { data: project, error: projectError } = await client
     .from("resume_projects")
     .insert({
@@ -117,19 +175,8 @@ export async function saveCompletedRun(client: SupabaseClient, input: CompletedR
     .insert({
       project_id: projectId,
       user_id: user.id,
-      source_resume_name: input.sourceResumeName || input.filename,
-      job_target: input.jobTarget || input.roleHint,
-      company_url: input.companyUrl || null,
-      mode: input.mode,
-      fit_score: input.score,
-      ats_score: input.atsScore ?? null,
-      keyword_match_count: input.keywordMatchCount ?? null,
-      read_time_seconds: input.readTimeSeconds ?? null,
-      download_format: input.downloadFormat || "pdf",
-      download_url: input.downloadUrl,
-      download_filename: input.downloadFilename || null,
-      payload: input.payload ?? {},
-      created_at: input.createdAt,
+      client_history_id: input.id,
+      ...runPayload,
     })
     .select("id")
     .single();
