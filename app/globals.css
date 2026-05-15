@@ -4536,6 +4536,43 @@ html[data-theme="dark"] input::file-selector-button {
   box-shadow: inset 0 0 0 1px rgba(14, 20, 48, 0.025);
 }
 
+.rf-preview-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 14px;
+}
+
+.rf-preview-status span,
+.rf-preview-alert {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--brand) 28%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand) 8%, #fff);
+  color: var(--brand-strong);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.rf-preview-status span.warn,
+.rf-preview-alert {
+  border-color: color-mix(in srgb, var(--warn) 42%, var(--line));
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.rf-preview-alert {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 0 14px;
+  border-radius: 10px;
+}
+
 .rf-live-card .studio-card-head {
   align-items: center;
   padding: 28px 28px 0;
@@ -5148,6 +5185,19 @@ html[data-theme="dark"] .rf-preview-wrap {
   background: rgba(15, 20, 35, 0.72);
   border-color: rgba(255, 247, 233, 0.16);
   color: var(--ink-0);
+}
+
+html[data-theme="dark"] .rf-preview-status span {
+  border-color: rgba(237, 127, 105, 0.3);
+  background: rgba(237, 127, 105, 0.12);
+  color: #ffbaaa;
+}
+
+html[data-theme="dark"] .rf-preview-status span.warn,
+html[data-theme="dark"] .rf-preview-alert {
+  border-color: rgba(222, 162, 79, 0.34);
+  background: rgba(222, 162, 79, 0.14);
+  color: #f3c16d;
 }
 
 html[data-theme="dark"] .rf-target-editor,

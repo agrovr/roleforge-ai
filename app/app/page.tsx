@@ -79,6 +79,7 @@ type ExportResponse = { saved_to: string; download_filename: string };
 type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error";
 type InputMode = "text" | "url";
 type PreviewMode = "tailored" | "original" | "diff";
+type PreviewUploadState = "idle" | "reading" | "ready" | "error";
 type ReviewTab = "score" | "gap" | "ats" | "resume" | "cover" | "interview" | "changes" | "history";
 type SavedRunSnapshot = {
   result: TailorResult;
@@ -433,6 +434,14 @@ function buildPlainResumeLines(text?: string): PlainResumeLine[] {
       if (isBulletLine(line)) return { text: cleanBulletLine(line), kind: "bullet" };
       return { text: line, kind: "body" };
     });
+}
+
+function fileUploadKey(file: File | null) {
+  return file ? `${file.name}:${file.size}:${file.lastModified}` : "";
+}
+
+function countReadableLines(text?: string) {
+  return (text ?? "").split(/\r?\n/).filter((line) => line.trim()).length;
 }
 
 function PlainResumeDocument({
@@ -944,8 +953,11 @@ export default function Page() {
   const [copyState, setCopyState] = useState("");
   const [error, setError] = useState("");
 
-  const [, setResumeId] = useState<string | null>(null);
+  const [resumeId, setResumeId] = useState<string | null>(null);
   const [uploadMeta, setUploadMeta] = useState<UploadResponse | null>(null);
+  const [uploadFileKey, setUploadFileKey] = useState("");
+  const [previewUploadState, setPreviewUploadState] = useState<PreviewUploadState>("idle");
+  const [previewUploadError, setPreviewUploadError] = useState("");
   const [sourcePreviewText, setSourcePreviewText] = useState("");
   const [result, setResult] = useState<TailorResult | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
@@ -1091,33 +1103,76 @@ export default function Page() {
   }, [baseUrl]);
 
   useEffect(() => {
-    let cancelled = false;
-    if (!file) return;
+    const currentFileKey = fileUploadKey(file);
 
+    if (!file) {
+      setResumeId(null);
+      setUploadMeta(null);
+      setUploadFileKey("");
+      setPreviewUploadState("idle");
+      setPreviewUploadError("");
+      return;
+    }
+
+    const controller = new AbortController();
+
+    setResumeId(null);
     setUploadMeta(null);
+    setUploadFileKey(currentFileKey);
+    setPreviewUploadState(baseUrl ? "reading" : "idle");
+    setPreviewUploadError("");
     setSourcePreviewText("");
-    setPreviewMode("tailored");
+    setResult(null);
+    setDownloadUrl(null);
+    setStage("idle");
+    setError("");
+    setCopyState("");
+    setPreviewMode("original");
     setRestoredHistoryId(null);
 
     if (/\.txt$/i.test(file.name)) {
       file.text()
         .then((value) => {
-          if (!cancelled) setSourcePreviewText(value.slice(0, 30000));
+          if (!controller.signal.aborted) setSourcePreviewText(value.slice(0, 30000));
         })
         .catch(() => {
-          if (!cancelled) setSourcePreviewText("");
+          if (!controller.signal.aborted) setSourcePreviewText("");
         });
     }
 
+    if (!baseUrl) return () => controller.abort();
+
+    const form = new FormData();
+    form.append("file", file);
+
+    fetch(`${baseUrl}/upload`, { method: "POST", body: form, signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(await readApiError(response, "Could not read this resume yet."));
+        return (await response.json()) as UploadResponse;
+      })
+      .then((data) => {
+        if (controller.signal.aborted) return;
+        setResumeId(data.resume_id);
+        setUploadMeta(data);
+        setUploadFileKey(currentFileKey);
+        if (typeof data.text_preview === "string") setSourcePreviewText(data.text_preview);
+        setPreviewUploadState("ready");
+      })
+      .catch((caught) => {
+        if ((caught as Error).name === "AbortError") return;
+        setPreviewUploadState("error");
+        setPreviewUploadError(caught instanceof Error ? caught.message : "Could not read this resume yet.");
+      });
+
     return () => {
-      cancelled = true;
+      controller.abort();
     };
-  }, [file]);
+  }, [baseUrl, file]);
 
   const hasTarget = Boolean(jdUrl.trim() || jdText.trim());
   const readyItems = [Boolean(baseUrl), Boolean(file), hasTarget];
   const readiness = Math.round((readyItems.filter(Boolean).length / readyItems.length) * 100);
-  const canRun = Boolean(baseUrl && file && hasTarget && !busy);
+  const canRun = Boolean(baseUrl && file && hasTarget && !busy && previewUploadState !== "reading");
 
   const score = result?.score_summary?.fit_after ?? result?.fit_score_after?.score ?? result?.fit_score?.score ?? 0;
   const presentKeywords = result?.fit_score_after?.present ?? result?.fit_score?.present ?? [];
@@ -1130,6 +1185,11 @@ export default function Page() {
   async function upload(): Promise<UploadResponse> {
     if (!baseUrl) throw new Error("The resume workflow is not available yet.");
     if (!file) throw new Error("Select a resume file first.");
+    const currentFileKey = fileUploadKey(file);
+
+    if (resumeId && uploadMeta && uploadFileKey === currentFileKey) {
+      return uploadMeta;
+    }
 
     const form = new FormData();
     form.append("file", file);
@@ -1140,6 +1200,9 @@ export default function Page() {
     const data = (await response.json()) as UploadResponse;
     setResumeId(data.resume_id);
     setUploadMeta(data);
+    setUploadFileKey(currentFileKey);
+    setPreviewUploadState("ready");
+    setPreviewUploadError("");
     if (typeof data.text_preview === "string") setSourcePreviewText(data.text_preview);
     return data;
   }
@@ -1278,6 +1341,9 @@ export default function Page() {
       filename: entry.filename,
       format: entry.downloadFormat,
     });
+    setUploadFileKey("");
+    setPreviewUploadState(snapshot.sourcePreviewText?.trim() ? "ready" : "idle");
+    setPreviewUploadError("");
     setSourcePreviewText(snapshot.sourcePreviewText ?? "");
     setResult(snapshot.result);
     setDownloadUrl(snapshot.downloadUrl || entry.downloadUrl || null);
@@ -1391,7 +1457,7 @@ export default function Page() {
   const scoreDetail = result?.score_summary?.fit_delta ? `${formatDelta(result.score_summary.fit_delta)} from baseline` : result ? "Run complete" : "Run needed";
   const atsDetail = result?.score_summary?.issues_resolved ? `${result.score_summary.issues_resolved} issues fixed` : result ? "Parser notes returned" : "Waiting for run";
   const keywordDetail = keywordTotal ? `${missingKeywords.length} missing` : "Target terms pending";
-  const runLabel = busy ? "Tailoring..." : result ? "Re-tailor" : "Run Tailor";
+  const runLabel = busy ? "Tailoring..." : previewUploadState === "reading" ? "Reading resume..." : result ? "Re-tailor" : "Run Tailor";
   const exportLabel = downloadUrl ? "Download PDF" : "Export PDF";
   const uploadFormats = capabilities?.upload_formats?.length ? capabilities.upload_formats : DEFAULT_UPLOAD_FORMATS;
   const exportFormats = customerExportFormats(capabilities?.export_formats);
@@ -1408,6 +1474,23 @@ export default function Page() {
       : previewMode === "diff"
         ? "Change notes · before export"
         : "Your resume · with AI edits applied";
+  const sourceLineCount = countReadableLines(sourcePreviewText);
+  const tailoredLineCount = countReadableLines(result?.tailored_text);
+  const previewStatusItems = [
+    previewUploadState === "ready"
+      ? `${sourceLineCount || 1} source line${sourceLineCount === 1 ? "" : "s"} extracted`
+      : previewUploadState === "reading"
+        ? "Reading source document"
+        : previewUploadState === "error"
+          ? "Source preview needs another try"
+          : file
+            ? "Source preview pending"
+            : "Choose a resume to preview",
+    result
+      ? `${tailoredLineCount || 1} tailored line${tailoredLineCount === 1 ? "" : "s"} generated`
+      : "Tailored draft appears after a run",
+    keywordTotal ? `${presentKeywords.length}/${keywordTotal} keywords matched` : "Keywords pending",
+  ];
   const accountButtonLabel = signedIn ? accountInitials(accountUser) : "IN";
   const accountItems = [
     {
@@ -1643,6 +1726,14 @@ export default function Page() {
                   aria-labelledby={`preview-tab-${previewMode}`}
                   aria-live="polite"
                 >
+                  <div className="rf-preview-status" aria-label="Preview status">
+                    {previewStatusItems.map((item, index) => (
+                      <span className={previewUploadState === "error" && index === 0 ? "warn" : ""} key={`${item}-${index}`}>
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                  {previewUploadError ? <div className="rf-preview-alert">{previewUploadError}</div> : null}
                   <MiniResumeDocument
                     text={previewMode === "original" ? sourcePreviewText : result?.tailored_text}
                     sourceText={sourcePreviewText}
