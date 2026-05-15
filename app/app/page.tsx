@@ -859,7 +859,7 @@ function accountNoticeLabel(value: string, detail = "") {
     case "check-email":
       return "Check your email for the secure sign-in link.";
     case "connected":
-      return "You are signed in. Saved project sync comes next.";
+      return "You are signed in. Saved project sync is active.";
     case "signed-out":
       return "You are signed out.";
     case "account-not-configured":

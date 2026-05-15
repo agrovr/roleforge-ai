@@ -80,7 +80,7 @@ The studio expects the backend to provide:
 
 ## Auth, Account, and Billing Readiness
 
-The studio includes a visible account menu so the interface has a stable place for sign-in, saved projects, settings, and billing controls. Email magic-link sign-in is wired through Supabase Auth. Saved projects, billing, account settings, and premium entitlements still remain disabled until the product rules and backend storage flows are complete.
+The studio includes a visible account menu so the interface has a stable place for sign-in, saved projects, settings, and billing controls. Email magic-link sign-in and Google OAuth are wired through Supabase Auth. Completed runs can sync into account-backed saved projects when the user is signed in. Billing, account settings, and premium entitlements still remain disabled until the product rules and backend storage flows are complete.
 
 The Supabase-ready frontend foundation is in place:
 
@@ -96,7 +96,7 @@ The Supabase-ready frontend foundation is in place:
 Add these public environment variables in Vercel:
 
 ```env
-NEXT_PUBLIC_SITE_URL=https://resume-tailor-ui-eta.vercel.app
+NEXT_PUBLIC_SITE_URL=https://roleforgeai.vercel.app
 NEXT_PUBLIC_SUPABASE_URL=https://ijdspodwpkuhwszmvqip.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
@@ -105,8 +105,9 @@ Do not add a Supabase `service_role` key or secret key to any `NEXT_PUBLIC_*` va
 
 In the Supabase dashboard, configure Auth URLs before testing production email links:
 
-- Site URL: `https://resume-tailor-ui-eta.vercel.app`
-- Redirect URL: `https://resume-tailor-ui-eta.vercel.app/auth/callback`
+- Site URL: `https://roleforgeai.vercel.app`
+- Redirect URL: `https://roleforgeai.vercel.app/auth/callback`
+- Temporary legacy redirect URL: `https://resume-tailor-ui-eta.vercel.app/auth/callback`
 - Local redirect URL: `http://localhost:3000/auth/callback`
 
 For email magic links, confirm the email template uses Supabase's confirmation link token that respects the request `redirectTo` value. Old links can expire or keep pointing at an older Site URL, so generate a fresh link after changing Auth URL settings.

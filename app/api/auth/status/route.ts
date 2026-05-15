@@ -34,7 +34,7 @@ export async function GET() {
     provider: "supabase",
     user,
     next: user
-      ? "Saved projects, row-level security policies, and account settings can be wired next."
-      : "Use email sign-in to start an account session. Saved projects remain local until database sync is wired.",
+      ? "Saved projects sync to your account when a completed run is available."
+      : "Use email or Google sign-in to sync completed runs to saved projects.",
   });
 }
