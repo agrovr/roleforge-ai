@@ -1,0 +1,143 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+export type SavedHistoryItem = {
+  id: string;
+  createdAt: string;
+  filename: string;
+  mode: "conservative" | "balanced" | "aggressive";
+  score: number;
+  downloadUrl: string;
+  downloadFormat?: "pdf" | "docx" | "txt";
+  roleHint: string;
+  saved?: boolean;
+};
+
+export type CompletedRunSaveInput = SavedHistoryItem & {
+  sourceResumeName?: string;
+  jobTarget?: string;
+  companyUrl?: string;
+  atsScore?: number;
+  keywordMatchCount?: number;
+  readTimeSeconds?: number;
+  downloadFilename?: string;
+  payload?: Record<string, unknown>;
+};
+
+type TailorRunRow = {
+  id: string;
+  created_at: string;
+  source_resume_name: string | null;
+  job_target: string | null;
+  mode: "conservative" | "balanced" | "aggressive";
+  fit_score: number | null;
+  download_format: "pdf" | "docx" | "txt" | null;
+  download_url: string | null;
+};
+
+function titleFromTarget(value: string | undefined) {
+  const trimmed = value?.replace(/\s+/g, " ").trim();
+  if (!trimmed) return "Resume project";
+  return trimmed.length > 80 ? `${trimmed.slice(0, 79).trimEnd()}...` : trimmed;
+}
+
+export async function loadSavedRuns(client: SupabaseClient): Promise<SavedHistoryItem[]> {
+  const { data, error } = await client
+    .from("tailor_runs")
+    .select("id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url")
+    .order("created_at", { ascending: false })
+    .limit(12);
+
+  if (error) throw error;
+
+  return ((data ?? []) as TailorRunRow[]).map((run) => ({
+    id: run.id,
+    createdAt: run.created_at,
+    filename: run.source_resume_name || "Saved resume",
+    mode: run.mode || "balanced",
+    score: run.fit_score ?? 0,
+    downloadUrl: run.download_url || "#",
+    downloadFormat: run.download_format || "pdf",
+    roleHint: titleFromTarget(run.job_target ?? undefined),
+    saved: true,
+  }));
+}
+
+export async function saveCompletedRun(client: SupabaseClient, input: CompletedRunSaveInput) {
+  const { data: userResult, error: userError } = await client.auth.getUser();
+  if (userError) throw userError;
+
+  const user = userResult.user;
+  if (!user) throw new Error("Not signed in");
+
+  const email = user.email ?? "";
+  const displayName =
+    typeof user.user_metadata?.name === "string"
+      ? user.user_metadata.name
+      : typeof user.user_metadata?.full_name === "string"
+        ? user.user_metadata.full_name
+        : "";
+
+  const { error: profileError } = await client.from("profiles").upsert(
+    {
+      id: user.id,
+      email,
+      display_name: displayName || null,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "id" },
+  );
+  if (profileError) throw profileError;
+
+  const projectTitle = titleFromTarget(input.jobTarget || input.roleHint || input.filename);
+  const { data: project, error: projectError } = await client
+    .from("resume_projects")
+    .insert({
+      user_id: user.id,
+      title: projectTitle,
+      status: "active",
+      source_filename: input.filename,
+      source_name: input.sourceResumeName || input.filename,
+      target_title: projectTitle,
+      target_source: input.jobTarget || input.roleHint,
+      last_target_summary: input.roleHint,
+    })
+    .select("id")
+    .single();
+
+  if (projectError) throw projectError;
+  const projectId = (project as { id: string }).id;
+
+  const { data: run, error: runError } = await client
+    .from("tailor_runs")
+    .insert({
+      project_id: projectId,
+      user_id: user.id,
+      source_resume_name: input.sourceResumeName || input.filename,
+      job_target: input.jobTarget || input.roleHint,
+      company_url: input.companyUrl || null,
+      mode: input.mode,
+      fit_score: input.score,
+      ats_score: input.atsScore ?? null,
+      keyword_match_count: input.keywordMatchCount ?? null,
+      read_time_seconds: input.readTimeSeconds ?? null,
+      download_format: input.downloadFormat || "pdf",
+      download_url: input.downloadUrl,
+      download_filename: input.downloadFilename || null,
+      payload: input.payload ?? {},
+      created_at: input.createdAt,
+    })
+    .select("id")
+    .single();
+
+  if (runError) throw runError;
+  const runId = (run as { id: string }).id;
+
+  const { error: updateError } = await client
+    .from("resume_projects")
+    .update({ latest_run_id: runId, updated_at: new Date().toISOString() })
+    .eq("id", projectId);
+
+  if (updateError) throw updateError;
+
+  return { projectId, runId };
+}

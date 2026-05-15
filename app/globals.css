@@ -3341,6 +3341,20 @@ html[data-theme="dark"] .result-box {
   gap: 14px;
 }
 
+.history-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.history-title-row strong,
+.history-item p {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .history-item p {
   margin: 6px 0;
   color: var(--ink-2);
@@ -3349,6 +3363,26 @@ html[data-theme="dark"] .result-box {
 .history-item span {
   color: var(--ink-3);
   font-size: 0.82rem;
+}
+
+.history-sync-note {
+  margin: 6px 0 0;
+  color: var(--ink-3);
+  font-size: 0.9rem;
+}
+
+.history-sync-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border: 1px solid color-mix(in srgb, var(--good) 42%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--good) 14%, var(--surface));
+  color: var(--good);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .preview-doc {
@@ -3758,10 +3792,48 @@ html[data-theme="dark"] input::file-selector-button {
   line-height: 1.08;
 }
 
+.studio-account-popover > .studio-account-email {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .studio-account-popover > p {
   margin: 8px 0 14px;
   color: var(--ink-2);
   line-height: 1.45;
+}
+
+.studio-account-sync {
+  display: block;
+  margin: -4px 0 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface-2) 78%, white);
+  color: var(--ink-2);
+  font-size: 0.78rem;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.studio-account-sync.synced {
+  border-color: color-mix(in srgb, var(--good) 40%, var(--line));
+  background: color-mix(in srgb, var(--good) 12%, var(--surface));
+  color: var(--good);
+}
+
+.studio-account-sync.saving,
+.studio-account-sync.loading {
+  border-color: color-mix(in srgb, var(--brand) 40%, var(--line));
+  color: var(--brand-dark);
+}
+
+.studio-account-sync.error {
+  border-color: color-mix(in srgb, #d66b58 45%, var(--line));
+  background: color-mix(in srgb, #d66b58 12%, var(--surface));
+  color: #9a392e;
 }
 
 .studio-account-notice {
@@ -6213,6 +6285,41 @@ html[data-theme="dark"] .studio-account-list div {
 html[data-theme="dark"] .studio-account-popover > p,
 html[data-theme="dark"] .studio-account-list small {
   color: var(--ink-2);
+}
+
+html[data-theme="dark"] .history-sync-note {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .history-sync-badge {
+  border-color: rgba(146, 191, 160, 0.34);
+  background: rgba(95, 132, 109, 0.18);
+  color: #b7e5c4;
+}
+
+html[data-theme="dark"] .studio-account-sync {
+  background: rgba(255, 247, 233, 0.06);
+  border-color: rgba(255, 247, 233, 0.16);
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .studio-account-sync.synced {
+  background: rgba(95, 132, 109, 0.18);
+  border-color: rgba(146, 191, 160, 0.34);
+  color: #b7e5c4;
+}
+
+html[data-theme="dark"] .studio-account-sync.saving,
+html[data-theme="dark"] .studio-account-sync.loading {
+  background: rgba(222, 162, 79, 0.14);
+  border-color: rgba(222, 162, 79, 0.34);
+  color: #f3c16d;
+}
+
+html[data-theme="dark"] .studio-account-sync.error {
+  background: rgba(214, 107, 88, 0.16);
+  border-color: rgba(214, 107, 88, 0.38);
+  color: #ffb4a8;
 }
 
 html[data-theme="dark"] .studio-account-notice {

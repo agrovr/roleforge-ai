@@ -5,6 +5,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { createRoleForgeBrowserClient } from "../lib/supabase/client";
+import { loadSavedRuns, saveCompletedRun } from "../lib/supabase/savedProjects";
 
 type AtsIssue = { severity: string; issue: string; fix: string };
 type AtsReport = { issues: AtsIssue[] };
@@ -95,6 +97,7 @@ type HistoryItem = {
   downloadUrl: string;
   downloadFormat?: ExportFormat;
   roleHint: string;
+  saved?: boolean;
 };
 type ApiErrorPayload = { error?: { code?: string; message?: string; request_id?: string; details?: unknown } };
 type StudioSuggestion = { label: string; meta: string; before?: string; after: string; tone?: "good" | "warn" | "neutral" };
@@ -104,6 +107,7 @@ type ParsedResumeEntry = { title: string; meta?: string; date?: string; details:
 type PlainResumeLine = { text: string; kind: "heading" | "bullet" | "body" };
 
 const HISTORY_KEY = "resume-tailor-history-v1";
+const SYNCED_HISTORY_KEY = "roleforge-synced-history-v1";
 const DEFAULT_UPLOAD_FORMATS: UploadCapability[] = [
   { format: "docx", label: "DOCX", enabled: true },
   { format: "pdf", label: "PDF", enabled: true },
@@ -758,6 +762,34 @@ function saveHistory(items: HistoryItem[]) {
   window.localStorage.setItem(HISTORY_KEY, JSON.stringify(items.slice(0, 12)));
 }
 
+function loadSyncedHistoryIds(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(SYNCED_HISTORY_KEY);
+    return raw ? (JSON.parse(raw) as string[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveSyncedHistoryIds(ids: string[]) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(SYNCED_HISTORY_KEY, JSON.stringify([...new Set(ids)].slice(0, 40)));
+}
+
+function mergeHistory(localItems: HistoryItem[], savedItems: HistoryItem[]) {
+  const merged = new Map<string, HistoryItem>();
+
+  [...savedItems, ...localItems].forEach((item) => {
+    const existing = merged.get(item.id);
+    merged.set(item.id, existing ? { ...item, saved: Boolean(existing.saved || item.saved) } : item);
+  });
+
+  return [...merged.values()]
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 12);
+}
+
 async function readApiError(response: Response, fallback: string): Promise<string> {
   try {
     const data = (await response.json()) as ApiErrorPayload;
@@ -851,6 +883,7 @@ export default function Page() {
     const value = process.env.NEXT_PUBLIC_BACKEND_URL;
     return value && value.trim() ? value.trim() : "";
   }, []);
+  const supabaseClient = useMemo(() => createRoleForgeBrowserClient(), []);
 
   const [file, setFile] = useState<File | null>(null);
   const [inputMode, setInputMode] = useState<InputMode>("text");
@@ -875,11 +908,67 @@ export default function Page() {
   const [result, setResult] = useState<TailorResult | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [historySyncState, setHistorySyncState] = useState<"local" | "loading" | "synced" | "saving" | "error">("local");
+  const [historySyncMessage, setHistorySyncMessage] = useState("Local browser history");
+  const [syncedHistoryIds, setSyncedHistoryIds] = useState<string[]>([]);
   const [capabilities, setCapabilities] = useState<CapabilitiesResponse | null>(null);
+
+  const accountUser = accountStatus?.user ?? null;
+  const accountReady = Boolean(accountStatus?.configured && accountStatus.enabled);
+  const signedIn = Boolean(accountUser);
 
   useEffect(() => {
     setHistory(loadHistory());
+    setSyncedHistoryIds(loadSyncedHistoryIds());
   }, []);
+
+  useEffect(() => {
+    if (!signedIn) {
+      setHistorySyncState("local");
+      setHistorySyncMessage("Sign in to sync completed runs");
+      return;
+    }
+
+    if (!supabaseClient) {
+      setHistorySyncState("error");
+      setHistorySyncMessage("Saved project sync needs Supabase configuration");
+      return;
+    }
+
+    let cancelled = false;
+    setHistorySyncState("loading");
+    setHistorySyncMessage("Loading saved projects...");
+
+    loadSavedRuns(supabaseClient)
+      .then((savedRuns) => {
+        if (cancelled) return;
+
+        setHistory((current) => {
+          const merged = mergeHistory(current.length ? current : loadHistory(), savedRuns);
+          saveHistory(merged);
+          return merged;
+        });
+
+        const savedIds = savedRuns.map((run) => run.id);
+        setSyncedHistoryIds(savedIds);
+        saveSyncedHistoryIds(savedIds);
+        setHistorySyncState("synced");
+        setHistorySyncMessage(
+          savedRuns.length
+            ? `${savedRuns.length} saved run${savedRuns.length === 1 ? "" : "s"} loaded`
+            : "Signed in. New completed runs will sync.",
+        );
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setHistorySyncState("error");
+        setHistorySyncMessage("Saved project sync is unavailable. Local history still works.");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [signedIn, supabaseClient]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1049,6 +1138,56 @@ export default function Page() {
     return url;
   }
 
+  async function syncCompletedRun(item: HistoryItem, output: TailorResult, url: string) {
+    if (!signedIn || !supabaseClient) {
+      setHistorySyncState("local");
+      setHistorySyncMessage(signedIn ? "Saved project sync needs Supabase configuration" : "Sign in to sync completed runs");
+      return;
+    }
+
+    const outputPresent = output.fit_score_after?.present ?? output.fit_score?.present ?? [];
+    const outputReadSeconds = output.tailored_text
+      ? Math.max(20, Math.round((output.tailored_text.split(/\s+/).length / 220) * 60))
+      : undefined;
+
+    setHistorySyncState("saving");
+    setHistorySyncMessage("Saving completed run...");
+
+    try {
+      await saveCompletedRun(supabaseClient, {
+        ...item,
+        sourceResumeName: file?.name,
+        jobTarget: jdText.trim() || jdUrl.trim() || item.roleHint,
+        companyUrl: companyUrl.trim() || undefined,
+        atsScore: output.score_summary?.ats_after,
+        keywordMatchCount: outputPresent.length,
+        readTimeSeconds: outputReadSeconds,
+        downloadFilename: url.split("/").pop(),
+        payload: {
+          runId: output.run_id,
+          generatedAt: output.generated_at,
+          warnings: output.warnings ?? [],
+          suggestions: output.suggestions ?? [],
+          changeLog: output.change_log ?? [],
+        },
+      });
+
+      const nextIds = [item.id, ...syncedHistoryIds.filter((id) => id !== item.id)].slice(0, 40);
+      setSyncedHistoryIds(nextIds);
+      saveSyncedHistoryIds(nextIds);
+      setHistory((current) => {
+        const next = current.map((entry) => (entry.id === item.id ? { ...entry, saved: true } : entry));
+        saveHistory(next);
+        return next;
+      });
+      setHistorySyncState("synced");
+      setHistorySyncMessage("Completed run saved to your account");
+    } catch {
+      setHistorySyncState("error");
+      setHistorySyncMessage("Could not sync this run. It is still saved locally.");
+    }
+  }
+
   async function onRun() {
     if (!canRun) return;
 
@@ -1074,10 +1213,12 @@ export default function Page() {
         downloadUrl: url,
         downloadFormat: "pdf",
         roleHint: (jdText || jdUrl || "Role target").slice(0, 90),
+        saved: false,
       };
       const nextHistory = [item, ...history.filter((entry) => entry.id !== item.id)].slice(0, 12);
       setHistory(nextHistory);
       saveHistory(nextHistory);
+      void syncCompletedRun(item, output, url);
       setStage("ready");
       setActiveTab("score");
       setPreviewMode("tailored");
@@ -1146,14 +1287,11 @@ export default function Page() {
       : previewMode === "diff"
         ? "Change notes · before export"
         : "Your resume · with AI edits applied";
-  const accountUser = accountStatus?.user ?? null;
-  const accountReady = Boolean(accountStatus?.configured && accountStatus.enabled);
-  const signedIn = Boolean(accountUser);
   const accountButtonLabel = signedIn ? accountInitials(accountUser) : "IN";
   const accountItems = [
     {
       label: "Saved projects",
-      detail: signedIn ? "Next: sync local runs to the Supabase project workspace." : "Sign in first, then saved project sync can be connected.",
+      detail: signedIn ? "Completed runs can sync to your account history." : "Sign in first, then completed runs can sync across browsers.",
     },
     { label: "Billing", detail: "Premium plans still wait on Stripe products and entitlement checks." },
   ];
@@ -1222,8 +1360,9 @@ export default function Page() {
                   {accountNotice ? <div className="studio-account-notice">{accountNotice}</div> : null}
                   {signedIn ? (
                     <>
-                      <strong>{accountUser?.email || "Signed in"}</strong>
-                      <p>Your session is active. Saved projects and billing controls are the next account pieces to wire.</p>
+                      <strong className="studio-account-email" title={accountUser?.email || "Signed in"}>{accountUser?.email || "Signed in"}</strong>
+                      <p>Your session is active. Completed runs can sync to saved projects.</p>
+                      <small className={`studio-account-sync ${historySyncState}`}>{historySyncMessage}</small>
                       <form className="studio-account-form" action="/auth/signout" method="post">
                         <input type="hidden" name="next" value="/app" />
                         <button className="ghost-button studio-account-submit" type="submit">
@@ -1601,18 +1740,34 @@ export default function Page() {
               <section className="studio-card">
                 <div className="studio-card-head">
                   <div>
-                    <div className="eyebrow">Local history</div>
-                    <h2 className="panel-title">Recent runs</h2>
+                    <div className="eyebrow">{signedIn ? "Saved history" : "Local history"}</div>
+                    <h2 className="panel-title">{signedIn ? "Saved projects" : "Recent runs"}</h2>
+                    <p className="history-sync-note">{historySyncMessage}</p>
                   </div>
-                  <button className="btn btn-soft btn-sm" type="button" onClick={() => { setHistory([]); saveHistory([]); }}>Clear</button>
+                  <button className="btn btn-soft btn-sm" type="button" onClick={() => { setHistory([]); saveHistory([]); }}>Clear local</button>
                 </div>
                 <div className="change-list panel-body">
-                  {history.length ? history.map((entry) => (
-                    <article className="history-item" key={entry.id}>
-                      <div><strong>{entry.filename}</strong><p>{entry.roleHint}</p><span>{new Date(entry.createdAt).toLocaleString()} · {entry.mode} · {entry.score}/100</span></div>
-                      <a className="ghost-button" href={entry.downloadUrl} download>Download {entry.downloadFormat?.toUpperCase() ?? "PDF"} <RoleForgeIcon name="download" size={14} /></a>
-                    </article>
-                  )) : <div className="empty-state"><strong>No local history yet</strong><p>Completed runs will appear here in this browser.</p></div>}
+                  {history.length ? history.map((entry) => {
+                    const saved = Boolean(entry.saved || syncedHistoryIds.includes(entry.id));
+                    return (
+                      <article className="history-item" key={entry.id}>
+                        <div>
+                          <div className="history-title-row">
+                            <strong>{entry.filename}</strong>
+                            {saved ? <small className="history-sync-badge">Saved</small> : null}
+                          </div>
+                          <p>{entry.roleHint}</p>
+                          <span>{new Date(entry.createdAt).toLocaleString()} · {entry.mode} · {entry.score}/100</span>
+                        </div>
+                        <a className="ghost-button" href={entry.downloadUrl} download>Download {entry.downloadFormat?.toUpperCase() ?? "PDF"} <RoleForgeIcon name="download" size={14} /></a>
+                      </article>
+                    );
+                  }) : (
+                    <div className="empty-state">
+                      <strong>{signedIn ? "No saved runs yet" : "No local history yet"}</strong>
+                      <p>{signedIn ? "Complete a tailor run and it will sync to your account when available." : "Completed runs will appear here in this browser."}</p>
+                    </div>
+                  )}
                 </div>
               </section>
             ) : null}
