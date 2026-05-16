@@ -81,7 +81,7 @@ type InputMode = "text" | "url";
 type PreviewMode = "tailored" | "original" | "diff";
 type PreviewUploadState = "idle" | "reading" | "ready" | "error";
 type DownloadState = "idle" | "checking" | "ready" | "expired";
-type ReviewTab = "score" | "gap" | "ats" | "resume" | "cover" | "interview" | "changes" | "history";
+type ReviewTab = "score" | "gap" | "ats" | "resume" | "cover" | "interview" | "changes" | "history" | "settings";
 type SavedRunSnapshot = {
   result: TailorResult;
   sourcePreviewText?: string;
@@ -887,7 +887,7 @@ function accountNoticeLabel(value: string, detail = "") {
     case "signed-out":
       return "You are signed out.";
     case "account-not-configured":
-      return "Account sign-in needs Supabase environment variables.";
+      return "Account sign-in is not enabled in this environment.";
     case "signin-error":
       if (safeDetail) return `Sign-in could not finish: ${safeDetail}`;
       return "Sign-in could not start. Check the email and try again.";
@@ -971,6 +971,7 @@ export default function Page() {
   const [restoredHistoryId, setRestoredHistoryId] = useState<string | null>(null);
   const [capabilities, setCapabilities] = useState<CapabilitiesResponse | null>(null);
   const historySectionRef = useRef<HTMLElement | null>(null);
+  const settingsSectionRef = useRef<HTMLElement | null>(null);
 
   const accountUser = accountStatus?.user ?? null;
   const accountReady = Boolean(accountStatus?.configured && accountStatus.enabled);
@@ -1035,6 +1036,14 @@ export default function Page() {
     setAccountPanelOpen(false);
     window.setTimeout(() => {
       historySectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
+  }
+
+  function openSettingsPanel() {
+    setActiveTab("settings");
+    setAccountPanelOpen(false);
+    window.setTimeout(() => {
+      settingsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 0);
   }
 
@@ -1570,7 +1579,24 @@ export default function Page() {
   ];
   const localHistoryCount = history.filter((entry) => !isAccountHistoryItem(entry, syncedHistoryIds)).length;
   const savedProjectCount = history.filter((entry) => isAccountHistoryItem(entry, syncedHistoryIds)).length;
+  const totalProjectCount = history.length;
+  const restorableHistoryCount = history.filter(hasRestorableSnapshot).length;
+  const accountStatusLabel = signedIn ? "Signed in" : accountReady ? "Ready to sign in" : "Sign-in unavailable";
+  const accountStatusDetail = signedIn
+    ? `${accountUser?.email || "Your account"} is connected for saved projects.`
+    : accountReady
+      ? "Sign in with Google or email to sync completed runs across browsers."
+      : "You can keep working with local history in this browser.";
+  const storageStatusDetail = signedIn
+    ? savedProjectCount
+      ? `${savedProjectCount} account project${savedProjectCount === 1 ? "" : "s"} and ${localHistoryCount} local run${localHistoryCount === 1 ? "" : "s"} are visible here.`
+      : "Completed runs will sync to saved projects after your next export."
+    : totalProjectCount
+      ? `${totalProjectCount} local run${totalProjectCount === 1 ? "" : "s"} saved in this browser.`
+      : "Runs you complete in this browser will appear in History.";
+  const pdfExportReady = Boolean(downloadReady && downloadUrl);
   const clearHistoryLabel = signedIn && savedProjectCount ? `Clear local${localHistoryCount ? ` (${localHistoryCount})` : ""}` : "Clear history";
+  const workspacePanelOpen = activeTab === "history" || activeTab === "settings";
 
   const suggestionCards: StudioSuggestion[] = result
     ? [
@@ -1667,7 +1693,7 @@ export default function Page() {
                   ) : (
                     <>
                       <strong>Account setup needed</strong>
-                      <p>Add Supabase public URL and publishable key in Vercel before sign-in can run.</p>
+                      <p>Account sign-in is not enabled in this environment yet.</p>
                     </>
                   )}
                   <div className="studio-account-list">
@@ -1686,17 +1712,17 @@ export default function Page() {
         <div className="rf-studio-layout">
           <aside className="rf-studio-rail" aria-label="Studio sections">
             <div className="rail-section-title">Build</div>
-            <a className={`rail-item ${activeTab === "history" ? "" : "active"}`} href="#editor"><RoleForgeIcon name="doc" size={15} /> Editor</a>
-            <a className="rail-item" href="#target"><RoleForgeIcon name="target" size={15} /> Job target</a>
-            <a className="rail-item" href="#suggestions"><RoleForgeIcon name="sparkle" size={15} /> AI tailor <span className="rail-pill">{suggestionCards.length || 0}</span></a>
-            <a className="rail-item" href="#ats"><RoleForgeIcon name="scan" size={15} /> ATS check</a>
-            <a className="rail-item" href="#assets"><RoleForgeIcon name="mail" size={15} /> Cover letter</a>
-            <a className="rail-item" href="#assets"><RoleForgeIcon name="briefcase" size={15} /> Interview prep</a>
+            <a className={`rail-item ${workspacePanelOpen ? "" : "active"}`} href="#editor" onClick={() => setActiveTab("score")}><RoleForgeIcon name="doc" size={15} /> Editor</a>
+            <a className="rail-item" href="#target" onClick={() => setActiveTab("score")}><RoleForgeIcon name="target" size={15} /> Job target</a>
+            <a className="rail-item" href="#suggestions" onClick={() => setActiveTab("score")}><RoleForgeIcon name="sparkle" size={15} /> AI tailor <span className="rail-pill">{suggestionCards.length || 0}</span></a>
+            <a className="rail-item" href="#ats" onClick={() => setActiveTab("score")}><RoleForgeIcon name="scan" size={15} /> ATS check</a>
+            <a className="rail-item" href="#assets" onClick={() => setActiveTab("cover")}><RoleForgeIcon name="mail" size={15} /> Cover letter</a>
+            <a className="rail-item" href="#assets" onClick={() => setActiveTab("interview")}><RoleForgeIcon name="briefcase" size={15} /> Interview prep</a>
             <div className="rail-divider" />
             <div className="rail-section-title">Workspace</div>
             <Link className="rail-item" href="/#templates"><RoleForgeIcon name="layers" size={15} /> Templates</Link>
             <button className={`rail-item ${activeTab === "history" ? "active" : ""}`} type="button" aria-pressed={activeTab === "history"} onClick={openHistoryPanel}><RoleForgeIcon name="chart" size={15} /> History</button>
-            <button className="rail-item" type="button" onClick={() => setAccountPanelOpen(true)}><RoleForgeIcon name="settings" size={15} /> Settings</button>
+            <button className={`rail-item ${activeTab === "settings" ? "active" : ""}`} type="button" aria-pressed={activeTab === "settings"} onClick={openSettingsPanel}><RoleForgeIcon name="settings" size={15} /> Settings</button>
             <div className="rf-rail-upgrade">
               <strong><RoleForgeIcon name="sparkle" size={14} /> Premium coming soon</strong>
               <p>Template controls, billing, and premium exports are coming soon.</p>
@@ -2076,6 +2102,116 @@ export default function Page() {
                       <p>{signedIn ? "Complete a tailor run and it will save here with resume preview, target details, scores, and a one-click studio restore." : "Complete a tailor run and it will stay in this browser with the preview, target, scores, and download ready to reopen."}</p>
                     </div>
                   )}
+                </div>
+              </section>
+            ) : null}
+            {activeTab === "settings" ? (
+              <section className="studio-card studio-settings-panel" id="settings" ref={settingsSectionRef}>
+                <div className="studio-card-head">
+                  <div>
+                    <div className="eyebrow">Workspace settings</div>
+                    <h2 className="panel-title">Account and exports</h2>
+                    <p className="settings-lede">{accountStatusDetail}</p>
+                  </div>
+                  <span className={`settings-status-pill ${signedIn ? "good" : accountReady ? "ready" : "muted"}`}>{accountStatusLabel}</span>
+                </div>
+                <div className="settings-grid">
+                  <article className="settings-card settings-account-card">
+                    <div className="settings-card-head">
+                      <span><RoleForgeIcon name="settings" size={15} /> Account</span>
+                      <small>{historySyncMessage}</small>
+                    </div>
+                    {accountNotice ? <div className="studio-account-notice">{accountNotice}</div> : null}
+                    {signedIn ? (
+                      <>
+                        <strong className="settings-account-email" title={accountUser?.email || "Signed in"}>{accountUser?.email || "Signed in"}</strong>
+                        <p>Saved projects are tied to this account. Local runs stay on this browser until they are synced by a completed export.</p>
+                        <div className="settings-action-row">
+                          <button className="btn btn-soft btn-sm" type="button" onClick={() => void refreshSavedRuns()} disabled={historySyncState === "loading"}>
+                            Refresh saved projects
+                          </button>
+                          <form action="/auth/signout" method="post">
+                            <input type="hidden" name="next" value="/app" />
+                            <button className="ghost-button" type="submit">Sign out</button>
+                          </form>
+                        </div>
+                      </>
+                    ) : accountReady ? (
+                      <>
+                        <p>Connect an account to keep saved projects available outside this browser.</p>
+                        <div className="settings-action-row">
+                          <a className="studio-oauth-button" href="/auth/oauth?provider=google&next=/app">
+                            <span className="studio-oauth-mark" aria-hidden="true">G</span>
+                            Continue with Google
+                          </a>
+                        </div>
+                        <form className="studio-account-form" action="/auth/signin" method="post">
+                          <input type="hidden" name="next" value="/app" />
+                          <label htmlFor="settings-account-email">Email address</label>
+                          <input id="settings-account-email" name="email" type="email" autoComplete="email" required placeholder="you@example.com" />
+                          <button className="primary-button studio-account-submit" type="submit">
+                            Send sign-in link
+                          </button>
+                        </form>
+                      </>
+                    ) : (
+                      <p>Account sign-in is not enabled here yet. Local history and PDF export still work in this browser.</p>
+                    )}
+                  </article>
+
+                  <article className="settings-card">
+                    <div className="settings-card-head">
+                      <span><RoleForgeIcon name="chart" size={15} /> Saved projects</span>
+                      <small>{storageStatusDetail}</small>
+                    </div>
+                    <div className="settings-metric-row">
+                      <div className="settings-metric">
+                        <strong>{savedProjectCount}</strong>
+                        <span>Account</span>
+                      </div>
+                      <div className="settings-metric">
+                        <strong>{localHistoryCount}</strong>
+                        <span>Local</span>
+                      </div>
+                      <div className="settings-metric">
+                        <strong>{restorableHistoryCount}</strong>
+                        <span>Restorable</span>
+                      </div>
+                    </div>
+                    <div className="settings-action-row">
+                      <button className="btn btn-soft btn-sm" type="button" onClick={openHistoryPanel}>Open history</button>
+                      <button className="btn btn-soft btn-sm" type="button" onClick={clearLocalHistory} disabled={signedIn ? !localHistoryCount : !history.length}>{clearHistoryLabel}</button>
+                    </div>
+                  </article>
+
+                  <article className="settings-card">
+                    <div className="settings-card-head">
+                      <span><RoleForgeIcon name="download" size={15} /> Export formats</span>
+                      <small>{pdfExportReady ? "Current PDF is ready to download." : "PDF unlocks after a completed run."}</small>
+                    </div>
+                    <div className="settings-export-list">
+                      {exportFormats.map((format) => (
+                        <div className={`settings-export-item ${format.enabled ? "enabled" : "disabled"}`} key={format.format}>
+                          <span>{format.enabled ? <RoleForgeIcon name="check" size={14} /> : <RoleForgeIcon name="lock" size={14} />}{format.label}</span>
+                          <small>{format.enabled ? (format.plan === "free" ? "Free workflow" : "Available") : format.reason || "Coming soon"}</small>
+                        </div>
+                      ))}
+                    </div>
+                    {pdfExportReady && downloadUrl ? (
+                      <a className="primary-button settings-download-button" href={downloadUrl} download>
+                        Download PDF <RoleForgeIcon name="download" size={14} />
+                      </a>
+                    ) : null}
+                  </article>
+
+                  <article className="settings-card">
+                    <div className="settings-card-head">
+                      <span><RoleForgeIcon name="lock" size={15} /> Premium</span>
+                      <small>Not live yet</small>
+                    </div>
+                    <p>Premium exports, plan management, and billing will stay disabled until pricing and entitlement checks are ready.</p>
+                    <button className="primary-button settings-coming-soon" type="button" disabled>Coming soon</button>
+                  </article>
                 </div>
               </section>
             ) : null}

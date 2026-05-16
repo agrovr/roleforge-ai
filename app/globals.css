@@ -4192,6 +4192,200 @@ html[data-theme="dark"] input::file-selector-button {
   scroll-margin-top: 128px;
 }
 
+.studio-settings-panel {
+  scroll-margin-top: 128px;
+}
+
+.settings-lede {
+  margin: 6px 0 0;
+  max-width: 620px;
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+
+.settings-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 0.76rem;
+  font-weight: 950;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.settings-status-pill.good {
+  border-color: color-mix(in srgb, var(--good) 38%, var(--line));
+  background: color-mix(in srgb, var(--good) 12%, var(--surface));
+  color: var(--good);
+}
+
+.settings-status-pill.ready {
+  border-color: color-mix(in srgb, var(--brand) 38%, var(--line));
+  background: color-mix(in srgb, var(--brand) 10%, var(--surface));
+  color: var(--brand-dark);
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 14px;
+}
+
+.settings-card {
+  display: flex;
+  min-width: 0;
+  min-height: 220px;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 88%, var(--bg-alt));
+}
+
+.settings-account-card {
+  min-height: 260px;
+}
+
+.settings-card-head {
+  display: grid;
+  gap: 6px;
+}
+
+.settings-card-head span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-0);
+  font-weight: 950;
+}
+
+.settings-card-head small {
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+
+.settings-card p {
+  margin: 0;
+  color: var(--ink-2);
+  line-height: 1.48;
+}
+
+.settings-account-email {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--ink-0);
+  font-size: 1.04rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-action-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.settings-action-row form {
+  margin: 0;
+}
+
+.settings-action-row .studio-oauth-button {
+  width: auto;
+  min-width: min(100%, 240px);
+  margin: 0;
+}
+
+.settings-metric-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.settings-metric {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.settings-metric strong {
+  display: block;
+  color: var(--ink-0);
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  line-height: 1;
+}
+
+.settings-metric span {
+  display: block;
+  margin-top: 7px;
+  color: var(--ink-3);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.settings-export-list {
+  display: grid;
+  gap: 8px;
+}
+
+.settings-export-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.settings-export-item span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-0);
+  font-weight: 950;
+}
+
+.settings-export-item small {
+  color: var(--good);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-align: right;
+}
+
+.settings-export-item.disabled {
+  border-style: dashed;
+  background: color-mix(in srgb, var(--surface) 72%, var(--bg-alt));
+}
+
+.settings-export-item.disabled span,
+.settings-export-item.disabled small {
+  color: var(--ink-3);
+}
+
+.settings-download-button,
+.settings-coming-soon {
+  width: fit-content;
+  margin-top: auto;
+}
+
 .rf-studio-stat-label {
   color: var(--ink-3);
   font-size: 0.72rem;
@@ -6452,6 +6646,51 @@ html[data-theme="dark"] .history-sync-note {
   color: var(--ink-2);
 }
 
+html[data-theme="dark"] .settings-lede,
+html[data-theme="dark"] .settings-card p,
+html[data-theme="dark"] .settings-card-head small {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .settings-status-pill,
+html[data-theme="dark"] .settings-card,
+html[data-theme="dark"] .settings-metric,
+html[data-theme="dark"] .settings-export-item {
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.045), rgba(255, 247, 233, 0.02)),
+    rgba(12, 17, 31, 0.78);
+  border-color: rgba(255, 247, 233, 0.18);
+}
+
+html[data-theme="dark"] .settings-status-pill.good {
+  border-color: rgba(146, 191, 160, 0.34);
+  background: rgba(95, 132, 109, 0.18);
+  color: #b7e5c4;
+}
+
+html[data-theme="dark"] .settings-status-pill.ready {
+  border-color: rgba(222, 162, 79, 0.34);
+  background: rgba(222, 162, 79, 0.14);
+  color: #f3c16d;
+}
+
+html[data-theme="dark"] .settings-card-head span,
+html[data-theme="dark"] .settings-account-email,
+html[data-theme="dark"] .settings-metric strong,
+html[data-theme="dark"] .settings-export-item span {
+  color: var(--ink-0);
+}
+
+html[data-theme="dark"] .settings-metric span,
+html[data-theme="dark"] .settings-export-item.disabled span,
+html[data-theme="dark"] .settings-export-item.disabled small {
+  color: var(--ink-3);
+}
+
+html[data-theme="dark"] .settings-export-item small {
+  color: #b7e5c4;
+}
+
 html[data-theme="dark"] .history-sync-badge {
   border-color: rgba(146, 191, 160, 0.34);
   background: rgba(95, 132, 109, 0.18);
@@ -6558,6 +6797,33 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 }
 
 @media (max-width: 760px) {
+  .settings-grid,
+  .settings-metric-row {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-card {
+    min-height: auto;
+  }
+
+  .settings-action-row,
+  .settings-export-item {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .settings-export-item small {
+    text-align: left;
+  }
+
+  .settings-download-button,
+  .settings-coming-soon,
+  .settings-action-row .btn,
+  .settings-action-row .ghost-button,
+  .settings-action-row .studio-oauth-button {
+    width: 100%;
+  }
+
   .rf-intake-grid {
     padding: 12px;
     gap: 12px;
