@@ -993,7 +993,9 @@ export default function Page() {
   const [projectActionId, setProjectActionId] = useState<string | null>(null);
   const [projectActionMessage, setProjectActionMessage] = useState("");
   const [capabilities, setCapabilities] = useState<CapabilitiesResponse | null>(null);
+  const editorSectionRef = useRef<HTMLElement | null>(null);
   const historySectionRef = useRef<HTMLElement | null>(null);
+  const historyDetailRef = useRef<HTMLElement | null>(null);
 
   const accountUser = accountStatus?.user ?? null;
   const accountReady = Boolean(accountStatus?.configured && accountStatus.enabled);
@@ -1071,6 +1073,23 @@ export default function Page() {
     window.setTimeout(() => {
       historySectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 0);
+  }
+
+  function openHistoryDetails(entry: HistoryItem) {
+    setSelectedHistoryId(entry.id);
+    setAccountPanelOpen(false);
+    setProjectActionMessage("");
+    window.setTimeout(() => {
+      historyDetailRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      historyDetailRef.current?.focus({ preventScroll: true });
+    }, 0);
+  }
+
+  function scrollToStudioEditor() {
+    window.setTimeout(() => {
+      editorSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      editorSectionRef.current?.focus({ preventScroll: true });
+    }, 30);
   }
 
   useEffect(() => {
@@ -1431,12 +1450,15 @@ export default function Page() {
     setStage("ready");
     setError("");
     setCopyState("");
+    setAccountPanelOpen(false);
     setActiveTab("score");
+    setSelectedHistoryId(entry.id);
     setPreviewMode("tailored");
     setRestoredHistoryId(entry.id);
     setHistorySyncState(isAccountHistoryItem(entry, syncedHistoryIds) ? "synced" : "local");
     setHistorySyncMessage(`${entry.filename} is open in the studio`);
-    window.setTimeout(() => document.getElementById("editor")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+    setCopyState(`${entry.filename} restored`);
+    scrollToStudioEditor();
   }
 
   function clearLocalHistory() {
@@ -1809,7 +1831,7 @@ export default function Page() {
             </div>
           </aside>
 
-          <section className="rf-studio-main" id="editor">
+          <section className="rf-studio-main" id="editor" ref={editorSectionRef} tabIndex={-1}>
             <div className="rf-studio-hero">
               <div>
                 <div className="eyebrow">Active resume</div>
@@ -2157,7 +2179,7 @@ export default function Page() {
                     const isEditingProject = Boolean(canManageProject && editingProjectId === entry.projectId);
                     const actionBusy = projectActionId === entry.id;
                     return (
-                      <article className={`history-item${restoredHistoryId === entry.id ? " active" : ""}`} key={entry.id}>
+                      <article className={`history-item${restoredHistoryId === entry.id ? " active" : ""}${selectedHistoryId === entry.id ? " selected" : ""}`} key={entry.id}>
                         <div className="history-item-main">
                           <div className="history-title-row">
                             {isEditingProject ? (
@@ -2206,7 +2228,7 @@ export default function Page() {
                               </button>
                             </>
                           ) : null}
-                          <button className="ghost-button" type="button" onClick={() => setSelectedHistoryId(entry.id)}>
+                          <button className="ghost-button" type="button" onClick={() => openHistoryDetails(entry)} aria-pressed={selectedHistoryId === entry.id}>
                             Details <RoleForgeIcon name="doc" size={14} />
                           </button>
                           <button className="ghost-button" type="button" onClick={() => restoreHistoryItem(entry)} disabled={!restorable}>
@@ -2228,7 +2250,7 @@ export default function Page() {
                   )}
                 </div>
                 {selectedHistoryItem ? (
-                  <aside className="history-detail-panel" aria-label="Saved project details">
+                  <aside className="history-detail-panel" aria-label="Saved project details" ref={historyDetailRef} tabIndex={-1}>
                     <div>
                       <div className="eyebrow">Project detail</div>
                       <h3>{historyProjectTitle(selectedHistoryItem, syncedHistoryIds)}</h3>
