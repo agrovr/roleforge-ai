@@ -55,7 +55,7 @@ function titleFromTarget(value: string | undefined) {
 export async function loadSavedRuns(client: SupabaseClient): Promise<SavedHistoryItem[]> {
   const { data, error } = await client
     .from("tailor_runs")
-    .select("id, client_history_id, project_id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url, payload, resume_projects(title, updated_at)")
+    .select("id, client_history_id, project_id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url, payload, resume_projects!tailor_runs_project_id_fkey(title, updated_at)")
     .order("created_at", { ascending: false })
     .limit(12);
 
