@@ -3,6 +3,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export type SavedHistoryItem = {
   id: string;
   accountRunId?: string;
+  projectId?: string;
+  projectTitle?: string;
   createdAt: string;
   filename: string;
   mode: "conservative" | "balanced" | "aggressive";
@@ -30,6 +32,10 @@ type TailorRunRow = {
   id: string;
   client_history_id: string | null;
   project_id: string;
+  resume_projects?: {
+    title: string | null;
+    updated_at: string | null;
+  } | { title: string | null; updated_at: string | null }[] | null;
   created_at: string;
   source_resume_name: string | null;
   job_target: string | null;
@@ -49,26 +55,58 @@ function titleFromTarget(value: string | undefined) {
 export async function loadSavedRuns(client: SupabaseClient): Promise<SavedHistoryItem[]> {
   const { data, error } = await client
     .from("tailor_runs")
-    .select("id, client_history_id, project_id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url, payload")
+    .select("id, client_history_id, project_id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url, payload, resume_projects(title, updated_at)")
     .order("created_at", { ascending: false })
     .limit(12);
 
   if (error) throw error;
 
-  return ((data ?? []) as TailorRunRow[]).map((run) => ({
-    id: run.client_history_id || run.id,
-    accountRunId: run.id,
-    createdAt: run.created_at,
-    filename: run.source_resume_name || "Saved resume",
-    mode: run.mode || "balanced",
-    score: run.fit_score ?? 0,
-    downloadUrl: run.download_url || "#",
-    downloadFormat: run.download_format || "pdf",
-    roleHint: titleFromTarget(run.job_target ?? undefined),
-    saved: true,
-    source: "account",
-    snapshot: (run.payload?.studioSnapshot as Record<string, unknown> | undefined) ?? undefined,
-  }));
+  return ((data ?? []) as TailorRunRow[]).map((run) => {
+    const project = Array.isArray(run.resume_projects) ? run.resume_projects[0] : run.resume_projects;
+
+    return {
+      id: run.client_history_id || run.id,
+      accountRunId: run.id,
+      projectId: run.project_id,
+      projectTitle: project?.title || titleFromTarget(run.job_target ?? undefined),
+      createdAt: run.created_at,
+      filename: run.source_resume_name || "Saved resume",
+      mode: run.mode || "balanced",
+      score: run.fit_score ?? 0,
+      downloadUrl: run.download_url || "#",
+      downloadFormat: run.download_format || "pdf",
+      roleHint: titleFromTarget(run.job_target ?? undefined),
+      saved: true,
+      source: "account",
+      snapshot: (run.payload?.studioSnapshot as Record<string, unknown> | undefined) ?? undefined,
+    };
+  });
+}
+
+export async function renameSavedProject(client: SupabaseClient, projectId: string, title: string) {
+  const cleanTitle = title.replace(/\s+/g, " ").trim();
+  if (!cleanTitle) throw new Error("Project name is required");
+
+  const { error } = await client
+    .from("resume_projects")
+    .update({
+      title: cleanTitle,
+      target_title: cleanTitle,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", projectId);
+
+  if (error) throw error;
+  return cleanTitle;
+}
+
+export async function deleteSavedProject(client: SupabaseClient, projectId: string) {
+  const { error } = await client
+    .from("resume_projects")
+    .delete()
+    .eq("id", projectId);
+
+  if (error) throw error;
 }
 
 export async function saveCompletedRun(client: SupabaseClient, input: CompletedRunSaveInput) {

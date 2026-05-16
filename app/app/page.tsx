@@ -6,7 +6,7 @@ import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { createRoleForgeBrowserClient } from "../lib/supabase/client";
-import { loadSavedRuns, saveCompletedRun } from "../lib/supabase/savedProjects";
+import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun } from "../lib/supabase/savedProjects";
 
 type AtsIssue = { severity: string; issue: string; fix: string };
 type AtsReport = { issues: AtsIssue[] };
@@ -105,6 +105,8 @@ type AccountStatus = {
 type HistoryItem = {
   id: string;
   accountRunId?: string;
+  projectId?: string;
+  projectTitle?: string;
   createdAt: string;
   filename: string;
   mode: TailoringMode;
@@ -818,6 +820,20 @@ function historyRestoreLabel(item: HistoryItem) {
   return hasRestorableSnapshot(item) ? "Opens in studio" : "PDF only";
 }
 
+function historyProjectTitle(item: HistoryItem, syncedIds: string[] = []) {
+  if (isAccountHistoryItem(item, syncedIds)) {
+    return item.projectTitle || item.roleHint || item.filename;
+  }
+  return item.filename;
+}
+
+function historyProjectDetail(item: HistoryItem, syncedIds: string[] = []) {
+  if (isAccountHistoryItem(item, syncedIds)) {
+    return item.filename === historyProjectTitle(item, syncedIds) ? item.roleHint : item.filename;
+  }
+  return item.roleHint;
+}
+
 function mergeHistory(localItems: HistoryItem[], savedItems: HistoryItem[]) {
   const merged = new Map<string, HistoryItem>();
 
@@ -829,6 +845,8 @@ function mergeHistory(localItems: HistoryItem[], savedItems: HistoryItem[]) {
         ? {
             ...item,
             accountRunId: existing.accountRunId ?? item.accountRunId,
+            projectId: existing.projectId ?? item.projectId,
+            projectTitle: existing.projectTitle ?? item.projectTitle,
             saved: Boolean(existing.saved || item.saved),
             source: existing.source === "account" || item.source === "account" ? "account" : "local",
             snapshot: existing.snapshot ?? item.snapshot,
@@ -969,6 +987,11 @@ export default function Page() {
   const [historySyncMessage, setHistorySyncMessage] = useState("Local browser history");
   const [syncedHistoryIds, setSyncedHistoryIds] = useState<string[]>([]);
   const [restoredHistoryId, setRestoredHistoryId] = useState<string | null>(null);
+  const [selectedHistoryId, setSelectedHistoryId] = useState<string | null>(null);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
+  const [editingProjectTitle, setEditingProjectTitle] = useState("");
+  const [projectActionId, setProjectActionId] = useState<string | null>(null);
+  const [projectActionMessage, setProjectActionMessage] = useState("");
   const [capabilities, setCapabilities] = useState<CapabilitiesResponse | null>(null);
   const historySectionRef = useRef<HTMLElement | null>(null);
   const settingsSectionRef = useRef<HTMLElement | null>(null);
@@ -1219,7 +1242,7 @@ export default function Page() {
   const hasTarget = Boolean(jdUrl.trim() || jdText.trim());
   const readyItems = [Boolean(baseUrl), Boolean(file), hasTarget];
   const readiness = Math.round((readyItems.filter(Boolean).length / readyItems.length) * 100);
-  const canRun = Boolean(baseUrl && file && hasTarget && !busy && previewUploadState !== "reading");
+  const canRun = Boolean(baseUrl && file && hasTarget && !busy && previewUploadState !== "reading" && (!accountStatus?.configured || signedIn));
 
   const score = result?.score_summary?.fit_after ?? result?.fit_score_after?.score ?? result?.fit_score?.score ?? 0;
   const presentKeywords = result?.fit_score_after?.present ?? result?.fit_score?.present ?? [];
@@ -1346,7 +1369,7 @@ export default function Page() {
       setHistory((current) => {
         const next = current.map((entry) =>
           entry.id === item.id
-            ? { ...entry, accountRunId: savedRun.runId, saved: true, source: "account" as const }
+            ? { ...entry, accountRunId: savedRun.runId, projectId: savedRun.projectId, projectTitle: item.roleHint, saved: true, source: "account" as const }
             : entry,
         );
         saveHistory(next);
@@ -1417,6 +1440,68 @@ export default function Page() {
     setHistory(next);
     saveHistory(next);
     setRestoredHistoryId((current) => (current && next.some((entry) => entry.id === current) ? current : null));
+    setSelectedHistoryId((current) => (current && next.some((entry) => entry.id === current) ? current : null));
+  }
+
+  function startRenameProject(entry: HistoryItem) {
+    if (!entry.projectId) return;
+    setEditingProjectId(entry.projectId);
+    setEditingProjectTitle(historyProjectTitle(entry, syncedHistoryIds));
+    setProjectActionMessage("");
+  }
+
+  async function submitProjectRename(entry: HistoryItem) {
+    if (!supabaseClient || !entry.projectId) return;
+
+    setProjectActionId(entry.id);
+    setProjectActionMessage("");
+
+    try {
+      const title = await renameSavedProject(supabaseClient, entry.projectId, editingProjectTitle);
+      setHistory((current) => {
+        const next = current.map((item) =>
+          item.projectId === entry.projectId ? { ...item, projectTitle: title, roleHint: item.roleHint || title } : item,
+        );
+        saveHistory(next);
+        return next;
+      });
+      setEditingProjectId(null);
+      setEditingProjectTitle("");
+      setHistorySyncState("synced");
+      setHistorySyncMessage("Saved project renamed");
+    } catch {
+      setProjectActionMessage("Project name could not be saved. Try again.");
+    } finally {
+      setProjectActionId(null);
+    }
+  }
+
+  async function removeSavedProject(entry: HistoryItem) {
+    if (!supabaseClient || !entry.projectId) return;
+
+    setProjectActionId(entry.id);
+    setProjectActionMessage("");
+
+    try {
+      await deleteSavedProject(supabaseClient, entry.projectId);
+      setHistory((current) => {
+        const next = current.filter((item) => item.projectId !== entry.projectId && item.accountRunId !== entry.accountRunId);
+        saveHistory(next);
+        return next;
+      });
+      const removedIds = new Set([entry.id, entry.accountRunId, entry.projectId].filter(Boolean) as string[]);
+      const nextSyncedIds = syncedHistoryIds.filter((id) => !removedIds.has(id));
+      setSyncedHistoryIds(nextSyncedIds);
+      saveSyncedHistoryIds(nextSyncedIds);
+      setSelectedHistoryId((current) => (current === entry.id ? null : current));
+      setRestoredHistoryId((current) => (current === entry.id ? null : current));
+      setHistorySyncState("synced");
+      setHistorySyncMessage("Saved project deleted");
+    } catch {
+      setProjectActionMessage("Saved project could not be deleted. Try again.");
+    } finally {
+      setProjectActionId(null);
+    }
   }
 
   async function onRun() {
@@ -1506,7 +1591,7 @@ export default function Page() {
   const scoreDetail = result?.score_summary?.fit_delta ? `${formatDelta(result.score_summary.fit_delta)} from baseline` : result ? "Run complete" : "Run needed";
   const atsDetail = result?.score_summary?.issues_resolved ? `${result.score_summary.issues_resolved} issues fixed` : result ? "Parser notes returned" : "Waiting for run";
   const keywordDetail = keywordTotal ? `${missingKeywords.length} missing` : "Target terms pending";
-  const runLabel = busy ? "Tailoring..." : previewUploadState === "reading" ? "Reading resume..." : result ? "Re-tailor" : "Run Tailor";
+  const runLabel = accountStatus?.configured && !signedIn ? "Sign in to run" : busy ? "Tailoring..." : previewUploadState === "reading" ? "Reading resume..." : result ? "Re-tailor" : "Run Tailor";
   const downloadReady = Boolean(downloadUrl && downloadState === "ready");
   const exportLabel = downloadUrl
     ? downloadState === "checking"
@@ -1581,6 +1666,11 @@ export default function Page() {
   const savedProjectCount = history.filter((entry) => isAccountHistoryItem(entry, syncedHistoryIds)).length;
   const totalProjectCount = history.length;
   const restorableHistoryCount = history.filter(hasRestorableSnapshot).length;
+  const selectedHistoryItem =
+    history.find((entry) => entry.id === selectedHistoryId) ??
+    history.find((entry) => isAccountHistoryItem(entry, syncedHistoryIds)) ??
+    history[0] ??
+    null;
   const accountStatusLabel = signedIn ? "Signed in" : accountReady ? "Ready to sign in" : "Sign-in unavailable";
   const accountStatusDetail = signedIn
     ? `${accountUser?.email || "Your account"} is connected for saved projects.`
@@ -2058,6 +2148,7 @@ export default function Page() {
                     <div className="eyebrow">{signedIn ? "Saved projects" : "Local history"}</div>
                     <h2 className="panel-title">{signedIn && savedProjectCount ? `${savedProjectCount} saved project${savedProjectCount === 1 ? "" : "s"}` : signedIn ? "Saved projects" : "Recent runs"}</h2>
                     <p className="history-sync-note">{historySyncMessage}</p>
+                    {projectActionMessage ? <p className="history-action-note error">{projectActionMessage}</p> : null}
                   </div>
                   <div className="history-panel-actions">
                     {signedIn ? (
@@ -2073,18 +2164,62 @@ export default function Page() {
                     const accountRun = isAccountHistoryItem(entry, syncedHistoryIds);
                     const restorable = hasRestorableSnapshot(entry);
                     const canDownload = Boolean(entry.downloadUrl && entry.downloadUrl !== "#");
+                    const canManageProject = Boolean(accountRun && entry.projectId && signedIn);
+                    const isEditingProject = Boolean(canManageProject && editingProjectId === entry.projectId);
+                    const actionBusy = projectActionId === entry.id;
                     return (
                       <article className={`history-item${restoredHistoryId === entry.id ? " active" : ""}`} key={entry.id}>
-                        <div>
+                        <div className="history-item-main">
                           <div className="history-title-row">
-                            <strong>{entry.filename}</strong>
+                            {isEditingProject ? (
+                              <label className="history-rename-field">
+                                <span className="sr-only">Saved project name</span>
+                                <input
+                                  value={editingProjectTitle}
+                                  onChange={(event) => setEditingProjectTitle(event.target.value)}
+                                  onKeyDown={(event) => {
+                                    if (event.key === "Enter") void submitProjectRename(entry);
+                                    if (event.key === "Escape") {
+                                      setEditingProjectId(null);
+                                      setEditingProjectTitle("");
+                                    }
+                                  }}
+                                  autoFocus
+                                />
+                              </label>
+                            ) : (
+                              <strong>{historyProjectTitle(entry, syncedHistoryIds)}</strong>
+                            )}
                             <small className={`history-sync-badge ${accountRun ? "account" : "local"}`}>{historyStatusLabel(entry, syncedHistoryIds)}</small>
                             <small className={`history-sync-badge ${restorable ? "restore" : "legacy"}`}>{restorable ? "Restorable" : "Download only"}</small>
                           </div>
-                          <p>{entry.roleHint}</p>
+                          <p>{historyProjectDetail(entry, syncedHistoryIds)}</p>
                           <span>{new Date(entry.createdAt).toLocaleString()} · {entry.mode} · {entry.score}/100 · {historyRestoreLabel(entry)}</span>
+                          {projectActionMessage && actionBusy ? <small className="history-action-note error">{projectActionMessage}</small> : null}
                         </div>
                         <div className="history-actions">
+                          {isEditingProject ? (
+                            <>
+                              <button className="btn btn-brand btn-sm" type="button" onClick={() => void submitProjectRename(entry)} disabled={actionBusy || !editingProjectTitle.trim()}>
+                                Save
+                              </button>
+                              <button className="btn btn-soft btn-sm" type="button" onClick={() => { setEditingProjectId(null); setEditingProjectTitle(""); }} disabled={actionBusy}>
+                                Cancel
+                              </button>
+                            </>
+                          ) : canManageProject ? (
+                            <>
+                              <button className="ghost-button" type="button" onClick={() => startRenameProject(entry)} disabled={actionBusy}>
+                                Rename <RoleForgeIcon name="edit" size={14} />
+                              </button>
+                              <button className="ghost-button" type="button" onClick={() => { if (window.confirm("Delete this saved project from your account?")) void removeSavedProject(entry); }} disabled={actionBusy}>
+                                Delete <RoleForgeIcon name="x" size={14} />
+                              </button>
+                            </>
+                          ) : null}
+                          <button className="ghost-button" type="button" onClick={() => setSelectedHistoryId(entry.id)}>
+                            Details <RoleForgeIcon name="doc" size={14} />
+                          </button>
                           <button className="ghost-button" type="button" onClick={() => restoreHistoryItem(entry)} disabled={!restorable}>
                             Restore <RoleForgeIcon name="edit" size={14} />
                           </button>
@@ -2103,6 +2238,39 @@ export default function Page() {
                     </div>
                   )}
                 </div>
+                {selectedHistoryItem ? (
+                  <aside className="history-detail-panel" aria-label="Saved project details">
+                    <div>
+                      <div className="eyebrow">Project detail</div>
+                      <h3>{historyProjectTitle(selectedHistoryItem, syncedHistoryIds)}</h3>
+                      <p>{selectedHistoryItem.roleHint}</p>
+                    </div>
+                    <dl>
+                      <div>
+                        <dt>Resume</dt>
+                        <dd>{selectedHistoryItem.filename}</dd>
+                      </div>
+                      <div>
+                        <dt>Storage</dt>
+                        <dd>{historyStatusLabel(selectedHistoryItem, syncedHistoryIds)}</dd>
+                      </div>
+                      <div>
+                        <dt>Score</dt>
+                        <dd>{selectedHistoryItem.score}/100</dd>
+                      </div>
+                      <div>
+                        <dt>Export</dt>
+                        <dd>{selectedHistoryItem.downloadUrl && selectedHistoryItem.downloadUrl !== "#" ? `${selectedHistoryItem.downloadFormat?.toUpperCase() ?? "PDF"} ready` : "No download link"}</dd>
+                      </div>
+                    </dl>
+                    <div className="history-detail-actions">
+                      <button className="btn btn-soft btn-sm" type="button" onClick={() => restoreHistoryItem(selectedHistoryItem)} disabled={!hasRestorableSnapshot(selectedHistoryItem)}>Restore</button>
+                      {selectedHistoryItem.downloadUrl && selectedHistoryItem.downloadUrl !== "#" ? (
+                        <a className="btn btn-soft btn-sm" href={selectedHistoryItem.downloadUrl} download>Download</a>
+                      ) : null}
+                    </div>
+                  </aside>
+                ) : null}
               </section>
             ) : null}
             {activeTab === "settings" ? (

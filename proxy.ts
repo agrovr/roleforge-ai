@@ -26,7 +26,16 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  await supabase.auth.getClaims();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user && request.nextUrl.pathname.startsWith("/app")) {
+    const signInUrl = new URL("/login", request.url);
+    signInUrl.searchParams.set("next", `${request.nextUrl.pathname}${request.nextUrl.search}`);
+    signInUrl.searchParams.set("account", "signin-required");
+    return NextResponse.redirect(signInUrl);
+  }
 
   return response;
 }

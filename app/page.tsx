@@ -17,8 +17,8 @@ function Nav() {
           <a className="nav-link" href="#pricing">Pricing</a>
           <span className="nav-divider" aria-hidden="true" />
           <ThemeToggle />
-          <Link className="nav-link" href="/app?account=signin">Sign in</Link>
-          <Link className="btn btn-brand" href="/app">
+          <Link className="nav-link" href="/login?next=/app">Sign in</Link>
+          <Link className="btn btn-brand" href="/login?next=/app">
             Build my resume <RoleForgeIcon name="arrow" size={14} />
           </Link>
         </nav>
@@ -44,7 +44,7 @@ function Hero() {
           Upload your resume, add a job target, review structure and keyword signals, then export a cleaner draft from the same guided workspace.
         </p>
         <div className="hero-ctas">
-          <Link className="btn btn-brand btn-lg" href="/app">
+          <Link className="btn btn-brand btn-lg" href="/login?next=/app">
             Build my resume <RoleForgeIcon name="arrow" size={14} />
           </Link>
           <a className="btn btn-ghost btn-lg" href="#how">See how it works</a>
