@@ -554,13 +554,19 @@ function DiffResumeDocument({
   const beforeLines = buildPlainResumeLines(sourceText).slice(0, 18);
   const afterLines = buildPlainResumeLines(tailoredText).slice(0, 18);
   const documentName = filename ? filename.replace(/\.(docx|pdf|txt)$/i, "") : "Resume";
+  const hasBefore = Boolean(sourceText?.trim());
+  const hasAfter = Boolean(tailoredText?.trim());
 
   return (
     <div className="rf-resume-paper rf-resume-paper-diff">
       <div className="rf-resume-head">
         <h3>Change review</h3>
         <p>{documentName}</p>
-        <span>Compare the source text with the tailored draft before export.</span>
+        <span>
+          {hasBefore && hasAfter
+            ? "Compare the source text with the tailored draft before export."
+            : "Restore a completed run or finish the tailor workflow to compare both sides."}
+        </span>
       </div>
       <section>
         <h4>Generated change notes</h4>
@@ -571,19 +577,98 @@ function DiffResumeDocument({
             ))}
           </ul>
         ) : (
-          <p>Run the workflow and generated change notes will appear here.</p>
+          <p>Change notes appear here after a completed tailoring run.</p>
         )}
       </section>
       <div className="rf-diff-grid" aria-label="Original and tailored resume comparison">
         <article className="rf-diff-column before">
           <div className="rf-diff-kicker">Original</div>
-          <PreviewLineList lines={beforeLines} keywords={[]} empty="Upload a resume to show the extracted source text." />
+          <PreviewLineList lines={beforeLines} keywords={[]} empty="Upload a resume, or restore a run with saved source text, to show the before state." />
         </article>
         <article className="rf-diff-column after">
           <div className="rf-diff-kicker">Tailored</div>
-          <PreviewLineList lines={afterLines} keywords={keywords} empty="Run the workflow to show the tailored draft." />
+          <PreviewLineList lines={afterLines} keywords={keywords} empty="Run Tailor, or restore a restorable saved run, to show the after state." />
         </article>
       </div>
+    </div>
+  );
+}
+
+function PreviewEmptyDocument({
+  mode,
+  filename,
+  uploadFormat,
+  characterCount,
+  hasSourceText,
+  hasTarget,
+  stage,
+  restored,
+}: {
+  mode: PreviewMode;
+  filename?: string;
+  uploadFormat?: UploadFormat;
+  characterCount?: number;
+  hasSourceText: boolean;
+  hasTarget: boolean;
+  stage: Stage;
+  restored: boolean;
+}) {
+  const documentName =
+    filename?.replace(/\.(docx|pdf|txt)$/i, "") ||
+    (mode === "tailored" ? "Tailored draft" : "Original resume");
+  const isWorking = stage === "uploading" || stage === "tailoring" || stage === "exporting";
+  const statusLine = characterCount
+    ? `${characterCount.toLocaleString()} characters processed`
+    : uploadFormat
+      ? `${uploadFormat.toUpperCase()} upload`
+      : "Resume preview";
+  const title = mode === "tailored" ? "Tailored preview" : "Original preview";
+  const description =
+    mode === "tailored"
+      ? isWorking
+        ? "The tailored draft is being generated now. This view will update as soon as the run completes."
+        : hasSourceText
+          ? "The original resume is ready. Run Tailor to generate the AI-edited draft for this tab."
+          : restored
+            ? "This saved run can be restored, but it does not include enough tailored text for a studio preview."
+            : "Upload a resume and add a job target, then run Tailor to preview the edited draft."
+      : stage === "uploading"
+        ? "The source document is being read now. The original preview will appear here when extraction finishes."
+        : restored
+          ? "This restored run did not save source preview text, so only the tailored draft can be reviewed."
+          : "Upload a resume to show the source text extracted from the document.";
+  const steps =
+    mode === "tailored"
+      ? [
+          { label: "Resume", value: hasSourceText || filename ? "Ready" : "Waiting" },
+          { label: "Job target", value: hasTarget ? "Ready" : "Waiting" },
+          { label: "Tailor run", value: isWorking ? "Running" : "Needed" },
+        ]
+      : [
+          { label: "Source file", value: filename ? "Selected" : "Waiting" },
+          { label: "Extraction", value: stage === "uploading" ? "Reading" : hasSourceText ? "Ready" : "Needed" },
+          { label: "AI edits", value: "Not applied" },
+        ];
+
+  return (
+    <div className="rf-resume-paper rf-resume-paper-empty">
+      <div className="rf-resume-head">
+        <h3>{documentName}</h3>
+        <p>{statusLine}</p>
+        <span>{title}</span>
+      </div>
+      <section>
+        <h4>{title}</h4>
+        <p>{description}</p>
+        <div className="rf-preview-empty-steps" aria-label={`${title} readiness`}>
+          {steps.map((step) => (
+            <span className={/waiting|needed/i.test(step.value) ? "waiting" : ""} key={`${step.label}-${step.value}`}>
+              <strong>{step.label}</strong>
+              {step.value}
+            </span>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
@@ -701,6 +786,9 @@ function MiniResumeDocument({
   uploadFormat,
   characterCount,
   changeLog,
+  hasTarget,
+  stage,
+  restored,
 }: {
   text?: string;
   sourceText?: string;
@@ -710,8 +798,12 @@ function MiniResumeDocument({
   uploadFormat?: UploadFormat;
   characterCount?: number;
   changeLog?: string[];
+  hasTarget: boolean;
+  stage: Stage;
+  restored: boolean;
 }) {
   const hasText = Boolean(text?.trim());
+  const hasSourceText = Boolean(sourceText?.trim());
 
   if (mode === "original" && hasText) {
     return (
@@ -726,24 +818,6 @@ function MiniResumeDocument({
     );
   }
 
-  const parsed = parseResumeText(text);
-
-  if (mode === "original" && !parsed && !hasText) {
-    return (
-      <div className="rf-resume-paper rf-resume-paper-empty">
-        <div className="rf-resume-head">
-          <h3>{filename ? filename.replace(/\.(docx|pdf|txt)$/i, "") : "Original resume"}</h3>
-          <p>{uploadFormat ? `${uploadFormat.toUpperCase()} upload` : "Source document"}</p>
-          <span>{characterCount ? `${characterCount.toLocaleString()} characters processed` : "Upload a resume to preview source details"}</span>
-        </div>
-        <section>
-          <h4>Original preview</h4>
-          <p>Upload a resume to show the source text extracted from the document.</p>
-        </section>
-      </div>
-    );
-  }
-
   if (mode === "diff") {
     return (
       <DiffResumeDocument
@@ -752,6 +826,23 @@ function MiniResumeDocument({
         keywords={keywords}
         changeLog={changeLog}
         filename={filename}
+      />
+    );
+  }
+
+  const parsed = parseResumeText(text);
+
+  if (!hasText) {
+    return (
+      <PreviewEmptyDocument
+        mode={mode}
+        filename={filename}
+        uploadFormat={uploadFormat}
+        characterCount={characterCount}
+        hasSourceText={hasSourceText}
+        hasTarget={hasTarget}
+        stage={stage}
+        restored={restored}
       />
     );
   }
@@ -1635,16 +1726,18 @@ export default function Page() {
   const uploadFormatHint = enabledUploadFormats.length
     ? `${enabledUploadFormats.map((format) => format.label).join(", ")}. Drop your file here or browse from your computer.`
     : "DOCX, PDF, or TXT. Drop your file here or browse from your computer.";
+  const sourceLineCount = countReadableLines(sourcePreviewText);
+  const tailoredLineCount = countReadableLines(result?.tailored_text);
+  const hasSourcePreview = Boolean(sourcePreviewText.trim());
+  const hasTailoredPreview = Boolean(result?.tailored_text?.trim());
   const previewTitle =
     previewMode === "original"
       ? "Original resume · before tailoring"
       : previewMode === "diff"
         ? "Change notes · before export"
-        : "Your resume · with AI edits applied";
-  const sourceLineCount = countReadableLines(sourcePreviewText);
-  const tailoredLineCount = countReadableLines(result?.tailored_text);
-  const hasSourcePreview = Boolean(sourcePreviewText.trim());
-  const hasTailoredPreview = Boolean(result?.tailored_text?.trim());
+        : hasTailoredPreview
+          ? "Tailored resume · AI edits applied"
+          : "Tailored resume · waiting for run";
   const previewStatusItems =
     previewMode === "original"
       ? [
@@ -1667,16 +1760,20 @@ export default function Page() {
         : [
             hasTailoredPreview
               ? `${tailoredLineCount || 1} tailored line${tailoredLineCount === 1 ? "" : "s"} generated`
-              : "Run the tailor to generate a draft",
+              : stage === "tailoring"
+                ? "Tailored draft is generating"
+                : "Run Tailor to generate a draft",
             keywordTotal ? `${presentKeywords.length}/${keywordTotal} keywords matched` : "Keywords pending",
-            restoredHistoryId ? "Restored run open" : downloadReady ? "PDF export ready" : "Review before export",
+            restoredHistoryId ? "Restored snapshot open" : downloadReady ? "PDF export ready" : "Review before export",
           ];
   const previewStatusTone = (item: string, index: number) =>
     (previewUploadState === "error" && previewMode === "original" && index === 0) ||
     item.includes("waiting") ||
+    item.includes("Waiting") ||
     item.includes("pending") ||
+    item.includes("Pending") ||
     item.includes("Upload a resume") ||
-    item.includes("Run the tailor")
+    item.includes("Run Tailor")
       ? "warn"
       : "";
   const accountButtonLabel = signedIn ? accountInitials(accountUser) : "IN";
@@ -1944,6 +2041,9 @@ export default function Page() {
                     uploadFormat={uploadMeta?.format}
                     characterCount={uploadMeta?.character_count}
                     changeLog={result?.change_log}
+                    hasTarget={hasTarget}
+                    stage={stage}
+                    restored={Boolean(restoredHistoryId)}
                   />
                 </div>
               </section>

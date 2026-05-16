@@ -5191,6 +5191,7 @@ html[data-theme="dark"] input::file-selector-button {
   border-radius: 22px;
   background: #f7f2e9;
   box-shadow: inset 0 0 0 1px rgba(14, 20, 48, 0.025);
+  overflow-x: auto;
 }
 
 .rf-preview-status {
@@ -5246,6 +5247,7 @@ html[data-theme="dark"] input::file-selector-button {
 .rf-resume-paper {
   position: relative;
   min-height: 670px;
+  width: 100%;
   overflow: visible;
   padding: 56px 64px 58px;
   border: 1px solid #e9e4da;
@@ -5364,6 +5366,40 @@ html[data-theme="dark"] input::file-selector-button {
 .rf-resume-paper-empty section p {
   max-width: 700px;
   color: #555;
+}
+
+.rf-preview-empty-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.rf-preview-empty-steps span {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 13px 14px;
+  border: 1px solid #e4dbc9;
+  border-radius: 12px;
+  background: #f8f3ea;
+  color: #363636;
+  font-family: var(--font-sans);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.rf-preview-empty-steps span.waiting {
+  color: #8c5d2d;
+  background: #fff7e6;
+}
+
+.rf-preview-empty-steps strong {
+  color: #777;
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .rf-resume-paper-diff {
@@ -6042,6 +6078,16 @@ html[data-theme="dark"] .rf-rail-upgrade p {
   .rf-resume-paper {
     min-height: 420px;
     padding: 24px;
+  }
+
+  .rf-preview-wrap {
+    margin: 14px;
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .rf-preview-empty-steps {
+    grid-template-columns: 1fr;
   }
 }
 
