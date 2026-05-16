@@ -4,8 +4,15 @@ import { FaqAccordion } from "./components/FaqAccordion";
 import { ResumePreview } from "./components/ResumePreview";
 import { RoleForgeIcon } from "./components/RoleForgeIcons";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { createRoleForgeServerClient } from "./lib/supabase/server";
 
-function Nav() {
+async function Nav() {
+  const supabase = await createRoleForgeServerClient();
+  const {
+    data: { user },
+  } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
+  const signedIn = Boolean(user);
+
   return (
     <header className="nav">
       <div className="nav-inner">
@@ -17,7 +24,7 @@ function Nav() {
           <a className="nav-link" href="#pricing">Pricing</a>
           <span className="nav-divider" aria-hidden="true" />
           <ThemeToggle />
-          <Link className="nav-link" href="/login?next=/app">Sign in</Link>
+          <Link className="nav-link" href={signedIn ? "/app" : "/login?next=/app"}>{signedIn ? "Studio" : "Sign in"}</Link>
           <Link className="btn btn-brand" href="/login?next=/app">
             Build my resume <RoleForgeIcon name="arrow" size={14} />
           </Link>
@@ -212,7 +219,7 @@ function StudioPreview() {
                   <h3>My Resumes</h3>
                   <p>Tailored to specific roles · sorted by recent</p>
                 </div>
-                <Link className="btn btn-brand btn-sm" href="/app"><RoleForgeIcon name="plus" size={14} />New resume</Link>
+                <Link className="btn btn-brand btn-sm" href="/login?next=/app"><RoleForgeIcon name="plus" size={14} />New resume</Link>
               </div>
               <div className="dash-stats">
                 {stats.map(([label, value, delta]) => (
@@ -400,7 +407,7 @@ function Pricing() {
               <li><RoleForgeIcon name="check" size={14} />Job description or public URL targeting</li>
               <li><RoleForgeIcon name="check" size={14} />Review tabs for generated results</li>
             </ul>
-            <Link className="btn btn-soft btn-lg" href="/app">Open studio</Link>
+            <Link className="btn btn-soft btn-lg" href="/login?next=/app">Open studio</Link>
           </article>
           <article className="price-card featured">
             <div className="price-name">Premium</div>
@@ -455,7 +462,7 @@ function CTABand() {
             <h2>Stop tailoring by hand. <em>Start</em> applying with clarity.</h2>
             <p>Free to start. No credit card required. Upload your resume, target the role, and review a cleaner draft.</p>
             <div className="cta-cluster">
-              <Link className="btn btn-brand btn-lg" href="/app">Build my resume <RoleForgeIcon name="arrow" size={14} /></Link>
+              <Link className="btn btn-brand btn-lg" href="/login?next=/app">Build my resume <RoleForgeIcon name="arrow" size={14} /></Link>
               <a className="btn btn-ghost btn-lg" href="#templates">Browse templates</a>
             </div>
           </div>
@@ -485,7 +492,7 @@ function Footer() {
         </div>
         <div className="footer-col">
           <h3>Launch notes</h3>
-          <span>Auth: coming soon</span>
+          <span>Auth: required for studio</span>
           <span>Billing: coming soon</span>
           <span>Customer proof: not included</span>
         </div>
