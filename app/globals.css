@@ -3783,6 +3783,7 @@ html[data-theme="dark"] .result-box {
 }
 
 .export-format-chip {
+  appearance: none;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -3796,6 +3797,13 @@ html[data-theme="dark"] .result-box {
   font-weight: 900;
   letter-spacing: 0.01em;
   white-space: nowrap;
+  cursor: pointer;
+}
+
+.export-format-chip:hover,
+.export-format-chip:focus-visible {
+  border-color: rgba(154, 102, 42, 0.34);
+  color: var(--ink-0);
 }
 
 .export-format-chip small {
@@ -3814,6 +3822,7 @@ html[data-theme="dark"] .result-box {
   border-style: dashed;
   background: rgba(255, 255, 255, 0.48);
   color: var(--ink-3);
+  cursor: default;
 }
 
 .export-format-chip.disabled small {

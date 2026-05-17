@@ -154,12 +154,18 @@ const DEFAULT_EXPORT_FORMATS: ExportCapability[] = [
   { format: "txt", label: "TXT", enabled: false, plan: "premium", reason: "Premium coming soon" },
 ];
 
-function customerExportFormats(formats?: ExportCapability[]) {
+function customerExportFormats(formats?: ExportCapability[], entitlement?: AccountEntitlement) {
   const pdfCapability = formats?.find((format) => format.format === "pdf");
+  const premiumFormats: ExportFormat[] = ["docx", "txt"];
   return DEFAULT_EXPORT_FORMATS.map((format) =>
     format.format === "pdf"
       ? { ...format, enabled: pdfCapability?.enabled ?? format.enabled, reason: pdfCapability?.reason }
-      : { ...format, enabled: false, plan: "premium" as const, reason: "Coming soon" },
+      : {
+          ...format,
+          enabled: premiumFormats.includes(format.format) && Boolean(entitlement?.exportFormats[format.format]),
+          plan: "premium" as const,
+          reason: entitlement?.plan === "premium" ? "Included" : "Premium",
+        },
   );
 }
 
@@ -1155,6 +1161,8 @@ export default function Page() {
   const [sourcePreviewText, setSourcePreviewText] = useState("");
   const [result, setResult] = useState<TailorResult | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [downloadFormat, setDownloadFormat] = useState<ExportFormat>("pdf");
+  const [selectedExportFormat, setSelectedExportFormat] = useState<ExportFormat>("pdf");
   const [downloadState, setDownloadState] = useState<DownloadState>("idle");
   const [downloadMessage, setDownloadMessage] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -1360,9 +1368,11 @@ export default function Page() {
     setPreviewUploadState(baseUrl ? "reading" : "idle");
     setPreviewUploadError("");
     setSourcePreviewText("");
-    setResult(null);
-    setDownloadUrl(null);
-    setStage("idle");
+      setResult(null);
+      setDownloadUrl(null);
+      setDownloadFormat("pdf");
+      setSelectedExportFormat("pdf");
+      setStage("idle");
     setError("");
     setCopyState("");
     setPreviewMode("original");
@@ -1417,7 +1427,7 @@ export default function Page() {
 
     const controller = new AbortController();
     setDownloadState("checking");
-    setDownloadMessage("Checking PDF download...");
+    setDownloadMessage(`Checking ${downloadFormat.toUpperCase()} download...`);
 
     fetch(downloadUrl, {
       method: "HEAD",
@@ -1427,20 +1437,20 @@ export default function Page() {
         if (controller.signal.aborted) return;
         if (response.ok) {
           setDownloadState("ready");
-          setDownloadMessage("PDF download is ready");
+          setDownloadMessage(`${downloadFormat.toUpperCase()} download is ready`);
         } else {
           setDownloadState("expired");
-          setDownloadMessage("This PDF link expired. Run the tailor again to create a fresh export.");
+          setDownloadMessage(`This ${downloadFormat.toUpperCase()} link expired. Run the export again to create a fresh file.`);
         }
       })
       .catch((caught) => {
         if ((caught as Error).name === "AbortError") return;
         setDownloadState("expired");
-        setDownloadMessage("This PDF link could not be checked. Run the tailor again if the download does not open.");
+        setDownloadMessage(`This ${downloadFormat.toUpperCase()} link could not be checked. Run the export again if the download does not open.`);
       });
 
     return () => controller.abort();
-  }, [downloadUrl]);
+  }, [downloadFormat, downloadUrl]);
 
   const hasTarget = Boolean(jdUrl.trim() || jdText.trim());
   const readyItems = [Boolean(baseUrl), Boolean(file), hasTarget];
@@ -1526,8 +1536,9 @@ export default function Page() {
     const data = (await response.json()) as ExportResponse;
     const url = `${baseUrl}/download/${data.download_filename}`;
     setDownloadUrl(url);
+    setDownloadFormat(format);
     setDownloadState("checking");
-    setDownloadMessage("Checking PDF download...");
+    setDownloadMessage(`Checking ${format.toUpperCase()} download...`);
     return url;
   }
 
@@ -1586,7 +1597,7 @@ export default function Page() {
     }
   }
 
-  function buildRunSnapshot(output: TailorResult, uploadData: UploadResponse, url: string): SavedRunSnapshot {
+  function buildRunSnapshot(output: TailorResult, uploadData: UploadResponse, url: string, format: ExportFormat = "pdf"): SavedRunSnapshot {
     return {
       result: output,
       sourcePreviewText: typeof uploadData.text_preview === "string" ? uploadData.text_preview : sourcePreviewText,
@@ -1597,7 +1608,7 @@ export default function Page() {
       inputMode,
       tailoringMode: output.tailoring_mode ?? tailoringMode,
       downloadUrl: url,
-      downloadFormat: "pdf",
+      downloadFormat: format,
     };
   }
 
@@ -1622,6 +1633,8 @@ export default function Page() {
     setSourcePreviewText(snapshot.sourcePreviewText ?? "");
     setResult(snapshot.result);
     setDownloadUrl(snapshot.downloadUrl || entry.downloadUrl || null);
+    setDownloadFormat(snapshot.downloadFormat ?? entry.downloadFormat ?? "pdf");
+    setSelectedExportFormat(snapshot.downloadFormat ?? entry.downloadFormat ?? "pdf");
     setJdText(snapshot.jdText ?? "");
     setJdUrl(snapshot.jdUrl ?? "");
     setCompanyUrl(snapshot.companyUrl ?? "");
@@ -1717,6 +1730,8 @@ export default function Page() {
     setError("");
     setResult(null);
     setDownloadUrl(null);
+    setDownloadFormat("pdf");
+    setSelectedExportFormat("pdf");
     setCopyState("");
 
     try {
@@ -1751,6 +1766,25 @@ export default function Page() {
       setRestoredHistoryId(null);
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "Something went wrong";
+      setError(message);
+      setStage("error");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onExportSelectedFormat() {
+    if (!result?.tailored_text || busy) return;
+
+    setBusy(true);
+    setError("");
+    setStage("exporting");
+
+    try {
+      await exportResume(result.tailored_text, selectedExportFormat);
+      setStage("ready");
+    } catch (caught) {
+      const message = caught instanceof Error ? caught.message : "Export failed";
       setError(message);
       setStage("error");
     } finally {
@@ -1799,15 +1833,20 @@ export default function Page() {
   const keywordDetail = keywordTotal ? `${missingKeywords.length} missing` : "Target terms pending";
   const runLabel = accountStatus?.configured && !signedIn ? "Sign in to run" : busy ? "Tailoring..." : previewUploadState === "reading" ? "Reading resume..." : result ? "Re-tailor" : "Run Tailor";
   const downloadReady = Boolean(downloadUrl && downloadState === "ready");
-  const exportLabel = downloadUrl
-    ? downloadState === "checking"
-      ? "Checking PDF"
-      : downloadState === "expired"
-        ? "PDF expired"
-        : "Download PDF"
-    : "Export PDF";
   const uploadFormats = capabilities?.upload_formats?.length ? capabilities.upload_formats : DEFAULT_UPLOAD_FORMATS;
-  const exportFormats = customerExportFormats(capabilities?.export_formats);
+  const exportFormats = customerExportFormats(capabilities?.export_formats, accountStatus?.entitlement);
+  const selectedExportCapability = exportFormats.find((format) => format.format === selectedExportFormat) ?? exportFormats[0];
+  const selectedDownloadReady = Boolean(downloadReady && downloadUrl && downloadFormat === selectedExportFormat);
+  const selectedFormatLabel = selectedExportFormat.toUpperCase();
+  const exportLabel = selectedDownloadReady
+    ? `Download ${selectedFormatLabel}`
+    : downloadFormat === selectedExportFormat && downloadState === "checking"
+      ? `Checking ${selectedFormatLabel}`
+      : downloadFormat === selectedExportFormat && downloadState === "expired"
+        ? `${selectedFormatLabel} expired`
+        : result?.tailored_text
+          ? `Export ${selectedFormatLabel}`
+          : `Export ${selectedFormatLabel}`;
   const enabledUploadFormats = uploadFormats.filter((format) => format.enabled);
   const uploadAccept = enabledUploadFormats.length
     ? enabledUploadFormats.map((format) => `.${format.format}`).join(",")
@@ -1858,7 +1897,7 @@ export default function Page() {
                 ? "Tailored draft is generating"
                 : "Run Tailor to generate a draft",
             keywordTotal ? `${presentKeywords.length}/${keywordTotal} keywords matched` : "Keywords pending",
-            restoredHistoryId ? "Restored snapshot open" : downloadReady ? "PDF export ready" : "Review before export",
+            restoredHistoryId ? "Restored snapshot open" : downloadReady ? `${downloadFormat.toUpperCase()} export ready` : "Review before export",
           ];
   const previewStatusTone = (item: string, index: number) =>
     (previewUploadState === "error" && previewMode === "original" && index === 0) ||
@@ -2084,25 +2123,37 @@ export default function Page() {
               </div>
               <div className="studio-hero-actions">
                 <button className="ghost-button" type="button" onClick={onRun} disabled={!canRun}>{runLabel}</button>
-                {downloadReady && downloadUrl ? (
+                {selectedDownloadReady && downloadUrl ? (
                   <a className="primary-button" href={downloadUrl} download>{exportLabel} <RoleForgeIcon name="download" size={14} /></a>
                 ) : (
-                  <button className="primary-button" type="button" disabled>{exportLabel} <RoleForgeIcon name="download" size={14} /></button>
+                  <button
+                    className="primary-button"
+                    type="button"
+                    onClick={() => void onExportSelectedFormat()}
+                    disabled={!result?.tailored_text || !selectedExportCapability?.enabled || busy}
+                  >
+                    {exportLabel} <RoleForgeIcon name="download" size={14} />
+                  </button>
                 )}
                 <div className="export-format-strip" aria-label="Export format availability">
                   {exportFormats.map((format) => {
-                    const isPdf = format.format === "pdf";
-                    const planLabel = format.plan === "premium" ? "Coming soon" : "Free";
+                    const selected = selectedExportFormat === format.format;
+                    const planLabel = format.plan === "premium" ? "Premium" : "Free";
                     return (
-                      <span
+                      <button
                         key={format.format}
-                        className={`export-format-chip${format.enabled && isPdf ? " active" : ""}${format.enabled ? "" : " disabled"}`}
+                        className={`export-format-chip${selected ? " active" : ""}${format.enabled ? "" : " disabled"}`}
                         aria-disabled={!format.enabled}
-                        title={!format.enabled ? "Premium exports are coming soon" : `${format.label} export available`}
+                        aria-pressed={selected}
+                        type="button"
+                        title={!format.enabled ? `${format.label} requires Premium` : `${format.label} export available`}
+                        onClick={() => {
+                          if (format.enabled) setSelectedExportFormat(format.format);
+                        }}
                       >
                         {!format.enabled ? <RoleForgeIcon name="lock" size={12} /> : null}
                         {format.label} <small>{format.enabled ? planLabel : format.reason || planLabel}</small>
-                      </span>
+                      </button>
                     );
                   })}
                 </div>
