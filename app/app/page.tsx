@@ -118,6 +118,19 @@ type HistoryItem = {
   source?: "local" | "account";
   snapshot?: SavedRunSnapshot;
 };
+type HistoryGroup = {
+  key: string;
+  title: string;
+  target: string;
+  latest: HistoryItem;
+  accountItem?: HistoryItem;
+  items: HistoryItem[];
+  accountCount: number;
+  localCount: number;
+  restorableCount: number;
+  downloadableCount: number;
+  bestScore: number;
+};
 type ApiErrorPayload = { error?: { code?: string; message?: string; request_id?: string; details?: unknown } };
 type StudioSuggestion = { label: string; meta: string; before?: string; after: string; tone?: "good" | "warn" | "neutral" };
 type ParsedResumeSection = { title: string; lines: string[] };
@@ -907,10 +920,6 @@ function historyStatusLabel(item: HistoryItem, syncedIds: string[] = []) {
   return isAccountHistoryItem(item, syncedIds) ? "Saved to account" : "This browser";
 }
 
-function historyRestoreLabel(item: HistoryItem) {
-  return hasRestorableSnapshot(item) ? "Opens in studio" : "PDF only";
-}
-
 function historyProjectTitle(item: HistoryItem, syncedIds: string[] = []) {
   if (isAccountHistoryItem(item, syncedIds)) {
     return item.projectTitle || item.roleHint || item.filename;
@@ -923,6 +932,71 @@ function historyProjectDetail(item: HistoryItem, syncedIds: string[] = []) {
     return item.filename === historyProjectTitle(item, syncedIds) ? item.roleHint : item.filename;
   }
   return item.roleHint;
+}
+
+function historySortValue(item: HistoryItem) {
+  const value = new Date(item.createdAt).getTime();
+  return Number.isFinite(value) ? value : 0;
+}
+
+function historyGroupKey(item: HistoryItem, syncedIds: string[] = []) {
+  if (isAccountHistoryItem(item, syncedIds) && item.projectId) return `account:${item.projectId}`;
+  const filename = item.filename.replace(/\s+/g, " ").trim().toLowerCase();
+  const target = item.roleHint.replace(/\s+/g, " ").trim().toLowerCase();
+  return `local:${filename}:${target}`;
+}
+
+function historyStorageLabel(group: HistoryGroup) {
+  if (group.accountCount && group.localCount) return "Account + browser";
+  if (group.accountCount) return "Account";
+  return "This browser";
+}
+
+function historyGroupSummary(group: HistoryGroup) {
+  const runLabel = `${group.items.length} run${group.items.length === 1 ? "" : "s"}`;
+  const restoreLabel = group.restorableCount
+    ? `${group.restorableCount} restore-ready`
+    : group.downloadableCount
+      ? "Download only"
+      : "No export";
+  return `${runLabel} · best ${group.bestScore}/100 · ${restoreLabel}`;
+}
+
+function groupHistoryItems(items: HistoryItem[], syncedIds: string[] = []): HistoryGroup[] {
+  const groups = new Map<string, HistoryItem[]>();
+
+  items.forEach((item) => {
+    const key = historyGroupKey(item, syncedIds);
+    const group = groups.get(key) ?? [];
+    group.push(item);
+    groups.set(key, group);
+  });
+
+  return [...groups.entries()]
+    .map(([key, groupItems]) => {
+      const sorted = [...groupItems].sort((a, b) => historySortValue(b) - historySortValue(a));
+      const latest = sorted[0];
+      const accountItems = sorted.filter((item) => isAccountHistoryItem(item, syncedIds));
+      const accountItem = accountItems[0];
+      const titleSource = accountItem ?? latest;
+      const targetSource = latest.roleHint ? latest : titleSource;
+
+      return {
+        key,
+        title: historyProjectTitle(titleSource, syncedIds),
+        target: historyProjectDetail(targetSource, syncedIds),
+        latest,
+        accountItem,
+        items: sorted,
+        accountCount: accountItems.length,
+        localCount: sorted.length - accountItems.length,
+        restorableCount: sorted.filter(hasRestorableSnapshot).length,
+        downloadableCount: sorted.filter((item) => item.downloadUrl && item.downloadUrl !== "#").length,
+        bestScore: Math.max(...sorted.map((item) => item.score || 0)),
+      };
+    })
+    .sort((a, b) => historySortValue(b.latest) - historySortValue(a.latest))
+    .slice(0, 12);
 }
 
 function mergeHistory(localItems: HistoryItem[], savedItems: HistoryItem[]) {
@@ -1791,10 +1865,15 @@ export default function Page() {
   ];
   const localHistoryCount = history.filter((entry) => !isAccountHistoryItem(entry, syncedHistoryIds)).length;
   const savedProjectCount = history.filter((entry) => isAccountHistoryItem(entry, syncedHistoryIds)).length;
+  const historyGroups = groupHistoryItems(history, syncedHistoryIds);
   const selectedHistoryItem =
     history.find((entry) => entry.id === selectedHistoryId) ??
     history.find((entry) => isAccountHistoryItem(entry, syncedHistoryIds)) ??
     history[0] ??
+    null;
+  const selectedHistoryGroup =
+    (selectedHistoryItem ? historyGroups.find((group) => group.items.some((entry) => entry.id === selectedHistoryItem.id)) : null) ??
+    historyGroups[0] ??
     null;
   const clearHistoryLabel = signedIn && savedProjectCount ? `Clear local${localHistoryCount ? ` (${localHistoryCount})` : ""}` : "Clear history";
   const workspacePanelOpen = activeTab === "history";
@@ -2261,7 +2340,13 @@ export default function Page() {
                 <div className="studio-card-head">
                   <div>
                     <div className="eyebrow">{signedIn ? "Saved projects" : "Local history"}</div>
-                    <h2 className="panel-title">{signedIn && savedProjectCount ? `${savedProjectCount} saved project${savedProjectCount === 1 ? "" : "s"}` : signedIn ? "Saved projects" : "Recent runs"}</h2>
+                    <h2 className="panel-title">
+                      {historyGroups.length
+                        ? `${historyGroups.length} project${historyGroups.length === 1 ? "" : "s"}`
+                        : signedIn
+                          ? "Saved projects"
+                          : "Recent runs"}
+                    </h2>
                     <p className="history-sync-note">{historySyncMessage}</p>
                     {projectActionMessage ? <p className="history-action-note error">{projectActionMessage}</p> : null}
                   </div>
@@ -2275,15 +2360,18 @@ export default function Page() {
                   </div>
                 </div>
                 <div className="change-list panel-body">
-                  {history.length ? history.map((entry) => {
-                    const accountRun = isAccountHistoryItem(entry, syncedHistoryIds);
+                  {historyGroups.length ? historyGroups.map((group) => {
+                    const entry = group.latest;
+                    const manageEntry = group.accountItem ?? entry;
                     const restorable = hasRestorableSnapshot(entry);
                     const canDownload = Boolean(entry.downloadUrl && entry.downloadUrl !== "#");
-                    const canManageProject = Boolean(accountRun && entry.projectId && signedIn);
-                    const isEditingProject = Boolean(canManageProject && editingProjectId === entry.projectId);
-                    const actionBusy = projectActionId === entry.id;
+                    const canManageProject = Boolean(group.accountItem?.projectId && signedIn);
+                    const isEditingProject = Boolean(canManageProject && editingProjectId === group.accountItem?.projectId);
+                    const actionBusy = group.items.some((item) => projectActionId === item.id);
+                    const selected = group.items.some((item) => selectedHistoryId === item.id);
+                    const active = group.items.some((item) => restoredHistoryId === item.id);
                     return (
-                      <article className={`history-item${restoredHistoryId === entry.id ? " active" : ""}${selectedHistoryId === entry.id ? " selected" : ""}`} key={entry.id}>
+                      <article className={`history-item${active ? " active" : ""}${selected ? " selected" : ""}`} key={group.key}>
                         <div className="history-item-main">
                           <div className="history-title-row">
                             {isEditingProject ? (
@@ -2293,7 +2381,7 @@ export default function Page() {
                                   value={editingProjectTitle}
                                   onChange={(event) => setEditingProjectTitle(event.target.value)}
                                   onKeyDown={(event) => {
-                                    if (event.key === "Enter") void submitProjectRename(entry);
+                                    if (event.key === "Enter") void submitProjectRename(manageEntry);
                                     if (event.key === "Escape") {
                                       setEditingProjectId(null);
                                       setEditingProjectTitle("");
@@ -2303,19 +2391,25 @@ export default function Page() {
                                 />
                               </label>
                             ) : (
-                              <strong>{historyProjectTitle(entry, syncedHistoryIds)}</strong>
+                              <strong>{group.title}</strong>
                             )}
-                            <small className={`history-sync-badge ${accountRun ? "account" : "local"}`}>{historyStatusLabel(entry, syncedHistoryIds)}</small>
-                            <small className={`history-sync-badge ${restorable ? "restore" : "legacy"}`}>{restorable ? "Restorable" : "Download only"}</small>
+                            <small className={`history-sync-badge ${group.accountCount ? "account" : "local"}`}>{historyStorageLabel(group)}</small>
+                            <small className={`history-sync-badge ${group.restorableCount ? "restore" : "legacy"}`}>
+                              {group.restorableCount ? "Restore ready" : "Download only"}
+                            </small>
                           </div>
-                          <p>{historyProjectDetail(entry, syncedHistoryIds)}</p>
-                          <span>{new Date(entry.createdAt).toLocaleString()} · {entry.mode} · {entry.score}/100 · {historyRestoreLabel(entry)}</span>
+                          <p>{group.target}</p>
+                          <div className="history-project-meta" aria-label="Project run summary">
+                            <span>{historyGroupSummary(group)}</span>
+                            <span>Latest {new Date(entry.createdAt).toLocaleString()}</span>
+                            <span>{entry.mode} mode</span>
+                          </div>
                           {projectActionMessage && actionBusy ? <small className="history-action-note error">{projectActionMessage}</small> : null}
                         </div>
                         <div className="history-actions">
                           {isEditingProject ? (
                             <>
-                              <button className="btn btn-brand btn-sm" type="button" onClick={() => void submitProjectRename(entry)} disabled={actionBusy || !editingProjectTitle.trim()}>
+                              <button className="btn btn-brand btn-sm" type="button" onClick={() => void submitProjectRename(manageEntry)} disabled={actionBusy || !editingProjectTitle.trim()}>
                                 Save
                               </button>
                               <button className="btn btn-soft btn-sm" type="button" onClick={() => { setEditingProjectId(null); setEditingProjectTitle(""); }} disabled={actionBusy}>
@@ -2324,15 +2418,15 @@ export default function Page() {
                             </>
                           ) : canManageProject ? (
                             <>
-                              <button className="ghost-button" type="button" onClick={() => startRenameProject(entry)} disabled={actionBusy}>
+                              <button className="ghost-button" type="button" onClick={() => startRenameProject(manageEntry)} disabled={actionBusy}>
                                 Rename <RoleForgeIcon name="edit" size={14} />
                               </button>
-                              <button className="ghost-button" type="button" onClick={() => { if (window.confirm("Delete this saved project from your account?")) void removeSavedProject(entry); }} disabled={actionBusy}>
+                              <button className="ghost-button" type="button" onClick={() => { if (window.confirm("Delete this saved project from your account?")) void removeSavedProject(manageEntry); }} disabled={actionBusy}>
                                 Delete <RoleForgeIcon name="x" size={14} />
                               </button>
                             </>
                           ) : null}
-                          <button className="ghost-button" type="button" onClick={() => openHistoryDetails(entry)} aria-pressed={selectedHistoryId === entry.id}>
+                          <button className="ghost-button" type="button" onClick={() => openHistoryDetails(entry)} aria-pressed={selected}>
                             Details <RoleForgeIcon name="doc" size={14} />
                           </button>
                           <button className="ghost-button" type="button" onClick={() => restoreHistoryItem(entry)} disabled={!restorable}>
@@ -2353,31 +2447,50 @@ export default function Page() {
                     </div>
                   )}
                 </div>
-                {selectedHistoryItem ? (
+                {selectedHistoryItem && selectedHistoryGroup ? (
                   <aside className="history-detail-panel" aria-label="Saved project details" ref={historyDetailRef} tabIndex={-1}>
                     <div>
                       <div className="eyebrow">Project detail</div>
-                      <h3>{historyProjectTitle(selectedHistoryItem, syncedHistoryIds)}</h3>
-                      <p>{selectedHistoryItem.roleHint}</p>
+                      <h3>{selectedHistoryGroup.title}</h3>
+                      <p>{selectedHistoryGroup.target}</p>
                     </div>
                     <dl>
                       <div>
-                        <dt>Resume</dt>
-                        <dd>{selectedHistoryItem.filename}</dd>
+                        <dt>Runs</dt>
+                        <dd>{selectedHistoryGroup.items.length}</dd>
                       </div>
                       <div>
                         <dt>Storage</dt>
-                        <dd>{historyStatusLabel(selectedHistoryItem, syncedHistoryIds)}</dd>
+                        <dd>{historyStorageLabel(selectedHistoryGroup)}</dd>
                       </div>
                       <div>
-                        <dt>Score</dt>
-                        <dd>{selectedHistoryItem.score}/100</dd>
+                        <dt>Best score</dt>
+                        <dd>{selectedHistoryGroup.bestScore}/100</dd>
                       </div>
                       <div>
                         <dt>Export</dt>
-                        <dd>{selectedHistoryItem.downloadUrl && selectedHistoryItem.downloadUrl !== "#" ? `${selectedHistoryItem.downloadFormat?.toUpperCase() ?? "PDF"} ready` : "No download link"}</dd>
+                        <dd>{selectedHistoryGroup.downloadableCount ? `${selectedHistoryGroup.downloadableCount} ready` : "No download link"}</dd>
                       </div>
                     </dl>
+                    <div className="history-version-list" aria-label="Runs in this project">
+                      {selectedHistoryGroup.items.slice(0, 5).map((entry) => {
+                        const restorable = hasRestorableSnapshot(entry);
+                        return (
+                          <article className={selectedHistoryId === entry.id ? "selected" : ""} key={`detail-${entry.id}`}>
+                            <button type="button" onClick={() => setSelectedHistoryId(entry.id)} aria-pressed={selectedHistoryId === entry.id}>
+                              <strong>{new Date(entry.createdAt).toLocaleString()}</strong>
+                              <span>{entry.score}/100 · {entry.mode} · {historyStatusLabel(entry, syncedHistoryIds)}</span>
+                            </button>
+                            <div>
+                              <button className="btn btn-soft btn-sm" type="button" onClick={() => restoreHistoryItem(entry)} disabled={!restorable}>Restore</button>
+                              {entry.downloadUrl && entry.downloadUrl !== "#" ? (
+                                <a className="btn btn-soft btn-sm" href={entry.downloadUrl} download>PDF</a>
+                              ) : null}
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
                     <div className="history-detail-actions">
                       <button className="btn btn-soft btn-sm" type="button" onClick={() => restoreHistoryItem(selectedHistoryItem)} disabled={!hasRestorableSnapshot(selectedHistoryItem)}>Restore</button>
                       {selectedHistoryItem.downloadUrl && selectedHistoryItem.downloadUrl !== "#" ? (
