@@ -3422,6 +3422,58 @@ html[data-theme="dark"] .result-box {
   flex-wrap: wrap;
 }
 
+.history-filter-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 40px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 84%, var(--bg-alt));
+}
+
+.history-filter-bar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 30px;
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 950;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.history-filter-bar button:hover {
+  color: var(--ink-0);
+}
+
+.history-filter-bar button.active {
+  background: var(--surface-strong);
+  color: var(--ink-0);
+  box-shadow: 0 8px 18px -14px var(--shadow);
+}
+
+.history-filter-bar span {
+  display: inline-grid;
+  min-width: 20px;
+  height: 20px;
+  place-items: center;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand) 12%, transparent);
+  color: var(--brand-strong);
+  font-size: 0.68rem;
+}
+
 .history-sync-badge {
   display: inline-flex;
   align-items: center;
@@ -6262,6 +6314,10 @@ html[data-theme="dark"] .rf-rail-upgrade p {
     justify-content: flex-start;
   }
 
+  .history-panel-actions {
+    justify-content: flex-start;
+  }
+
   .hero-stage {
     height: 520px;
   }
@@ -7335,6 +7391,30 @@ html[data-theme="dark"] .history-sync-badge {
   color: #b7e5c4;
 }
 
+html[data-theme="dark"] .history-filter-bar {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: rgba(255, 247, 233, 0.055);
+}
+
+html[data-theme="dark"] .history-filter-bar button {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .history-filter-bar button:hover,
+html[data-theme="dark"] .history-filter-bar button.active {
+  color: var(--ink-0);
+}
+
+html[data-theme="dark"] .history-filter-bar button.active {
+  background: rgba(255, 247, 233, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 247, 233, 0.08);
+}
+
+html[data-theme="dark"] .history-filter-bar span {
+  background: rgba(231, 188, 111, 0.12);
+  color: #ffe6ac;
+}
+
 html[data-theme="dark"] .history-item.active {
   border-color: rgba(237, 127, 105, 0.38);
   background: rgba(237, 127, 105, 0.12);
@@ -7537,6 +7617,17 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   .history-detail-panel,
   .history-detail-panel dl {
     grid-template-columns: 1fr;
+  }
+
+  .history-filter-bar {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .history-filter-bar button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-inline: 8px;
   }
 
   .history-detail-actions {

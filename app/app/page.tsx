@@ -79,6 +79,7 @@ type ExportResponse = { saved_to: string; download_filename: string };
 type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error";
 type InputMode = "text" | "url";
 type PreviewMode = "tailored" | "original" | "diff";
+type HistoryFilter = "all" | "account" | "local";
 type PreviewUploadState = "idle" | "reading" | "ready" | "error";
 type DownloadState = "idle" | "checking" | "ready" | "expired";
 type ReviewTab = "score" | "gap" | "ats" | "resume" | "cover" | "interview" | "changes" | "history";
@@ -1153,6 +1154,7 @@ export default function Page() {
   const [syncedHistoryIds, setSyncedHistoryIds] = useState<string[]>([]);
   const [restoredHistoryId, setRestoredHistoryId] = useState<string | null>(null);
   const [selectedHistoryId, setSelectedHistoryId] = useState<string | null>(null);
+  const [historyFilter, setHistoryFilter] = useState<HistoryFilter>("all");
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editingProjectTitle, setEditingProjectTitle] = useState("");
   const [projectActionId, setProjectActionId] = useState<string | null>(null);
@@ -1866,16 +1868,48 @@ export default function Page() {
   const localHistoryCount = history.filter((entry) => !isAccountHistoryItem(entry, syncedHistoryIds)).length;
   const savedProjectCount = history.filter((entry) => isAccountHistoryItem(entry, syncedHistoryIds)).length;
   const historyGroups = groupHistoryItems(history, syncedHistoryIds);
+  const accountHistoryGroups = historyGroups.filter((group) => group.accountCount > 0);
+  const localHistoryGroups = historyGroups.filter((group) => group.localCount > 0);
+  const visibleHistoryGroups =
+    historyFilter === "account"
+      ? accountHistoryGroups
+      : historyFilter === "local"
+        ? localHistoryGroups
+        : historyGroups;
   const selectedHistoryItem =
     history.find((entry) => entry.id === selectedHistoryId) ??
     history.find((entry) => isAccountHistoryItem(entry, syncedHistoryIds)) ??
     history[0] ??
     null;
   const selectedHistoryGroup =
-    (selectedHistoryItem ? historyGroups.find((group) => group.items.some((entry) => entry.id === selectedHistoryItem.id)) : null) ??
-    historyGroups[0] ??
+    (selectedHistoryItem ? visibleHistoryGroups.find((group) => group.items.some((entry) => entry.id === selectedHistoryItem.id)) : null) ??
+    visibleHistoryGroups[0] ??
+    null;
+  const visibleSelectedHistoryItem =
+    selectedHistoryGroup?.items.find((entry) => entry.id === selectedHistoryId) ??
+    selectedHistoryGroup?.latest ??
     null;
   const clearHistoryLabel = signedIn && savedProjectCount ? `Clear local${localHistoryCount ? ` (${localHistoryCount})` : ""}` : "Clear history";
+  const historyEmptyTitle =
+    historyFilter === "account"
+      ? "No account projects yet"
+      : historyFilter === "local"
+        ? "No browser projects"
+        : signedIn
+          ? "No saved projects yet"
+          : "No local runs yet";
+  const historyEmptyDetail =
+    historyFilter === "account"
+      ? localHistoryGroups.length
+        ? "Your completed local runs are still available under This browser. Complete a new signed-in run or refresh after sync to see account projects here."
+        : "Complete a signed-in tailor run and it will save here with restore, target details, scores, and export links."
+      : historyFilter === "local"
+        ? accountHistoryGroups.length
+          ? "All visible projects are saved to your account. Switch to All or Account to review them."
+          : "Complete a tailor run and it will stay in this browser with the preview, target, scores, and download ready to reopen."
+        : signedIn
+          ? "Complete a tailor run and it will save here with resume preview, target details, scores, and a one-click studio restore."
+          : "Complete a tailor run and it will stay in this browser with the preview, target, scores, and download ready to reopen.";
   const workspacePanelOpen = activeTab === "history";
 
   const suggestionCards: StudioSuggestion[] = result
@@ -2341,8 +2375,8 @@ export default function Page() {
                   <div>
                     <div className="eyebrow">{signedIn ? "Saved projects" : "Local history"}</div>
                     <h2 className="panel-title">
-                      {historyGroups.length
-                        ? `${historyGroups.length} project${historyGroups.length === 1 ? "" : "s"}`
+                      {visibleHistoryGroups.length
+                        ? `${visibleHistoryGroups.length} project${visibleHistoryGroups.length === 1 ? "" : "s"}`
                         : signedIn
                           ? "Saved projects"
                           : "Recent runs"}
@@ -2351,6 +2385,37 @@ export default function Page() {
                     {projectActionMessage ? <p className="history-action-note error">{projectActionMessage}</p> : null}
                   </div>
                   <div className="history-panel-actions">
+                    <div className="history-filter-bar" role="tablist" aria-label="Saved project storage filter">
+                      <button
+                        className={historyFilter === "all" ? "active" : ""}
+                        type="button"
+                        role="tab"
+                        aria-selected={historyFilter === "all"}
+                        onClick={() => setHistoryFilter("all")}
+                      >
+                        All <span>{historyGroups.length}</span>
+                      </button>
+                      {signedIn ? (
+                        <button
+                          className={historyFilter === "account" ? "active" : ""}
+                          type="button"
+                          role="tab"
+                          aria-selected={historyFilter === "account"}
+                          onClick={() => setHistoryFilter("account")}
+                        >
+                          Account <span>{accountHistoryGroups.length}</span>
+                        </button>
+                      ) : null}
+                      <button
+                        className={historyFilter === "local" ? "active" : ""}
+                        type="button"
+                        role="tab"
+                        aria-selected={historyFilter === "local"}
+                        onClick={() => setHistoryFilter("local")}
+                      >
+                        This browser <span>{localHistoryGroups.length}</span>
+                      </button>
+                    </div>
                     {signedIn ? (
                       <button className="btn btn-soft btn-sm" type="button" onClick={() => void refreshSavedRuns()} disabled={historySyncState === "loading"}>
                         Refresh
@@ -2360,7 +2425,7 @@ export default function Page() {
                   </div>
                 </div>
                 <div className="change-list panel-body">
-                  {historyGroups.length ? historyGroups.map((group) => {
+                  {visibleHistoryGroups.length ? visibleHistoryGroups.map((group) => {
                     const entry = group.latest;
                     const manageEntry = group.accountItem ?? entry;
                     const restorable = hasRestorableSnapshot(entry);
@@ -2442,12 +2507,12 @@ export default function Page() {
                     );
                   }) : (
                     <div className="empty-state">
-                      <strong>{signedIn ? "No saved projects yet" : "No local runs yet"}</strong>
-                      <p>{signedIn ? "Complete a tailor run and it will save here with resume preview, target details, scores, and a one-click studio restore." : "Complete a tailor run and it will stay in this browser with the preview, target, scores, and download ready to reopen."}</p>
+                      <strong>{historyEmptyTitle}</strong>
+                      <p>{historyEmptyDetail}</p>
                     </div>
                   )}
                 </div>
-                {selectedHistoryItem && selectedHistoryGroup ? (
+                {visibleSelectedHistoryItem && selectedHistoryGroup ? (
                   <aside className="history-detail-panel" aria-label="Saved project details" ref={historyDetailRef} tabIndex={-1}>
                     <div>
                       <div className="eyebrow">Project detail</div>
@@ -2492,9 +2557,9 @@ export default function Page() {
                       })}
                     </div>
                     <div className="history-detail-actions">
-                      <button className="btn btn-soft btn-sm" type="button" onClick={() => restoreHistoryItem(selectedHistoryItem)} disabled={!hasRestorableSnapshot(selectedHistoryItem)}>Restore</button>
-                      {selectedHistoryItem.downloadUrl && selectedHistoryItem.downloadUrl !== "#" ? (
-                        <a className="btn btn-soft btn-sm" href={selectedHistoryItem.downloadUrl} download>Download</a>
+                      <button className="btn btn-soft btn-sm" type="button" onClick={() => restoreHistoryItem(visibleSelectedHistoryItem)} disabled={!hasRestorableSnapshot(visibleSelectedHistoryItem)}>Restore</button>
+                      {visibleSelectedHistoryItem.downloadUrl && visibleSelectedHistoryItem.downloadUrl !== "#" ? (
+                        <a className="btn btn-soft btn-sm" href={visibleSelectedHistoryItem.downloadUrl} download>Download</a>
                       ) : null}
                     </div>
                   </aside>
