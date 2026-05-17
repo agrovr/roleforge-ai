@@ -6,7 +6,7 @@ import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { createRoleForgeBrowserClient } from "../lib/supabase/client";
-import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun } from "../lib/supabase/savedProjects";
+import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun } from "../lib/supabase/savedProjectClient";
 
 type AtsIssue = { severity: string; issue: string; fix: string };
 type AtsReport = { issues: AtsIssue[] };
@@ -1116,7 +1116,7 @@ export default function Page() {
       return;
     }
 
-    if (!supabaseClient) {
+    if (!accountReady) {
       setHistorySyncState("error");
       setHistorySyncMessage("Account sync is not ready yet. Local history still works.");
       return;
@@ -1126,7 +1126,7 @@ export default function Page() {
     if (!options.quiet) setHistorySyncMessage("Loading saved projects...");
 
     try {
-      const savedRuns = await loadSavedRuns(supabaseClient);
+      const savedRuns = await loadSavedRuns();
       const savedHistory = savedRuns.map((run) => ({
         ...run,
         source: "account" as const,
@@ -1148,11 +1148,15 @@ export default function Page() {
           ? `${savedRuns.length} saved project${savedRuns.length === 1 ? "" : "s"} ready to restore`
           : "Signed in. Completed runs will save here.",
       );
-    } catch {
+    } catch (caught) {
       setHistorySyncState("error");
-      setHistorySyncMessage("Account history could not refresh. Local history still works.");
+      setHistorySyncMessage(
+        caught instanceof Error && /sign in/i.test(caught.message)
+          ? "Sign in again to refresh saved projects."
+          : "Saved projects could not refresh. Local history still works.",
+      );
     }
-  }, [signedIn, supabaseClient]);
+  }, [accountReady, signedIn]);
 
   useEffect(() => {
     void refreshSavedRuns();
@@ -1443,7 +1447,7 @@ export default function Page() {
   }
 
   async function syncCompletedRun(item: HistoryItem, output: TailorResult, url: string) {
-    if (!signedIn || !supabaseClient) {
+    if (!signedIn || !accountReady) {
       setHistorySyncState("local");
       setHistorySyncMessage(signedIn ? "Account sync is not ready yet. Local history still works." : "Sign in to sync completed runs");
       return;
@@ -1458,7 +1462,7 @@ export default function Page() {
     setHistorySyncMessage("Saving completed run...");
 
     try {
-      const savedRun = await saveCompletedRun(supabaseClient, {
+      const savedRun = await saveCompletedRun({
         ...item,
         sourceResumeName: file?.name,
         jobTarget: jdText.trim() || jdUrl.trim() || item.roleHint,
@@ -1568,13 +1572,13 @@ export default function Page() {
   }
 
   async function submitProjectRename(entry: HistoryItem) {
-    if (!supabaseClient || !entry.projectId) return;
+    if (!accountReady || !entry.projectId) return;
 
     setProjectActionId(entry.id);
     setProjectActionMessage("");
 
     try {
-      const title = await renameSavedProject(supabaseClient, entry.projectId, editingProjectTitle);
+      const title = await renameSavedProject(entry.projectId, editingProjectTitle);
       setHistory((current) => {
         const next = current.map((item) =>
           item.projectId === entry.projectId ? { ...item, projectTitle: title, roleHint: item.roleHint || title } : item,
@@ -1594,13 +1598,13 @@ export default function Page() {
   }
 
   async function removeSavedProject(entry: HistoryItem) {
-    if (!supabaseClient || !entry.projectId) return;
+    if (!accountReady || !entry.projectId) return;
 
     setProjectActionId(entry.id);
     setProjectActionMessage("");
 
     try {
-      await deleteSavedProject(supabaseClient, entry.projectId);
+      await deleteSavedProject(entry.projectId);
       setHistory((current) => {
         const next = current.filter((item) => item.projectId !== entry.projectId && item.accountRunId !== entry.accountRunId);
         saveHistory(next);
