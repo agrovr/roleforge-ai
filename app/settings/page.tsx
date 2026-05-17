@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { loadAccountEntitlement } from "../lib/entitlements";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 
 type CountResult = { count: number | null; error: unknown };
@@ -35,6 +36,12 @@ export default async function SettingsPage() {
     countRows(supabase, "resume_projects"),
     countRows(supabase, "tailor_runs"),
   ]);
+  const entitlement = await loadAccountEntitlement(supabase, user.id);
+  const planLabel = entitlement.plan === "premium" ? "Premium" : "Free";
+  const billingLabel =
+    entitlement.billingStatus === "none"
+      ? "No billing active"
+      : entitlement.billingStatus.replace(/_/g, " ");
   const displayName =
     typeof user.user_metadata?.name === "string"
       ? user.user_metadata.name
@@ -65,9 +72,9 @@ export default async function SettingsPage() {
             <div>
               <div className="eyebrow">Workspace settings</div>
               <h1>Settings</h1>
-              <p>Manage your account, saved projects, export access, and upcoming premium options.</p>
+              <p>Manage your account, saved projects, export access, and plan state.</p>
             </div>
-            <span className="settings-status-pill good">Signed in</span>
+            <span className="settings-status-pill good">{planLabel} plan</span>
           </div>
 
           <section className="settings-section" id="account">
@@ -83,6 +90,16 @@ export default async function SettingsPage() {
                 <div>
                   <strong>{displayName || "RoleForge user"}</strong>
                   <span>{user.email}</span>
+                </div>
+              </div>
+              <div className="settings-metric-row">
+                <div className="settings-metric">
+                  <strong>{planLabel}</strong>
+                  <span>Current plan</span>
+                </div>
+                <div className="settings-metric">
+                  <strong>{billingLabel}</strong>
+                  <span>Billing state</span>
                 </div>
               </div>
               <form action="/auth/signout" method="post">
@@ -120,15 +137,15 @@ export default async function SettingsPage() {
             <div className="settings-section-panel settings-export-list">
               <div className="settings-export-item enabled">
                 <span><RoleForgeIcon name="check" size={14} />PDF</span>
-                <small>Free workflow</small>
+                <small>{entitlement.exportFormats.pdf ? "Included" : "Unavailable"}</small>
               </div>
               <div className="settings-export-item disabled">
                 <span><RoleForgeIcon name="lock" size={14} />DOCX</span>
-                <small>Coming soon</small>
+                <small>{entitlement.exportFormats.docx ? "Entitled, pending exporter" : "Coming soon"}</small>
               </div>
               <div className="settings-export-item disabled">
                 <span><RoleForgeIcon name="lock" size={14} />TXT</span>
-                <small>Coming soon</small>
+                <small>{entitlement.exportFormats.txt ? "Entitled, pending exporter" : "Coming soon"}</small>
               </div>
             </div>
           </section>
@@ -139,7 +156,7 @@ export default async function SettingsPage() {
               <p>No paid plan is active. Billing controls will appear only after pricing and Stripe entitlements are ready.</p>
             </div>
             <div className="settings-section-panel">
-              <span className="settings-status-pill muted">Premium not live</span>
+              <span className="settings-status-pill muted">{billingLabel}</span>
               <button className="primary-button settings-coming-soon" type="button" disabled>Coming soon</button>
             </div>
           </section>

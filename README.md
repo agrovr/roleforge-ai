@@ -83,6 +83,8 @@ The studio expects the backend to provide:
 
 The studio includes a visible account menu so the interface has a stable place for sign-in, saved projects, settings, and billing controls. Email magic-link sign-in and Google OAuth are wired through Supabase Auth. Completed runs can sync into account-backed saved projects when the user is signed in. Saved runs can restore the studio state when they include a snapshot, while billing, account settings, and premium entitlements remain disabled until the product rules and backend storage flows are complete.
 
+Pre-payment plan rules live in `docs/pre-payment-plan-rules.md`. The app now has an additive `account_entitlements` foundation so signed-in users can read their current plan state while client-side writes remain blocked.
+
 The Supabase-ready frontend foundation is in place:
 
 - `GET /api/auth/status` reports whether public Supabase environment variables are configured and whether a user session exists.

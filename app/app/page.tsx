@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import type { AccountEntitlement } from "../lib/entitlements";
 import { createRoleForgeBrowserClient } from "../lib/supabase/client";
 import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun } from "../lib/supabase/savedProjectClient";
 
@@ -101,6 +102,7 @@ type AccountStatus = {
   enabled: boolean;
   provider: "supabase";
   user: AccountUser | null;
+  entitlement?: AccountEntitlement;
   next: string;
 };
 type HistoryItem = {
@@ -1869,11 +1871,13 @@ export default function Page() {
       ? "warn"
       : "";
   const accountButtonLabel = signedIn ? accountInitials(accountUser) : "IN";
+  const accountPlanLabel = accountStatus?.entitlement?.plan === "premium" ? "Premium" : "Free";
   const accountItems = [
     {
       label: "Saved projects",
       detail: signedIn ? "Completed runs sync here and reopen in the studio." : "Sign in first, then completed runs can sync across browsers.",
     },
+    { label: "Plan", detail: signedIn ? `${accountPlanLabel} workspace. PDF export is available now.` : "Sign in to connect plan and saved project state." },
     { label: "Exports", detail: "PDF is live for the free workflow. DOCX and TXT stay locked until premium is real." },
     { label: "Billing", detail: "Premium plans still wait on Stripe products and entitlement checks." },
   ];
