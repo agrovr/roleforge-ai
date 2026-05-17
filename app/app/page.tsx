@@ -614,6 +614,7 @@ function PreviewEmptyDocument({
   uploadFormat,
   characterCount,
   hasSourceText,
+  sourcePreviewUnavailable,
   hasTarget,
   stage,
   restored,
@@ -623,6 +624,7 @@ function PreviewEmptyDocument({
   uploadFormat?: UploadFormat;
   characterCount?: number;
   hasSourceText: boolean;
+  sourcePreviewUnavailable: boolean;
   hasTarget: boolean;
   stage: Stage;
   restored: boolean;
@@ -648,6 +650,8 @@ function PreviewEmptyDocument({
             : "Upload a resume and add a job target, then run Tailor to preview the edited draft."
       : stage === "uploading"
         ? "The source document is being read now. The original preview will appear here when extraction finishes."
+        : sourcePreviewUnavailable
+          ? "The resume uploaded, but the original text preview was not returned. You can still run Tailor and review the generated draft after completion."
         : restored
           ? "This restored run did not save source preview text, so only the tailored draft can be reviewed."
           : "Upload a resume to show the source text extracted from the document.";
@@ -660,7 +664,7 @@ function PreviewEmptyDocument({
         ]
       : [
           { label: "Source file", value: filename ? "Selected" : "Waiting" },
-          { label: "Extraction", value: stage === "uploading" ? "Reading" : hasSourceText ? "Ready" : "Needed" },
+          { label: "Extraction", value: stage === "uploading" ? "Reading" : hasSourceText ? "Ready" : sourcePreviewUnavailable ? "Unavailable" : "Needed" },
           { label: "AI edits", value: "Not applied" },
         ];
 
@@ -676,7 +680,7 @@ function PreviewEmptyDocument({
         <p>{description}</p>
         <div className="rf-preview-empty-steps" aria-label={`${title} readiness`}>
           {steps.map((step) => (
-            <span className={/waiting|needed/i.test(step.value) ? "waiting" : ""} key={`${step.label}-${step.value}`}>
+            <span className={/waiting|needed|unavailable/i.test(step.value) ? "waiting" : ""} key={`${step.label}-${step.value}`}>
               <strong>{step.label}</strong>
               {step.value}
             </span>
@@ -801,6 +805,7 @@ function MiniResumeDocument({
   characterCount,
   changeLog,
   hasTarget,
+  sourcePreviewUnavailable,
   stage,
   restored,
 }: {
@@ -813,6 +818,7 @@ function MiniResumeDocument({
   characterCount?: number;
   changeLog?: string[];
   hasTarget: boolean;
+  sourcePreviewUnavailable: boolean;
   stage: Stage;
   restored: boolean;
 }) {
@@ -854,6 +860,7 @@ function MiniResumeDocument({
         uploadFormat={uploadFormat}
         characterCount={characterCount}
         hasSourceText={hasSourceText}
+        sourcePreviewUnavailable={sourcePreviewUnavailable}
         hasTarget={hasTarget}
         stage={stage}
         restored={restored}
@@ -1810,9 +1817,12 @@ export default function Page() {
   const tailoredLineCount = countReadableLines(result?.tailored_text);
   const hasSourcePreview = Boolean(sourcePreviewText.trim());
   const hasTailoredPreview = Boolean(result?.tailored_text?.trim());
+  const sourcePreviewUnavailable = Boolean((uploadMeta || file) && previewUploadState === "ready" && !hasSourcePreview);
   const previewTitle =
     previewMode === "original"
-      ? "Original resume · before tailoring"
+      ? sourcePreviewUnavailable
+        ? "Original resume · preview unavailable"
+        : "Original resume · before tailoring"
       : previewMode === "diff"
         ? "Change notes · before export"
         : hasTailoredPreview
@@ -1827,7 +1837,9 @@ export default function Page() {
               ? "Reading source document"
               : previewUploadState === "error"
                 ? "Source preview needs another try"
-                : "Upload a resume to see the original",
+                : sourcePreviewUnavailable
+                  ? "Source preview unavailable"
+                  : "Upload a resume to see the original",
           uploadMeta?.filename ?? file?.name ?? "No source file selected",
           restoredHistoryId ? "Restored run source" : "Before AI edits",
         ]
@@ -2173,6 +2185,7 @@ export default function Page() {
                     characterCount={uploadMeta?.character_count}
                     changeLog={result?.change_log}
                     hasTarget={hasTarget}
+                    sourcePreviewUnavailable={sourcePreviewUnavailable}
                     stage={stage}
                     restored={Boolean(restoredHistoryId)}
                   />
