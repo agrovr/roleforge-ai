@@ -154,29 +154,29 @@ function HowItWorks() {
 
 function StudioPreview() {
   const navItems = [
-    ["doc", "My Resumes", "7"],
-    ["briefcase", "Applications", "23"],
-    ["mail", "Cover Letters", "12"],
-    ["layers", "Templates", ""],
+    ["doc", "Resume", "Ready"],
+    ["target", "Job target", "Set"],
+    ["sparkle", "AI tailor", "Review"],
+    ["chart", "History", "Saved"],
   ] as const;
 
   const toolItems = [
-    ["scan", "Format check"],
-    ["chart", "Insights"],
+    ["scan", "ATS check"],
+    ["download", "Export"],
     ["settings", "Settings"],
   ] as const;
 
   const stats = [
-    ["Resumes", "7", "+2 this week"],
-    ["Avg fit score", "86", "↑ 11 pts"],
-    ["Applications", "23", "8 active"],
-    ["Interviews", "5", "2.4× rate"],
+    ["Resume", "Uploaded", "PDF, DOCX, or TXT"],
+    ["Target", "Added", "Paste text or URL"],
+    ["Review", "Generated", "Approve each change"],
+    ["Export", "PDF", "Free workflow"],
   ] as const;
 
   const tips = [
-    ["sparkle", "Quantify the impact", "Two bullets in your Lattice role lack a number. Try replacing \"led migration\" with the actual scope."],
-    ["check", "Add a missing keyword", "The Stripe posting mentions experimentation 4× — your resume mentions it once. Add to summary?"],
-    ["scan", "ATS · single-column", "Your two-column variant scores 11 points lower in ATS parsing. Keep the single-column version primary."],
+    ["sparkle", "Clarify the impact", "Review bullets that could use a stronger outcome, scope, or responsibility signal before export."],
+    ["check", "Check target terms", "Compare matched and missing terms against the role so edits stay relevant to the job."],
+    ["scan", "Keep parsing simple", "Review common layout risks before sending a draft through an application form."],
   ] as const;
 
   return (
@@ -187,7 +187,7 @@ function StudioPreview() {
             <div className="eyebrow">The studio</div>
             <h2 className="display h2">Everything you need.<br /><span className="italic">Nothing</span> you don&apos;t.</h2>
           </div>
-          <p className="lede">A focused workspace that shows your resume, the job, and generated suggestions side-by-side. Fit signals, gaps, and warnings stay in one calm panel.</p>
+          <p className="lede">A focused workspace that shows your resume, the job, and generated suggestions side-by-side. Fit signals, gaps, and export controls stay in one calm panel.</p>
         </div>
         <div className="dash-mock">
           <div className="dash-mock-head">
@@ -216,8 +216,8 @@ function StudioPreview() {
             <div className="dash-main">
               <div className="dash-main-head">
                 <div>
-                  <h3>My Resumes</h3>
-                  <p>Tailored to specific roles · sorted by recent</p>
+                  <h3>Resume studio</h3>
+                  <p>Current run · saved project ready</p>
                 </div>
                 <Link className="btn btn-brand btn-sm" href="/login?next=/app"><RoleForgeIcon name="plus" size={14} />New resume</Link>
               </div>
@@ -234,12 +234,12 @@ function StudioPreview() {
                 <div className="dash-resume-thumb"><ResumePreview highlight /></div>
                 <div className="dash-resume-info">
                   <div>
-                    <h4 className="dash-resume-title">Senior PM · Stripe</h4>
+                    <h4 className="dash-resume-title">Role-targeted resume draft</h4>
                     <div className="dash-resume-meta">
-                      <span>Updated 2h ago</span><span>·</span><span>Fit 86/100</span><span>·</span><span>ATS 94</span>
+                      <span>Sample preview</span><span>·</span><span>PDF export</span><span>·</span><span>Review before sending</span>
                     </div>
                     <div className="dash-progress">
-                      <div className="dash-progress-row"><span>Tailoring strength</span><span>86%</span></div>
+                      <div className="dash-progress-row"><span>Workflow status</span><span>Ready</span></div>
                       <div className="dash-progress-track"><span /></div>
                     </div>
                   </div>
@@ -255,8 +255,8 @@ function StudioPreview() {
             <aside className="dash-aside">
               <div>
                 <div className="eyebrow">AI guidance</div>
-                <h4>Three quick wins</h4>
-                <p>Tweaks the AI spotted across your active resumes.</p>
+                <h4>Review notes</h4>
+                <p>Generated suggestions stay tied to the resume and target in the active run.</p>
               </div>
               {tips.map(([icon, title, text]) => (
                 <div className="dash-aside-tip" key={title}>
@@ -362,7 +362,7 @@ function Features() {
         <div className="section-head">
           <div>
             <div className="eyebrow">Features</div>
-            <h2 className="display h2">More than a builder.<br /><span className="italic">An application coach.</span></h2>
+            <h2 className="display h2">More than a builder.<br /><span className="italic">A guided workspace.</span></h2>
           </div>
           <p className="lede">RoleForge compares the target role with your resume and shows practical next steps without rewriting your career.</p>
         </div>
