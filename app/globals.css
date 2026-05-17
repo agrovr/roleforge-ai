@@ -4243,6 +4243,43 @@ html[data-theme="dark"] input::file-selector-button {
   justify-content: center;
 }
 
+.studio-account-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0 2px;
+}
+
+.studio-account-shortcuts a,
+.studio-account-shortcuts button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-2) 82%, white);
+  color: var(--ink-0);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 950;
+  text-decoration: none;
+  transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.studio-account-shortcuts a:hover,
+.studio-account-shortcuts a:focus-visible,
+.studio-account-shortcuts button:hover,
+.studio-account-shortcuts button:focus-visible {
+  border-color: color-mix(in srgb, var(--brand) 40%, var(--line));
+  box-shadow: 0 14px 28px -24px var(--shadow);
+  outline: none;
+  transform: translateY(-1px);
+}
+
 .studio-account-list {
   display: grid;
   gap: 8px;
@@ -7273,9 +7310,24 @@ html[data-theme="dark"] .studio-account-popover-head span {
 }
 
 html[data-theme="dark"] .studio-account-popover-head button,
+html[data-theme="dark"] .studio-account-shortcuts a,
+html[data-theme="dark"] .studio-account-shortcuts button,
 html[data-theme="dark"] .studio-account-list div {
   background: rgba(255, 247, 233, 0.06);
   border-color: rgba(255, 247, 233, 0.16);
+}
+
+html[data-theme="dark"] .studio-account-shortcuts a,
+html[data-theme="dark"] .studio-account-shortcuts button {
+  color: var(--ink-0);
+}
+
+html[data-theme="dark"] .studio-account-shortcuts a:hover,
+html[data-theme="dark"] .studio-account-shortcuts a:focus-visible,
+html[data-theme="dark"] .studio-account-shortcuts button:hover,
+html[data-theme="dark"] .studio-account-shortcuts button:focus-visible {
+  border-color: rgba(231, 188, 111, 0.36);
+  background: rgba(231, 188, 111, 0.1);
 }
 
 html[data-theme="dark"] .studio-account-popover > p,

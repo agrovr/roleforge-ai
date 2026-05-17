@@ -1979,6 +1979,20 @@ export default function Page() {
                       <strong className="studio-account-email" title={accountUser?.email || "Signed in"}>{accountUser?.email || "Signed in"}</strong>
                       <p>Your session is active. Completed runs sync to saved projects.</p>
                       <small className={`studio-account-sync ${historySyncState}`}>{historySyncMessage}</small>
+                      <div className="studio-account-shortcuts">
+                        <Link href="/settings" onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="settings" size={14} /> Settings
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAccountPanelOpen(false);
+                            openHistoryPanel();
+                          }}
+                        >
+                          <RoleForgeIcon name="chart" size={14} /> History
+                        </button>
+                      </div>
                       <form className="studio-account-form" action="/auth/signout" method="post">
                         <input type="hidden" name="next" value="/app" />
                         <button className="ghost-button studio-account-submit" type="submit">
