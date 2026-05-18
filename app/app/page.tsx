@@ -144,6 +144,17 @@ type HistoryGroup = {
   bestScore: number;
 };
 type ApiErrorPayload = { error?: { code?: string; message?: string; request_id?: string; details?: unknown } };
+type ApiWorkflowError = Error & {
+  code?: string;
+  requestId?: string;
+  details?: Record<string, unknown> | null;
+};
+type WorkflowErrorState = {
+  message: string;
+  code?: string;
+  requestId?: string;
+  details?: Record<string, unknown> | null;
+};
 type StudioSuggestion = { label: string; meta: string; before?: string; after: string; tone?: "good" | "warn" | "neutral" };
 type ParsedResumeSection = { title: string; lines: string[] };
 type ParsedResume = { name: string; role: string; contact: string; sections: ParsedResumeSection[] };
@@ -1050,17 +1061,60 @@ function mergeHistory(localItems: HistoryItem[], savedItems: HistoryItem[]) {
     .slice(0, 12);
 }
 
-async function readApiError(response: Response, fallback: string): Promise<string> {
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
+}
+
+function createWorkflowError(message: string, code?: string, requestId?: string, details?: unknown): ApiWorkflowError {
+  const error = new Error(message) as ApiWorkflowError;
+  error.code = code;
+  error.requestId = requestId;
+  error.details = asRecord(details);
+  return error;
+}
+
+async function readApiError(response: Response, fallback: string): Promise<ApiWorkflowError> {
   try {
     const data = (await response.json()) as ApiErrorPayload;
     const message = data.error?.message;
     const code = data.error?.code;
     const requestId = data.error?.request_id;
-    if (message) return [message, code ? `Code: ${code}` : "", requestId ? `Request: ${requestId}` : ""].filter(Boolean).join(" ");
+    if (message) return createWorkflowError(message, code, requestId, data.error?.details);
   } catch {
     // Keep the interaction moving with the fallback below.
   }
-  return fallback;
+  return createWorkflowError(fallback);
+}
+
+function workflowErrorFromCaught(caught: unknown, fallback: string): WorkflowErrorState {
+  if (caught instanceof Error) {
+    const apiError = caught as ApiWorkflowError;
+    return {
+      message: apiError.message || fallback,
+      code: apiError.code,
+      requestId: apiError.requestId,
+      details: apiError.details ?? null,
+    };
+  }
+
+  return { message: fallback, details: null };
+}
+
+function numberDetail(details: Record<string, unknown> | null | undefined, key: string): number | null {
+  const value = details?.[key];
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function stringDetail(details: Record<string, unknown> | null | undefined, key: string): string {
+  const value = details?.[key];
+  return typeof value === "string" ? value : "";
+}
+
+function formatResetDate(value: string) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
 function formatDelta(value: number | undefined) {
@@ -1161,6 +1215,7 @@ export default function Page() {
   const [accountNotice, setAccountNotice] = useState("");
   const [copyState, setCopyState] = useState("");
   const [error, setError] = useState("");
+  const [workflowError, setWorkflowError] = useState<WorkflowErrorState | null>(null);
 
   const [resumeId, setResumeId] = useState<string | null>(null);
   const [uploadMeta, setUploadMeta] = useState<UploadResponse | null>(null);
@@ -1194,6 +1249,16 @@ export default function Page() {
   const accountReady = Boolean(accountStatus?.configured && accountStatus.enabled);
   const signedIn = Boolean(accountUser);
   const usageLimited = Boolean(accountStatus?.usage?.runLimited);
+  const limitError = workflowError?.code === "plan_limit_reached";
+  const limitReached = usageLimited || limitError;
+  const usage = accountStatus?.usage ?? null;
+  const errorLimit = numberDetail(workflowError?.details, "monthly_limit");
+  const errorRuns = numberDetail(workflowError?.details, "monthly_runs");
+  const monthlyRunLimit = usage?.monthlyRunLimit ?? errorLimit ?? 5;
+  const monthlyRuns = usage?.monthlyRuns ?? errorRuns ?? monthlyRunLimit;
+  const resetAt = usage?.currentPeriodEnd || stringDetail(workflowError?.details, "reset_at");
+  const resetLabel = formatResetDate(resetAt);
+  const usageLabel = typeof monthlyRunLimit === "number" ? `${monthlyRuns}/${monthlyRunLimit} runs used` : "Premium runs are unlimited";
 
   const workflowHeaders = useCallback(async (extra: Record<string, string> = {}) => {
     if (!supabaseClient) return extra;
@@ -1384,6 +1449,7 @@ export default function Page() {
     setSelectedExportFormat("pdf");
     setStage("idle");
     setError("");
+    setWorkflowError(null);
     setCopyState("");
     setPreviewMode("original");
     setRestoredHistoryId(null);
@@ -1406,7 +1472,7 @@ export default function Page() {
     workflowHeaders()
       .then((headers) => fetch(`${baseUrl}/upload`, { method: "POST", body: form, headers, signal: controller.signal }))
       .then(async (response) => {
-        if (!response.ok) throw new Error(await readApiError(response, "Could not read this resume yet."));
+        if (!response.ok) throw await readApiError(response, "Could not read this resume yet.");
         return (await response.json()) as UploadResponse;
       })
       .then((data) => {
@@ -1465,7 +1531,7 @@ export default function Page() {
   const hasTarget = Boolean(jdUrl.trim() || jdText.trim());
   const readyItems = [Boolean(baseUrl), Boolean(file), hasTarget];
   const readiness = Math.round((readyItems.filter(Boolean).length / readyItems.length) * 100);
-  const canRun = Boolean(baseUrl && file && hasTarget && !busy && previewUploadState !== "reading" && (!accountStatus?.configured || signedIn) && !usageLimited);
+  const canRun = Boolean(baseUrl && file && hasTarget && !busy && previewUploadState !== "reading" && (!accountStatus?.configured || signedIn) && !limitReached);
 
   const score = result?.score_summary?.fit_after ?? result?.fit_score_after?.score ?? result?.fit_score?.score ?? 0;
   const presentKeywords = result?.fit_score_after?.present ?? result?.fit_score?.present ?? [];
@@ -1488,7 +1554,7 @@ export default function Page() {
     form.append("file", file);
 
     const response = await fetch(`${baseUrl}/upload`, { method: "POST", body: form, headers: await workflowHeaders() });
-    if (!response.ok) throw new Error(await readApiError(response, "Upload failed"));
+    if (!response.ok) throw await readApiError(response, "Upload failed");
 
     const data = (await response.json()) as UploadResponse;
     setResumeId(data.resume_id);
@@ -1521,7 +1587,7 @@ export default function Page() {
       headers: await workflowHeaders({ "Content-Type": "application/json" }),
       body: JSON.stringify(payload),
     });
-    if (!response.ok) throw new Error(await readApiError(response, "Tailor failed"));
+    if (!response.ok) throw await readApiError(response, "Tailor failed");
 
     const data = (await response.json()) as TailorResult;
     setResult(data);
@@ -1541,7 +1607,7 @@ export default function Page() {
         format,
       }),
     });
-    if (!response.ok) throw new Error(await readApiError(response, "Export failed"));
+    if (!response.ok) throw await readApiError(response, "Export failed");
 
     const data = (await response.json()) as ExportResponse;
     const url = `${baseUrl}/download/${data.download_filename}`;
@@ -1671,6 +1737,7 @@ export default function Page() {
     setTailoringMode(snapshot.tailoringMode ?? entry.mode);
     setStage("ready");
     setError("");
+    setWorkflowError(null);
     setCopyState("");
     setAccountPanelOpen(false);
     setActiveTab("score");
@@ -1757,6 +1824,7 @@ export default function Page() {
 
     setBusy(true);
     setError("");
+    setWorkflowError(null);
     setResult(null);
     setDownloadUrl(null);
     setDownloadFormat("pdf");
@@ -1794,8 +1862,28 @@ export default function Page() {
       setPreviewMode("tailored");
       setRestoredHistoryId(null);
     } catch (caught) {
-      const message = caught instanceof Error ? caught.message : "Something went wrong";
-      setError(message);
+      const nextError = workflowErrorFromCaught(caught, "Something went wrong");
+      setWorkflowError(nextError);
+      setError(nextError.message);
+      if (nextError.code === "plan_limit_reached") {
+        const monthlyRuns = numberDetail(nextError.details, "monthly_runs");
+        const monthlyRunLimit = numberDetail(nextError.details, "monthly_limit");
+        const resetAt = stringDetail(nextError.details, "reset_at");
+        setCopyState("Free monthly limit reached");
+        setAccountStatus((current) => current?.usage
+          ? {
+              ...current,
+              usage: {
+                ...current.usage,
+                currentPeriodEnd: resetAt || current.usage.currentPeriodEnd,
+                monthlyRuns: monthlyRuns ?? current.usage.monthlyRuns,
+                monthlyRunLimit: monthlyRunLimit ?? current.usage.monthlyRunLimit,
+                runLimited: true,
+                remainingRuns: 0,
+              },
+            }
+          : current);
+      }
       setStage("error");
     } finally {
       setBusy(false);
@@ -1807,14 +1895,16 @@ export default function Page() {
 
     setBusy(true);
     setError("");
+    setWorkflowError(null);
     setStage("exporting");
 
     try {
       await exportResume(result.tailored_text, selectedExportFormat);
       setStage("ready");
     } catch (caught) {
-      const message = caught instanceof Error ? caught.message : "Export failed";
-      setError(message);
+      const nextError = workflowErrorFromCaught(caught, "Export failed");
+      setWorkflowError(nextError);
+      setError(nextError.message);
       setStage("error");
     } finally {
       setBusy(false);
@@ -1862,7 +1952,7 @@ export default function Page() {
   const keywordDetail = keywordTotal ? `${missingKeywords.length} missing` : "Target terms pending";
   const runLabel = accountStatus?.configured && !signedIn
     ? "Sign in to run"
-    : usageLimited
+    : limitReached
       ? "Monthly limit reached"
       : busy
         ? "Tailoring..."
@@ -2160,9 +2250,9 @@ export default function Page() {
             <button className={`rail-item ${activeTab === "history" ? "active" : ""}`} type="button" aria-pressed={activeTab === "history"} onClick={openHistoryPanel}><RoleForgeIcon name="chart" size={15} /> History</button>
             <Link className="rail-item" href="/settings"><RoleForgeIcon name="settings" size={15} /> Settings</Link>
             <div className="rf-rail-upgrade">
-              <strong><RoleForgeIcon name="sparkle" size={14} /> Premium coming soon</strong>
-              <p>Template controls, billing, and premium exports are coming soon.</p>
-              <button className="primary-button" type="button" disabled>Coming soon</button>
+              <strong><RoleForgeIcon name="sparkle" size={14} /> Premium workspace</strong>
+              <p>Unlimited tailoring runs with premium exports when your plan is active.</p>
+              <Link className="primary-button" href="/settings#billing">View plans</Link>
             </div>
           </aside>
 
@@ -2494,10 +2584,27 @@ export default function Page() {
                     </div>
                   </div>
                 </article>
-                {error ? (
+                {limitReached ? (
+                  <div className="rf-callout upgrade">
+                    <strong>Free monthly limit reached</strong>
+                    <p>
+                      Your free plan includes {typeof monthlyRunLimit === "number" ? monthlyRunLimit : 5} completed tailoring runs each month.
+                      Upgrade to keep tailoring today.
+                    </p>
+                    <div className="rf-callout-meta">
+                      <span>{usageLabel}</span>
+                      {resetLabel ? <span>Resets {resetLabel}</span> : null}
+                    </div>
+                    <div className="rf-callout-actions">
+                      <Link className="primary-button" href="/settings#billing">Upgrade plan <RoleForgeIcon name="sparkle" size={14} /></Link>
+                      <Link className="ghost-button" href="/settings#usage">View usage</Link>
+                    </div>
+                  </div>
+                ) : error ? (
                   <div className="rf-callout danger">
                     <strong>Workflow stopped</strong>
                     <p>{error}</p>
+                    {workflowError?.requestId ? <p className="rf-callout-meta">Request {workflowError.requestId}</p> : null}
                   </div>
                 ) : null}
               </div>

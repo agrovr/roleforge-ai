@@ -4388,7 +4388,7 @@ html[data-theme="dark"] input::file-selector-button {
   justify-content: center;
   padding: 8px 12px;
   font-size: 0.82rem;
-  opacity: 0.72;
+  opacity: 1;
 }
 
 .rf-studio-main {
@@ -5199,6 +5199,40 @@ html[data-theme="dark"] input::file-selector-button {
 .rf-callout p {
   margin: 8px 0 0;
   color: var(--ink-2);
+}
+
+.rf-callout.upgrade {
+  border-color: color-mix(in srgb, var(--brand) 34%, var(--line));
+  background:
+    radial-gradient(circle at 8% 20%, rgba(226, 165, 81, 0.18), transparent 10rem),
+    color-mix(in srgb, var(--brand) 8%, var(--surface));
+}
+
+.rf-callout.upgrade strong {
+  color: var(--ink-0);
+}
+
+.rf-callout-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 10px;
+  color: var(--ink-2);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.rf-callout-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.rf-callout-actions .primary-button,
+.rf-callout-actions .ghost-button {
+  min-height: 40px;
+  padding: 8px 14px;
 }
 
 .rf-file-drop {
