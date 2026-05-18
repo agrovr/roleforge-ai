@@ -1332,13 +1332,26 @@ export default function Page() {
     void refreshSavedRuns();
   }, [refreshSavedRuns]);
 
-  function openHistoryPanel() {
+  const openHistoryPanel = useCallback(() => {
     setActiveTab("history");
     setAccountPanelOpen(false);
     window.setTimeout(() => {
       historySectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 0);
-  }
+  }, []);
+
+  useEffect(() => {
+    function openHashTarget() {
+      if (window.location.hash === "#history") {
+        openHistoryPanel();
+      }
+    }
+
+    openHashTarget();
+    window.addEventListener("hashchange", openHashTarget);
+
+    return () => window.removeEventListener("hashchange", openHashTarget);
+  }, [openHistoryPanel]);
 
   function openHistoryDetails(entry: HistoryItem) {
     setSelectedHistoryId(entry.id);
@@ -2107,7 +2120,11 @@ export default function Page() {
       : "";
   };
   const accountButtonLabel = signedIn ? accountInitials(accountUser) : "IN";
-  const accountPremiumEnding = Boolean(accountStatus?.entitlement?.plan === "premium" && accountStatus.entitlement.cancelAtPeriodEnd);
+  const accountPremiumActive = Boolean(
+    accountStatus?.entitlement?.plan === "premium" &&
+      ["active", "trialing"].includes(accountStatus.entitlement.billingStatus),
+  );
+  const accountPremiumEnding = Boolean(accountPremiumActive && accountStatus?.entitlement?.cancelAtPeriodEnd);
   const accountPremiumEndLabel = formatResetDate(accountStatus?.entitlement?.cancelAt || accountStatus?.entitlement?.currentPeriodEnd || "");
   const accountItems = [
     {
@@ -2125,9 +2142,9 @@ export default function Page() {
     {
       label: "Plan",
       detail: signedIn
-        ? accountPremiumEnding && accountPremiumEndLabel
-          ? `Premium access ends ${accountPremiumEndLabel}. PDF, DOCX, and TXT remain available until then.`
-          : accountStatus?.entitlement?.plan === "premium"
+          ? accountPremiumEnding && accountPremiumEndLabel
+            ? `Premium access ends ${accountPremiumEndLabel}. PDF, DOCX, and TXT remain available until then.`
+          : accountPremiumActive
             ? "Premium workspace. PDF, DOCX, and TXT exports are available."
             : "Free workspace. PDF export is available now."
         : "Sign in to connect plan and saved project state.",

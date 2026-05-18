@@ -4751,7 +4751,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-metric-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 8px;
 }
 
@@ -5140,7 +5140,7 @@ html[data-theme="dark"] input::file-selector-button {
   margin: 4px 0 6px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(2.4rem, 5vw, 4.8rem);
+  font-size: 4.2rem;
   line-height: 0.92;
 }
 
@@ -5242,7 +5242,7 @@ html[data-theme="dark"] input::file-selector-button {
   display: inline-block;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3rem);
+  font-size: 2.7rem;
   line-height: 0.9;
 }
 
@@ -5267,7 +5267,7 @@ html[data-theme="dark"] input::file-selector-button {
   display: inline-block;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-size: 2.8rem;
   line-height: 0.95;
 }
 
@@ -5296,6 +5296,16 @@ html[data-theme="dark"] input::file-selector-button {
   background: linear-gradient(90deg, var(--good), var(--brand));
 }
 
+.settings-usage-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 14px;
+  color: var(--ink-3);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
 .settings-price-card form,
 .settings-price-card button {
   width: 100%;
@@ -5318,7 +5328,7 @@ html[data-theme="dark"] input::file-selector-button {
   display: block;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-size: 2.3rem;
   line-height: 0.96;
 }
 

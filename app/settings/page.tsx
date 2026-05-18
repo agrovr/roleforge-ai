@@ -58,13 +58,14 @@ export default async function SettingsPage() {
   const billingConfig = getStripeBillingConfig();
   const billingReady = billingConfig.checkoutConfigured && Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
   const premiumActive = entitlement.plan === "premium" && ["active", "trialing"].includes(entitlement.billingStatus);
-  const planLabel = entitlement.plan === "premium" ? "Premium" : "Free";
+  const planLabel = premiumActive ? "Premium" : "Free";
   const billingLabel =
     entitlement.billingStatus === "none"
       ? "No billing active"
       : entitlement.billingStatus.replace(/_/g, " ");
   const premiumEnding = premiumActive && entitlement.cancelAtPeriodEnd;
   const premiumEndLabel = formatPlanDate(entitlement.cancelAt || entitlement.currentPeriodEnd);
+  const usageResetLabel = formatPlanDate(usage.currentPeriodEnd);
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName =
     typeof user.user_metadata?.name === "string"
@@ -141,6 +142,10 @@ export default async function SettingsPage() {
                   <strong>{billingLabel}</strong>
                   <span>Billing state</span>
                 </div>
+                <div className="settings-metric">
+                  <strong>{usage.monthlyRunLimit === null ? "Unlimited" : usage.remainingRuns}</strong>
+                  <span>{usage.monthlyRunLimit === null ? "Runs available" : "Runs left"}</span>
+                </div>
               </div>
               <form action="/auth/signout" method="post">
                 <input type="hidden" name="next" value="/login?account=signed-out" />
@@ -192,6 +197,10 @@ export default async function SettingsPage() {
                     <span style={{ width: `${Math.min(100, (usage.monthlyRuns / usage.monthlyRunLimit) * 100)}%` }} />
                   </div>
                 )}
+                <div className="settings-usage-meta">
+                  <span>{usage.monthlyRunLimit === null ? "No monthly cap" : `${usage.remainingRuns} runs left`}</span>
+                  <span>{usageResetLabel ? `Resets ${usageResetLabel}` : "Resets monthly"}</span>
+                </div>
               </div>
               <p className="settings-billing-note">
                 {usage.monthlyRunLimit === null
@@ -286,7 +295,7 @@ export default async function SettingsPage() {
                     : "Use Manage billing for subscription changes and invoices."
                   : billingReady
                   ? "Checkout opens in Stripe. Premium access updates after Stripe confirms the subscription."
-                  : "Checkout is disabled until the Stripe and Supabase service environment variables are configured."}
+                  : "Premium checkout is not open yet."}
               </p>
             </div>
           </section>
