@@ -7,6 +7,7 @@ import { ThemeToggle } from "../components/ThemeToggle";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
+import { loadAccountUsage } from "../lib/usage";
 
 type CountResult = { count: number | null; error: unknown };
 
@@ -38,6 +39,7 @@ export default async function SettingsPage() {
     countRows(supabase, "tailor_runs"),
   ]);
   const entitlement = await loadAccountEntitlement(supabase, user.id);
+  const usage = await loadAccountUsage(supabase, entitlement);
   const billingConfig = getStripeBillingConfig();
   const billingReady = billingConfig.checkoutConfigured && Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
   const premiumActive = entitlement.plan === "premium" && ["active", "trialing"].includes(entitlement.billingStatus);
@@ -67,6 +69,7 @@ export default async function SettingsPage() {
         <aside className="settings-page-nav" aria-label="Settings sections">
           <a className="active" href="#account"><RoleForgeIcon name="settings" size={15} /> Account</a>
           <a href="#projects"><RoleForgeIcon name="chart" size={15} /> Saved projects</a>
+          <a href="#usage"><RoleForgeIcon name="sparkle" size={15} /> Usage</a>
           <a href="#exports"><RoleForgeIcon name="download" size={15} /> Exports</a>
           <a href="#billing"><RoleForgeIcon name="lock" size={15} /> Billing</a>
         </aside>
@@ -133,6 +136,38 @@ export default async function SettingsPage() {
             </div>
           </section>
 
+          <section className="settings-section" id="usage">
+            <div className="settings-section-copy">
+              <h2>Usage</h2>
+              <p>Completed tailoring runs count against the current monthly plan period.</p>
+            </div>
+            <div className="settings-section-panel">
+              <div className="settings-usage-card">
+                <div>
+                  <span className="settings-price-kicker">This month</span>
+                  <strong>
+                    {usage.monthlyRunLimit === null
+                      ? `${usage.monthlyRuns}`
+                      : `${usage.monthlyRuns}/${usage.monthlyRunLimit}`}
+                  </strong>
+                  <small>{usage.monthlyRunLimit === null ? "unlimited premium runs" : `${usage.remainingRuns} remaining`}</small>
+                </div>
+                {usage.monthlyRunLimit === null ? (
+                  <div className="settings-usage-track unlimited"><span style={{ width: "100%" }} /></div>
+                ) : (
+                  <div className="settings-usage-track">
+                    <span style={{ width: `${Math.min(100, (usage.monthlyRuns / usage.monthlyRunLimit) * 100)}%` }} />
+                  </div>
+                )}
+              </div>
+              <p className="settings-billing-note">
+                {usage.monthlyRunLimit === null
+                  ? "Premium has no monthly run cap. Fair-use protections still apply to keep the service stable."
+                  : "Free includes 5 completed tailoring runs each month. Upgrade when you need more room."}
+              </p>
+            </div>
+          </section>
+
           <section className="settings-section" id="exports">
             <div className="settings-section-copy">
               <h2>Exports</h2>
@@ -143,11 +178,11 @@ export default async function SettingsPage() {
                 <span><RoleForgeIcon name="check" size={14} />PDF</span>
                 <small>{entitlement.exportFormats.pdf ? "Included" : "Unavailable"}</small>
               </div>
-              <div className="settings-export-item disabled">
+              <div className={`settings-export-item ${entitlement.exportFormats.docx ? "enabled" : "disabled"}`}>
                 <span><RoleForgeIcon name="lock" size={14} />DOCX</span>
                 <small>{entitlement.exportFormats.docx ? "Premium entitlement active" : "Premium"}</small>
               </div>
-              <div className="settings-export-item disabled">
+              <div className={`settings-export-item ${entitlement.exportFormats.txt ? "enabled" : "disabled"}`}>
                 <span><RoleForgeIcon name="lock" size={14} />TXT</span>
                 <small>{entitlement.exportFormats.txt ? "Premium entitlement active" : "Premium"}</small>
               </div>

@@ -97,12 +97,21 @@ type SavedRunSnapshot = {
   downloadFormat?: ExportFormat;
 };
 type AccountUser = { id: string; email?: string; name?: string };
+type AccountUsage = {
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  monthlyRuns: number;
+  monthlyRunLimit: number | null;
+  remainingRuns: number | null;
+  runLimited: boolean;
+};
 type AccountStatus = {
   configured: boolean;
   enabled: boolean;
   provider: "supabase";
   user: AccountUser | null;
   entitlement?: AccountEntitlement;
+  usage?: AccountUsage | null;
   next: string;
 };
 type HistoryItem = {
@@ -1184,6 +1193,7 @@ export default function Page() {
   const accountUser = accountStatus?.user ?? null;
   const accountReady = Boolean(accountStatus?.configured && accountStatus.enabled);
   const signedIn = Boolean(accountUser);
+  const usageLimited = Boolean(accountStatus?.usage?.runLimited);
 
   const workflowHeaders = useCallback(async (extra: Record<string, string> = {}) => {
     if (!supabaseClient) return extra;
@@ -1368,11 +1378,11 @@ export default function Page() {
     setPreviewUploadState(baseUrl ? "reading" : "idle");
     setPreviewUploadError("");
     setSourcePreviewText("");
-      setResult(null);
-      setDownloadUrl(null);
-      setDownloadFormat("pdf");
-      setSelectedExportFormat("pdf");
-      setStage("idle");
+    setResult(null);
+    setDownloadUrl(null);
+    setDownloadFormat("pdf");
+    setSelectedExportFormat("pdf");
+    setStage("idle");
     setError("");
     setCopyState("");
     setPreviewMode("original");
@@ -1455,7 +1465,7 @@ export default function Page() {
   const hasTarget = Boolean(jdUrl.trim() || jdText.trim());
   const readyItems = [Boolean(baseUrl), Boolean(file), hasTarget];
   const readiness = Math.round((readyItems.filter(Boolean).length / readyItems.length) * 100);
-  const canRun = Boolean(baseUrl && file && hasTarget && !busy && previewUploadState !== "reading" && (!accountStatus?.configured || signedIn));
+  const canRun = Boolean(baseUrl && file && hasTarget && !busy && previewUploadState !== "reading" && (!accountStatus?.configured || signedIn) && !usageLimited);
 
   const score = result?.score_summary?.fit_after ?? result?.fit_score_after?.score ?? result?.fit_score?.score ?? 0;
   const presentKeywords = result?.fit_score_after?.present ?? result?.fit_score?.present ?? [];
@@ -1591,6 +1601,25 @@ export default function Page() {
       });
       setHistorySyncState("synced");
       setHistorySyncMessage("Saved to your account and ready to restore");
+      setAccountStatus((current) => {
+        if (!current?.usage) return current;
+
+        const monthlyRuns = current.usage.monthlyRuns + 1;
+        const remainingRuns =
+          typeof current.usage.monthlyRunLimit === "number"
+            ? Math.max(0, current.usage.monthlyRunLimit - monthlyRuns)
+            : null;
+
+        return {
+          ...current,
+          usage: {
+            ...current.usage,
+            monthlyRuns,
+            remainingRuns,
+            runLimited: typeof current.usage.monthlyRunLimit === "number" && monthlyRuns >= current.usage.monthlyRunLimit,
+          },
+        };
+      });
     } catch {
       setHistorySyncState("error");
       setHistorySyncMessage("Could not sync this run. It is still saved locally.");
@@ -1831,7 +1860,17 @@ export default function Page() {
   const scoreDetail = result?.score_summary?.fit_delta ? `${formatDelta(result.score_summary.fit_delta)} from baseline` : result ? "Run complete" : "Run needed";
   const atsDetail = result?.score_summary?.issues_resolved ? `${result.score_summary.issues_resolved} issues fixed` : result ? "Parser notes returned" : "Waiting for run";
   const keywordDetail = keywordTotal ? `${missingKeywords.length} missing` : "Target terms pending";
-  const runLabel = accountStatus?.configured && !signedIn ? "Sign in to run" : busy ? "Tailoring..." : previewUploadState === "reading" ? "Reading resume..." : result ? "Re-tailor" : "Run Tailor";
+  const runLabel = accountStatus?.configured && !signedIn
+    ? "Sign in to run"
+    : usageLimited
+      ? "Monthly limit reached"
+      : busy
+        ? "Tailoring..."
+        : previewUploadState === "reading"
+          ? "Reading resume..."
+          : result
+            ? "Re-tailor"
+            : "Run Tailor";
   const downloadReady = Boolean(downloadUrl && downloadState === "ready");
   const uploadFormats = capabilities?.upload_formats?.length ? capabilities.upload_formats : DEFAULT_UPLOAD_FORMATS;
   const exportFormats = customerExportFormats(capabilities?.export_formats, accountStatus?.entitlement);
@@ -1916,9 +1955,22 @@ export default function Page() {
       label: "Saved projects",
       detail: signedIn ? "Completed runs sync here and reopen in the studio." : "Sign in first, then completed runs can sync across browsers.",
     },
+    {
+      label: "Usage",
+      detail: accountStatus?.usage
+        ? accountStatus.usage.monthlyRunLimit === null
+          ? `${accountStatus.usage.monthlyRuns} runs this month. Premium is unlimited.`
+          : `${accountStatus.usage.monthlyRuns}/${accountStatus.usage.monthlyRunLimit} free runs used this month.`
+        : "Usage appears after sign-in.",
+    },
     { label: "Plan", detail: signedIn ? `${accountPlanLabel} workspace. PDF export is available now.` : "Sign in to connect plan and saved project state." },
-    { label: "Exports", detail: "PDF is live for the free workflow. DOCX and TXT stay locked until premium is real." },
-    { label: "Billing", detail: "Premium plans still wait on Stripe products and entitlement checks." },
+    {
+      label: "Exports",
+      detail: accountStatus?.entitlement?.exportFormats.docx
+        ? "PDF, DOCX, and TXT exports are available for this account."
+        : "PDF is live for the free workflow. DOCX and TXT unlock with premium.",
+    },
+    { label: "Billing", detail: "Stripe checkout and billing management are connected for plan changes." },
   ];
   const localHistoryCount = history.filter((entry) => !isAccountHistoryItem(entry, syncedHistoryIds)).length;
   const savedProjectCount = history.filter((entry) => isAccountHistoryItem(entry, syncedHistoryIds)).length;

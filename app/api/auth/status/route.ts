@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { FREE_ENTITLEMENT, loadAccountEntitlement } from "@/app/lib/entitlements";
 import { getSupabaseConfig } from "@/app/lib/supabase/config";
 import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
+import { loadAccountUsage } from "@/app/lib/usage";
 
 export async function GET() {
   const config = getSupabaseConfig();
@@ -30,6 +31,7 @@ export async function GET() {
       }
     : null;
   const entitlement = user && supabase ? await loadAccountEntitlement(supabase, user.id) : FREE_ENTITLEMENT;
+  const usage = user && supabase ? await loadAccountUsage(supabase, entitlement) : null;
 
   return NextResponse.json({
     configured: true,
@@ -37,6 +39,7 @@ export async function GET() {
     provider: "supabase",
     user,
     entitlement,
+    usage,
     next: user
       ? "Saved projects sync to your account when a completed run is available."
       : "Use email or Google sign-in to sync completed runs to saved projects.",

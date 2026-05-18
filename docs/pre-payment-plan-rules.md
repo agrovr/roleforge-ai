@@ -7,6 +7,7 @@ These rules keep the app honest as Stripe billing is connected.
 - Account required for studio access.
 - Resume upload, job target input, AI tailoring, review tabs, saved project sync, restore, and PDF export stay available.
 - Saved projects are tied to the signed-in Supabase account.
+- Free includes 5 completed tailoring runs per calendar month.
 
 ## Premium
 
@@ -16,6 +17,7 @@ These rules keep the app honest as Stripe billing is connected.
   - Monthly: `price_1TXwpIRpyJeACd6qTXDo2gyr`
   - Yearly: `price_1TXwpJRpyJeACd6qp7hWyWIJ`
 - DOCX and TXT exports remain locked unless Stripe confirms a subscription and the entitlement row is premium active/trialing.
+- Premium has no monthly tailoring run cap at launch.
 - Premium templates and higher limits remain disabled until their product rules and implementation are real.
 - The UI may show the current plan state, but must not claim an active paid subscription unless `account_entitlements.plan = 'premium'` and billing state is active/trialing.
 
@@ -25,6 +27,7 @@ These rules keep the app honest as Stripe billing is connected.
 - Authenticated users can read only their own entitlement row.
 - Users cannot insert or update entitlement rows from the client.
 - Stripe webhook handlers update this table with server-side credentials only.
+- Entitlement `features.monthly_run_limit` is `5` for free accounts and `null` for active/trialing premium accounts.
 
 ## Billing environment
 

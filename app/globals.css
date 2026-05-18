@@ -5067,6 +5067,50 @@ html[data-theme="dark"] input::file-selector-button {
   font-weight: 850;
 }
 
+.settings-usage-card {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.34)),
+    var(--surface);
+}
+
+.settings-usage-card strong {
+  display: inline-block;
+  color: var(--ink-0);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 0.95;
+}
+
+.settings-usage-card small {
+  margin-left: 8px;
+  color: var(--ink-2);
+  font-weight: 900;
+}
+
+.settings-usage-track {
+  height: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink-0) 8%, transparent);
+}
+
+.settings-usage-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand), var(--brand-2));
+}
+
+.settings-usage-track.unlimited span {
+  background: linear-gradient(90deg, var(--good), var(--brand));
+}
+
 .settings-price-card form,
 .settings-price-card button {
   width: 100%;
@@ -7504,6 +7548,26 @@ html[data-theme="dark"] .settings-section {
 html[data-theme="dark"] .settings-price-card {
   background: rgba(255, 247, 233, 0.055);
   border-color: rgba(255, 247, 233, 0.16);
+}
+
+html[data-theme="dark"] .settings-usage-card {
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.06), rgba(255, 247, 233, 0.025)),
+    rgba(15, 20, 35, 0.82);
+  border-color: rgba(255, 247, 233, 0.16);
+}
+
+html[data-theme="dark"] .settings-usage-card strong {
+  color: var(--ink-0);
+}
+
+html[data-theme="dark"] .settings-usage-card small {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .settings-usage-track {
+  background: rgba(255, 247, 233, 0.08);
+  border-color: rgba(255, 247, 233, 0.14);
 }
 
 html[data-theme="dark"] .settings-price-card.featured {

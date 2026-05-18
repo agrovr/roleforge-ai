@@ -15,13 +15,10 @@ This price intentionally undercuts mature resume/job-search products while RoleF
 Configured in Vercel production:
 
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `STRIPE_PREMIUM_MONTHLY_PRICE_ID`
-- `STRIPE_PREMIUM_YEARLY_PRICE_ID`
-
-Still required before checkout can run:
-
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_PREMIUM_MONTHLY_PRICE_ID`
+- `STRIPE_PREMIUM_YEARLY_PRICE_ID`
 
 ## Stripe webhook endpoint
 
@@ -46,5 +43,6 @@ After creating the endpoint, add its signing secret to Vercel as `STRIPE_WEBHOOK
 - Checkout is only available to signed-in users.
 - Checkout creates or reuses a Stripe customer and records the customer ID in `account_entitlements`.
 - Premium is only granted by Stripe webhook events.
-- Active or trialing subscriptions set `plan = 'premium'` and unlock premium export entitlements.
+- Active or trialing subscriptions set `plan = 'premium'`, unlock premium export entitlements, and set `monthly_run_limit = null`.
 - Canceled, incomplete, past-due, or missing subscriptions fall back to free entitlements.
+- Free entitlement keeps PDF export available and sets `monthly_run_limit = 5`.

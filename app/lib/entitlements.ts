@@ -12,6 +12,7 @@ export type AccountEntitlement = {
     txt: boolean;
   };
   projectStorage: boolean;
+  monthlyRunLimit: number | null;
   currentPeriodEnd: string | null;
 };
 
@@ -31,12 +32,18 @@ export const FREE_ENTITLEMENT: AccountEntitlement = {
     txt: false,
   },
   projectStorage: true,
+  monthlyRunLimit: 5,
   currentPeriodEnd: null,
 };
 
 function booleanFeature(features: Record<string, unknown> | null, key: string, fallback: boolean) {
   const value = features?.[key];
   return typeof value === "boolean" ? value : fallback;
+}
+
+function numberFeature(features: Record<string, unknown> | null, key: string, fallback: number | null) {
+  const value = features?.[key];
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }
 
 export function entitlementFromRow(row?: EntitlementRow | null): AccountEntitlement {
@@ -55,6 +62,7 @@ export function entitlementFromRow(row?: EntitlementRow | null): AccountEntitlem
       txt: booleanFeature(features, "export_txt", premiumActive),
     },
     projectStorage: booleanFeature(features, "project_storage", true),
+    monthlyRunLimit: numberFeature(features, "monthly_run_limit", premiumActive ? null : FREE_ENTITLEMENT.monthlyRunLimit),
     currentPeriodEnd: row.current_period_end,
   };
 }

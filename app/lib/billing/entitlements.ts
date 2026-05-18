@@ -18,6 +18,7 @@ const PREMIUM_FEATURES = {
   export_docx: true,
   export_txt: true,
   project_storage: true,
+  monthly_run_limit: null,
 };
 
 const FREE_FEATURES = {
@@ -25,6 +26,7 @@ const FREE_FEATURES = {
   export_docx: false,
   export_txt: false,
   project_storage: true,
+  monthly_run_limit: 5,
 };
 
 function normalizeBillingStatus(status?: Stripe.Subscription.Status | null): BillingStatus {
