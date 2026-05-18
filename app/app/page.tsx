@@ -6,6 +6,12 @@ import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import type { AccountEntitlement } from "../lib/entitlements";
+import {
+  customerExportFormats,
+  exportFormatAllowed,
+  type ExportCapability,
+  type ExportFormat,
+} from "../lib/exportFormats";
 import { createRoleForgeBrowserClient } from "../lib/supabase/client";
 import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun } from "../lib/supabase/savedProjectClient";
 
@@ -65,9 +71,7 @@ type TailorResult = {
 };
 
 type UploadFormat = "docx" | "pdf" | "txt";
-type ExportFormat = "pdf" | "docx" | "txt";
 type UploadCapability = { format: UploadFormat; label: string; enabled: boolean };
-type ExportCapability = { format: ExportFormat; label: string; enabled: boolean; plan?: "free" | "premium"; reason?: string };
 type CapabilitiesResponse = { upload_formats?: UploadCapability[]; export_formats?: ExportCapability[] };
 type UploadResponse = {
   resume_id: string;
@@ -169,27 +173,6 @@ const DEFAULT_UPLOAD_FORMATS: UploadCapability[] = [
   { format: "pdf", label: "PDF", enabled: true },
   { format: "txt", label: "TXT", enabled: true },
 ];
-const DEFAULT_EXPORT_FORMATS: ExportCapability[] = [
-  { format: "pdf", label: "PDF", enabled: true, plan: "free" },
-  { format: "docx", label: "DOCX", enabled: false, plan: "premium", reason: "Premium coming soon" },
-  { format: "txt", label: "TXT", enabled: false, plan: "premium", reason: "Premium coming soon" },
-];
-
-function customerExportFormats(formats?: ExportCapability[], entitlement?: AccountEntitlement) {
-  const pdfCapability = formats?.find((format) => format.format === "pdf");
-  const premiumFormats: ExportFormat[] = ["docx", "txt"];
-  return DEFAULT_EXPORT_FORMATS.map((format) =>
-    format.format === "pdf"
-      ? { ...format, enabled: pdfCapability?.enabled ?? format.enabled, reason: pdfCapability?.reason }
-      : {
-          ...format,
-          enabled: premiumFormats.includes(format.format) && Boolean(entitlement?.exportFormats[format.format]),
-          plan: "premium" as const,
-          reason: entitlement?.plan === "premium" ? "Included" : "Premium",
-        },
-  );
-}
-
 function Pill({ text, kind }: { text: string; kind: "good" | "bad" }) {
   return <span className={`pill ${kind}`}>{text}</span>;
 }
@@ -1504,6 +1487,12 @@ export default function Page() {
       return;
     }
 
+    if (!exportFormatAllowed(downloadFormat, accountStatus?.entitlement)) {
+      setDownloadState("expired");
+      setDownloadMessage(`${downloadFormat.toUpperCase()} export requires Premium. Switch to PDF or upgrade to download this format.`);
+      return;
+    }
+
     const controller = new AbortController();
     setDownloadState("checking");
     setDownloadMessage(`Checking ${downloadFormat.toUpperCase()} download...`);
@@ -1529,7 +1518,7 @@ export default function Page() {
       });
 
     return () => controller.abort();
-  }, [downloadFormat, downloadUrl]);
+  }, [accountStatus?.entitlement, downloadFormat, downloadUrl]);
 
   const hasTarget = Boolean(jdUrl.trim() || jdText.trim());
   const readyItems = [Boolean(baseUrl), Boolean(file), hasTarget];
@@ -2013,7 +2002,9 @@ export default function Page() {
   const uploadFormats = capabilities?.upload_formats?.length ? capabilities.upload_formats : DEFAULT_UPLOAD_FORMATS;
   const exportFormats = customerExportFormats(capabilities?.export_formats, accountStatus?.entitlement);
   const selectedExportCapability = exportFormats.find((format) => format.format === selectedExportFormat) ?? exportFormats[0];
-  const selectedDownloadReady = Boolean(downloadReady && downloadUrl && downloadFormat === selectedExportFormat);
+  const selectedExportAllowed = Boolean(selectedExportCapability?.enabled);
+  const currentDownloadAllowed = exportFormatAllowed(downloadFormat, accountStatus?.entitlement);
+  const selectedDownloadReady = Boolean(downloadReady && downloadUrl && downloadFormat === selectedExportFormat && currentDownloadAllowed);
   const selectedFormatLabel = selectedExportFormat.toUpperCase();
   const premiumExportFormat = stringDetail(workflowError?.details, "format")?.toUpperCase() ?? selectedFormatLabel;
   const premiumExportRequested = exportNotice ?? (workflowError?.code === "premium_required" ? { format: selectedExportFormat, label: premiumExportFormat } : null);
@@ -2038,6 +2029,13 @@ export default function Page() {
   const hasSourcePreview = Boolean(sourcePreviewText.trim());
   const hasTailoredPreview = Boolean(result?.tailored_text?.trim());
   const sourcePreviewUnavailable = Boolean((uploadMeta || file) && previewUploadState === "ready" && !hasSourcePreview);
+
+  useEffect(() => {
+    if (selectedExportFormat !== "pdf" && !selectedExportAllowed) {
+      setSelectedExportFormat("pdf");
+      setExportNotice(null);
+    }
+  }, [selectedExportAllowed, selectedExportFormat]);
   const previewTitle =
     previewMode === "original"
       ? sourcePreviewUnavailable
@@ -2167,6 +2165,8 @@ export default function Page() {
         : signedIn
           ? "Complete a tailor run and it will save here with resume preview, target details, scores, and a one-click studio restore."
           : "Complete a tailor run and it will stay in this browser with the preview, target, scores, and download ready to reopen.";
+  const canDownloadHistoryItem = (entry: HistoryItem) =>
+    Boolean(entry.downloadUrl && entry.downloadUrl !== "#" && exportFormatAllowed(entry.downloadFormat ?? "pdf", accountStatus?.entitlement));
   const workspacePanelOpen = activeTab === "history";
 
   const suggestionCards: StudioSuggestion[] = result
@@ -2201,7 +2201,7 @@ export default function Page() {
             <button className="ghost-button studio-top-button" type="button" disabled={!result}>
               <RoleForgeIcon name="copy" size={16} /> Duplicate
             </button>
-            {downloadReady && downloadUrl ? (
+            {downloadReady && downloadUrl && currentDownloadAllowed ? (
               <a className="ghost-button studio-top-button" href={downloadUrl} download>
                 <RoleForgeIcon name="download" size={16} /> Export
               </a>
@@ -2332,7 +2332,7 @@ export default function Page() {
                     className="primary-button"
                     type="button"
                     onClick={() => void onExportSelectedFormat()}
-                    disabled={!result?.tailored_text || !selectedExportCapability?.enabled || busy}
+                    disabled={!result?.tailored_text || !selectedExportAllowed || busy}
                   >
                     {exportLabel} <RoleForgeIcon name="download" size={14} />
                   </button>
@@ -2759,7 +2759,7 @@ export default function Page() {
                     const entry = group.latest;
                     const manageEntry = group.accountItem ?? entry;
                     const restorable = hasRestorableSnapshot(entry);
-                    const canDownload = Boolean(entry.downloadUrl && entry.downloadUrl !== "#");
+                    const canDownload = canDownloadHistoryItem(entry);
                     const canManageProject = Boolean(group.accountItem?.projectId && signedIn);
                     const isEditingProject = Boolean(canManageProject && editingProjectId === group.accountItem?.projectId);
                     const actionBusy = group.items.some((item) => projectActionId === item.id);
@@ -2878,9 +2878,11 @@ export default function Page() {
                             </button>
                             <div>
                               <button className="btn btn-soft btn-sm" type="button" onClick={() => restoreHistoryItem(entry)} disabled={!restorable}>Restore</button>
-                              {entry.downloadUrl && entry.downloadUrl !== "#" ? (
+                              {canDownloadHistoryItem(entry) ? (
                                 <a className="btn btn-soft btn-sm" href={entry.downloadUrl} download>{entry.downloadFormat?.toUpperCase() ?? "PDF"}</a>
-                              ) : null}
+                              ) : (
+                                <button className="btn btn-soft btn-sm" type="button" disabled>{entry.downloadFormat?.toUpperCase() ?? "PDF"}</button>
+                              )}
                             </div>
                           </article>
                         );
@@ -2888,9 +2890,11 @@ export default function Page() {
                     </div>
                     <div className="history-detail-actions">
                       <button className="btn btn-soft btn-sm" type="button" onClick={() => restoreHistoryItem(visibleSelectedHistoryItem)} disabled={!hasRestorableSnapshot(visibleSelectedHistoryItem)}>Restore</button>
-                      {visibleSelectedHistoryItem.downloadUrl && visibleSelectedHistoryItem.downloadUrl !== "#" ? (
+                      {canDownloadHistoryItem(visibleSelectedHistoryItem) ? (
                         <a className="btn btn-soft btn-sm" href={visibleSelectedHistoryItem.downloadUrl} download>Download {visibleSelectedHistoryItem.downloadFormat?.toUpperCase() ?? "PDF"}</a>
-                      ) : null}
+                      ) : (
+                        <button className="btn btn-soft btn-sm" type="button" disabled>Download {visibleSelectedHistoryItem.downloadFormat?.toUpperCase() ?? "PDF"}</button>
+                      )}
                     </div>
                   </aside>
                 ) : null}
