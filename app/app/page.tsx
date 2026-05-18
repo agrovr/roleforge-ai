@@ -2089,7 +2089,8 @@ export default function Page() {
       ? "warn"
       : "";
   const accountButtonLabel = signedIn ? accountInitials(accountUser) : "IN";
-  const accountPlanLabel = accountStatus?.entitlement?.plan === "premium" ? "Premium" : "Free";
+  const accountPremiumEnding = Boolean(accountStatus?.entitlement?.plan === "premium" && accountStatus.entitlement.cancelAtPeriodEnd);
+  const accountPremiumEndLabel = formatResetDate(accountStatus?.entitlement?.cancelAt || accountStatus?.entitlement?.currentPeriodEnd || "");
   const accountItems = [
     {
       label: "Saved projects",
@@ -2103,7 +2104,16 @@ export default function Page() {
           : `${accountStatus.usage.monthlyRuns}/${accountStatus.usage.monthlyRunLimit} free runs used this month.`
         : "Usage appears after sign-in.",
     },
-    { label: "Plan", detail: signedIn ? `${accountPlanLabel} workspace. PDF export is available now.` : "Sign in to connect plan and saved project state." },
+    {
+      label: "Plan",
+      detail: signedIn
+        ? accountPremiumEnding && accountPremiumEndLabel
+          ? `Premium access ends ${accountPremiumEndLabel}. PDF, DOCX, and TXT remain available until then.`
+          : accountStatus?.entitlement?.plan === "premium"
+            ? "Premium workspace. PDF, DOCX, and TXT exports are available."
+            : "Free workspace. PDF export is available now."
+        : "Sign in to connect plan and saved project state.",
+    },
     {
       label: "Exports",
       detail: accountStatus?.entitlement?.exportFormats.docx

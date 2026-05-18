@@ -17,6 +17,13 @@ type ExportRow = {
   locked: string;
 };
 
+function formatPlanDate(value: string | null) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
 async function countRows(
   supabase: NonNullable<Awaited<ReturnType<typeof createRoleForgeServerClient>>>,
   table: "resume_projects" | "tailor_runs",
@@ -54,6 +61,9 @@ export default async function SettingsPage() {
     entitlement.billingStatus === "none"
       ? "No billing active"
       : entitlement.billingStatus.replace(/_/g, " ");
+  const premiumEnding = premiumActive && entitlement.cancelAtPeriodEnd;
+  const premiumEndLabel = formatPlanDate(entitlement.cancelAt || entitlement.currentPeriodEnd);
+  const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName =
     typeof user.user_metadata?.name === "string"
       ? user.user_metadata.name
@@ -61,7 +71,7 @@ export default async function SettingsPage() {
         ? user.user_metadata.full_name
         : "";
   const planFeatures = premiumActive
-    ? ["Unlimited runs", "DOCX and TXT exports", "Saved projects"]
+    ? ["Unlimited runs", "DOCX and TXT exports", premiumEnding && premiumEndLabel ? `Access until ${premiumEndLabel}` : "Saved projects"]
     : ["5 runs each month", "PDF export", "Saved projects"];
   const exportRows: ExportRow[] = [
     { label: "PDF", enabled: entitlement.exportFormats.pdf, included: "Included", locked: "Unavailable" },
@@ -96,7 +106,7 @@ export default async function SettingsPage() {
               <p>Manage your account, saved projects, export access, and plan state.</p>
             </div>
             <div className="settings-hero-status">
-              <span className={`settings-status-pill ${premiumActive ? "good" : "ready"}`}>{planLabel} plan</span>
+              <span className={`settings-status-pill ${premiumEnding ? "ready" : premiumActive ? "good" : "ready"}`}>{displayPlanLabel}</span>
               <div className="settings-plan-includes" aria-label={`${planLabel} plan includes`}>
                 {planFeatures.map((feature) => (
                   <span key={feature}>{feature}</span>
@@ -122,7 +132,7 @@ export default async function SettingsPage() {
               </div>
               <div className="settings-metric-row">
                 <div className="settings-metric">
-                  <strong>{planLabel}</strong>
+                  <strong>{premiumEnding ? "Ending" : planLabel}</strong>
                   <span>Current plan</span>
                 </div>
                 <div className="settings-metric">
@@ -183,7 +193,9 @@ export default async function SettingsPage() {
               </div>
               <p className="settings-billing-note">
                 {usage.monthlyRunLimit === null
-                  ? "Premium does not count completed runs against a monthly cap."
+                  ? premiumEnding && premiumEndLabel
+                    ? `Premium access remains available until ${premiumEndLabel}.`
+                    : "Premium does not count completed runs against a monthly cap."
                   : "Free includes 5 completed tailoring runs each month. Upgrade when you need more room."}
               </p>
             </div>
@@ -194,7 +206,9 @@ export default async function SettingsPage() {
               <h2>Exports</h2>
               <p>
                 {premiumActive
-                  ? "PDF, DOCX, and TXT exports are active for this account."
+                  ? premiumEnding && premiumEndLabel
+                    ? `PDF, DOCX, and TXT exports remain active until ${premiumEndLabel}.`
+                    : "PDF, DOCX, and TXT exports are active for this account."
                   : "PDF export is included on Free. DOCX and TXT unlock with Premium."}
               </p>
             </div>
@@ -215,7 +229,9 @@ export default async function SettingsPage() {
             </div>
             <div className="settings-section-panel settings-billing-panel">
               <div className="settings-billing-head">
-                <span className={`settings-status-pill ${premiumActive ? "good" : "muted"}`}>{billingLabel}</span>
+                <span className={`settings-status-pill ${premiumEnding ? "ready" : premiumActive ? "good" : "muted"}`}>
+                  {premiumEnding ? "Canceling" : billingLabel}
+                </span>
                 <form action="/api/billing/portal" method="post">
                   <button className="ghost-button" type="submit" disabled={!billingReady || entitlement.billingStatus === "none"}>
                     Manage billing
@@ -226,8 +242,12 @@ export default async function SettingsPage() {
                 <div className="settings-plan-active-card">
                   <div>
                     <span className="settings-price-kicker">Current access</span>
-                    <strong>Premium is active</strong>
-                    <p>Unlimited tailoring runs and PDF, DOCX, and TXT exports are available in the studio.</p>
+                    <strong>{premiumEnding ? "Premium is ending" : "Premium is active"}</strong>
+                    <p>
+                      {premiumEnding && premiumEndLabel
+                        ? `Your subscription is canceled and Premium access remains available until ${premiumEndLabel}.`
+                        : "Unlimited tailoring runs and PDF, DOCX, and TXT exports are available in the studio."}
+                    </p>
                   </div>
                   <Link className="btn btn-soft btn-sm settings-inline-link" href="/app">Open studio</Link>
                 </div>
@@ -259,7 +279,9 @@ export default async function SettingsPage() {
               )}
               <p className="settings-billing-note">
                 {premiumActive
-                  ? "Use Manage billing for subscription changes and invoices."
+                  ? premiumEnding
+                    ? "Use Manage billing if you want to reactivate or review invoices."
+                    : "Use Manage billing for subscription changes and invoices."
                   : billingReady
                   ? "Checkout opens in Stripe. Premium access updates after Stripe confirms the subscription."
                   : "Checkout is disabled until the Stripe and Supabase service environment variables are configured."}

@@ -11,6 +11,9 @@ type EntitlementPatch = {
   stripeCustomerId?: string | null;
   stripeSubscriptionId?: string | null;
   currentPeriodEnd?: string | null;
+  cancelAtPeriodEnd?: boolean;
+  cancelAt?: string | null;
+  canceledAt?: string | null;
 };
 
 const PREMIUM_FEATURES = {
@@ -45,6 +48,10 @@ function currentPeriodEnd(subscription: Stripe.Subscription) {
   return periodEnd ? new Date(periodEnd * 1000).toISOString() : null;
 }
 
+function timestampToIso(timestamp?: number | null) {
+  return timestamp ? new Date(timestamp * 1000).toISOString() : null;
+}
+
 export async function upsertEntitlement(patch: EntitlementPatch) {
   const supabase = createRoleForgeServiceClient();
 
@@ -63,6 +70,9 @@ export async function upsertEntitlement(patch: EntitlementPatch) {
       stripe_customer_id: patch.stripeCustomerId ?? null,
       stripe_subscription_id: patch.stripeSubscriptionId ?? null,
       current_period_end: patch.currentPeriodEnd ?? null,
+      cancel_at_period_end: patch.cancelAtPeriodEnd ?? false,
+      cancel_at: patch.cancelAt ?? null,
+      canceled_at: patch.canceledAt ?? null,
       features: premiumActive ? PREMIUM_FEATURES : FREE_FEATURES,
       updated_at: new Date().toISOString(),
     }, { onConflict: "user_id" });
@@ -89,5 +99,8 @@ export async function syncSubscriptionEntitlement(subscription: Stripe.Subscript
     stripeCustomerId: customerId,
     stripeSubscriptionId: subscription.id,
     currentPeriodEnd: currentPeriodEnd(subscription),
+    cancelAtPeriodEnd: subscription.cancel_at_period_end ?? false,
+    cancelAt: timestampToIso(subscription.cancel_at),
+    canceledAt: timestampToIso(subscription.canceled_at),
   });
 }

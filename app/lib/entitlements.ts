@@ -14,12 +14,18 @@ export type AccountEntitlement = {
   projectStorage: boolean;
   monthlyRunLimit: number | null;
   currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+  cancelAt: string | null;
+  canceledAt: string | null;
 };
 
 type EntitlementRow = {
   plan: AccountPlan | null;
   billing_status: BillingStatus | null;
   current_period_end: string | null;
+  cancel_at_period_end?: boolean | null;
+  cancel_at?: string | null;
+  canceled_at?: string | null;
   features: Record<string, unknown> | null;
 };
 
@@ -34,6 +40,9 @@ export const FREE_ENTITLEMENT: AccountEntitlement = {
   projectStorage: true,
   monthlyRunLimit: 5,
   currentPeriodEnd: null,
+  cancelAtPeriodEnd: false,
+  cancelAt: null,
+  canceledAt: null,
 };
 
 function booleanFeature(features: Record<string, unknown> | null, key: string, fallback: boolean) {
@@ -64,13 +73,16 @@ export function entitlementFromRow(row?: EntitlementRow | null): AccountEntitlem
     projectStorage: booleanFeature(features, "project_storage", true),
     monthlyRunLimit: numberFeature(features, "monthly_run_limit", premiumActive ? null : FREE_ENTITLEMENT.monthlyRunLimit),
     currentPeriodEnd: row.current_period_end,
+    cancelAtPeriodEnd: Boolean(row.cancel_at_period_end),
+    cancelAt: row.cancel_at ?? null,
+    canceledAt: row.canceled_at ?? null,
   };
 }
 
 export async function loadAccountEntitlement(client: SupabaseClient, userId: string): Promise<AccountEntitlement> {
   const { data, error } = await client
     .from("account_entitlements")
-    .select("plan, billing_status, current_period_end, features")
+    .select("plan, billing_status, current_period_end, cancel_at_period_end, cancel_at, canceled_at, features")
     .eq("user_id", userId)
     .maybeSingle();
 

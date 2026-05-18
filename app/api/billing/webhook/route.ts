@@ -69,6 +69,9 @@ export async function POST(request: Request) {
         stripeCustomerId: null,
         stripeSubscriptionId: null,
         currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+        cancelAt: null,
+        canceledAt: new Date().toISOString(),
       });
     }
   }
