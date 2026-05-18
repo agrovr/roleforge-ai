@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { reconcileUserSubscriptionEntitlement } from "@/app/lib/billing/entitlements";
 import { FREE_ENTITLEMENT, loadAccountEntitlement } from "@/app/lib/entitlements";
 import { getSupabaseConfig } from "@/app/lib/supabase/config";
 import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
@@ -30,6 +31,11 @@ export async function GET() {
         name: typeof data.user.user_metadata?.name === "string" ? data.user.user_metadata.name : "",
       }
     : null;
+
+  if (user) {
+    await reconcileUserSubscriptionEntitlement(user.id).catch(() => false);
+  }
+
   const entitlement = user && supabase ? await loadAccountEntitlement(supabase, user.id) : FREE_ENTITLEMENT;
   const usage = user && supabase ? await loadAccountUsage(supabase, entitlement) : null;
 

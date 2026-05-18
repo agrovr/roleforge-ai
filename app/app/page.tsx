@@ -1970,6 +1970,13 @@ export default function Page() {
       setStage("ready");
     } catch (caught) {
       const nextError = workflowErrorFromCaught(caught, "Export failed");
+      if (nextError.code === "premium_required") {
+        setExportNotice({ format: selectedExportFormat, label: selectedFormatLabel });
+        setError("");
+        setWorkflowError(null);
+        setStage("ready");
+        return;
+      }
       setWorkflowError(nextError);
       setError(nextError.message);
       setStage("error");
@@ -2126,6 +2133,28 @@ export default function Page() {
   );
   const accountPremiumEnding = Boolean(accountPremiumActive && accountStatus?.entitlement?.cancelAtPeriodEnd);
   const accountPremiumEndLabel = formatResetDate(accountStatus?.entitlement?.cancelAt || accountStatus?.entitlement?.currentPeriodEnd || "");
+  const railPlanCard = accountPremiumActive
+    ? {
+        title: accountPremiumEnding ? "Premium ending" : "Premium active",
+        detail: accountPremiumEnding && accountPremiumEndLabel
+          ? `Premium exports stay active until ${accountPremiumEndLabel}.`
+          : "Unlimited runs and premium exports are active for this workspace.",
+        href: "/settings#billing",
+        action: "Manage plan",
+      }
+    : signedIn
+      ? {
+          title: "Premium workspace",
+          detail: "Unlock unlimited tailoring runs plus DOCX and TXT exports.",
+          href: "/settings#billing",
+          action: "View plans",
+        }
+      : {
+          title: "Account required",
+          detail: "Sign in to use the studio and keep saved projects with your account.",
+          href: "/login?next=%2Fapp&account=signin-required",
+          action: "Sign in",
+        };
   const accountItems = [
     {
       label: "Saved projects",
@@ -2360,9 +2389,9 @@ export default function Page() {
             <button className={`rail-item ${activeTab === "history" ? "active" : ""}`} type="button" aria-pressed={activeTab === "history"} onClick={openHistoryPanel}><RoleForgeIcon name="chart" size={15} /> History</button>
             <Link className="rail-item" href="/settings"><RoleForgeIcon name="settings" size={15} /> Settings</Link>
             <div className="rf-rail-upgrade">
-              <strong><RoleForgeIcon name="sparkle" size={14} /> Premium workspace</strong>
-              <p>Unlimited tailoring runs with premium exports when your plan is active.</p>
-              <Link className="primary-button" href="/settings#billing">View plans</Link>
+              <strong><RoleForgeIcon name={accountPremiumActive ? "check" : "sparkle"} size={14} /> {railPlanCard.title}</strong>
+              <p>{railPlanCard.detail}</p>
+              <Link className="primary-button" href={railPlanCard.href}>{railPlanCard.action}</Link>
             </div>
           </aside>
 
