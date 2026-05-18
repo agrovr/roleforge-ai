@@ -545,7 +545,7 @@ function PreviewLineList({
 
   return (
     <div className="rf-diff-lines">
-      {lines.slice(0, 14).map((line, index) => {
+      {lines.map((line, index) => {
         if (line.kind === "heading") return <h5 key={`diff-line-${index}`}>{line.text}</h5>;
         if (line.kind === "bullet") {
           return (
@@ -577,8 +577,8 @@ function DiffResumeDocument({
   changeLog?: string[];
   filename?: string;
 }) {
-  const beforeLines = buildPlainResumeLines(sourceText).slice(0, 18);
-  const afterLines = buildPlainResumeLines(tailoredText).slice(0, 18);
+  const beforeLines = buildPlainResumeLines(sourceText);
+  const afterLines = buildPlainResumeLines(tailoredText);
   const documentName = filename ? filename.replace(/\.(docx|pdf|txt)$/i, "") : "Resume";
   const hasBefore = Boolean(sourceText?.trim());
   const hasAfter = Boolean(tailoredText?.trim());
@@ -1996,7 +1996,8 @@ export default function Page() {
       ? "Resume selected · add a target and run the workflow"
       : "Upload a resume, add a job target, then run the workflow";
   const topbarLabel = compactLabel(hasTarget ? activeRole : activeResumeName, 36);
-  const heroLabel = compactLabel(hasTarget ? activeRole : activeResumeName, 44);
+  const heroTitle = result ? activeResumeName : hasTarget ? activeRole : activeResumeName;
+  const heroLabel = compactLabel(heroTitle, 44);
   const targetLabel = compactLabel(activeRole, 62);
   const atsScore = result?.score_summary?.ats_after ?? result?.fit_score_after?.score ?? score;
   const keywordTotal = presentKeywords.length + missingKeywords.length;
@@ -2093,16 +2094,18 @@ export default function Page() {
             keywordTotal ? `${presentKeywords.length}/${keywordTotal} keywords matched` : "Keywords pending",
             restoredHistoryId ? "Restored snapshot open" : downloadReady ? `${downloadFormat.toUpperCase()} export ready` : "Review before export",
           ];
-  const previewStatusTone = (item: string, index: number) =>
-    (previewUploadState === "error" && previewMode === "original" && index === 0) ||
-    item.includes("waiting") ||
-    item.includes("Waiting") ||
-    item.includes("pending") ||
-    item.includes("Pending") ||
-    item.includes("Upload a resume") ||
-    item.includes("Run Tailor")
+  const previewStatusTone = (item: string, index: number) => {
+    const normalized = item.toLowerCase();
+    return (previewUploadState === "error" && previewMode === "original" && index === 0) ||
+      normalized.includes("waiting") ||
+      normalized.includes("pending") ||
+      normalized.includes("unavailable") ||
+      normalized.includes("needs another try") ||
+      normalized.includes("upload a resume") ||
+      normalized.includes("run tailor")
       ? "warn"
       : "";
+  };
   const accountButtonLabel = signedIn ? accountInitials(accountUser) : "IN";
   const accountPremiumEnding = Boolean(accountStatus?.entitlement?.plan === "premium" && accountStatus.entitlement.cancelAtPeriodEnd);
   const accountPremiumEndLabel = formatResetDate(accountStatus?.entitlement?.cancelAt || accountStatus?.entitlement?.currentPeriodEnd || "");
@@ -2350,7 +2353,7 @@ export default function Page() {
             <div className="rf-studio-hero">
               <div>
                 <div className="eyebrow">Active resume</div>
-                <h1 title={activeTitle}>{heroLabel}</h1>
+                <h1 title={result ? activeResumeName : activeTitle}>{heroLabel}</h1>
                 <p>{activeDetail}</p>
               </div>
               <div className="studio-hero-actions">
@@ -2457,10 +2460,12 @@ export default function Page() {
                 </div>
                 <div
                   className="rf-preview-wrap"
+                  data-preview-mode={previewMode}
                   id="preview-panel"
                   role="tabpanel"
                   aria-labelledby={`preview-tab-${previewMode}`}
                   aria-live="polite"
+                  aria-busy={stage === "uploading" || stage === "tailoring" || stage === "exporting"}
                 >
                   <div className="rf-preview-status" aria-label="Preview status">
                     {previewStatusItems.map((item, index) => (

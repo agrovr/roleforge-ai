@@ -5782,7 +5782,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .rf-resume-paper {
   position: relative;
-  min-height: 670px;
+  min-height: 560px;
   width: 100%;
   overflow: visible;
   padding: 56px 64px 58px;
@@ -5855,7 +5855,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .rf-resume-paper-plain {
-  min-height: 600px;
+  min-height: 520px;
 }
 
 .rf-resume-plain-lines {
@@ -5939,7 +5939,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .rf-resume-paper-diff {
-  min-height: 560px;
+  min-height: 480px;
 }
 
 .rf-resume-change-list {
