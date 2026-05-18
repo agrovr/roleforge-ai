@@ -1,10 +1,20 @@
 import type Stripe from "stripe";
 
 import { createRoleForgeServiceClient } from "../supabase/service";
+import { getStripeClient } from "./stripe";
 
-type BillingStatus = "none" | "trialing" | "active" | "past_due" | "canceled" | "incomplete";
+export type BillingStatus =
+  | "none"
+  | "trialing"
+  | "active"
+  | "past_due"
+  | "canceled"
+  | "incomplete"
+  | "incomplete_expired"
+  | "unpaid"
+  | "paused";
 
-type EntitlementPatch = {
+export type EntitlementPatch = {
   userId: string;
   plan: "free" | "premium";
   billingStatus: BillingStatus;
@@ -14,6 +24,11 @@ type EntitlementPatch = {
   cancelAtPeriodEnd?: boolean;
   cancelAt?: string | null;
   canceledAt?: string | null;
+};
+
+type EntitlementSubscriptionRow = {
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
 };
 
 const PREMIUM_FEATURES = {
@@ -32,8 +47,17 @@ const FREE_FEATURES = {
   monthly_run_limit: 5,
 };
 
-function normalizeBillingStatus(status?: Stripe.Subscription.Status | null): BillingStatus {
-  if (status === "active" || status === "trialing" || status === "past_due" || status === "canceled" || status === "incomplete") {
+export function normalizeBillingStatus(status?: Stripe.Subscription.Status | null): BillingStatus {
+  if (
+    status === "active" ||
+    status === "trialing" ||
+    status === "past_due" ||
+    status === "canceled" ||
+    status === "incomplete" ||
+    status === "incomplete_expired" ||
+    status === "unpaid" ||
+    status === "paused"
+  ) {
     return status;
   }
 
@@ -82,7 +106,7 @@ export async function upsertEntitlement(patch: EntitlementPatch) {
   }
 }
 
-export async function syncSubscriptionEntitlement(subscription: Stripe.Subscription) {
+export function entitlementPatchFromSubscription(subscription: Stripe.Subscription): EntitlementPatch {
   const supabaseUserId = subscription.metadata.supabase_user_id;
   const customerId = typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id;
 
@@ -92,7 +116,7 @@ export async function syncSubscriptionEntitlement(subscription: Stripe.Subscript
 
   const billingStatus = normalizeBillingStatus(subscription.status);
 
-  await upsertEntitlement({
+  return {
     userId: supabaseUserId,
     plan: ["active", "trialing"].includes(billingStatus) ? "premium" : "free",
     billingStatus,
@@ -102,5 +126,63 @@ export async function syncSubscriptionEntitlement(subscription: Stripe.Subscript
     cancelAtPeriodEnd: subscription.cancel_at_period_end ?? false,
     cancelAt: timestampToIso(subscription.cancel_at),
     canceledAt: timestampToIso(subscription.canceled_at),
-  });
+  };
+}
+
+export async function syncSubscriptionEntitlement(subscription: Stripe.Subscription) {
+  await upsertEntitlement(entitlementPatchFromSubscription(subscription));
+}
+
+export async function reconcileUserSubscriptionEntitlement(userId: string) {
+  const supabase = createRoleForgeServiceClient();
+  const stripe = getStripeClient();
+
+  if (!supabase || !stripe) {
+    return false;
+  }
+
+  const { data, error } = await supabase
+    .from("account_entitlements")
+    .select("stripe_customer_id, stripe_subscription_id")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const subscriptionId = (data as EntitlementSubscriptionRow | null)?.stripe_subscription_id;
+  const customerId = (data as EntitlementSubscriptionRow | null)?.stripe_customer_id;
+
+  if (!subscriptionId) {
+    return false;
+  }
+
+  let subscription: Stripe.Subscription;
+
+  try {
+    subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  } catch (error) {
+    const stripeError = error as { code?: string };
+
+    if (stripeError.code === "resource_missing") {
+      await upsertEntitlement({
+        userId,
+        plan: "free",
+        billingStatus: "canceled",
+        stripeCustomerId: customerId,
+        stripeSubscriptionId: null,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+        cancelAt: null,
+        canceledAt: new Date().toISOString(),
+      });
+      return true;
+    }
+
+    throw error;
+  }
+
+  await syncSubscriptionEntitlement(subscription);
+  return true;
 }

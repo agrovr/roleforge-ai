@@ -1,7 +1,16 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type AccountPlan = "free" | "premium";
-export type BillingStatus = "none" | "trialing" | "active" | "past_due" | "canceled" | "incomplete";
+export type BillingStatus =
+  | "none"
+  | "trialing"
+  | "active"
+  | "past_due"
+  | "canceled"
+  | "incomplete"
+  | "incomplete_expired"
+  | "unpaid"
+  | "paused";
 
 export type AccountEntitlement = {
   plan: AccountPlan;

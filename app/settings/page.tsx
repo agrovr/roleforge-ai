@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { reconcileUserSubscriptionEntitlement } from "../lib/billing/entitlements";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
@@ -50,6 +51,7 @@ export default async function SettingsPage() {
   const [projectCount, runCount] = await Promise.all([
     countRows(supabase, "resume_projects"),
     countRows(supabase, "tailor_runs"),
+    reconcileUserSubscriptionEntitlement(user.id).catch(() => false),
   ]);
   const entitlement = await loadAccountEntitlement(supabase, user.id);
   const usage = await loadAccountUsage(supabase, entitlement);
