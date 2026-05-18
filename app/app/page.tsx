@@ -155,6 +155,7 @@ type WorkflowErrorState = {
   requestId?: string;
   details?: Record<string, unknown> | null;
 };
+type ExportNotice = { format: ExportFormat; label: string };
 type StudioSuggestion = { label: string; meta: string; before?: string; after: string; tone?: "good" | "warn" | "neutral" };
 type ParsedResumeSection = { title: string; lines: string[] };
 type ParsedResume = { name: string; role: string; contact: string; sections: ParsedResumeSection[] };
@@ -1216,6 +1217,7 @@ export default function Page() {
   const [copyState, setCopyState] = useState("");
   const [error, setError] = useState("");
   const [workflowError, setWorkflowError] = useState<WorkflowErrorState | null>(null);
+  const [exportNotice, setExportNotice] = useState<ExportNotice | null>(null);
 
   const [resumeId, setResumeId] = useState<string | null>(null);
   const [uploadMeta, setUploadMeta] = useState<UploadResponse | null>(null);
@@ -1450,6 +1452,7 @@ export default function Page() {
     setStage("idle");
     setError("");
     setWorkflowError(null);
+    setExportNotice(null);
     setCopyState("");
     setPreviewMode("original");
     setRestoredHistoryId(null);
@@ -1768,6 +1771,7 @@ export default function Page() {
     setStage("ready");
     setError("");
     setWorkflowError(null);
+    setExportNotice(null);
     setCopyState("");
     setAccountPanelOpen(false);
     setActiveTab("score");
@@ -1855,6 +1859,7 @@ export default function Page() {
     setBusy(true);
     setError("");
     setWorkflowError(null);
+    setExportNotice(null);
     setResult(null);
     setDownloadUrl(null);
     setDownloadFormat("pdf");
@@ -1923,9 +1928,17 @@ export default function Page() {
   async function onExportSelectedFormat() {
     if (!result?.tailored_text || busy) return;
 
+    if (!selectedExportCapability?.enabled) {
+      setExportNotice({ format: selectedExportFormat, label: selectedFormatLabel });
+      setError("");
+      setWorkflowError(null);
+      return;
+    }
+
     setBusy(true);
     setError("");
     setWorkflowError(null);
+    setExportNotice(null);
     setStage("exporting");
 
     try {
@@ -2002,6 +2015,8 @@ export default function Page() {
   const selectedExportCapability = exportFormats.find((format) => format.format === selectedExportFormat) ?? exportFormats[0];
   const selectedDownloadReady = Boolean(downloadReady && downloadUrl && downloadFormat === selectedExportFormat);
   const selectedFormatLabel = selectedExportFormat.toUpperCase();
+  const premiumExportFormat = stringDetail(workflowError?.details, "format")?.toUpperCase() ?? selectedFormatLabel;
+  const premiumExportRequested = exportNotice ?? (workflowError?.code === "premium_required" ? { format: selectedExportFormat, label: premiumExportFormat } : null);
   const exportLabel = selectedDownloadReady
     ? `Download ${selectedFormatLabel}`
     : downloadFormat === selectedExportFormat && downloadState === "checking"
@@ -2316,20 +2331,28 @@ export default function Page() {
                   {exportFormats.map((format) => {
                     const selected = selectedExportFormat === format.format;
                     const planLabel = format.plan === "premium" ? "Premium" : "Free";
+                    const badgeLabel = format.reason || planLabel;
                     return (
                       <button
                         key={format.format}
-                        className={`export-format-chip${selected ? " active" : ""}${format.enabled ? "" : " disabled"}`}
+                        className={`export-format-chip${selected ? " active" : ""}${format.enabled ? "" : " disabled"}${format.enabled && format.plan === "premium" ? " included" : ""}`}
                         aria-disabled={!format.enabled}
                         aria-pressed={selected}
                         type="button"
                         title={!format.enabled ? `${format.label} requires Premium` : `${format.label} export available`}
                         onClick={() => {
-                          if (format.enabled) setSelectedExportFormat(format.format);
+                          if (!format.enabled) {
+                            setExportNotice({ format: format.format, label: format.label });
+                            setError("");
+                            setWorkflowError(null);
+                            return;
+                          }
+                          setSelectedExportFormat(format.format);
+                          setExportNotice(null);
                         }}
                       >
                         {!format.enabled ? <RoleForgeIcon name="lock" size={12} /> : null}
-                        {format.label} <small>{format.enabled ? planLabel : format.reason || planLabel}</small>
+                        {format.label} <small>{badgeLabel}</small>
                       </button>
                     );
                   })}
@@ -2619,7 +2642,28 @@ export default function Page() {
                     </div>
                   </div>
                 </article>
-                {limitReached ? (
+                {premiumExportRequested ? (
+                  <div className="rf-callout upgrade">
+                    <strong>{premiumExportRequested.label} export is included with Premium</strong>
+                    <p>Upgrade to export DOCX and TXT files, or keep using PDF on the free plan.</p>
+                    <div className="rf-callout-actions">
+                      <Link className="primary-button" href="/settings#billing">View premium <RoleForgeIcon name="sparkle" size={14} /></Link>
+                      <button
+                        className="ghost-button"
+                        type="button"
+                        onClick={() => {
+                          setSelectedExportFormat("pdf");
+                          setExportNotice(null);
+                          setWorkflowError(null);
+                          setError("");
+                          setStage(result ? "ready" : "idle");
+                        }}
+                      >
+                        Use PDF
+                      </button>
+                    </div>
+                  </div>
+                ) : limitReached ? (
                   <div className="rf-callout upgrade">
                     <strong>Free monthly limit reached</strong>
                     <p>

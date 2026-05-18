@@ -3818,11 +3818,27 @@ html[data-theme="dark"] .result-box {
   color: #2f6842;
 }
 
+.export-format-chip.included:not(.active) {
+  border-color: rgba(154, 102, 42, 0.24);
+  background: rgba(225, 177, 91, 0.16);
+  color: var(--ink-1);
+}
+
+.export-format-chip.included:not(.active) small {
+  color: color-mix(in srgb, var(--brand) 76%, var(--ink-0));
+}
+
 .export-format-chip.disabled {
   border-style: dashed;
   background: rgba(255, 255, 255, 0.48);
   color: var(--ink-3);
-  cursor: default;
+  cursor: pointer;
+}
+
+.export-format-chip.disabled:hover,
+.export-format-chip.disabled:focus-visible {
+  border-color: rgba(154, 102, 42, 0.32);
+  color: var(--ink-1);
 }
 
 .export-format-chip.disabled small {
@@ -7045,10 +7061,26 @@ html[data-theme="dark"] .export-format-chip.active {
   color: #bfe7c5;
 }
 
+html[data-theme="dark"] .export-format-chip.included:not(.active) {
+  border-color: rgba(233, 191, 112, 0.28);
+  background: rgba(226, 165, 81, 0.12);
+  color: #fff4da;
+}
+
+html[data-theme="dark"] .export-format-chip.included:not(.active) small {
+  color: rgba(249, 211, 143, 0.9);
+}
+
 html[data-theme="dark"] .export-format-chip.disabled {
   border-color: rgba(255, 247, 233, 0.14);
   background: rgba(255, 247, 233, 0.035);
   color: rgba(224, 228, 241, 0.66);
+}
+
+html[data-theme="dark"] .export-format-chip.disabled:hover,
+html[data-theme="dark"] .export-format-chip.disabled:focus-visible {
+  border-color: rgba(233, 191, 112, 0.28);
+  color: rgba(255, 247, 233, 0.88);
 }
 
 html[data-theme="dark"] .export-format-chip.disabled small {
