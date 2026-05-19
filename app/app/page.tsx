@@ -1238,6 +1238,7 @@ export default function Page() {
   const [restoredHistoryId, setRestoredHistoryId] = useState<string | null>(null);
   const [selectedHistoryId, setSelectedHistoryId] = useState<string | null>(null);
   const [historyFilter, setHistoryFilter] = useState<HistoryFilter>("all");
+  const [historyExportRequest, setHistoryExportRequest] = useState<{ id: string; format: ExportFormat } | null>(null);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editingProjectTitle, setEditingProjectTitle] = useState("");
   const [projectActionId, setProjectActionId] = useState<string | null>(null);
@@ -1658,9 +1659,9 @@ export default function Page() {
     try {
       const savedRun = await saveCompletedRun({
         ...item,
-        sourceResumeName: file?.name,
-        jobTarget: jdText.trim() || jdUrl.trim() || item.roleHint,
-        companyUrl: companyUrl.trim() || undefined,
+        sourceResumeName: file?.name ?? item.filename,
+        jobTarget: item.snapshot?.jdText?.trim() || item.snapshot?.jdUrl?.trim() || jdText.trim() || jdUrl.trim() || item.roleHint,
+        companyUrl: item.snapshot?.companyUrl?.trim() || companyUrl.trim() || undefined,
         atsScore: output.score_summary?.ats_after,
         keywordMatchCount: outputPresent.length,
         readTimeSeconds: outputReadSeconds,
@@ -1742,6 +1743,77 @@ export default function Page() {
     }
 
     return updatedItem;
+  }
+
+  function updateHistoryEntryExport(entry: HistoryItem, url: string, format: ExportFormat) {
+    let updatedItem: HistoryItem | null = null;
+
+    const nextHistory = history.map((candidate) => {
+      if (candidate.id !== entry.id) return candidate;
+
+      const nextSnapshot = candidate.snapshot
+        ? { ...candidate.snapshot, downloadUrl: url, downloadFormat: format }
+        : candidate.snapshot;
+      const nextEntry = { ...candidate, downloadUrl: url, downloadFormat: format, snapshot: nextSnapshot };
+      updatedItem = nextEntry;
+      return nextEntry;
+    });
+
+    setHistory(nextHistory);
+    saveHistory(nextHistory);
+    return updatedItem;
+  }
+
+  async function exportHistoryItem(entry: HistoryItem, format: ExportFormat) {
+    const tailoredText = entry.snapshot?.result?.tailored_text?.trim();
+    const label = format.toUpperCase();
+
+    if (!tailoredText) {
+      setHistorySyncState("error");
+      setHistorySyncMessage("This saved run can be downloaded, but it does not have a restorable export snapshot.");
+      return;
+    }
+
+    if (!exportFormatAllowed(format, accountStatus?.entitlement)) {
+      setExportNotice({ format, label });
+      setHistorySyncState("local");
+      setHistorySyncMessage(`${label} exports unlock with Premium. PDF is still available.`);
+      return;
+    }
+
+    setHistoryExportRequest({ id: entry.id, format });
+    setHistorySyncState("saving");
+    setHistorySyncMessage(`Creating ${label} export...`);
+    setError("");
+    setWorkflowError(null);
+    setExportNotice(null);
+
+    try {
+      const url = await exportResume(tailoredText, format);
+      const updatedItem = updateHistoryEntryExport(entry, url, format);
+      setSelectedHistoryId(entry.id);
+      setDownloadFormat(format);
+      setSelectedExportFormat(format);
+      setCopyState(`${label} export ready`);
+      setHistorySyncState(isAccountHistoryItem(entry, syncedHistoryIds) ? "synced" : "local");
+      setHistorySyncMessage(`${label} export ready for ${entry.filename}`);
+
+      if (updatedItem && entry.snapshot?.result) {
+        void syncCompletedRun(updatedItem, entry.snapshot.result, url, { countUsage: false });
+      }
+    } catch (caught) {
+      const nextError = workflowErrorFromCaught(caught, "Export failed");
+      if (nextError.code === "premium_required") {
+        setExportNotice({ format, label });
+        setHistorySyncState("local");
+        setHistorySyncMessage(`${label} exports unlock with Premium. PDF is still available.`);
+      } else {
+        setHistorySyncState("error");
+        setHistorySyncMessage(`${label} export could not be created. Try again in a moment.`);
+      }
+    } finally {
+      setHistoryExportRequest(null);
+    }
   }
 
   function buildRunSnapshot(output: TailorResult, uploadData: UploadResponse, url: string, format: ExportFormat = "pdf"): SavedRunSnapshot {
@@ -2992,6 +3064,34 @@ export default function Page() {
                       <span>{selectedHistoryVersionLabel}</span>
                       <strong>{formatHistoryTimestamp(visibleSelectedHistoryItem.createdAt)}</strong>
                       <small>{visibleSelectedHistoryItem.score}/100 · {visibleSelectedHistoryItem.mode} · {historyStatusLabel(visibleSelectedHistoryItem, syncedHistoryIds)}</small>
+                    </div>
+                    <div className="history-export-panel">
+                      <div>
+                        <span className="eyebrow">Export this run</span>
+                        <strong>{hasRestorableSnapshot(visibleSelectedHistoryItem) ? "Create a fresh file from the saved tailored resume" : "Only the saved download link is available"}</strong>
+                      </div>
+                      <div className="history-export-actions" aria-label="Export selected saved run">
+                        {exportFormats.map((format) => {
+                          const label = format.format.toUpperCase();
+                          const exporting = historyExportRequest?.id === visibleSelectedHistoryItem.id && historyExportRequest.format === format.format;
+                          const blocked = !hasRestorableSnapshot(visibleSelectedHistoryItem);
+                          const existingDownloadReady =
+                            canDownloadHistoryItem(visibleSelectedHistoryItem) && visibleSelectedHistoryItem.downloadFormat === format.format;
+                          return (
+                            <button
+                              className={`btn btn-soft btn-sm ${format.enabled ? "" : "locked"}`}
+                              type="button"
+                              key={`history-export-${visibleSelectedHistoryItem.id}-${format.format}`}
+                              onClick={() => void exportHistoryItem(visibleSelectedHistoryItem, format.format)}
+                              disabled={blocked || Boolean(historyExportRequest)}
+                              title={format.enabled ? `Export ${label}` : `${label} exports unlock with Premium`}
+                            >
+                              {!format.enabled ? <RoleForgeIcon name="lock" size={12} /> : null}
+                              {exporting ? `Exporting ${label}` : existingDownloadReady ? `${label} ready` : `Export ${label}`}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                     <div className="history-version-list" aria-label="Runs in this project">
                       {selectedHistoryGroup.items.slice(0, 5).map((entry, index) => {
