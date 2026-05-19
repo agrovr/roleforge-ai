@@ -6631,6 +6631,11 @@ html[data-theme="dark"] .rf-rail-upgrade p {
     max-width: 100%;
   }
 
+  .studio-history-panel,
+  .studio-settings-panel {
+    scroll-margin-top: 24px;
+  }
+
   .rf-studio-breadcrumb {
     max-width: 100%;
     flex-wrap: wrap;

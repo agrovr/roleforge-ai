@@ -1377,13 +1377,28 @@ export default function Page() {
     void refreshSavedRuns();
   }, [refreshSavedRuns]);
 
+  const scrollToHistoryPanel = useCallback((behavior: ScrollBehavior = "smooth") => {
+    let attempts = 0;
+    const scrollWhenReady = () => {
+      const target = historySectionRef.current;
+      if (target) {
+        target.scrollIntoView({ behavior: attempts === 0 ? behavior : "auto", block: "start" });
+      }
+
+      attempts += 1;
+      if (attempts <= 8) {
+        window.setTimeout(scrollWhenReady, 80);
+      }
+    };
+
+    window.setTimeout(scrollWhenReady, 30);
+  }, []);
+
   const openHistoryPanel = useCallback(() => {
     setActiveTab("history");
     setAccountPanelOpen(false);
-    window.setTimeout(() => {
-      historySectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 0);
-  }, []);
+    scrollToHistoryPanel();
+  }, [scrollToHistoryPanel]);
 
   useEffect(() => {
     function openHashTarget() {
