@@ -3426,6 +3426,10 @@ html[data-theme="dark"] .result-box {
   margin: 14px 0 4px;
 }
 
+.history-overview.compact {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .history-overview > div {
   min-width: 0;
   padding: 12px 14px;
@@ -8416,6 +8420,10 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   }
 
   .history-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .history-overview.compact {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 

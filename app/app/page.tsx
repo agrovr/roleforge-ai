@@ -2379,10 +2379,12 @@ export default function Page() {
   const historyGroups = groupHistoryItems(history, syncedHistoryIds);
   const accountHistoryGroups = historyGroups.filter((group) => group.accountCount > 0);
   const localHistoryGroups = historyGroups.filter((group) => group.localCount > 0);
+  const showHistoryFilter = signedIn || (accountHistoryGroups.length > 0 && localHistoryGroups.length > 0);
+  const activeHistoryFilter = showHistoryFilter ? historyFilter : "all";
   const visibleHistoryGroups =
-    historyFilter === "account"
+    activeHistoryFilter === "account"
       ? accountHistoryGroups
-      : historyFilter === "local"
+      : activeHistoryFilter === "local"
         ? localHistoryGroups
         : historyGroups;
   const selectedHistoryItem =
@@ -2400,19 +2402,19 @@ export default function Page() {
     null;
   const clearHistoryLabel = signedIn && savedProjectCount ? `Clear local${localHistoryCount ? ` (${localHistoryCount})` : ""}` : "Clear history";
   const historyEmptyTitle =
-    historyFilter === "account"
+    activeHistoryFilter === "account"
       ? "No account projects yet"
-      : historyFilter === "local"
+      : activeHistoryFilter === "local"
         ? "No browser projects"
         : signedIn
           ? "No saved projects yet"
           : "No local runs yet";
   const historyEmptyDetail =
-    historyFilter === "account"
+    activeHistoryFilter === "account"
       ? localHistoryGroups.length
         ? "Your completed local runs are still available under This browser. Complete a new signed-in run or refresh after sync to see account projects here."
         : "Complete a signed-in tailor run and it will save here with restore, target details, scores, and export links."
-      : historyFilter === "local"
+      : activeHistoryFilter === "local"
         ? accountHistoryGroups.length
           ? "All visible projects are saved to your account. Switch to All or Account to review them."
           : "Complete a tailor run and it will stay in this browser with the preview, target, scores, and download ready to reopen."
@@ -2423,6 +2425,7 @@ export default function Page() {
   const canDownloadHistoryItem = (entry: HistoryItem) => historyDownloadEntriesFor(entry).length > 0;
   const visibleRunCount = visibleHistoryGroups.reduce((total, group) => total + group.items.length, 0);
   const visibleAccountProjectCount = visibleHistoryGroups.filter((group) => group.accountCount > 0).length;
+  const showAccountHistorySummary = signedIn || visibleAccountProjectCount > 0;
   const visibleRestoreReadyCount = visibleHistoryGroups.reduce((total, group) => total + group.restorableCount, 0);
   const visibleDownloadReadyCount = visibleHistoryGroups.reduce(
     (total, group) => total + group.items.filter(canDownloadHistoryItem).length,
@@ -3000,37 +3003,39 @@ export default function Page() {
                     {projectActionMessage ? <p className="history-action-note error">{projectActionMessage}</p> : null}
                   </div>
                   <div className="history-panel-actions">
-                    <div className="history-filter-bar" role="tablist" aria-label="Saved project storage filter">
-                      <button
-                        className={historyFilter === "all" ? "active" : ""}
-                        type="button"
-                        role="tab"
-                        aria-selected={historyFilter === "all"}
-                        onClick={() => setHistoryFilter("all")}
-                      >
-                        All <span>{historyGroups.length}</span>
-                      </button>
-                      {signedIn ? (
+                    {showHistoryFilter ? (
+                      <div className="history-filter-bar" role="tablist" aria-label="Saved project storage filter">
                         <button
-                          className={historyFilter === "account" ? "active" : ""}
+                          className={activeHistoryFilter === "all" ? "active" : ""}
                           type="button"
                           role="tab"
-                          aria-selected={historyFilter === "account"}
-                          onClick={() => setHistoryFilter("account")}
+                          aria-selected={activeHistoryFilter === "all"}
+                          onClick={() => setHistoryFilter("all")}
                         >
-                          Account <span>{accountHistoryGroups.length}</span>
+                          All <span>{historyGroups.length}</span>
                         </button>
-                      ) : null}
-                      <button
-                        className={historyFilter === "local" ? "active" : ""}
-                        type="button"
-                        role="tab"
-                        aria-selected={historyFilter === "local"}
-                        onClick={() => setHistoryFilter("local")}
-                      >
-                        This browser <span>{localHistoryGroups.length}</span>
-                      </button>
-                    </div>
+                        {signedIn || accountHistoryGroups.length ? (
+                          <button
+                            className={activeHistoryFilter === "account" ? "active" : ""}
+                            type="button"
+                            role="tab"
+                            aria-selected={activeHistoryFilter === "account"}
+                            onClick={() => setHistoryFilter("account")}
+                          >
+                            Account <span>{accountHistoryGroups.length}</span>
+                          </button>
+                        ) : null}
+                        <button
+                          className={activeHistoryFilter === "local" ? "active" : ""}
+                          type="button"
+                          role="tab"
+                          aria-selected={activeHistoryFilter === "local"}
+                          onClick={() => setHistoryFilter("local")}
+                        >
+                          This browser <span>{localHistoryGroups.length}</span>
+                        </button>
+                      </div>
+                    ) : null}
                     {signedIn ? (
                       <button className="btn btn-soft btn-sm" type="button" onClick={() => void refreshSavedRuns()} disabled={historySyncState === "loading"}>
                         Refresh
@@ -3040,15 +3045,17 @@ export default function Page() {
                   </div>
                 </div>
                 {visibleHistoryGroups.length ? (
-                  <div className="history-overview" aria-label="Saved project overview">
+                  <div className={`history-overview ${showAccountHistorySummary ? "" : "compact"}`} aria-label="Saved project overview">
                     <div>
                       <strong>{visibleRunCount}</strong>
                       <span>{visibleRunCount === 1 ? "Run" : "Runs"}</span>
                     </div>
-                    <div>
-                      <strong>{visibleAccountProjectCount}</strong>
-                      <span>Account projects</span>
-                    </div>
+                    {showAccountHistorySummary ? (
+                      <div>
+                        <strong>{visibleAccountProjectCount}</strong>
+                        <span>Account projects</span>
+                      </div>
+                    ) : null}
                     <div>
                       <strong>{visibleRestoreReadyCount}</strong>
                       <span>Restore-ready</span>
