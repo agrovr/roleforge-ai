@@ -1285,6 +1285,7 @@ export default function Page() {
   const [historyExportRequest, setHistoryExportRequest] = useState<{ id: string; format: ExportFormat } | null>(null);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
   const [editingProjectTitle, setEditingProjectTitle] = useState("");
+  const [expandedHistoryGroupKey, setExpandedHistoryGroupKey] = useState<string | null>(null);
   const [projectActionId, setProjectActionId] = useState<string | null>(null);
   const [projectActionMessage, setProjectActionMessage] = useState("");
   const [capabilities, setCapabilities] = useState<CapabilitiesResponse | null>(null);
@@ -2452,6 +2453,13 @@ export default function Page() {
     selectedHistoryGroup && selectedHistoryIndex >= 0
       ? historyVersionLabel(selectedHistoryGroup.items.length, selectedHistoryIndex)
       : "Latest run";
+  const selectedHistoryVersions =
+    selectedHistoryGroup && expandedHistoryGroupKey === selectedHistoryGroup.key
+      ? selectedHistoryGroup.items
+      : selectedHistoryGroup?.items.slice(0, 5) ?? [];
+  const hiddenHistoryVersionCount = selectedHistoryGroup
+    ? Math.max(0, selectedHistoryGroup.items.length - selectedHistoryVersions.length)
+    : 0;
   const visibleSelectedHistoryDownloads = visibleSelectedHistoryItem ? historyDownloadEntriesFor(visibleSelectedHistoryItem) : [];
   const selectedHistoryDownloadCount = visibleSelectedHistoryDownloads.length;
   const editorRailActive = activeTab === "score" || activeTab === "resume";
@@ -3265,7 +3273,7 @@ export default function Page() {
                       </div>
                     ) : null}
                     <div className="history-version-list" aria-label="Runs in this project">
-                      {selectedHistoryGroup.items.slice(0, 5).map((entry, index) => {
+                      {selectedHistoryVersions.map((entry, index) => {
                         const restorable = hasRestorableSnapshot(entry);
                         const versionLabel = historyVersionLabel(selectedHistoryGroup.items.length, index);
                         const entryDownloads = historyDownloadEntriesFor(entry);
@@ -3288,6 +3296,23 @@ export default function Page() {
                           </article>
                         );
                       })}
+                      {hiddenHistoryVersionCount ? (
+                        <button
+                          className="history-version-more"
+                          type="button"
+                          onClick={() => setExpandedHistoryGroupKey(selectedHistoryGroup.key)}
+                        >
+                          Show {hiddenHistoryVersionCount} older run{hiddenHistoryVersionCount === 1 ? "" : "s"}
+                        </button>
+                      ) : selectedHistoryGroup.items.length > 5 ? (
+                        <button
+                          className="history-version-more"
+                          type="button"
+                          onClick={() => setExpandedHistoryGroupKey(null)}
+                        >
+                          Show latest 5 runs
+                        </button>
+                      ) : null}
                     </div>
                   </aside>
                 ) : null}
