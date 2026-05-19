@@ -1922,6 +1922,48 @@ export default function Page() {
     scrollToStudioEditor();
   }
 
+  function duplicateCurrentRun() {
+    if (!result?.tailored_text?.trim() || !uploadMeta || !downloadUrl) return;
+
+    const sourceHistoryItem = restoredHistoryId ? history.find((entry) => entry.id === restoredHistoryId) : null;
+    const copiedDownloads = {
+      ...(sourceHistoryItem ? historyDownloads(sourceHistoryItem) : {}),
+      [downloadFormat]: downloadUrl,
+    };
+    const duplicateId = `${result.run_id ?? resumeId ?? uploadMeta.resume_id}-copy-${Date.now()}`;
+    const snapshot: SavedRunSnapshot = {
+      ...buildRunSnapshot(result, uploadMeta, downloadUrl, downloadFormat),
+      downloads: copiedDownloads,
+    };
+    const item: HistoryItem = {
+      id: duplicateId,
+      createdAt: new Date().toISOString(),
+      filename: uploadMeta.filename || file?.name || "resume",
+      mode: result.tailoring_mode ?? tailoringMode,
+      score: result.score_summary?.fit_after ?? result.fit_score_after?.score ?? result.fit_score?.score ?? 0,
+      downloadUrl,
+      downloadFormat,
+      downloads: copiedDownloads,
+      roleHint: (jdText || jdUrl || companyUrl || "Role target").slice(0, 90),
+      saved: false,
+      source: "local",
+      snapshot,
+    };
+
+    setHistory((current) => {
+      const next = [item, ...current.filter((entry) => entry.id !== item.id)].slice(0, 12);
+      saveHistory(next);
+      return next;
+    });
+    setSelectedHistoryId(item.id);
+    setRestoredHistoryId(item.id);
+    setHistoryFilter("all");
+    setHistorySyncState("local");
+    setHistorySyncMessage(`${item.filename} duplicated in saved projects`);
+    setCopyState("Duplicated to saved projects");
+    openHistoryPanel();
+  }
+
   function clearLocalHistory() {
     const next = signedIn ? history.filter((entry) => isAccountHistoryItem(entry, syncedHistoryIds)) : [];
     setHistory(next);
@@ -2157,6 +2199,7 @@ export default function Page() {
             ? "Re-tailor"
             : "Run Tailor";
   const downloadReady = Boolean(downloadUrl && downloadState === "ready");
+  const canDuplicateCurrentRun = Boolean(result?.tailored_text?.trim() && uploadMeta && downloadUrl);
   const uploadFormats = capabilities?.upload_formats?.length ? capabilities.upload_formats : DEFAULT_UPLOAD_FORMATS;
   const exportFormats = customerExportFormats(capabilities?.export_formats, accountStatus?.entitlement);
   const selectedExportCapability = exportFormats.find((format) => format.format === selectedExportFormat) ?? exportFormats[0];
@@ -2398,7 +2441,12 @@ export default function Page() {
             <strong title={activeTitle}>{topbarLabel}</strong>
           </div>
           <div className="rf-studio-top-actions">
-            <button className="ghost-button studio-top-button" type="button" disabled={!result}>
+            <button
+              className="ghost-button studio-top-button"
+              type="button"
+              onClick={duplicateCurrentRun}
+              disabled={!canDuplicateCurrentRun}
+            >
               <RoleForgeIcon name="copy" size={16} /> Duplicate
             </button>
             {downloadReady && downloadUrl && currentDownloadAllowed ? (
