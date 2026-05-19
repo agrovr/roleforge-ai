@@ -1394,6 +1394,25 @@ export default function Page() {
     window.setTimeout(scrollWhenReady, 30);
   }, []);
 
+  const scrollToHistoryDetails = useCallback((behavior: ScrollBehavior = "smooth") => {
+    let attempts = 0;
+    const scrollWhenReady = () => {
+      const target = historyDetailRef.current;
+      if (target) {
+        const compact = window.matchMedia("(max-width: 720px)").matches;
+        target.scrollIntoView({ behavior: attempts === 0 ? behavior : "auto", block: compact ? "start" : "center" });
+        target.focus({ preventScroll: true });
+      }
+
+      attempts += 1;
+      if (attempts <= 6) {
+        window.setTimeout(scrollWhenReady, 70);
+      }
+    };
+
+    window.setTimeout(scrollWhenReady, 30);
+  }, []);
+
   const openHistoryPanel = useCallback(() => {
     setActiveTab("history");
     setAccountPanelOpen(false);
@@ -1417,10 +1436,7 @@ export default function Page() {
     setSelectedHistoryId(entry.id);
     setAccountPanelOpen(false);
     setProjectActionMessage("");
-    window.setTimeout(() => {
-      historyDetailRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      historyDetailRef.current?.focus({ preventScroll: true });
-    }, 0);
+    scrollToHistoryDetails();
   }
 
   function scrollToStudioEditor() {
