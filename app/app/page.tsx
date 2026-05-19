@@ -3172,30 +3172,16 @@ export default function Page() {
                             <div>
                               <button className="btn btn-soft btn-sm" type="button" onClick={() => restoreHistoryItem(entry)} disabled={!restorable}>Restore</button>
                               {entryDownloads.length ? (
-                                entryDownloads.map((download) => (
-                                  <a className="btn btn-soft btn-sm" href={download.url} download key={`version-download-${entry.id}-${download.format}`}>
-                                    {download.format.toUpperCase()}
-                                  </a>
-                                ))
+                                <span className="history-version-formats">
+                                  {entryDownloads.map((download) => download.format.toUpperCase()).join(" / ")} ready
+                                </span>
                               ) : (
-                                <button className="btn btn-soft btn-sm" type="button" disabled>No download</button>
+                                <span className="history-version-formats muted">No downloads</span>
                               )}
                             </div>
                           </article>
                         );
                       })}
-                    </div>
-                    <div className="history-detail-actions">
-                      <button className="btn btn-soft btn-sm" type="button" onClick={() => restoreHistoryItem(visibleSelectedHistoryItem)} disabled={!hasRestorableSnapshot(visibleSelectedHistoryItem)}>Restore</button>
-                      {visibleSelectedHistoryDownloads.length ? (
-                        visibleSelectedHistoryDownloads.map((download) => (
-                          <a className="btn btn-soft btn-sm" href={download.url} download key={`detail-download-${download.format}`}>
-                            Download {download.format.toUpperCase()}
-                          </a>
-                        ))
-                      ) : (
-                        <button className="btn btn-soft btn-sm" type="button" disabled>No download</button>
-                      )}
                     </div>
                   </aside>
                 ) : null}

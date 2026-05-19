@@ -3836,6 +3836,27 @@ html[data-theme="dark"] .result-box {
   font-size: 0.78rem;
 }
 
+.history-version-formats {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  padding: 5px 10px;
+  border: 1px solid color-mix(in srgb, var(--good) 34%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--good) 10%, var(--surface));
+  color: var(--good);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.history-version-formats.muted {
+  border-color: color-mix(in srgb, var(--ink-3) 30%, var(--line));
+  background: color-mix(in srgb, var(--ink-3) 8%, transparent);
+  color: var(--ink-3);
+}
+
 .history-version-list article > div,
 .history-detail-actions {
   grid-column: 1 / -1;
