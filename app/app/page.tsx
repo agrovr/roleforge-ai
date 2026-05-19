@@ -1440,11 +1440,22 @@ export default function Page() {
     scrollToHistoryDetails();
   }
 
-  function scrollToStudioEditor() {
-    window.setTimeout(() => {
-      editorSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      editorSectionRef.current?.focus({ preventScroll: true });
-    }, 30);
+  function scrollToStudioEditor(behavior: ScrollBehavior = "smooth") {
+    let attempts = 0;
+    const scrollWhenReady = () => {
+      const target = editorSectionRef.current;
+      if (target) {
+        target.scrollIntoView({ behavior: attempts === 0 ? behavior : "auto", block: "start" });
+        target.focus({ preventScroll: true });
+      }
+
+      attempts += 1;
+      if (attempts <= 8) {
+        window.setTimeout(scrollWhenReady, 80);
+      }
+    };
+
+    window.setTimeout(scrollWhenReady, 30);
   }
 
   function openPreviewMode(mode: PreviewMode) {
