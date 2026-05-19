@@ -3885,15 +3885,11 @@ html[data-theme="dark"] .result-box {
 }
 
 .history-version-list article > div {
-  grid-column: 1 / -1;
+  grid-column: auto;
   display: flex;
   justify-content: flex-end;
   gap: 8px;
   flex-wrap: wrap;
-}
-
-.history-version-list article > div {
-  grid-column: auto;
 }
 
 .history-version-more {
@@ -8513,14 +8509,24 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   }
 
   .history-filter-bar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     width: 100%;
-    justify-content: stretch;
   }
 
   .history-filter-bar button {
-    flex: 1 1 0;
+    gap: 5px;
     min-width: 0;
+    min-height: 34px;
     padding-inline: 8px;
+    line-height: 1.05;
+    white-space: normal;
+  }
+
+  .history-filter-bar span {
+    min-width: 18px;
+    height: 18px;
+    padding-inline: 5px;
   }
 
   .history-panel-actions,
@@ -8550,8 +8556,16 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     gap: 8px;
   }
 
+  .history-version-list article > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
   .history-actions .ghost-button,
-  .history-actions .btn {
+  .history-actions .btn,
+  .history-version-list article > div .btn,
+  .history-version-formats {
     width: 100%;
     min-width: 0;
     min-height: 42px;
