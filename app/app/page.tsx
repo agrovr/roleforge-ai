@@ -1440,7 +1440,14 @@ export default function Page() {
     scrollToHistoryDetails();
   }
 
+  function clearHistoryHash() {
+    if (window.location.hash !== "#history") return;
+    window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+  }
+
   function scrollToStudioEditor(behavior: ScrollBehavior = "smooth") {
+    clearHistoryHash();
+
     let attempts = 0;
     const scrollWhenReady = () => {
       const target = editorSectionRef.current;
