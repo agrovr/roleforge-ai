@@ -2169,11 +2169,12 @@ export default function Page() {
     if (droppedFile) setFile(droppedFile);
   }
 
-  async function copyDownloadUrl() {
-    if (!downloadUrl || downloadState !== "ready") return;
+  async function copyCoverLetter(text: string) {
+    const letter = text.trim();
+    if (!letter) return;
     try {
-      await navigator.clipboard.writeText(downloadUrl);
-      setCopyState("Copied");
+      await navigator.clipboard.writeText(letter);
+      setCopyState("Cover letter copied");
       window.setTimeout(() => setCopyState(""), 1600);
     } catch {
       setCopyState("Copy failed");
@@ -2214,6 +2215,7 @@ export default function Page() {
             ? "Re-tailor"
             : "Run Tailor";
   const downloadReady = Boolean(downloadUrl && downloadState === "ready");
+  const coverLetterText = result?.cover_letter?.trim() ?? "";
   const canDuplicateCurrentRun = Boolean(result?.tailored_text?.trim() && uploadMeta && downloadUrl);
   const uploadFormats = capabilities?.upload_formats?.length ? capabilities.upload_formats : DEFAULT_UPLOAD_FORMATS;
   const exportFormats = customerExportFormats(capabilities?.export_formats, accountStatus?.entitlement);
@@ -2828,11 +2830,17 @@ export default function Page() {
                 <article className="generated-card">
                   <div className="generated-head"><RoleForgeIcon name="mail" size={14} /> Cover letter</div>
                   <div className="generated-body">
-                    {result?.cover_letter ? result.cover_letter : "After tailoring, the generated cover letter will appear here for review."}
+                    {coverLetterText || "After tailoring, the generated cover letter will appear here for review."}
                   </div>
                   <div className="suggestion-actions">
-                    <button className="btn btn-soft btn-sm" type="button" onClick={() => setActiveTab("cover")}><RoleForgeIcon name="edit" size={12} />Open</button>
-                    <button className="btn btn-soft btn-sm" type="button" onClick={copyDownloadUrl} disabled={!downloadReady}><RoleForgeIcon name="copy" size={12} />Copy link</button>
+                    {coverLetterText ? (
+                      <>
+                        <button className="btn btn-soft btn-sm" type="button" onClick={() => setActiveTab("cover")}><RoleForgeIcon name="edit" size={12} />Open</button>
+                        <button className="btn btn-soft btn-sm" type="button" onClick={() => copyCoverLetter(coverLetterText)}><RoleForgeIcon name="copy" size={12} />Copy letter</button>
+                      </>
+                    ) : (
+                      <span className="generated-action-note">Ready after tailoring</span>
+                    )}
                   </div>
                 </article>
                 <article className="generated-card">

@@ -6456,6 +6456,18 @@ html[data-theme="dark"] input::file-selector-button {
   white-space: pre-wrap;
 }
 
+.generated-action-note {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: var(--ink-3);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
 .generated-list {
   display: grid;
   gap: 10px;
