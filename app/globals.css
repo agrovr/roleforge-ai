@@ -3335,13 +3335,16 @@ html[data-theme="dark"] .result-box {
 }
 
 .history-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 14px 18px;
+  border-radius: 14px;
 }
 
 .history-item-main {
+  display: grid;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -3376,8 +3379,9 @@ html[data-theme="dark"] .result-box {
 }
 
 .history-item p {
-  margin: 6px 0;
+  margin: 0;
   color: var(--ink-2);
+  line-height: 1.35;
 }
 
 .history-item span,
@@ -3390,6 +3394,7 @@ html[data-theme="dark"] .result-box {
   display: flex;
   flex-wrap: wrap;
   gap: 6px 12px;
+  line-height: 1.35;
 }
 
 .history-project-meta span {
@@ -3550,7 +3555,7 @@ html[data-theme="dark"] .result-box {
 
 .history-project-facts {
   display: grid;
-  grid-template-columns: minmax(90px, 0.55fr) minmax(110px, 0.7fr) minmax(150px, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   margin: 12px 0 8px;
 }
@@ -3593,10 +3598,12 @@ html[data-theme="dark"] .result-box {
   justify-content: flex-end;
   gap: 8px;
   flex-wrap: wrap;
+  max-width: 560px;
 }
 
 .history-actions .ghost-button {
   min-height: 38px;
+  white-space: nowrap;
 }
 
 .history-rename-field {
@@ -3629,13 +3636,13 @@ html[data-theme="dark"] .result-box {
 
 .history-detail-panel {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.82fr);
-  gap: 16px;
+  grid-template-columns: minmax(0, 1.08fr) minmax(240px, 0.78fr);
+  gap: 14px;
   align-items: start;
   margin-top: 14px;
-  padding: 16px;
+  padding: 18px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 14px;
   background: color-mix(in srgb, var(--surface) 82%, var(--bg-alt));
 }
 
@@ -3683,6 +3690,14 @@ html[data-theme="dark"] .result-box {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin: 0;
+}
+
+.history-detail-panel dl > div {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-strong) 48%, transparent);
 }
 
 .history-detail-panel dt {
@@ -3739,7 +3754,7 @@ html[data-theme="dark"] .result-box {
   align-items: center;
   padding: 14px;
   border: 1px solid rgba(40, 31, 55, 0.12);
-  border-radius: 18px;
+  border-radius: 14px;
   background:
     linear-gradient(135deg, rgba(231, 188, 111, 0.1), rgba(255, 255, 255, 0.42)),
     rgba(255, 252, 244, 0.68);
@@ -3782,6 +3797,10 @@ html[data-theme="dark"] .result-box {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.history-download-panel .btn {
+  min-width: 132px;
 }
 
 .history-version-list {
@@ -3857,8 +3876,7 @@ html[data-theme="dark"] .result-box {
   color: var(--ink-3);
 }
 
-.history-version-list article > div,
-.history-detail-actions {
+.history-version-list article > div {
   grid-column: 1 / -1;
   display: flex;
   justify-content: flex-end;
@@ -6808,12 +6826,21 @@ html[data-theme="dark"] .rf-rail-upgrade p {
   }
 
   .history-version-list article > div,
-  .history-export-actions,
-  .history-detail-actions {
+  .history-export-actions {
     justify-content: flex-start;
   }
 
   .history-panel-actions {
+    justify-content: flex-start;
+  }
+
+  .history-item {
+    grid-template-columns: 1fr;
+  }
+
+  .history-actions {
+    width: 100%;
+    max-width: none;
     justify-content: flex-start;
   }
 
@@ -8279,16 +8306,29 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     padding-inline: 8px;
   }
 
-  .history-detail-actions {
+  .history-panel-actions,
+  .history-actions,
+  .history-download-panel > div,
+  .history-version-list article > div {
+    width: 100%;
     justify-content: stretch;
   }
 
   .history-export-actions {
+    width: 100%;
     justify-content: stretch;
   }
 
+  .history-actions .ghost-button,
+  .history-download-panel .btn,
+  .history-version-list article > div .btn,
+  .history-version-formats {
+    flex: 1 1 140px;
+    justify-content: center;
+  }
+
   .history-export-actions .btn,
-  .history-detail-actions .btn {
+  .history-download-panel .btn {
     width: 100%;
   }
 
