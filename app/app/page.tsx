@@ -3023,8 +3023,8 @@ export default function Page() {
                           ? "Saved projects"
                           : "Recent runs"}
                     </h2>
-                    <p className="history-sync-note">{historySyncMessage}</p>
-                    {projectActionMessage ? <p className="history-action-note error">{projectActionMessage}</p> : null}
+                    <p className="history-sync-note" role="status" aria-live="polite">{historySyncMessage}</p>
+                    {projectActionMessage ? <p className="history-action-note error" role="alert">{projectActionMessage}</p> : null}
                   </div>
                   <div className="history-panel-actions">
                     {showHistoryFilter ? (
@@ -3151,7 +3151,7 @@ export default function Page() {
                             <span>{historyGroupSummary(group)}</span>
                             <span>{entry.mode} mode</span>
                           </div>
-                          {projectActionMessage && actionBusy ? <small className="history-action-note error">{projectActionMessage}</small> : null}
+                          {projectActionMessage && actionBusy ? <small className="history-action-note error" role="alert">{projectActionMessage}</small> : null}
                         </div>
                         <div className="history-actions">
                           {isEditingProject ? (
@@ -3176,7 +3176,13 @@ export default function Page() {
                           <button className="ghost-button" type="button" onClick={() => openHistoryDetails(entry)} aria-pressed={selected}>
                             Details <RoleForgeIcon name="doc" size={14} />
                           </button>
-                          <button className="ghost-button" type="button" onClick={() => restoreHistoryItem(entry)} disabled={!restorable}>
+                          <button
+                            className="ghost-button"
+                            type="button"
+                            onClick={() => restoreHistoryItem(entry)}
+                            disabled={!restorable}
+                            title={restorable ? `Restore ${entry.filename} in the studio` : "This saved run only has a download link"}
+                          >
                             Restore <RoleForgeIcon name="edit" size={14} />
                           </button>
                           {primaryDownload ? (
@@ -3284,7 +3290,15 @@ export default function Page() {
                               <span>{formatHistoryTimestamp(entry.createdAt)} · {entry.score}/100 · {entry.mode} · {historyStatusLabel(entry, syncedHistoryIds)}</span>
                             </button>
                             <div>
-                              <button className="btn btn-soft btn-sm" type="button" onClick={() => restoreHistoryItem(entry)} disabled={!restorable}>Restore</button>
+                              <button
+                                className="btn btn-soft btn-sm"
+                                type="button"
+                                onClick={() => restoreHistoryItem(entry)}
+                                disabled={!restorable}
+                                title={restorable ? `Restore ${entry.filename} in the studio` : "This saved run only has a download link"}
+                              >
+                                Restore
+                              </button>
                               {entryDownloads.length ? (
                                 <span className="history-version-formats">
                                   {entryDownloads.map((download) => download.format.toUpperCase()).join(" / ")} ready
