@@ -1,5 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+type ExportFormat = "pdf" | "docx" | "txt";
+type SavedDownloadMap = Partial<Record<ExportFormat, string>>;
+
 export type SavedHistoryItem = {
   id: string;
   accountRunId?: string;
@@ -10,7 +13,8 @@ export type SavedHistoryItem = {
   mode: "conservative" | "balanced" | "aggressive";
   score: number;
   downloadUrl: string;
-  downloadFormat?: "pdf" | "docx" | "txt";
+  downloadFormat?: ExportFormat;
+  downloads?: SavedDownloadMap;
   roleHint: string;
   saved?: boolean;
   source?: "account" | "local";
@@ -41,7 +45,7 @@ type TailorRunRow = {
   job_target: string | null;
   mode: "conservative" | "balanced" | "aggressive";
   fit_score: number | null;
-  download_format: "pdf" | "docx" | "txt" | null;
+  download_format: ExportFormat | null;
   download_url: string | null;
   payload: Record<string, unknown> | null;
 };
@@ -50,6 +54,17 @@ function titleFromTarget(value: string | undefined) {
   const trimmed = value?.replace(/\s+/g, " ").trim();
   if (!trimmed) return "Resume project";
   return trimmed.length > 80 ? `${trimmed.slice(0, 79).trimEnd()}...` : trimmed;
+}
+
+function readSnapshotDownloads(snapshot: Record<string, unknown> | undefined) {
+  const rawDownloads = snapshot?.downloads;
+  if (!rawDownloads || typeof rawDownloads !== "object") return {};
+
+  return (["pdf", "docx", "txt"] as ExportFormat[]).reduce<SavedDownloadMap>((downloads, format) => {
+    const value = (rawDownloads as Record<string, unknown>)[format];
+    if (typeof value === "string" && value && value !== "#") downloads[format] = value;
+    return downloads;
+  }, {});
 }
 
 export async function loadSavedRuns(client: SupabaseClient): Promise<SavedHistoryItem[]> {
@@ -63,6 +78,10 @@ export async function loadSavedRuns(client: SupabaseClient): Promise<SavedHistor
 
   return ((data ?? []) as TailorRunRow[]).map((run) => {
     const project = Array.isArray(run.resume_projects) ? run.resume_projects[0] : run.resume_projects;
+    const snapshot = (run.payload?.studioSnapshot as Record<string, unknown> | undefined) ?? undefined;
+    const downloadFormat = run.download_format || "pdf";
+    const downloads = readSnapshotDownloads(snapshot);
+    if (run.download_url && run.download_url !== "#") downloads[downloadFormat] = run.download_url;
 
     return {
       id: run.client_history_id || run.id,
@@ -74,11 +93,12 @@ export async function loadSavedRuns(client: SupabaseClient): Promise<SavedHistor
       mode: run.mode || "balanced",
       score: run.fit_score ?? 0,
       downloadUrl: run.download_url || "#",
-      downloadFormat: run.download_format || "pdf",
+      downloadFormat,
+      downloads,
       roleHint: titleFromTarget(run.job_target ?? undefined),
       saved: true,
       source: "account",
-      snapshot: (run.payload?.studioSnapshot as Record<string, unknown> | undefined) ?? undefined,
+      snapshot,
     };
   });
 }

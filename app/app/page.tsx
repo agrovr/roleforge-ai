@@ -88,6 +88,7 @@ type HistoryFilter = "all" | "account" | "local";
 type PreviewUploadState = "idle" | "reading" | "ready" | "error";
 type DownloadState = "idle" | "checking" | "ready" | "expired";
 type ReviewTab = "score" | "gap" | "ats" | "resume" | "cover" | "interview" | "changes" | "history";
+type HistoryDownloads = Partial<Record<ExportFormat, string>>;
 type SavedRunSnapshot = {
   result: TailorResult;
   sourcePreviewText?: string;
@@ -99,6 +100,7 @@ type SavedRunSnapshot = {
   tailoringMode?: TailoringMode;
   downloadUrl?: string;
   downloadFormat?: ExportFormat;
+  downloads?: HistoryDownloads;
 };
 type AccountUser = { id: string; email?: string; name?: string };
 type AccountUsage = {
@@ -129,6 +131,7 @@ type HistoryItem = {
   score: number;
   downloadUrl: string;
   downloadFormat?: ExportFormat;
+  downloads?: HistoryDownloads;
   roleHint: string;
   saved?: boolean;
   source?: "local" | "account";
@@ -168,6 +171,7 @@ type PlainResumeLine = { text: string; kind: "heading" | "bullet" | "body" };
 
 const HISTORY_KEY = "resume-tailor-history-v1";
 const SYNCED_HISTORY_KEY = "roleforge-synced-history-v1";
+const EXPORT_FORMAT_ORDER: ExportFormat[] = ["pdf", "docx", "txt"];
 const DEFAULT_UPLOAD_FORMATS: UploadCapability[] = [
   { format: "docx", label: "DOCX", enabled: true },
   { format: "pdf", label: "PDF", enabled: true },
@@ -932,6 +936,43 @@ function hasRestorableSnapshot(item: HistoryItem) {
   return Boolean(item.snapshot?.result?.tailored_text?.trim());
 }
 
+function validHistoryDownloadUrl(url?: string | null) {
+  return Boolean(url && url !== "#");
+}
+
+function historyDownloads(item: HistoryItem): HistoryDownloads {
+  const downloads: HistoryDownloads = {
+    ...(item.snapshot?.downloads ?? {}),
+    ...(item.downloads ?? {}),
+  };
+  const latestFormat = item.downloadFormat ?? item.snapshot?.downloadFormat ?? "pdf";
+  const latestUrl = item.downloadUrl || item.snapshot?.downloadUrl;
+
+  if (validHistoryDownloadUrl(latestUrl)) {
+    downloads[latestFormat] = latestUrl;
+  }
+
+  return EXPORT_FORMAT_ORDER.reduce<HistoryDownloads>((readyDownloads, format) => {
+    const url = downloads[format];
+    if (validHistoryDownloadUrl(url)) readyDownloads[format] = url;
+    return readyDownloads;
+  }, {});
+}
+
+function historyDownloadEntries(item: HistoryItem, entitlement?: AccountEntitlement) {
+  const downloads = historyDownloads(item);
+  return EXPORT_FORMAT_ORDER.flatMap((format) => {
+    const url = downloads[format];
+    return url && exportFormatAllowed(format, entitlement) ? [{ format, url }] : [];
+  });
+}
+
+function primaryHistoryDownload(item: HistoryItem, entitlement?: AccountEntitlement) {
+  const downloads = historyDownloadEntries(item, entitlement);
+  const latestFormat = item.downloadFormat ?? item.snapshot?.downloadFormat ?? "pdf";
+  return downloads.find((download) => download.format === latestFormat) ?? downloads[0] ?? null;
+}
+
 function isAccountHistoryItem(item: HistoryItem, syncedIds: string[] = []) {
   return Boolean(item.saved || item.source === "account" || syncedIds.includes(item.id) || (item.accountRunId && syncedIds.includes(item.accountRunId)));
 }
@@ -1028,7 +1069,7 @@ function groupHistoryItems(items: HistoryItem[], syncedIds: string[] = []): Hist
         accountCount: accountItems.length,
         localCount: sorted.length - accountItems.length,
         restorableCount: sorted.filter(hasRestorableSnapshot).length,
-        downloadableCount: sorted.filter((item) => item.downloadUrl && item.downloadUrl !== "#").length,
+        downloadableCount: sorted.filter((item) => Object.keys(historyDownloads(item)).length > 0).length,
         bestScore: Math.max(...sorted.map((item) => item.score || 0)),
       };
     })
@@ -1051,7 +1092,10 @@ function mergeHistory(localItems: HistoryItem[], savedItems: HistoryItem[]) {
             projectTitle: existing.projectTitle ?? item.projectTitle,
             saved: Boolean(existing.saved || item.saved),
             source: existing.source === "account" || item.source === "account" ? "account" : "local",
+            downloadUrl: validHistoryDownloadUrl(existing.downloadUrl) ? existing.downloadUrl : item.downloadUrl,
+            downloadFormat: existing.downloadFormat ?? item.downloadFormat,
             snapshot: existing.snapshot ?? item.snapshot,
+            downloads: { ...historyDownloads(item), ...historyDownloads(existing) },
           }
         : item,
     );
@@ -1729,10 +1773,11 @@ export default function Page() {
 
       if (!matches) return entry;
 
+      const nextDownloads = { ...historyDownloads(entry), [format]: url };
       const nextSnapshot = entry.snapshot
-        ? { ...entry.snapshot, downloadUrl: url, downloadFormat: format }
+        ? { ...entry.snapshot, downloadUrl: url, downloadFormat: format, downloads: nextDownloads }
         : entry.snapshot;
-      const nextEntry = { ...entry, downloadUrl: url, downloadFormat: format, snapshot: nextSnapshot };
+      const nextEntry = { ...entry, downloadUrl: url, downloadFormat: format, downloads: nextDownloads, snapshot: nextSnapshot };
       updatedItem = nextEntry;
       return nextEntry;
     });
@@ -1751,10 +1796,11 @@ export default function Page() {
     const nextHistory = history.map((candidate) => {
       if (candidate.id !== entry.id) return candidate;
 
+      const nextDownloads = { ...historyDownloads(candidate), [format]: url };
       const nextSnapshot = candidate.snapshot
-        ? { ...candidate.snapshot, downloadUrl: url, downloadFormat: format }
+        ? { ...candidate.snapshot, downloadUrl: url, downloadFormat: format, downloads: nextDownloads }
         : candidate.snapshot;
-      const nextEntry = { ...candidate, downloadUrl: url, downloadFormat: format, snapshot: nextSnapshot };
+      const nextEntry = { ...candidate, downloadUrl: url, downloadFormat: format, downloads: nextDownloads, snapshot: nextSnapshot };
       updatedItem = nextEntry;
       return nextEntry;
     });
@@ -1828,6 +1874,7 @@ export default function Page() {
       tailoringMode: output.tailoring_mode ?? tailoringMode,
       downloadUrl: url,
       downloadFormat: format,
+      downloads: { [format]: url },
     };
   }
 
@@ -1974,6 +2021,7 @@ export default function Page() {
         score: output.score_summary?.fit_after ?? output.fit_score_after?.score ?? output.fit_score?.score ?? 0,
         downloadUrl: url,
         downloadFormat: "pdf",
+        downloads: { pdf: url },
         roleHint: (jdText || jdUrl || "Role target").slice(0, 90),
         saved: false,
         source: "local",
@@ -2303,8 +2351,8 @@ export default function Page() {
         : signedIn
           ? "Complete a tailor run and it will save here with resume preview, target details, scores, and a one-click studio restore."
           : "Complete a tailor run and it will stay in this browser with the preview, target, scores, and download ready to reopen.";
-  const canDownloadHistoryItem = (entry: HistoryItem) =>
-    Boolean(entry.downloadUrl && entry.downloadUrl !== "#" && exportFormatAllowed(entry.downloadFormat ?? "pdf", accountStatus?.entitlement));
+  const historyDownloadEntriesFor = (entry: HistoryItem) => historyDownloadEntries(entry, accountStatus?.entitlement);
+  const canDownloadHistoryItem = (entry: HistoryItem) => historyDownloadEntriesFor(entry).length > 0;
   const visibleRunCount = visibleHistoryGroups.reduce((total, group) => total + group.items.length, 0);
   const visibleAccountProjectCount = visibleHistoryGroups.filter((group) => group.accountCount > 0).length;
   const visibleRestoreReadyCount = visibleHistoryGroups.reduce((total, group) => total + group.restorableCount, 0);
@@ -2317,7 +2365,8 @@ export default function Page() {
     selectedHistoryGroup && selectedHistoryIndex >= 0
       ? historyVersionLabel(selectedHistoryGroup.items.length, selectedHistoryIndex)
       : "Latest run";
-  const selectedHistoryDownloadCount = selectedHistoryGroup?.items.filter(canDownloadHistoryItem).length ?? 0;
+  const visibleSelectedHistoryDownloads = visibleSelectedHistoryItem ? historyDownloadEntriesFor(visibleSelectedHistoryItem) : [];
+  const selectedHistoryDownloadCount = visibleSelectedHistoryDownloads.length;
   const workspacePanelOpen = activeTab === "history";
 
   const suggestionCards: StudioSuggestion[] = result
@@ -2932,13 +2981,14 @@ export default function Page() {
                     const entry = group.latest;
                     const manageEntry = group.accountItem ?? entry;
                     const restorable = hasRestorableSnapshot(entry);
-                    const canDownload = canDownloadHistoryItem(entry);
+                    const primaryDownload = primaryHistoryDownload(entry, accountStatus?.entitlement);
+                    const availableDownloadCount = historyDownloadEntriesFor(entry).length;
                     const canManageProject = Boolean(group.accountItem?.projectId && signedIn);
                     const isEditingProject = Boolean(canManageProject && editingProjectId === group.accountItem?.projectId);
                     const actionBusy = group.items.some((item) => projectActionId === item.id);
                     const selected = group.items.some((item) => selectedHistoryId === item.id);
                     const active = group.items.some((item) => restoredHistoryId === item.id);
-                    const latestDownloadLabel = entry.downloadFormat?.toUpperCase() ?? "PDF";
+                    const latestDownloadLabel = primaryDownload?.format.toUpperCase() ?? entry.downloadFormat?.toUpperCase() ?? "PDF";
                     return (
                       <article className={`history-item${active ? " active" : ""}${selected ? " selected" : ""}`} key={group.key}>
                         <div className="history-item-main">
@@ -3015,8 +3065,10 @@ export default function Page() {
                           <button className="ghost-button" type="button" onClick={() => restoreHistoryItem(entry)} disabled={!restorable}>
                             Restore <RoleForgeIcon name="edit" size={14} />
                           </button>
-                          {canDownload ? (
-                            <a className="ghost-button" href={entry.downloadUrl} download>Download {latestDownloadLabel} <RoleForgeIcon name="download" size={14} /></a>
+                          {primaryDownload ? (
+                            <a className="ghost-button" href={primaryDownload.url} download>
+                              Download {latestDownloadLabel}{availableDownloadCount > 1 ? ` +${availableDownloadCount - 1}` : ""} <RoleForgeIcon name="download" size={14} />
+                            </a>
                           ) : (
                             <button className="ghost-button" type="button" disabled>Download {latestDownloadLabel} <RoleForgeIcon name="download" size={14} /></button>
                           )}
@@ -3057,7 +3109,7 @@ export default function Page() {
                       </div>
                       <div>
                         <dt>Export</dt>
-                        <dd>{selectedHistoryDownloadCount ? `${selectedHistoryDownloadCount} ready` : "No download link"}</dd>
+                        <dd>{selectedHistoryDownloadCount ? `${selectedHistoryDownloadCount} file${selectedHistoryDownloadCount === 1 ? "" : "s"} ready` : "No download link"}</dd>
                       </div>
                     </dl>
                     <div className="history-selected-run">
@@ -3076,7 +3128,8 @@ export default function Page() {
                           const exporting = historyExportRequest?.id === visibleSelectedHistoryItem.id && historyExportRequest.format === format.format;
                           const blocked = !hasRestorableSnapshot(visibleSelectedHistoryItem);
                           const existingDownloadReady =
-                            canDownloadHistoryItem(visibleSelectedHistoryItem) && visibleSelectedHistoryItem.downloadFormat === format.format;
+                            Boolean(historyDownloads(visibleSelectedHistoryItem)[format.format]) &&
+                            exportFormatAllowed(format.format, accountStatus?.entitlement);
                           return (
                             <button
                               className={`btn btn-soft btn-sm ${format.enabled ? "" : "locked"}`}
@@ -3087,17 +3140,29 @@ export default function Page() {
                               title={format.enabled ? `Export ${label}` : `${label} exports unlock with Premium`}
                             >
                               {!format.enabled ? <RoleForgeIcon name="lock" size={12} /> : null}
-                              {exporting ? `Exporting ${label}` : existingDownloadReady ? `${label} ready` : `Export ${label}`}
+                              {exporting ? `Exporting ${label}` : existingDownloadReady ? `Refresh ${label}` : `Export ${label}`}
                             </button>
                           );
                         })}
                       </div>
                     </div>
+                    {visibleSelectedHistoryDownloads.length ? (
+                      <div className="history-download-panel" aria-label="Ready downloads for selected run">
+                        <span className="eyebrow">Ready downloads</span>
+                        <div>
+                          {visibleSelectedHistoryDownloads.map((download) => (
+                            <a className="btn btn-soft btn-sm" href={download.url} download key={`selected-download-${download.format}`}>
+                              Download {download.format.toUpperCase()} <RoleForgeIcon name="download" size={12} />
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
                     <div className="history-version-list" aria-label="Runs in this project">
                       {selectedHistoryGroup.items.slice(0, 5).map((entry, index) => {
                         const restorable = hasRestorableSnapshot(entry);
                         const versionLabel = historyVersionLabel(selectedHistoryGroup.items.length, index);
-                        const downloadLabel = entry.downloadFormat?.toUpperCase() ?? "PDF";
+                        const entryDownloads = historyDownloadEntriesFor(entry);
                         return (
                           <article className={selectedHistoryId === entry.id ? "selected" : ""} key={`detail-${entry.id}`}>
                             <button type="button" onClick={() => setSelectedHistoryId(entry.id)} aria-pressed={selectedHistoryId === entry.id}>
@@ -3106,10 +3171,14 @@ export default function Page() {
                             </button>
                             <div>
                               <button className="btn btn-soft btn-sm" type="button" onClick={() => restoreHistoryItem(entry)} disabled={!restorable}>Restore</button>
-                              {canDownloadHistoryItem(entry) ? (
-                                <a className="btn btn-soft btn-sm" href={entry.downloadUrl} download>{downloadLabel}</a>
+                              {entryDownloads.length ? (
+                                entryDownloads.map((download) => (
+                                  <a className="btn btn-soft btn-sm" href={download.url} download key={`version-download-${entry.id}-${download.format}`}>
+                                    {download.format.toUpperCase()}
+                                  </a>
+                                ))
                               ) : (
-                                <button className="btn btn-soft btn-sm" type="button" disabled>{downloadLabel}</button>
+                                <button className="btn btn-soft btn-sm" type="button" disabled>No download</button>
                               )}
                             </div>
                           </article>
@@ -3118,10 +3187,14 @@ export default function Page() {
                     </div>
                     <div className="history-detail-actions">
                       <button className="btn btn-soft btn-sm" type="button" onClick={() => restoreHistoryItem(visibleSelectedHistoryItem)} disabled={!hasRestorableSnapshot(visibleSelectedHistoryItem)}>Restore</button>
-                      {canDownloadHistoryItem(visibleSelectedHistoryItem) ? (
-                        <a className="btn btn-soft btn-sm" href={visibleSelectedHistoryItem.downloadUrl} download>Download {visibleSelectedHistoryItem.downloadFormat?.toUpperCase() ?? "PDF"}</a>
+                      {visibleSelectedHistoryDownloads.length ? (
+                        visibleSelectedHistoryDownloads.map((download) => (
+                          <a className="btn btn-soft btn-sm" href={download.url} download key={`detail-download-${download.format}`}>
+                            Download {download.format.toUpperCase()}
+                          </a>
+                        ))
                       ) : (
-                        <button className="btn btn-soft btn-sm" type="button" disabled>Download {visibleSelectedHistoryItem.downloadFormat?.toUpperCase() ?? "PDF"}</button>
+                        <button className="btn btn-soft btn-sm" type="button" disabled>No download</button>
                       )}
                     </div>
                   </aside>

@@ -3768,6 +3768,22 @@ html[data-theme="dark"] .result-box {
   border-style: dashed;
 }
 
+.history-download-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 86%, var(--bg-alt));
+}
+
+.history-download-panel > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .history-version-list {
   grid-column: 1 / -1;
   display: grid;
@@ -6756,6 +6772,7 @@ html[data-theme="dark"] .rf-rail-upgrade p {
   .history-detail-panel,
   .history-detail-panel dl,
   .history-export-panel,
+  .history-download-panel,
   .history-version-list article {
     grid-template-columns: 1fr;
   }
@@ -8014,6 +8031,7 @@ html[data-theme="dark"] .history-item .ghost-button[aria-pressed="true"] {
 html[data-theme="dark"] .history-rename-field input,
 html[data-theme="dark"] .history-detail-panel,
 html[data-theme="dark"] .history-export-panel,
+html[data-theme="dark"] .history-download-panel,
 html[data-theme="dark"] .history-version-list article {
   background:
     linear-gradient(180deg, rgba(255, 247, 233, 0.045), rgba(255, 247, 233, 0.02)),
@@ -8218,7 +8236,8 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
   .history-detail-panel,
   .history-detail-panel dl,
-  .history-export-panel {
+  .history-export-panel,
+  .history-download-panel {
     grid-template-columns: 1fr;
   }
 
