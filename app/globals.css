@@ -8410,10 +8410,13 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     grid-template-columns: 1fr;
   }
 
-  .history-overview,
   .history-project-facts,
   .history-selected-run {
     grid-template-columns: 1fr;
+  }
+
+  .history-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .history-filter-bar {
