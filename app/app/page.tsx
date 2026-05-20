@@ -2387,6 +2387,8 @@ export default function Page() {
     previewMode === "original"
       ? sourcePreviewUnavailable
         ? "Original resume · preview unavailable"
+        : restoredSourceMissing
+          ? "Original resume · source not saved"
         : "Original resume · before tailoring"
       : previewMode === "diff"
         ? "Change notes · before export"
