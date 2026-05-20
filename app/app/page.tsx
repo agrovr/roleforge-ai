@@ -1743,7 +1743,11 @@ export default function Page() {
     return data;
   }
 
-  async function exportResume(tailoredText: string, format: ExportFormat = "pdf"): Promise<string> {
+  async function exportResume(
+    tailoredText: string,
+    format: ExportFormat = "pdf",
+    options: { updateActiveDownload?: boolean } = {},
+  ): Promise<string> {
     if (!baseUrl) throw new Error("Export is not available yet.");
 
     const response = await fetch(`${baseUrl}/export`, {
@@ -1760,10 +1764,12 @@ export default function Page() {
 
     const data = (await response.json()) as ExportResponse;
     const url = `${baseUrl}/download/${data.download_filename}`;
-    setDownloadUrl(url);
-    setDownloadFormat(format);
-    setDownloadState("checking");
-    setDownloadMessage(`Checking ${format.toUpperCase()} download...`);
+    if (options.updateActiveDownload ?? true) {
+      setDownloadUrl(url);
+      setDownloadFormat(format);
+      setDownloadState("checking");
+      setDownloadMessage(`Checking ${format.toUpperCase()} download...`);
+    }
     return url;
   }
 
@@ -1843,17 +1849,10 @@ export default function Page() {
   }
 
   function updateCurrentHistoryExport(url: string, format: ExportFormat) {
-    const matchIds = new Set([restoredHistoryId, result?.run_id, resumeId].filter(Boolean) as string[]);
     let updatedItem: HistoryItem | null = null;
 
     const nextHistory = history.map((entry) => {
-      const snapshotRunId = entry.snapshot?.result?.run_id;
-      const matches =
-        matchIds.has(entry.id) ||
-        Boolean(entry.accountRunId && matchIds.has(entry.accountRunId)) ||
-        Boolean(snapshotRunId && matchIds.has(snapshotRunId));
-
-      if (!matches) return entry;
+      if (!historyEntryIsOpenInStudio(entry)) return entry;
 
       const nextDownloads = { ...historyDownloads(entry), [format]: url };
       const nextSnapshot = entry.snapshot
@@ -1870,6 +1869,19 @@ export default function Page() {
     }
 
     return updatedItem;
+  }
+
+  function historyEntryIsOpenInStudio(entry: HistoryItem) {
+    const matchIds = new Set([restoredHistoryId, result?.run_id, resumeId, uploadMeta?.resume_id].filter(Boolean) as string[]);
+    const snapshotRunId = entry.snapshot?.result?.run_id;
+    const snapshotResumeId = entry.snapshot?.uploadMeta?.resume_id;
+
+    return (
+      matchIds.has(entry.id) ||
+      Boolean(entry.accountRunId && matchIds.has(entry.accountRunId)) ||
+      Boolean(snapshotRunId && matchIds.has(snapshotRunId)) ||
+      Boolean(snapshotResumeId && matchIds.has(snapshotResumeId))
+    );
   }
 
   function updateHistoryEntryExport(entry: HistoryItem, url: string, format: ExportFormat) {
@@ -1917,11 +1929,14 @@ export default function Page() {
     setExportNotice(null);
 
     try {
-      const url = await exportResume(tailoredText, format);
+      const updatesActiveStudioDownload = historyEntryIsOpenInStudio(entry);
+      const url = await exportResume(tailoredText, format, { updateActiveDownload: updatesActiveStudioDownload });
       const updatedItem = updateHistoryEntryExport(entry, url, format);
       setSelectedHistoryId(entry.id);
-      setDownloadFormat(format);
-      setSelectedExportFormat(format);
+      if (updatesActiveStudioDownload) {
+        setDownloadFormat(format);
+        setSelectedExportFormat(format);
+      }
       setCopyState(`${label} export ready`);
       setHistorySyncState(isAccountHistoryItem(entry, syncedHistoryIds) ? "synced" : "local");
       setHistorySyncMessage(`${label} export ready for ${entry.filename}`);
