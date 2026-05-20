@@ -6022,7 +6022,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .rf-live-card {
-  min-height: 760px;
+  min-height: 0;
 }
 
 .rf-preview-wrap {
