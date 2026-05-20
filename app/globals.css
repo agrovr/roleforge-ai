@@ -5303,6 +5303,94 @@ html[data-theme="dark"] input::file-selector-button {
   line-height: 1.5;
 }
 
+.studio-auth-shell {
+  background:
+    radial-gradient(circle at 82% 14%, rgba(222, 162, 79, 0.18), transparent 24rem),
+    radial-gradient(circle at 8% 76%, rgba(137, 209, 190, 0.16), transparent 26rem),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
+}
+
+.studio-auth-panel {
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 420px);
+}
+
+.studio-auth-copy h1 {
+  max-width: 760px;
+}
+
+.studio-auth-card {
+  align-self: center;
+}
+
+.studio-auth-preview {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--line));
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 48%, transparent), transparent),
+    color-mix(in srgb, var(--surface) 86%, var(--bg-alt));
+}
+
+.studio-auth-preview span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-2);
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.studio-auth-preview strong {
+  color: var(--ink-0);
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 4vw, 2.3rem);
+  line-height: 0.95;
+}
+
+.studio-auth-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.studio-auth-actions .primary-button,
+.studio-auth-actions .ghost-button {
+  justify-content: center;
+  width: 100%;
+  min-height: 54px;
+  text-decoration: none;
+}
+
+.studio-auth-progress {
+  position: relative;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--line) 76%, transparent);
+}
+
+.studio-auth-progress::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  width: 34%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand), var(--mint));
+  animation: studio-auth-progress 1.15s ease-in-out infinite alternate;
+}
+
+@keyframes studio-auth-progress {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(186%);
+  }
+}
+
 .settings-page-shell {
   min-height: 100vh;
   padding: 28px clamp(18px, 4vw, 54px) 54px;

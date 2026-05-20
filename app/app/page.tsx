@@ -1255,6 +1255,71 @@ function accountNoticeLabel(value: string, detail = "") {
   }
 }
 
+function StudioAccountGate({ state }: { state: "loading" | "required" }) {
+  const isLoading = state === "loading";
+
+  return (
+    <main className="login-shell studio-auth-shell">
+      <header className="login-nav studio-auth-nav">
+        <Brand href="/" label="RoleForge AI home" />
+        <div className="login-nav-actions">
+          <ThemeToggle />
+          <Link className="btn btn-soft btn-sm" href="/">Home</Link>
+        </div>
+      </header>
+
+      <section className="login-panel studio-auth-panel" aria-labelledby="studio-auth-title">
+        <div className="login-copy studio-auth-copy">
+          <div className="eyebrow">Protected studio</div>
+          <h1 id="studio-auth-title" className="display">
+            {isLoading ? "Opening your workspace." : "Sign in to open RoleForge AI."}
+          </h1>
+          <p>
+            {isLoading
+              ? "Checking your account before the resume tools load."
+              : "The studio stays behind your account so saved projects, exports, and usage stay connected."}
+          </p>
+          <div className="login-benefits" aria-label="Protected workspace benefits">
+            <span><RoleForgeIcon name="lock" size={14} /> Studio tools stay account protected</span>
+            <span><RoleForgeIcon name="chart" size={14} /> Saved projects reopen cleanly</span>
+            <span><RoleForgeIcon name="download" size={14} /> Exports stay tied to completed runs</span>
+          </div>
+        </div>
+
+        <div className="login-card studio-auth-card">
+          <div className="login-card-head">
+            <span className={`login-status ${isLoading ? "neutral" : "info"}`}>
+              {isLoading ? "Checking session" : "Account required"}
+            </span>
+            <h2>{isLoading ? "Almost there" : "Continue to the studio"}</h2>
+            <p>
+              {isLoading
+                ? "Your workspace will open as soon as your session is ready."
+                : "Use Google or email sign-in, then you will land back in the resume studio."}
+            </p>
+          </div>
+          <div className="studio-auth-preview" aria-label="Protected studio state">
+            <span><RoleForgeIcon name="file" size={15} /> Resume workflow</span>
+            <strong>{isLoading ? "Preparing workspace" : "Sign in required"}</strong>
+          </div>
+          {isLoading ? (
+            <div className="studio-auth-progress" aria-hidden="true" />
+          ) : (
+            <div className="studio-auth-actions">
+              <Link className="primary-button studio-account-submit" href="/login?next=%2Fapp&account=signin-required">
+                Sign in
+              </Link>
+              <Link className="ghost-button" href="/">
+                Back home
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function isUrlTarget(value: string) {
   return /^(https?:\/\/|www\.)/i.test(value.trim());
 }
@@ -1552,11 +1617,11 @@ export default function Page() {
       .catch((caught) => {
         if ((caught as Error).name !== "AbortError") {
           setAccountStatus({
-            configured: false,
+            configured: true,
             enabled: false,
             provider: "supabase",
             user: null,
-            next: "Account status is unavailable.",
+            next: "Account access could not be confirmed.",
           });
         }
       });
@@ -2637,6 +2702,14 @@ export default function Page() {
         })),
       ].slice(0, 4)
     : [];
+
+  if (accountStatus === null) {
+    return <StudioAccountGate state="loading" />;
+  }
+
+  if (accountStatus.configured && !signedIn) {
+    return <StudioAccountGate state="required" />;
+  }
 
   return (
     <main className="page-shell rf-studio-page">
