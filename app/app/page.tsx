@@ -2313,6 +2313,8 @@ export default function Page() {
   const tailoredLineCount = countReadableLines(result?.tailored_text);
   const hasSourcePreview = Boolean(sourcePreviewText.trim());
   const hasTailoredPreview = Boolean(result?.tailored_text?.trim());
+  const restoredRunOpen = Boolean(restoredHistoryId);
+  const restoredSourceMissing = restoredRunOpen && hasTailoredPreview && !hasSourcePreview;
   const sourcePreviewUnavailable = Boolean((uploadMeta || file) && previewUploadState === "ready" && !hasSourcePreview);
 
   useEffect(() => {
@@ -2342,13 +2344,15 @@ export default function Page() {
                 ? "Source preview needs another try"
                 : sourcePreviewUnavailable
                   ? "Source preview unavailable"
+                  : restoredSourceMissing
+                    ? "Original source was not saved"
                   : "Upload a resume to see the original",
           uploadMeta?.filename ?? file?.name ?? "No source file selected",
-          restoredHistoryId ? "Restored run source" : "Before AI edits",
+          restoredRunOpen ? (hasSourcePreview ? "Restored run source" : "Tailored draft restored") : "Before AI edits",
         ]
       : previewMode === "diff"
         ? [
-            hasSourcePreview ? "Original side ready" : "Original side waiting",
+            hasSourcePreview ? "Original side ready" : restoredSourceMissing ? "Original side not saved" : "Original side waiting",
             hasTailoredPreview ? "Tailored side ready" : "Tailored side waiting",
             result?.change_log?.length ? `${result.change_log.length} change note${result.change_log.length === 1 ? "" : "s"}` : "Change notes appear after a run",
           ]
@@ -2359,7 +2363,7 @@ export default function Page() {
                 ? "Tailored draft is generating"
                 : "Run Tailor to generate a draft",
             keywordTotal ? `${presentKeywords.length}/${keywordTotal} keywords matched` : "Keywords pending",
-            restoredHistoryId ? "Restored snapshot open" : downloadReady ? `${downloadFormat.toUpperCase()} export ready` : "Review before export",
+            restoredRunOpen ? "Restored snapshot open" : downloadReady ? `${downloadFormat.toUpperCase()} export ready` : "Review before export",
           ];
   const previewStatusTone = (item: string, index: number) => {
     const normalized = item.toLowerCase();
@@ -2367,6 +2371,8 @@ export default function Page() {
       normalized.includes("waiting") ||
       normalized.includes("pending") ||
       normalized.includes("unavailable") ||
+      normalized.includes("not saved") ||
+      normalized.includes("was not saved") ||
       normalized.includes("needs another try") ||
       normalized.includes("upload a resume") ||
       normalized.includes("appear after a run") ||
