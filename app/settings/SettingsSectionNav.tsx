@@ -107,12 +107,14 @@ export function SettingsSectionNav() {
     };
 
     updateFromHash();
+    const initialHashTimers = [0, 250, 1000].map((delay) => window.setTimeout(updateFromHash, delay));
     window.addEventListener("hashchange", updateFromHash);
     window.addEventListener("scroll", scheduleViewportUpdate, { passive: true });
     window.addEventListener("resize", scheduleViewportUpdate);
 
     return () => {
       window.cancelAnimationFrame(frame);
+      initialHashTimers.forEach((timer) => window.clearTimeout(timer));
       window.removeEventListener("hashchange", updateFromHash);
       window.removeEventListener("scroll", scheduleViewportUpdate);
       window.removeEventListener("resize", scheduleViewportUpdate);
