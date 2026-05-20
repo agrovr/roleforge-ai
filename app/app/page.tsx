@@ -1218,7 +1218,7 @@ function accountNoticeLabel(value: string, detail = "") {
     case "signed-out":
       return "You are signed out.";
     case "account-not-configured":
-      return "Account sign-in is not enabled in this environment.";
+      return "Sign-in is temporarily unavailable here.";
     case "signin-error":
       if (safeDetail) return `Sign-in could not finish: ${safeDetail}`;
       return "Sign-in could not start. Check the email and try again.";
@@ -2620,12 +2620,12 @@ export default function Page() {
                   ) : accountReady ? (
                     <>
                       <strong>Sign in</strong>
-                      <p>Use Google for the quickest path, or send a secure email magic link.</p>
+                      <p>Use Google for the quickest path, or send a secure email sign-in link.</p>
                       <a className="studio-oauth-button" href="/auth/oauth?provider=google&next=/app">
                         <span className="studio-oauth-mark" aria-hidden="true">G</span>
                         Continue with Google
                       </a>
-                      <div className="studio-account-divider"><span>Email fallback</span></div>
+                      <div className="studio-account-divider"><span>Email sign-in</span></div>
                       <form className="studio-account-form" action="/auth/signin" method="post">
                         <input type="hidden" name="next" value="/app" />
                         <input type="hidden" name="statusNext" value="/login?next=%2Fapp" />
@@ -3000,7 +3000,7 @@ export default function Page() {
                 </article>
 
                 <article className="rf-intake-card rf-intake-config">
-                  <h3 className="rf-intake-card-header">Configuration</h3>
+                  <h3 className="rf-intake-card-header">Tailor settings</h3>
                   <div className="rf-intake-card-body">
                     <div className="rf-run-controls">
                       <div className="rf-config-label">Tailoring mode</div>

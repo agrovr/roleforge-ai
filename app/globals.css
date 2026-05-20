@@ -5125,6 +5125,33 @@ html[data-theme="dark"] input::file-selector-button {
   width: 100%;
 }
 
+.login-session-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.login-session-strip span {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--good) 26%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--good) 9%, var(--surface));
+  color: var(--ink-1);
+  font-size: 0.78rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.login-session-strip svg {
+  color: var(--good);
+}
+
 .login-disabled {
   display: grid;
   gap: 10px;
@@ -8101,6 +8128,12 @@ html[data-theme="dark"] .login-preview {
   border-color: rgba(255, 247, 233, 0.16);
 }
 
+html[data-theme="dark"] .login-session-strip span {
+  border-color: rgba(146, 191, 160, 0.28);
+  background: rgba(95, 132, 109, 0.14);
+  color: #eff8ed;
+}
+
 html[data-theme="dark"] .settings-page-shell {
   background:
     radial-gradient(circle at 88% 4%, rgba(222, 162, 79, 0.12), transparent 22rem),
@@ -8433,6 +8466,10 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
   .login-card {
     padding: 18px;
+  }
+
+  .login-session-strip {
+    grid-template-columns: 1fr;
   }
 
   .settings-page-shell {

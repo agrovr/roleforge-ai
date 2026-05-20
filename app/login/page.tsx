@@ -25,7 +25,7 @@ function noticeCopy(account: string | undefined) {
     case "signin-error":
       return "Sign-in could not finish. Try Google or send a new email link.";
     default:
-      return "Use Google or email to continue to the studio.";
+      return "Choose Google or a secure email link to continue to the studio.";
   }
 }
 
@@ -100,11 +100,15 @@ export default async function LoginPage({ searchParams }: { searchParams: LoginS
                 <h2>Continue to RoleForge AI</h2>
                 <p>Google is fastest. Email sends a secure sign-in link to this address.</p>
               </div>
+              <div className="login-session-strip" aria-label="Protected account access">
+                <span><RoleForgeIcon name="lock" size={13} /> Protected studio</span>
+                <span><RoleForgeIcon name="chart" size={13} /> Saved projects</span>
+              </div>
               <a className="studio-oauth-button login-oauth" href={`/auth/oauth?provider=google&next=${encodeURIComponent(next)}`}>
                 <span className="studio-oauth-mark" aria-hidden="true">G</span>
                 Continue with Google
               </a>
-              <div className="studio-account-divider"><span>Email fallback</span></div>
+              <div className="studio-account-divider"><span>Email sign-in</span></div>
               <form className="studio-account-form" action="/auth/signin" method="post">
                 <input type="hidden" name="next" value={next} />
                 <input type="hidden" name="statusNext" value={statusNext} />
@@ -117,8 +121,8 @@ export default async function LoginPage({ searchParams }: { searchParams: LoginS
             </>
           ) : (
             <div className="login-disabled">
-              <strong>Sign-in is not enabled in this environment.</strong>
-              <p>The public site can load, but the protected studio needs account configuration before use.</p>
+              <strong>Sign-in is temporarily unavailable.</strong>
+              <p>The public site is available, but protected studio access cannot open from here right now.</p>
             </div>
           )}
         </div>
