@@ -1410,6 +1410,7 @@ export default function Page() {
   const editorSectionRef = useRef<HTMLElement | null>(null);
   const historySectionRef = useRef<HTMLElement | null>(null);
   const historyDetailRef = useRef<HTMLElement | null>(null);
+  const accountMenuRef = useRef<HTMLDivElement | null>(null);
 
   const accountUser = accountStatus?.user ?? null;
   const accountReady = Boolean(accountStatus?.configured && accountStatus.enabled);
@@ -1442,6 +1443,25 @@ export default function Page() {
     setHistory(loadHistory());
     setSyncedHistoryIds(loadSyncedHistoryIds());
   }, []);
+
+  useEffect(() => {
+    if (!accountPanelOpen) return;
+
+    const closeFromOutside = (event: PointerEvent) => {
+      if (accountMenuRef.current?.contains(event.target as Node)) return;
+      setAccountPanelOpen(false);
+    };
+    const closeFromKeyboard = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setAccountPanelOpen(false);
+    };
+
+    document.addEventListener("pointerdown", closeFromOutside);
+    document.addEventListener("keydown", closeFromKeyboard);
+    return () => {
+      document.removeEventListener("pointerdown", closeFromOutside);
+      document.removeEventListener("keydown", closeFromKeyboard);
+    };
+  }, [accountPanelOpen]);
 
   const refreshSavedRuns = useCallback(async (options: { quiet?: boolean } = {}) => {
     if (!signedIn) {
@@ -2744,7 +2764,7 @@ export default function Page() {
               </button>
             )}
             <ThemeToggle />
-            <div className="studio-account-menu">
+            <div className="studio-account-menu" ref={accountMenuRef}>
               <button
                 className="studio-account-button"
                 type="button"
