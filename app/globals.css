@@ -3494,7 +3494,32 @@ html[data-theme="dark"] .result-box {
 .history-content-grid.has-detail .history-detail-panel {
   position: sticky;
   top: 104px;
+  max-height: calc(100vh - 128px);
   margin-top: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+.history-content-grid.has-detail .history-item,
+.history-content-grid.has-detail .history-version-list article,
+.history-content-grid.has-detail .history-selected-run {
+  grid-template-columns: 1fr;
+}
+
+.history-content-grid.has-detail .history-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  max-width: none;
+  justify-content: stretch;
+}
+
+.history-content-grid.has-detail .history-actions .ghost-button,
+.history-content-grid.has-detail .history-actions .btn {
+  width: 100%;
+  min-width: 0;
+  justify-content: center;
+  padding-inline: 10px;
 }
 
 .history-content-grid.has-detail .history-detail-panel,
@@ -3507,6 +3532,10 @@ html[data-theme="dark"] .result-box {
 .history-content-grid.has-detail .history-download-panel > div,
 .history-content-grid.has-detail .history-version-list article > div {
   justify-content: flex-start;
+}
+
+.history-content-grid.has-detail .history-version-list article > div {
+  width: 100%;
 }
 
 .history-filter-bar {
@@ -7090,6 +7119,8 @@ html[data-theme="dark"] .rf-rail-upgrade p {
 
   .history-content-grid.has-detail .history-detail-panel {
     position: static;
+    max-height: none;
+    overflow: visible;
   }
 
   .history-item {
@@ -8591,6 +8622,8 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
   .history-content-grid.has-detail .history-detail-panel {
     position: static;
+    max-height: none;
+    overflow: visible;
   }
 
   .history-detail-panel {

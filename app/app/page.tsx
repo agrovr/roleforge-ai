@@ -1424,7 +1424,7 @@ export default function Page() {
     const scrollWhenReady = () => {
       const target = historyDetailRef.current;
       if (target) {
-        const compact = window.matchMedia("(max-width: 720px)").matches;
+        const compact = window.matchMedia("(max-width: 900px)").matches;
         target.scrollIntoView({ behavior: attempts === 0 ? behavior : "auto", block: compact ? "start" : "center" });
         target.focus({ preventScroll: true });
       }
