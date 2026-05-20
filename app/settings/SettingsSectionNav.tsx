@@ -90,17 +90,17 @@ export function SettingsSectionNav() {
       const hash = window.location.hash.replace("#", "");
       const nextSection = settingsSections.find((section) => section.id === hash)?.id;
       if (nextSection) {
-        scrollSpyLockUntilRef.current = Date.now() + 1200;
+        scrollSpyLockUntilRef.current = Date.now() + 3600;
         setActiveSection(nextSection);
         let attempts = 0;
         const scrollHashTarget = () => {
           setActiveSection(nextSection);
           scrollToSection(nextSection, "auto");
           attempts += 1;
-          if (attempts <= 6) window.setTimeout(scrollHashTarget, 80);
+          if (attempts <= 30) window.setTimeout(scrollHashTarget, 100);
         };
         window.requestAnimationFrame(scrollHashTarget);
-        window.setTimeout(setActiveFromViewport, 700);
+        window.setTimeout(setActiveFromViewport, 3400);
       } else {
         setActiveFromViewport();
       }
