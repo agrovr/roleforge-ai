@@ -40,6 +40,12 @@ export function SettingsSectionNav() {
         (section) => section.rect.bottom > 0 && section.rect.top < window.innerHeight,
       );
       const isNearPageEnd = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8;
+      const hash = window.location.hash.replace("#", "");
+      const hashSection = sectionRects.find((section) => section.id === hash);
+      if (hashSection && hashSection.rect.bottom > 0 && hashSection.rect.top < window.innerHeight) {
+        setActiveSection(hashSection.id);
+        return;
+      }
 
       const current =
         isNearPageEnd && visibleSections.length > 0
@@ -61,7 +67,7 @@ export function SettingsSectionNav() {
       const hash = window.location.hash.replace("#", "");
       const nextSection = settingsSections.find((section) => section.id === hash)?.id;
       if (nextSection) {
-        scrollSpyLockUntilRef.current = Date.now() + 900;
+        scrollSpyLockUntilRef.current = Date.now() + 1200;
         setActiveSection(nextSection);
         window.requestAnimationFrame(() => scrollToSection(nextSection, "auto"));
         window.setTimeout(setActiveFromViewport, 260);
@@ -102,7 +108,7 @@ export function SettingsSectionNav() {
           onClick={(event) => {
             event.preventDefault();
             window.history.pushState(null, "", `#${section.id}`);
-            scrollSpyLockUntilRef.current = Date.now() + 900;
+            scrollSpyLockUntilRef.current = Date.now() + 1200;
             setActiveSection(section.id);
             scrollToSection(section.id);
           }}
