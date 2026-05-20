@@ -3145,131 +3145,132 @@ export default function Page() {
                     </div>
                   </div>
                 ) : null}
-                <div className="change-list panel-body">
-                  {visibleHistoryGroups.length ? visibleHistoryGroups.map((group) => {
-                    const entry = group.latest;
-                    const manageEntry = group.accountItem ?? entry;
-                    const restorable = hasRestorableSnapshot(entry);
-                    const primaryDownload = primaryHistoryDownload(entry, accountStatus?.entitlement);
-                    const availableDownloadCount = historyDownloadEntriesFor(entry).length;
-                    const canManageProject = Boolean(group.accountItem?.projectId && signedIn);
-                    const isEditingProject = Boolean(canManageProject && editingProjectId === group.accountItem?.projectId);
-                    const actionBusy = group.items.some((item) => projectActionId === item.id);
-                    const selected = group.items.some((item) => selectedHistoryId === item.id);
-                    const active = group.items.some((item) => restoredHistoryId === item.id);
-                    const latestDownloadLabel = primaryDownload?.format.toUpperCase() ?? entry.downloadFormat?.toUpperCase() ?? "PDF";
-                    return (
-                      <article className={`history-item${active ? " active" : ""}${selected ? " selected" : ""}`} key={group.key}>
-                        <div className="history-item-main">
-                          <div className="history-title-row">
+                <div className={`history-content-grid${visibleSelectedHistoryItem && selectedHistoryGroup ? " has-detail" : ""}`}>
+                  <div className="change-list panel-body history-project-list">
+                    {visibleHistoryGroups.length ? visibleHistoryGroups.map((group) => {
+                      const entry = group.latest;
+                      const manageEntry = group.accountItem ?? entry;
+                      const restorable = hasRestorableSnapshot(entry);
+                      const primaryDownload = primaryHistoryDownload(entry, accountStatus?.entitlement);
+                      const availableDownloadCount = historyDownloadEntriesFor(entry).length;
+                      const canManageProject = Boolean(group.accountItem?.projectId && signedIn);
+                      const isEditingProject = Boolean(canManageProject && editingProjectId === group.accountItem?.projectId);
+                      const actionBusy = group.items.some((item) => projectActionId === item.id);
+                      const selected = group.items.some((item) => selectedHistoryId === item.id);
+                      const active = group.items.some((item) => restoredHistoryId === item.id);
+                      const latestDownloadLabel = primaryDownload?.format.toUpperCase() ?? entry.downloadFormat?.toUpperCase() ?? "PDF";
+                      return (
+                        <article className={`history-item${active ? " active" : ""}${selected ? " selected" : ""}`} key={group.key}>
+                          <div className="history-item-main">
+                            <div className="history-title-row">
+                              {isEditingProject ? (
+                                <label className="history-rename-field">
+                                  <span className="sr-only">Saved project name</span>
+                                  <input
+                                    value={editingProjectTitle}
+                                    onChange={(event) => setEditingProjectTitle(event.target.value)}
+                                    onKeyDown={(event) => {
+                                      if (event.key === "Enter") void submitProjectRename(manageEntry);
+                                      if (event.key === "Escape") {
+                                        setEditingProjectId(null);
+                                        setEditingProjectTitle("");
+                                      }
+                                    }}
+                                    autoFocus
+                                  />
+                                </label>
+                              ) : (
+                                <strong>{group.title}</strong>
+                              )}
+                              <small className={`history-sync-badge ${group.accountCount ? "account" : "local"}`}>{historyStorageLabel(group)}</small>
+                              <small className={`history-sync-badge ${group.restorableCount ? "restore" : "legacy"}`}>
+                                {group.restorableCount ? "Restore ready" : "Download only"}
+                              </small>
+                              {active ? <small className="history-sync-badge open">Open now</small> : null}
+                            </div>
+                            <p>{group.target}</p>
+                            <div className="history-project-facts" aria-label="Project facts">
+                              <span>
+                                <strong>{group.items.length}</strong>
+                                <small>{group.items.length === 1 ? "Version" : "Versions"}</small>
+                              </span>
+                              <span>
+                                <strong>{group.bestScore}/100</strong>
+                                <small>Best fit</small>
+                              </span>
+                              <span>
+                                <strong>{formatHistoryTimestamp(entry.createdAt)}</strong>
+                                <small>Latest run</small>
+                              </span>
+                            </div>
+                            <div className="history-project-meta" aria-label="Project run summary">
+                              <span>{historyGroupSummary(group)}</span>
+                              <span>{entry.mode} mode</span>
+                            </div>
+                            {projectActionMessage && actionBusy ? <small className="history-action-note error" role="alert">{projectActionMessage}</small> : null}
+                          </div>
+                          <div className="history-actions">
                             {isEditingProject ? (
-                              <label className="history-rename-field">
-                                <span className="sr-only">Saved project name</span>
-                                <input
-                                  value={editingProjectTitle}
-                                  onChange={(event) => setEditingProjectTitle(event.target.value)}
-                                  onKeyDown={(event) => {
-                                    if (event.key === "Enter") void submitProjectRename(manageEntry);
-                                    if (event.key === "Escape") {
-                                      setEditingProjectId(null);
-                                      setEditingProjectTitle("");
-                                    }
-                                  }}
-                                  autoFocus
-                                />
-                              </label>
+                              <>
+                                <button className="btn btn-brand btn-sm" type="button" onClick={() => void submitProjectRename(manageEntry)} disabled={actionBusy || !editingProjectTitle.trim()}>
+                                  Save
+                                </button>
+                                <button className="btn btn-soft btn-sm" type="button" onClick={() => { setEditingProjectId(null); setEditingProjectTitle(""); }} disabled={actionBusy}>
+                                  Cancel
+                                </button>
+                              </>
+                            ) : canManageProject ? (
+                              <>
+                                <button className="ghost-button" type="button" onClick={() => startRenameProject(manageEntry)} disabled={actionBusy}>
+                                  Rename <RoleForgeIcon name="edit" size={14} />
+                                </button>
+                                <button className="ghost-button" type="button" onClick={() => { if (window.confirm("Delete this saved project from your account?")) void removeSavedProject(manageEntry); }} disabled={actionBusy}>
+                                  Delete <RoleForgeIcon name="x" size={14} />
+                                </button>
+                              </>
+                            ) : null}
+                            <button className="ghost-button" type="button" onClick={() => openHistoryDetails(entry)} aria-pressed={selected} aria-label={`Show details for ${entry.filename}`}>
+                              Details <RoleForgeIcon name="doc" size={14} />
+                            </button>
+                            <button
+                              className="ghost-button"
+                              type="button"
+                              onClick={() => restoreHistoryItem(entry)}
+                              disabled={!restorable}
+                              title={restorable ? `Restore ${entry.filename} in the studio` : "This saved run only has a download link"}
+                              aria-label={`Restore ${entry.filename} in the studio`}
+                            >
+                              Restore <RoleForgeIcon name="edit" size={14} />
+                            </button>
+                            {primaryDownload ? (
+                              <a className="ghost-button" href={primaryDownload.url} download aria-label={`Download ${latestDownloadLabel} for ${entry.filename}`}>
+                                <span className="history-download-prefix">Download </span>{latestDownloadLabel}{availableDownloadCount > 1 ? ` +${availableDownloadCount - 1}` : ""} <RoleForgeIcon name="download" size={14} />
+                              </a>
                             ) : (
-                              <strong>{group.title}</strong>
+                              <button className="ghost-button" type="button" disabled aria-label={`${latestDownloadLabel} download is not ready for ${entry.filename}`}><span className="history-download-prefix">Download </span>{latestDownloadLabel} <RoleForgeIcon name="download" size={14} /></button>
                             )}
-                            <small className={`history-sync-badge ${group.accountCount ? "account" : "local"}`}>{historyStorageLabel(group)}</small>
-                            <small className={`history-sync-badge ${group.restorableCount ? "restore" : "legacy"}`}>
-                              {group.restorableCount ? "Restore ready" : "Download only"}
-                            </small>
-                            {active ? <small className="history-sync-badge open">Open now</small> : null}
                           </div>
-                          <p>{group.target}</p>
-                          <div className="history-project-facts" aria-label="Project facts">
-                            <span>
-                              <strong>{group.items.length}</strong>
-                              <small>{group.items.length === 1 ? "Version" : "Versions"}</small>
-                            </span>
-                            <span>
-                              <strong>{group.bestScore}/100</strong>
-                              <small>Best fit</small>
-                            </span>
-                            <span>
-                              <strong>{formatHistoryTimestamp(entry.createdAt)}</strong>
-                              <small>Latest run</small>
-                            </span>
-                          </div>
-                          <div className="history-project-meta" aria-label="Project run summary">
-                            <span>{historyGroupSummary(group)}</span>
-                            <span>{entry.mode} mode</span>
-                          </div>
-                          {projectActionMessage && actionBusy ? <small className="history-action-note error" role="alert">{projectActionMessage}</small> : null}
-                        </div>
-                        <div className="history-actions">
-                          {isEditingProject ? (
-                            <>
-                              <button className="btn btn-brand btn-sm" type="button" onClick={() => void submitProjectRename(manageEntry)} disabled={actionBusy || !editingProjectTitle.trim()}>
-                                Save
-                              </button>
-                              <button className="btn btn-soft btn-sm" type="button" onClick={() => { setEditingProjectId(null); setEditingProjectTitle(""); }} disabled={actionBusy}>
-                                Cancel
-                              </button>
-                            </>
-                          ) : canManageProject ? (
-                            <>
-                              <button className="ghost-button" type="button" onClick={() => startRenameProject(manageEntry)} disabled={actionBusy}>
-                                Rename <RoleForgeIcon name="edit" size={14} />
-                              </button>
-                              <button className="ghost-button" type="button" onClick={() => { if (window.confirm("Delete this saved project from your account?")) void removeSavedProject(manageEntry); }} disabled={actionBusy}>
-                                Delete <RoleForgeIcon name="x" size={14} />
-                              </button>
-                            </>
-                          ) : null}
-                          <button className="ghost-button" type="button" onClick={() => openHistoryDetails(entry)} aria-pressed={selected} aria-label={`Show details for ${entry.filename}`}>
-                            Details <RoleForgeIcon name="doc" size={14} />
-                          </button>
-                          <button
-                            className="ghost-button"
-                            type="button"
-                            onClick={() => restoreHistoryItem(entry)}
-                            disabled={!restorable}
-                            title={restorable ? `Restore ${entry.filename} in the studio` : "This saved run only has a download link"}
-                            aria-label={`Restore ${entry.filename} in the studio`}
-                          >
-                            Restore <RoleForgeIcon name="edit" size={14} />
-                          </button>
-                          {primaryDownload ? (
-                            <a className="ghost-button" href={primaryDownload.url} download aria-label={`Download ${latestDownloadLabel} for ${entry.filename}`}>
-                              <span className="history-download-prefix">Download </span>{latestDownloadLabel}{availableDownloadCount > 1 ? ` +${availableDownloadCount - 1}` : ""} <RoleForgeIcon name="download" size={14} />
-                            </a>
-                          ) : (
-                            <button className="ghost-button" type="button" disabled aria-label={`${latestDownloadLabel} download is not ready for ${entry.filename}`}><span className="history-download-prefix">Download </span>{latestDownloadLabel} <RoleForgeIcon name="download" size={14} /></button>
-                          )}
-                        </div>
-                      </article>
-                    );
-                  }) : (
-                    <div className="empty-state">
-                      <strong>{historyEmptyTitle}</strong>
-                      <p>{historyEmptyDetail}</p>
-                      <button
-                        className="btn btn-soft btn-sm empty-state-action"
-                        type="button"
-                        onClick={() => {
-                          setActiveTab("score");
-                          scrollToStudioEditor();
-                        }}
-                      >
-                        Start a run
-                      </button>
-                    </div>
-                  )}
-                </div>
-                {visibleSelectedHistoryItem && selectedHistoryGroup ? (
-                  <aside className="history-detail-panel" aria-label="Saved project details" ref={historyDetailRef} tabIndex={-1}>
+                        </article>
+                      );
+                    }) : (
+                      <div className="empty-state">
+                        <strong>{historyEmptyTitle}</strong>
+                        <p>{historyEmptyDetail}</p>
+                        <button
+                          className="btn btn-soft btn-sm empty-state-action"
+                          type="button"
+                          onClick={() => {
+                            setActiveTab("score");
+                            scrollToStudioEditor();
+                          }}
+                        >
+                          Start a run
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  {visibleSelectedHistoryItem && selectedHistoryGroup ? (
+                    <aside className="history-detail-panel" aria-label="Saved project details" ref={historyDetailRef} tabIndex={-1}>
                     <div>
                       <div className="eyebrow">Project detail</div>
                       <h3>{selectedHistoryGroup.title}</h3>
@@ -3394,8 +3395,9 @@ export default function Page() {
                         </button>
                       ) : null}
                     </div>
-                  </aside>
-                ) : null}
+                    </aside>
+                  ) : null}
+                </div>
               </section>
             ) : null}
           </section>

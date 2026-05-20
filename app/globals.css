@@ -3471,6 +3471,44 @@ html[data-theme="dark"] .result-box {
   flex-wrap: wrap;
 }
 
+.history-content-grid {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px 20px 20px;
+}
+
+.history-content-grid.has-detail {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  align-items: start;
+}
+
+.history-project-list {
+  min-width: 0;
+}
+
+.history-content-grid > .history-project-list {
+  padding: 0;
+}
+
+.history-content-grid.has-detail .history-detail-panel {
+  position: sticky;
+  top: 104px;
+  margin-top: 0;
+}
+
+.history-content-grid.has-detail .history-detail-panel,
+.history-content-grid.has-detail .history-export-panel,
+.history-content-grid.has-detail .history-download-panel {
+  grid-template-columns: 1fr;
+}
+
+.history-content-grid.has-detail .history-export-actions,
+.history-content-grid.has-detail .history-download-panel > div,
+.history-content-grid.has-detail .history-version-list article > div {
+  justify-content: flex-start;
+}
+
 .history-filter-bar {
   display: inline-flex;
   align-items: center;
@@ -7020,6 +7058,7 @@ html[data-theme="dark"] .rf-rail-upgrade p {
   }
 
   .history-detail-panel,
+  .history-content-grid.has-detail,
   .history-detail-panel dl,
   .history-export-panel,
   .history-download-panel,
@@ -7043,6 +7082,14 @@ html[data-theme="dark"] .rf-rail-upgrade p {
 
   .history-panel-actions {
     justify-content: flex-start;
+  }
+
+  .history-content-grid {
+    padding: 14px 16px 16px;
+  }
+
+  .history-content-grid.has-detail .history-detail-panel {
+    position: static;
   }
 
   .history-item {
@@ -8530,11 +8577,20 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     justify-content: flex-start;
   }
 
+  .history-content-grid {
+    padding: 12px;
+  }
+
   .history-detail-panel,
+  .history-content-grid.has-detail,
   .history-detail-panel dl,
   .history-export-panel,
   .history-download-panel {
     grid-template-columns: 1fr;
+  }
+
+  .history-content-grid.has-detail .history-detail-panel {
+    position: static;
   }
 
   .history-detail-panel {
