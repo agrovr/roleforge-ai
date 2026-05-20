@@ -3821,6 +3821,19 @@ html[data-theme="dark"] .result-box {
   white-space: nowrap;
 }
 
+.history-detail-actions {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.history-detail-actions .btn {
+  width: 100%;
+  min-width: 0;
+  justify-content: center;
+}
+
 .history-export-panel {
   grid-column: 1 / -1;
   display: grid;
@@ -8829,6 +8842,10 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     justify-content: stretch;
   }
 
+  .history-detail-actions {
+    grid-template-columns: 1fr;
+  }
+
   .history-actions .ghost-button,
   .history-download-panel .btn,
   .history-version-list article > div .btn,
@@ -8875,6 +8892,7 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   }
 
   .history-export-actions .btn,
+  .history-detail-actions .btn,
   .history-download-panel .btn {
     width: 100%;
   }

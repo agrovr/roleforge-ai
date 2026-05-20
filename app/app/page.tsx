@@ -2589,6 +2589,12 @@ export default function Page() {
     : 0;
   const visibleSelectedHistoryDownloads = visibleSelectedHistoryItem ? historyDownloadEntriesFor(visibleSelectedHistoryItem) : [];
   const selectedHistoryDownloadCount = visibleSelectedHistoryDownloads.length;
+  const selectedHistoryRestorable = visibleSelectedHistoryItem ? hasRestorableSnapshot(visibleSelectedHistoryItem) : false;
+  const selectedHistoryPrimaryDownload = visibleSelectedHistoryItem
+    ? primaryHistoryDownload(visibleSelectedHistoryItem, accountStatus?.entitlement)
+    : null;
+  const selectedHistoryPrimaryDownloadLabel =
+    selectedHistoryPrimaryDownload?.format.toUpperCase() ?? visibleSelectedHistoryItem?.downloadFormat?.toUpperCase() ?? "PDF";
   const editorRailActive = activeTab === "score" || activeTab === "resume";
   const targetRailActive = activeTab === "gap";
   const suggestionsRailActive = activeTab === "changes";
@@ -3375,6 +3381,26 @@ export default function Page() {
                       <span>{selectedHistoryVersionLabel}</span>
                       <strong>{formatHistoryTimestamp(visibleSelectedHistoryItem.createdAt)}</strong>
                       <small>{visibleSelectedHistoryItem.score}/100 · {visibleSelectedHistoryItem.mode} · {historyStatusLabel(visibleSelectedHistoryItem, syncedHistoryIds)}</small>
+                    </div>
+                    <div className="history-detail-actions" aria-label="Selected saved run actions">
+                      <button
+                        className="btn btn-brand btn-sm"
+                        type="button"
+                        onClick={() => restoreHistoryItem(visibleSelectedHistoryItem)}
+                        disabled={!selectedHistoryRestorable}
+                        title={selectedHistoryRestorable ? `Restore ${visibleSelectedHistoryItem.filename} in the studio` : "This saved run only has a download link"}
+                      >
+                        Restore in studio <RoleForgeIcon name="edit" size={12} />
+                      </button>
+                      {selectedHistoryPrimaryDownload ? (
+                        <a className="btn btn-soft btn-sm" href={selectedHistoryPrimaryDownload.url} download>
+                          Download {selectedHistoryPrimaryDownloadLabel} <RoleForgeIcon name="download" size={12} />
+                        </a>
+                      ) : (
+                        <button className="btn btn-soft btn-sm" type="button" disabled>
+                          Download {selectedHistoryPrimaryDownloadLabel} <RoleForgeIcon name="download" size={12} />
+                        </button>
+                      )}
                     </div>
                     <div className="history-export-panel">
                       <div>
