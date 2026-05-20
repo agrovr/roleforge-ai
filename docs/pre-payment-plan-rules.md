@@ -1,6 +1,6 @@
-# RoleForge AI Pre-Payment Plan Rules
+# RoleForge AI Plan Rules
 
-These rules keep the app honest as Stripe billing is connected.
+These rules keep the app honest now that Stripe billing and entitlement state are connected.
 
 ## Free plan
 
@@ -18,7 +18,7 @@ These rules keep the app honest as Stripe billing is connected.
   - Yearly: `price_1TXwpJRpyJeACd6qp7hWyWIJ`
 - DOCX and TXT exports remain locked unless Stripe confirms a subscription and the entitlement row is premium active/trialing.
 - Premium has no monthly tailoring run cap at launch.
-- Premium templates and higher limits remain disabled until their product rules and implementation are real.
+- Premium templates and other premium-only workflow upgrades remain disabled until their product rules and implementation are real.
 - The UI may show the current plan state, but must not claim an active paid subscription unless `account_entitlements.plan = 'premium'` and billing state is active/trialing.
 
 ## Entitlement source

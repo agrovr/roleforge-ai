@@ -16,9 +16,10 @@ The public-facing copy intentionally avoids unsupported customer proof, performa
 - Job description text or public URL targeting
 - Optional company URL context
 - Fit, gap, formatting, generated resume, cover letter, interview prep, change log, warning, and local history views when returned by the backend
-- PDF export for the launch flow
-- Supabase email sign-in foundation for account sessions
-- Saved project restore/sync states, with coming-soon states for premium billing, account settings, and premium feature gating
+- PDF export for the free workflow, with DOCX and TXT export access gated by premium entitlement
+- Supabase Google OAuth and email magic-link sign-in for protected studio access
+- Saved project sync, restore, rename, delete, and account/local history states
+- Stripe checkout, customer portal, webhook, and entitlement-backed premium plan state
 - Light and dark visual themes
 
 ## Tech Stack
@@ -79,11 +80,11 @@ The studio expects the backend to provide:
 - `GET /download/{filename}`
 - `HEAD /download/{filename}`
 
-## Auth, Account, and Billing Readiness
+## Auth, Account, and Billing
 
-The studio includes a visible account menu so the interface has a stable place for sign-in, saved projects, settings, and billing controls. Email magic-link sign-in and Google OAuth are wired through Supabase Auth. Completed runs can sync into account-backed saved projects when the user is signed in. Saved runs can restore the studio state when they include a snapshot, while billing, account settings, and premium entitlements remain disabled until the product rules and backend storage flows are complete.
+The studio is protected behind Supabase Auth. Email magic-link sign-in and Google OAuth are wired through Supabase Auth, and completed runs can sync into account-backed saved projects when the user is signed in. Saved runs can restore the studio state when they include a snapshot.
 
-Pre-payment plan rules live in `docs/pre-payment-plan-rules.md`. The app now has an additive `account_entitlements` foundation so signed-in users can read their current plan state while client-side writes remain blocked.
+Plan rules live in `docs/pre-payment-plan-rules.md`, and Stripe setup notes live in `docs/stripe-billing-foundation.md`. The app uses `account_entitlements` as the account-level source of truth so signed-in users can read their current plan while client-side writes remain blocked.
 
 The Supabase-ready frontend foundation is in place:
 
@@ -94,7 +95,7 @@ The Supabase-ready frontend foundation is in place:
 - `POST /auth/signout` clears the current session.
 - `proxy.ts` refreshes the Supabase SSR session cookies for app routes.
 - `app/lib/supabase/client.ts` creates a browser client only when config exists.
-- `docs/supabase-account-foundation.sql` defines the RLS-backed profile, project, and run-history schema applied to the `roleforge-ai` Supabase project.
+- `docs/supabase-account-foundation.sql` defines the RLS-backed profile, entitlement, project, and run-history schema applied to the `roleforge-ai` Supabase project.
 
 Add these public environment variables in Vercel:
 
@@ -110,7 +111,6 @@ In the Supabase dashboard, configure Auth URLs before testing production email l
 
 - Site URL: `https://roleforgeai.vercel.app`
 - Redirect URL: `https://roleforgeai.vercel.app/auth/callback`
-- Temporary legacy redirect URL: `https://resume-tailor-ui-eta.vercel.app/auth/callback`
 - Local redirect URL: `http://localhost:3000/auth/callback`
 
 For email magic links, confirm the email template uses Supabase's confirmation link token that respects the request `redirectTo` value. Old links can expire or keep pointing at an older Site URL, so generate a fresh link after changing Auth URL settings.
@@ -121,11 +121,17 @@ For Google OAuth, enable the Google provider in Supabase and use this provider c
 https://ijdspodwpkuhwszmvqip.supabase.co/auth/v1/callback
 ```
 
-Needed before enabling these areas:
+Server-only production variables required for billing and account writes:
 
-- Stripe products, price IDs, checkout/customer portal endpoints, and entitlement checks
-- Plan rules for premium exports, templates, and feature limits
-- Saved-project sync rules and UI states
+```env
+SUPABASE_SERVICE_ROLE_KEY=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+STRIPE_PREMIUM_MONTHLY_PRICE_ID=
+STRIPE_PREMIUM_YEARLY_PRICE_ID=
+```
+
+Do not expose these values through `NEXT_PUBLIC_*` variables.
 
 ## Production Checks
 
@@ -135,4 +141,4 @@ npx tsc --noEmit
 npm run build
 ```
 
-Before enabling auth or billing, provide the auth provider, payment provider, Stripe price IDs or billing model, redirect URLs, backend endpoints, and entitlement rules.
+Before changing billing behavior, confirm the Stripe products, price IDs, webhook events, redirect URLs, backend endpoints, and entitlement rules match the current production setup.
