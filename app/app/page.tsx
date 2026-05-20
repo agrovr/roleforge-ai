@@ -1803,7 +1803,12 @@ export default function Page() {
     return url;
   }
 
-  async function syncCompletedRun(item: HistoryItem, output: TailorResult, url: string, options: { countUsage?: boolean } = {}) {
+  async function syncCompletedRun(
+    item: HistoryItem,
+    output: TailorResult,
+    url: string,
+    options: { countUsage?: boolean; preserveSuccessOnFailure?: boolean } = {},
+  ) {
     if (!signedIn || !accountReady) {
       setHistorySyncState("local");
       setHistorySyncMessage(signedIn ? "Saved projects are reconnecting. Local history still works." : "Sign in to sync completed runs");
@@ -1815,8 +1820,10 @@ export default function Page() {
       ? Math.max(20, Math.round((output.tailored_text.split(/\s+/).length / 220) * 60))
       : undefined;
 
-    setHistorySyncState("saving");
-    setHistorySyncMessage("Saving completed run...");
+    if (!options.preserveSuccessOnFailure) {
+      setHistorySyncState("saving");
+      setHistorySyncMessage("Saving completed run...");
+    }
 
     try {
       const savedRun = await saveCompletedRun({
@@ -1873,6 +1880,10 @@ export default function Page() {
         };
       });
     } catch {
+      if (options.preserveSuccessOnFailure) {
+        setHistorySyncState(isAccountHistoryItem(item, syncedHistoryIds) ? "synced" : "local");
+        return;
+      }
       setHistorySyncState("error");
       setHistorySyncMessage("Could not sync this run. It is still saved locally.");
     }
@@ -1972,7 +1983,7 @@ export default function Page() {
       setHistorySyncMessage(`${label} export ready for ${entry.filename}`);
 
       if (updatedItem && entry.snapshot?.result) {
-        void syncCompletedRun(updatedItem, entry.snapshot.result, url, { countUsage: false });
+        void syncCompletedRun(updatedItem, entry.snapshot.result, url, { countUsage: false, preserveSuccessOnFailure: true });
       }
     } catch (caught) {
       const nextError = workflowErrorFromCaught(caught, "Export failed");
@@ -2254,7 +2265,7 @@ export default function Page() {
       const updatedItem = updateCurrentHistoryExport(url, selectedExportFormat);
       setCopyState(`${selectedExportFormat.toUpperCase()} export ready`);
       if (updatedItem) {
-        void syncCompletedRun(updatedItem, result, url, { countUsage: false });
+        void syncCompletedRun(updatedItem, result, url, { countUsage: false, preserveSuccessOnFailure: true });
       }
       setStage("ready");
     } catch (caught) {
