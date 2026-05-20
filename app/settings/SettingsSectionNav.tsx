@@ -20,7 +20,19 @@ export function SettingsSectionNav() {
   const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
   const scrollSpyLockUntilRef = useRef(0);
   const scrollToSection = useCallback((sectionId: SettingsSectionId, behavior: ScrollBehavior = "smooth") => {
-    document.getElementById(sectionId)?.scrollIntoView({ behavior, block: "start" });
+    const target = document.getElementById(sectionId);
+    if (!target) return;
+
+    const targetTop = Math.max(0, target.getBoundingClientRect().top + window.scrollY - 24);
+    const scrollTarget = document.scrollingElement ?? document.documentElement;
+
+    if (typeof scrollTarget.scrollTo === "function") {
+      scrollTarget.scrollTo({ top: targetTop, behavior });
+    } else {
+      scrollTarget.scrollTop = targetTop;
+      document.documentElement.scrollTop = targetTop;
+      document.body.scrollTop = targetTop;
+    }
   }, []);
 
   useEffect(() => {
