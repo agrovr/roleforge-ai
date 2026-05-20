@@ -69,8 +69,15 @@ export function SettingsSectionNav() {
       if (nextSection) {
         scrollSpyLockUntilRef.current = Date.now() + 1200;
         setActiveSection(nextSection);
-        window.requestAnimationFrame(() => scrollToSection(nextSection, "auto"));
-        window.setTimeout(setActiveFromViewport, 260);
+        let attempts = 0;
+        const scrollHashTarget = () => {
+          setActiveSection(nextSection);
+          scrollToSection(nextSection, "auto");
+          attempts += 1;
+          if (attempts <= 6) window.setTimeout(scrollHashTarget, 80);
+        };
+        window.requestAnimationFrame(scrollHashTarget);
+        window.setTimeout(setActiveFromViewport, 700);
       } else {
         setActiveFromViewport();
       }
