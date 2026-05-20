@@ -9052,6 +9052,72 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 }
 
 @media (max-width: 560px) {
+  .settings-page-shell {
+    padding: 16px 12px 32px;
+  }
+
+  .settings-page-layout {
+    gap: 14px;
+    margin-top: 24px;
+  }
+
+  .settings-page-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+    padding: 7px;
+  }
+
+  .settings-page-nav a {
+    flex: initial;
+    justify-content: center;
+    min-width: 0;
+    min-height: 42px;
+    padding-inline: 8px;
+  }
+
+  .settings-page-hero,
+  .settings-section {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .settings-page-hero h1 {
+    font-size: 2.82rem;
+  }
+
+  .settings-page-hero p,
+  .settings-section-copy p,
+  .settings-billing-note {
+    font-size: 0.95rem;
+  }
+
+  .settings-hero-status,
+  .settings-plan-includes {
+    width: 100%;
+  }
+
+  .settings-plan-includes {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .settings-plan-includes span,
+  .settings-status-pill {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .settings-profile-row {
+    align-items: flex-start;
+  }
+
+  .settings-metric strong,
+  .settings-plan-active-card strong {
+    font-size: 1.9rem;
+  }
+
   .rf-live-card .studio-card-head {
     padding: 18px 16px 0;
   }
