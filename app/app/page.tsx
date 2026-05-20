@@ -3287,19 +3287,19 @@ export default function Page() {
                               </>
                             ) : canManageProject ? (
                               <>
-                                <button className="ghost-button" type="button" onClick={() => startRenameProject(manageEntry)} disabled={actionBusy}>
+                                <button className="ghost-button history-action-manage" type="button" onClick={() => startRenameProject(manageEntry)} disabled={actionBusy}>
                                   Rename <RoleForgeIcon name="edit" size={14} />
                                 </button>
-                                <button className="ghost-button" type="button" onClick={() => { if (window.confirm("Delete this saved project from your account?")) void removeSavedProject(manageEntry); }} disabled={actionBusy}>
+                                <button className="ghost-button history-action-manage" type="button" onClick={() => { if (window.confirm("Delete this saved project from your account?")) void removeSavedProject(manageEntry); }} disabled={actionBusy}>
                                   Delete <RoleForgeIcon name="x" size={14} />
                                 </button>
                               </>
                             ) : null}
-                            <button className="ghost-button" type="button" onClick={() => openHistoryDetails(entry)} aria-pressed={selected} aria-label={`Show details for ${entry.filename}`}>
+                            <button className="ghost-button history-action-details" type="button" onClick={() => openHistoryDetails(entry)} aria-pressed={selected} aria-label={`Show details for ${entry.filename}`}>
                               Details <RoleForgeIcon name="doc" size={14} />
                             </button>
                             <button
-                              className="ghost-button"
+                              className="ghost-button history-action-restore"
                               type="button"
                               onClick={() => restoreHistoryItem(entry)}
                               disabled={!restorable}
@@ -3309,11 +3309,11 @@ export default function Page() {
                               Restore <RoleForgeIcon name="edit" size={14} />
                             </button>
                             {primaryDownload ? (
-                              <a className="ghost-button" href={primaryDownload.url} download aria-label={`Download ${latestDownloadLabel} for ${entry.filename}`}>
+                              <a className="ghost-button history-action-download" href={primaryDownload.url} download aria-label={`Download ${latestDownloadLabel} for ${entry.filename}`}>
                                 <span className="history-download-prefix">Download </span>{latestDownloadLabel}{availableDownloadCount > 1 ? ` +${availableDownloadCount - 1}` : ""} <RoleForgeIcon name="download" size={14} />
                               </a>
                             ) : (
-                              <button className="ghost-button" type="button" disabled aria-label={`${latestDownloadLabel} download is not ready for ${entry.filename}`}><span className="history-download-prefix">Download </span>{latestDownloadLabel} <RoleForgeIcon name="download" size={14} /></button>
+                              <button className="ghost-button history-action-download" type="button" disabled aria-label={`${latestDownloadLabel} download is not ready for ${entry.filename}`}><span className="history-download-prefix">Download </span>{latestDownloadLabel} <RoleForgeIcon name="download" size={14} /></button>
                             )}
                           </div>
                         </article>
