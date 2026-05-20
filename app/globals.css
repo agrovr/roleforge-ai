@@ -4812,6 +4812,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .studio-history-panel {
+  order: -1;
   scroll-margin-top: 128px;
 }
 
