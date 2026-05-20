@@ -9051,6 +9051,86 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   }
 }
 
+@media (max-width: 560px) {
+  .rf-live-card .studio-card-head {
+    padding: 18px 16px 0;
+  }
+
+  .rf-live-card .panel-title {
+    font-size: 1.34rem;
+    line-height: 1.12;
+  }
+
+  .rf-preview-wrap {
+    margin: 10px;
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  .rf-preview-status {
+    gap: 7px;
+    margin-bottom: 10px;
+  }
+
+  .rf-preview-status span,
+  .rf-preview-alert {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.25;
+    border-radius: 12px;
+  }
+
+  .rf-resume-paper {
+    min-height: 360px;
+    padding: 18px 16px;
+    border-radius: 12px;
+  }
+
+  .rf-resume-paper section {
+    margin-top: 24px;
+  }
+
+  .rf-resume-head h3 {
+    font-size: 1.62rem;
+    line-height: 1;
+  }
+
+  .rf-resume-head p {
+    margin-top: 10px;
+    font-size: 0.98rem;
+  }
+
+  .rf-resume-head span {
+    font-size: 0.84rem;
+  }
+
+  .rf-resume-paper h4,
+  .rf-resume-plain-lines h5,
+  .rf-diff-lines h5 {
+    font-size: 0.76rem;
+    letter-spacing: 0.09em;
+  }
+
+  .rf-resume-paper p,
+  .rf-resume-paper li,
+  .rf-resume-generated,
+  .rf-diff-lines p,
+  .rf-diff-empty {
+    font-size: 0.88rem;
+  }
+
+  .rf-diff-readiness {
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .rf-diff-column {
+    padding: 14px;
+    border-radius: 10px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
