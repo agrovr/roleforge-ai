@@ -3508,7 +3508,7 @@ html[data-theme="dark"] .result-box {
 
 .history-content-grid.has-detail .history-actions {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(126px, 1fr));
   width: 100%;
   max-width: none;
   justify-content: stretch;
@@ -3678,6 +3678,8 @@ html[data-theme="dark"] .result-box {
 
 .history-actions .ghost-button {
   min-height: 38px;
+  min-width: 0;
+  justify-content: center;
   white-space: nowrap;
 }
 
@@ -8944,12 +8946,12 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
   .history-actions {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
     gap: 8px;
   }
 
   .history-content-grid.has-detail .history-actions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
   }
 
   .history-action-download {
