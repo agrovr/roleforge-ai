@@ -6878,9 +6878,9 @@ html[data-theme="dark"] .rf-preview-wrap {
 }
 
 html[data-theme="dark"] .rf-preview-status span {
-  border-color: rgba(237, 127, 105, 0.3);
-  background: rgba(237, 127, 105, 0.12);
-  color: #ffbaaa;
+  border-color: rgba(137, 209, 190, 0.34);
+  background: rgba(137, 209, 190, 0.12);
+  color: #c8f0df;
 }
 
 html[data-theme="dark"] .rf-preview-status span.warn,
