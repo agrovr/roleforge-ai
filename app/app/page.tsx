@@ -1955,7 +1955,7 @@ export default function Page() {
 
     if (!tailoredText) {
       setHistorySyncState("error");
-      setHistorySyncMessage("This saved run can be downloaded, but it does not have a restorable export snapshot.");
+      setHistorySyncMessage("This saved run can be downloaded, but it cannot be reopened in the studio.");
       return;
     }
 
@@ -2024,7 +2024,7 @@ export default function Page() {
     const snapshot = entry.snapshot;
     if (!snapshot?.result?.tailored_text?.trim()) {
       setHistorySyncState("error");
-      setHistorySyncMessage("This older run has a download link, but no restorable studio snapshot.");
+      setHistorySyncMessage("This older run has a download link, but cannot be reopened in the studio.");
       return;
     }
 
@@ -2425,7 +2425,7 @@ export default function Page() {
                 ? "Tailored draft is generating"
                 : "Run Tailor to generate a draft",
             keywordTotal ? `${presentKeywords.length}/${keywordTotal} keywords matched` : "Keywords pending",
-            restoredRunOpen ? "Restored snapshot open" : downloadReady ? `${downloadFormat.toUpperCase()} export ready` : "Review before export",
+            restoredRunOpen ? "Saved run open" : downloadReady ? `${downloadFormat.toUpperCase()} export ready` : "Review before export",
           ];
   const previewStatusTone = (item: string, index: number) => {
     const normalized = item.toLowerCase();
