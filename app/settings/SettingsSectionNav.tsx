@@ -25,13 +25,24 @@ export function SettingsSectionNav() {
 
     const targetTop = Math.max(0, target.getBoundingClientRect().top + window.scrollY - 24);
     const scrollTarget = document.scrollingElement ?? document.documentElement;
-
-    if (typeof scrollTarget.scrollTo === "function") {
-      scrollTarget.scrollTo({ top: targetTop, behavior });
-    } else {
+    const fallback = () => {
       scrollTarget.scrollTop = targetTop;
       document.documentElement.scrollTop = targetTop;
       document.body.scrollTop = targetTop;
+    };
+
+    if (typeof window.scrollTo === "function") {
+      window.scrollTo({ top: targetTop, behavior });
+    } else if (typeof scrollTarget.scrollTo === "function") {
+      scrollTarget.scrollTo({ top: targetTop, behavior });
+    }
+
+    if (behavior === "auto") {
+      fallback();
+    } else {
+      window.setTimeout(() => {
+        if (Math.abs(window.scrollY - targetTop) > 48) fallback();
+      }, 180);
     }
   }, []);
 
