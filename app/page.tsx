@@ -304,7 +304,7 @@ function Templates() {
             <div className="eyebrow">Templates</div>
               <h2 className="display h2">Resume formats.<br /><span className="italic">Beautifully</span> simple.</h2>
           </div>
-          <p className="lede">Templates are shown as design direction. A selectable template library should stay gated until the templates are ready to ship.</p>
+          <p className="lede">Browse the visual directions planned for cleaner resume exports. Template switching stays gated until each design is ready for real files.</p>
         </div>
       </div>
       <div className="templates-row">
@@ -444,8 +444,8 @@ function FAQ() {
   const items = [
     ["Does RoleForge replace my judgment?", "No. The app surfaces generated guidance and exports a draft for your review."],
     ["Can I use a job posting URL?", "Yes, if the posting is public and RoleForge can access it. Pasted text is the most reliable target input."],
-    ["What file formats can I export?", "The current free workflow exports PDF. DOCX and TXT are premium entitlement formats and remain locked unless billing confirms access."],
-    ["Can I use templates?", "Templates are visual examples for now. A selectable template library will stay gated until the designs are ready to use."],
+    ["What file formats can I export?", "The free workflow exports PDF. Premium enables DOCX and TXT exports when your plan is active."],
+    ["Can I use templates?", "Templates are visual examples for now. Template switching will unlock once those designs are wired into real exports."],
     ["Is sign-in available?", "Yes. Google and email magic-link sign-in are available. Saved projects sync after sign-in."],
     ["How much is Premium?", "The launch price is $9/month or $72/year. Checkout and billing management are handled by Stripe."],
   ] as const;
@@ -458,7 +458,7 @@ function FAQ() {
             <div className="eyebrow">FAQ</div>
             <h2 className="display h2">Clear answers for this launch.</h2>
           </div>
-          <p className="lede">No customer proof, privacy, billing, or performance promises are included without approval.</p>
+          <p className="lede">Straight answers about what RoleForge does today, what stays gated, and how billing works.</p>
         </div>
         <FaqAccordion items={items} />
       </div>
@@ -505,15 +505,15 @@ function Footer() {
           <a href="#templates">Templates</a>
         </div>
         <div className="footer-col">
-          <h3>Launch notes</h3>
-          <span>Auth: required for studio</span>
-          <span>Billing: Stripe checkout</span>
-          <span>Customer proof: not included</span>
+          <h3>Available now</h3>
+          <span>Protected studio access</span>
+          <span>Saved project history</span>
+          <span>Stripe billing management</span>
         </div>
       </div>
       <div className="footer-meta">
         <span>RoleForge AI</span>
-        <span>Production copy avoids unsupported claims.</span>
+        <span>Focused resume tailoring for real applications.</span>
       </div>
     </footer>
   );
