@@ -1327,6 +1327,9 @@ export default function Page() {
         if (response.ok) {
           setDownloadState("ready");
           setDownloadMessage(`${downloadFormat.toUpperCase()} download is ready`);
+        } else if (response.status === 402) {
+          setDownloadState("expired");
+          setDownloadMessage(`${downloadFormat.toUpperCase()} download requires an active Premium plan. Switch to PDF or reopen Premium to use this file.`);
         } else {
           setDownloadState("expired");
           setDownloadMessage(`This ${downloadFormat.toUpperCase()} link expired. Run the export again to create a fresh file.`);
