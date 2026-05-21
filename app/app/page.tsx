@@ -12,6 +12,23 @@ import {
   type ExportCapability,
   type ExportFormat,
 } from "../lib/exportFormats";
+import {
+  formatHistoryTimestamp,
+  groupHistoryItems,
+  hasRestorableSnapshot,
+  historyDownloadEntries,
+  historyDownloads,
+  historyGroupSummary,
+  historyProjectTitle,
+  historyStatusLabel,
+  historyStorageLabel,
+  historyVersionLabel,
+  isAccountHistoryItem,
+  mergeHistory,
+  primaryHistoryDownload,
+  type HistoryDownloads,
+  type HistoryItem as BaseHistoryItem,
+} from "../lib/history";
 import { createRoleForgeBrowserClient } from "../lib/supabase/client";
 import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun } from "../lib/supabase/savedProjectClient";
 
@@ -88,7 +105,6 @@ type HistoryFilter = "all" | "account" | "local";
 type PreviewUploadState = "idle" | "reading" | "ready" | "error";
 type DownloadState = "idle" | "checking" | "ready" | "expired";
 type ReviewTab = "score" | "gap" | "ats" | "resume" | "cover" | "interview" | "changes" | "history";
-type HistoryDownloads = Partial<Record<ExportFormat, string>>;
 type SavedRunSnapshot = {
   result: TailorResult;
   sourcePreviewText?: string;
@@ -102,6 +118,7 @@ type SavedRunSnapshot = {
   downloadFormat?: ExportFormat;
   downloads?: HistoryDownloads;
 };
+type HistoryItem = BaseHistoryItem<SavedRunSnapshot>;
 type AccountUser = { id: string; email?: string; name?: string };
 type AccountUsage = {
   currentPeriodStart: string;
@@ -119,36 +136,6 @@ type AccountStatus = {
   entitlement?: AccountEntitlement;
   usage?: AccountUsage | null;
   next: string;
-};
-type HistoryItem = {
-  id: string;
-  accountRunId?: string;
-  projectId?: string;
-  projectTitle?: string;
-  createdAt: string;
-  filename: string;
-  mode: TailoringMode;
-  score: number;
-  downloadUrl: string;
-  downloadFormat?: ExportFormat;
-  downloads?: HistoryDownloads;
-  roleHint: string;
-  saved?: boolean;
-  source?: "local" | "account";
-  snapshot?: SavedRunSnapshot;
-};
-type HistoryGroup = {
-  key: string;
-  title: string;
-  target: string;
-  latest: HistoryItem;
-  accountItem?: HistoryItem;
-  items: HistoryItem[];
-  accountCount: number;
-  localCount: number;
-  restorableCount: number;
-  downloadableCount: number;
-  bestScore: number;
 };
 type ApiErrorPayload = { error?: { code?: string; message?: string; request_id?: string; details?: unknown } };
 type ApiWorkflowError = Error & {
@@ -171,7 +158,6 @@ type PlainResumeLine = { text: string; kind: "heading" | "bullet" | "body" };
 
 const HISTORY_KEY = "resume-tailor-history-v1";
 const SYNCED_HISTORY_KEY = "roleforge-synced-history-v1";
-const EXPORT_FORMAT_ORDER: ExportFormat[] = ["pdf", "docx", "txt"];
 const DEFAULT_UPLOAD_FORMATS: UploadCapability[] = [
   { format: "docx", label: "DOCX", enabled: true },
   { format: "pdf", label: "PDF", enabled: true },
@@ -959,180 +945,6 @@ function loadSyncedHistoryIds(): string[] {
 function saveSyncedHistoryIds(ids: string[]) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(SYNCED_HISTORY_KEY, JSON.stringify([...new Set(ids)].slice(0, 40)));
-}
-
-function hasRestorableSnapshot(item: HistoryItem) {
-  return Boolean(item.snapshot?.result?.tailored_text?.trim());
-}
-
-function validHistoryDownloadUrl(url?: string | null) {
-  return Boolean(url && url !== "#");
-}
-
-function historyDownloads(item: HistoryItem): HistoryDownloads {
-  const downloads: HistoryDownloads = {
-    ...(item.snapshot?.downloads ?? {}),
-    ...(item.downloads ?? {}),
-  };
-  const latestFormat = item.downloadFormat ?? item.snapshot?.downloadFormat ?? "pdf";
-  const latestUrl = item.downloadUrl || item.snapshot?.downloadUrl;
-
-  if (validHistoryDownloadUrl(latestUrl)) {
-    downloads[latestFormat] = latestUrl;
-  }
-
-  return EXPORT_FORMAT_ORDER.reduce<HistoryDownloads>((readyDownloads, format) => {
-    const url = downloads[format];
-    if (validHistoryDownloadUrl(url)) readyDownloads[format] = url;
-    return readyDownloads;
-  }, {});
-}
-
-function historyDownloadEntries(item: HistoryItem, entitlement?: AccountEntitlement) {
-  const downloads = historyDownloads(item);
-  return EXPORT_FORMAT_ORDER.flatMap((format) => {
-    const url = downloads[format];
-    return url && exportFormatAllowed(format, entitlement) ? [{ format, url }] : [];
-  });
-}
-
-function primaryHistoryDownload(item: HistoryItem, entitlement?: AccountEntitlement) {
-  const downloads = historyDownloadEntries(item, entitlement);
-  const latestFormat = item.downloadFormat ?? item.snapshot?.downloadFormat ?? "pdf";
-  return downloads.find((download) => download.format === latestFormat) ?? downloads[0] ?? null;
-}
-
-function isAccountHistoryItem(item: HistoryItem, syncedIds: string[] = []) {
-  return Boolean(item.saved || item.source === "account" || syncedIds.includes(item.id) || (item.accountRunId && syncedIds.includes(item.accountRunId)));
-}
-
-function historyStatusLabel(item: HistoryItem, syncedIds: string[] = []) {
-  return isAccountHistoryItem(item, syncedIds) ? "Saved to account" : "This browser";
-}
-
-function historyProjectTitle(item: HistoryItem, syncedIds: string[] = []) {
-  if (isAccountHistoryItem(item, syncedIds)) {
-    return item.projectTitle || item.roleHint || item.filename;
-  }
-  return item.filename;
-}
-
-function historyProjectDetail(item: HistoryItem, syncedIds: string[] = []) {
-  if (isAccountHistoryItem(item, syncedIds)) {
-    return item.filename === historyProjectTitle(item, syncedIds) ? item.roleHint : item.filename;
-  }
-  return item.roleHint;
-}
-
-function historySortValue(item: HistoryItem) {
-  const value = new Date(item.createdAt).getTime();
-  return Number.isFinite(value) ? value : 0;
-}
-
-function historyGroupKey(item: HistoryItem, syncedIds: string[] = []) {
-  if (isAccountHistoryItem(item, syncedIds) && item.projectId) return `account:${item.projectId}`;
-  const filename = item.filename.replace(/\s+/g, " ").trim().toLowerCase();
-  const target = item.roleHint.replace(/\s+/g, " ").trim().toLowerCase();
-  return `local:${filename}:${target}`;
-}
-
-function historyStorageLabel(group: HistoryGroup) {
-  if (group.accountCount && group.localCount) return "Account + browser";
-  if (group.accountCount) return "Account";
-  return "This browser";
-}
-
-function historyGroupSummary(group: HistoryGroup) {
-  const runLabel = `${group.items.length} run${group.items.length === 1 ? "" : "s"}`;
-  const restoreLabel = group.restorableCount
-    ? `${group.restorableCount} restore-ready`
-    : group.downloadableCount
-      ? "Download only"
-      : "No export";
-  return `${runLabel} · best ${group.bestScore}/100 · ${restoreLabel}`;
-}
-
-function historyVersionLabel(total: number, index: number) {
-  if (total <= 1) return "Latest run";
-  const versionNumber = Math.max(total - index, 1);
-  return index === 0 ? `Version ${versionNumber} · Latest` : `Version ${versionNumber}`;
-}
-
-function formatHistoryTimestamp(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Recent run";
-  return date.toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
-
-function groupHistoryItems(items: HistoryItem[], syncedIds: string[] = []): HistoryGroup[] {
-  const groups = new Map<string, HistoryItem[]>();
-
-  items.forEach((item) => {
-    const key = historyGroupKey(item, syncedIds);
-    const group = groups.get(key) ?? [];
-    group.push(item);
-    groups.set(key, group);
-  });
-
-  return [...groups.entries()]
-    .map(([key, groupItems]) => {
-      const sorted = [...groupItems].sort((a, b) => historySortValue(b) - historySortValue(a));
-      const latest = sorted[0];
-      const accountItems = sorted.filter((item) => isAccountHistoryItem(item, syncedIds));
-      const accountItem = accountItems[0];
-      const titleSource = accountItem ?? latest;
-      const targetSource = latest.roleHint ? latest : titleSource;
-
-      return {
-        key,
-        title: historyProjectTitle(titleSource, syncedIds),
-        target: historyProjectDetail(targetSource, syncedIds),
-        latest,
-        accountItem,
-        items: sorted,
-        accountCount: accountItems.length,
-        localCount: sorted.length - accountItems.length,
-        restorableCount: sorted.filter(hasRestorableSnapshot).length,
-        downloadableCount: sorted.filter((item) => Object.keys(historyDownloads(item)).length > 0).length,
-        bestScore: Math.max(...sorted.map((item) => item.score || 0)),
-      };
-    })
-    .sort((a, b) => historySortValue(b.latest) - historySortValue(a.latest))
-    .slice(0, 12);
-}
-
-function mergeHistory(localItems: HistoryItem[], savedItems: HistoryItem[]) {
-  const merged = new Map<string, HistoryItem>();
-
-  [...savedItems, ...localItems].forEach((item) => {
-    const existing = merged.get(item.id);
-    merged.set(
-      item.id,
-      existing
-        ? {
-            ...item,
-            accountRunId: existing.accountRunId ?? item.accountRunId,
-            projectId: existing.projectId ?? item.projectId,
-            projectTitle: existing.projectTitle ?? item.projectTitle,
-            saved: Boolean(existing.saved || item.saved),
-            source: existing.source === "account" || item.source === "account" ? "account" : "local",
-            downloadUrl: validHistoryDownloadUrl(existing.downloadUrl) ? existing.downloadUrl : item.downloadUrl,
-            downloadFormat: existing.downloadFormat ?? item.downloadFormat,
-            snapshot: existing.snapshot ?? item.snapshot,
-            downloads: { ...historyDownloads(item), ...historyDownloads(existing) },
-          }
-        : item,
-    );
-  });
-
-  return [...merged.values()]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 12);
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
