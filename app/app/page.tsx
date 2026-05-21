@@ -3645,6 +3645,12 @@ export default function Page() {
                           );
                         })}
                       </div>
+                      {premiumExportRequested && !accountPremiumActive ? (
+                        <div className="history-export-upgrade" role="status">
+                          <span>{premiumExportRequested.label} is a Premium export.</span>
+                          <Link href="/settings#billing">View premium</Link>
+                        </div>
+                      ) : null}
                     </div>
                     {visibleSelectedHistoryDownloads.length ? (
                       <div className="history-download-panel" aria-label="Ready downloads for selected run">

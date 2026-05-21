@@ -3979,6 +3979,33 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
   color: color-mix(in srgb, var(--warn) 76%, var(--ink-1));
 }
 
+.history-export-upgrade {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--warn) 34%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--warn) 10%, var(--surface));
+  color: var(--ink-2);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.history-export-upgrade a {
+  flex: 0 0 auto;
+  color: var(--brand-strong);
+  font-weight: 950;
+  text-decoration: none;
+}
+
+.history-export-upgrade a:hover,
+.history-export-upgrade a:focus-visible {
+  text-decoration: underline;
+}
+
 .history-download-panel {
   grid-column: 1 / -1;
   display: grid;
@@ -9111,6 +9138,11 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   .history-export-actions {
     width: 100%;
     justify-content: stretch;
+  }
+
+  .history-export-upgrade {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .history-detail-actions {
