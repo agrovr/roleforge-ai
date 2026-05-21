@@ -45,10 +45,6 @@ type TailorRunRow = {
   id: string;
   client_history_id: string | null;
   project_id: string;
-  resume_projects?: {
-    title: string | null;
-    updated_at: string | null;
-  } | { title: string | null; updated_at: string | null }[] | null;
   created_at: string;
   source_resume_name: string | null;
   job_target: string | null;
@@ -57,6 +53,11 @@ type TailorRunRow = {
   download_format: ExportFormat | null;
   download_url: string | null;
   payload: Record<string, unknown> | null;
+};
+
+type ResumeProjectRow = {
+  id: string;
+  title: string | null;
 };
 
 function titleFromTarget(value: string | undefined) {
@@ -79,15 +80,32 @@ function readSnapshotDownloads(snapshot: Record<string, unknown> | undefined) {
 export async function loadSavedRuns(client: SupabaseClient, userId: string): Promise<SavedHistoryItem[]> {
   const { data, error } = await client
     .from("tailor_runs")
-    .select("id, client_history_id, project_id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url, payload, resume_projects!tailor_runs_project_id_fkey(title, updated_at)")
+    .select("id, client_history_id, project_id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url, payload")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(12);
 
   if (error) throw error;
 
-  return ((data ?? []) as TailorRunRow[]).map((run) => {
-    const project = Array.isArray(run.resume_projects) ? run.resume_projects[0] : run.resume_projects;
+  const runs = (data ?? []) as TailorRunRow[];
+  const projectIds = Array.from(new Set(runs.map((run) => run.project_id).filter(Boolean)));
+  const projectTitles = new Map<string, string>();
+
+  if (projectIds.length) {
+    const { data: projects, error: projectError } = await client
+      .from("resume_projects")
+      .select("id, title")
+      .eq("user_id", userId)
+      .in("id", projectIds);
+
+    if (projectError) throw projectError;
+
+    ((projects ?? []) as ResumeProjectRow[]).forEach((project) => {
+      if (project.title) projectTitles.set(project.id, project.title);
+    });
+  }
+
+  return runs.map((run) => {
     const snapshot = (run.payload?.studioSnapshot as Record<string, unknown> | undefined) ?? undefined;
     const downloadFormat = run.download_format || "pdf";
     const downloads = readSnapshotDownloads(snapshot);
@@ -97,7 +115,7 @@ export async function loadSavedRuns(client: SupabaseClient, userId: string): Pro
       id: run.client_history_id || run.id,
       accountRunId: run.id,
       projectId: run.project_id,
-      projectTitle: project?.title || titleFromTarget(run.job_target ?? undefined),
+      projectTitle: projectTitles.get(run.project_id) || titleFromTarget(run.job_target ?? undefined),
       createdAt: run.created_at,
       filename: run.source_resume_name || "Saved resume",
       mode: run.mode || "balanced",
