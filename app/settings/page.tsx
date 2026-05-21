@@ -96,7 +96,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const entitlement = await loadAccountEntitlement(supabase, user.id);
   const usage = await loadAccountUsage(supabase, user.id, entitlement);
   const billingConfig = getStripeBillingConfig();
-  const billingReady = billingConfig.checkoutConfigured && Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
   const premiumActive = entitlement.plan === "premium" && ["active", "trialing"].includes(entitlement.billingStatus);
   const planLabel = premiumActive ? "Premium" : "Free";
   const billingLabel = billingStatusLabel(entitlement.billingStatus);
@@ -105,6 +104,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const premiumEnding = premiumActive && entitlement.cancelAtPeriodEnd;
   const premiumEndLabel = formatPlanDate(entitlement.cancelAt || entitlement.currentPeriodEnd);
   const usageResetLabel = formatPlanDate(usage.currentPeriodEnd);
+  const billingServiceReady = Boolean(billingConfig.secretKey && process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
+  const checkoutReady = billingConfig.checkoutConfigured && billingServiceReady;
+  const portalReady = billingServiceReady && Boolean(entitlement.billingStatus !== "none");
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName =
     typeof user.user_metadata?.name === "string"
@@ -285,7 +287,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   {premiumEnding ? "Canceling" : billingLabel}
                 </span>
                 <form action="/api/billing/portal" method="post">
-                  <button className="ghost-button" type="submit" disabled={!billingReady || entitlement.billingStatus === "none"}>
+                  <button className="ghost-button" type="submit" disabled={!portalReady}>
                     Manage billing
                   </button>
                 </form>
@@ -313,7 +315,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     </div>
                     <form action="/api/billing/checkout" method="post">
                       <input type="hidden" name="interval" value="month" />
-                      <button className="primary-button" type="submit" disabled={!billingReady}>Start monthly</button>
+                      <button className="primary-button" type="submit" disabled={!checkoutReady}>Start monthly</button>
                     </form>
                   </article>
                   <article className="settings-price-card featured">
@@ -324,7 +326,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     </div>
                     <form action="/api/billing/checkout" method="post">
                       <input type="hidden" name="interval" value="year" />
-                      <button className="primary-button" type="submit" disabled={!billingReady}>Start yearly</button>
+                      <button className="primary-button" type="submit" disabled={!checkoutReady}>Start yearly</button>
                     </form>
                   </article>
                 </div>
@@ -334,7 +336,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   ? premiumEnding
                     ? "Use Manage billing if you want to reactivate or review invoices."
                     : "Use Manage billing for subscription changes and invoices."
-                  : billingReady
+                  : checkoutReady
                   ? "Checkout opens securely in Stripe. Premium access updates after the subscription syncs."
                   : "Premium checkout is not available right now."}
               </p>
