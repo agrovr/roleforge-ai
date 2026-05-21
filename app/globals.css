@@ -4255,9 +4255,10 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
 }
 
 .studio-hero-actions {
-  flex: 0 1 560px;
-  justify-content: flex-end;
-  min-width: min(100%, 320px);
+  flex: none;
+  justify-content: flex-start;
+  width: min(100%, 660px);
+  min-width: 0;
 }
 
 .export-format-strip {
@@ -4912,19 +4913,19 @@ html[data-theme="dark"] input::file-selector-button {
 
 .rf-studio-hero {
   display: grid;
-  grid-template-columns: minmax(320px, 1fr) minmax(300px, 560px);
+  grid-template-columns: minmax(0, 1fr);
   align-items: flex-start;
-  gap: 28px;
+  gap: 18px;
   padding: 2px 4px 0;
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .rf-studio-hero > div:first-child {
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .studio-hero-actions .ghost-button,
@@ -4946,19 +4947,16 @@ html[data-theme="dark"] input::file-selector-button {
   margin: 3px 0 4px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(2.1rem, 3.8vw, 3.35rem);
+  font-size: clamp(2.25rem, 4vw, 3.65rem);
   font-weight: 650;
   letter-spacing: 0;
-  line-height: 0.94;
-  max-width: 100%;
+  line-height: 0.96;
+  max-width: min(100%, 18ch);
   width: 100%;
-  display: -webkit-box;
-  overflow: hidden;
-  overflow-wrap: normal;
+  display: block;
+  overflow: visible;
+  overflow-wrap: break-word;
   text-wrap: balance;
-  text-overflow: ellipsis;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
   word-break: normal;
   hyphens: none;
 }
@@ -6294,8 +6292,8 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .rf-preview-wrap {
-  margin: 24px;
-  padding: 26px;
+  margin: 20px 22px 22px;
+  padding: 22px;
   border: 1px solid var(--line);
   border-radius: 22px;
   background: #f7f2e9;
@@ -6368,11 +6366,11 @@ html[data-theme="dark"] input::file-selector-button {
 
 .rf-resume-paper {
   position: relative;
-  min-height: clamp(420px, 44vh, 520px);
+  min-height: clamp(360px, 38vh, 460px);
   width: 100%;
   overflow: visible;
   overflow-wrap: anywhere;
-  padding: 56px 64px 58px;
+  padding: 46px 54px 50px;
   border: 1px solid #e9e4da;
   border-radius: 14px;
   background: #fffdf8;
@@ -6401,7 +6399,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .rf-resume-paper section {
-  margin-top: 34px;
+  margin-top: 28px;
 }
 
 .rf-resume-paper h4 {
@@ -6442,7 +6440,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .rf-resume-paper-plain {
-  min-height: clamp(380px, 40vh, 500px);
+  min-height: clamp(330px, 35vh, 430px);
 }
 
 .rf-resume-plain-lines {
@@ -6483,7 +6481,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .rf-resume-paper-empty {
-  min-height: clamp(320px, 34vh, 400px);
+  min-height: clamp(280px, 30vh, 360px);
 }
 
 .rf-resume-paper-empty section p {
@@ -6526,7 +6524,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .rf-resume-paper-diff {
-  min-height: 480px;
+  min-height: 400px;
 }
 
 .rf-diff-readiness {
