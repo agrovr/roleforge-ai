@@ -2489,6 +2489,22 @@ export default function Page() {
   const restoredRunOpen = Boolean(restoredHistoryId);
   const restoredSourceMissing = restoredRunOpen && hasTailoredPreview && !hasSourcePreview;
   const sourcePreviewUnavailable = Boolean((uploadMeta || file) && previewUploadState === "ready" && !hasSourcePreview);
+  const previewTabState = {
+    tailored: hasTailoredPreview ? "Ready" : stage === "tailoring" ? "Running" : "Waiting",
+    original: hasSourcePreview
+      ? "Ready"
+      : previewUploadState === "reading"
+        ? "Reading"
+        : sourcePreviewUnavailable || restoredSourceMissing
+          ? "Unavailable"
+          : "Waiting",
+    diff:
+      hasSourcePreview && hasTailoredPreview
+        ? "Ready"
+        : hasTailoredPreview
+          ? "Partial"
+          : "Waiting",
+  };
 
   useEffect(() => {
     if (selectedExportFormat !== "pdf" && !selectedExportAllowed) {
@@ -2967,7 +2983,8 @@ export default function Page() {
                       aria-controls="preview-panel"
                       onClick={() => setPreviewMode("tailored")}
                     >
-                      Tailored
+                      <span>Tailored</span>
+                      <small className="preview-tab-state">{previewTabState.tailored}</small>
                     </button>
                     <button
                       className={previewMode === "original" ? "active" : ""}
@@ -2978,7 +2995,8 @@ export default function Page() {
                       aria-controls="preview-panel"
                       onClick={() => setPreviewMode("original")}
                     >
-                      Original
+                      <span>Original</span>
+                      <small className="preview-tab-state">{previewTabState.original}</small>
                     </button>
                     <button
                       className={previewMode === "diff" ? "active" : ""}
@@ -2989,7 +3007,8 @@ export default function Page() {
                       aria-controls="preview-panel"
                       onClick={() => setPreviewMode("diff")}
                     >
-                      Changes
+                      <span>Changes</span>
+                      <small className="preview-tab-state">{previewTabState.diff}</small>
                     </button>
                   </div>
                 </div>
