@@ -27,6 +27,7 @@ import {
   isAccountHistoryItem,
   mergeHistory,
   primaryHistoryDownload,
+  restoredHistoryDownloadSelection,
   type HistoryDownloads,
   type HistoryItem as BaseHistoryItem,
 } from "../lib/history";
@@ -1682,10 +1683,10 @@ export default function Page() {
     setPreviewUploadError("");
     setSourcePreviewText(snapshot.sourcePreviewText ?? "");
     setResult(snapshot.result);
-    const restoredDownloadUrl = snapshot.downloadUrl || entry.downloadUrl || "";
-    setDownloadUrl(restoredDownloadUrl ? normalizeWorkflowDownloadUrl(restoredDownloadUrl) : null);
-    setDownloadFormat(snapshot.downloadFormat ?? entry.downloadFormat ?? "pdf");
-    setSelectedExportFormat(snapshot.downloadFormat ?? entry.downloadFormat ?? "pdf");
+    const restoredDownload = restoredHistoryDownloadSelection(entry, accountStatus?.entitlement);
+    setDownloadUrl(restoredDownload.url ? normalizeWorkflowDownloadUrl(restoredDownload.url) : null);
+    setDownloadFormat(restoredDownload.format);
+    setSelectedExportFormat(restoredDownload.format);
     setJdText(snapshot.jdText ?? "");
     setJdUrl(snapshot.jdUrl ?? "");
     setCompanyUrl(snapshot.companyUrl ?? "");

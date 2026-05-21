@@ -10,6 +10,7 @@ import {
   historyVersionLabel,
   mergeHistory,
   primaryHistoryDownload,
+  restoredHistoryDownloadSelection,
   type HistoryItem,
 } from "./history";
 import type { ExportEntitlement } from "./exportFormats";
@@ -105,6 +106,51 @@ test("falls back to an allowed primary download when the latest format is locked
   assert.deepEqual(primaryHistoryDownload(item, premiumEntitlement), {
     format: "docx",
     url: "https://downloads.example/resume.docx",
+  });
+});
+
+test("selects an allowed download when restoring a premium-format saved run on free access", () => {
+  const item = historyItem({
+    downloadFormat: "docx",
+    downloadUrl: "https://downloads.example/resume.docx",
+    downloads: {
+      pdf: "https://downloads.example/resume.pdf",
+    },
+    snapshot: {
+      result: { tailored_text: "Saved tailored draft" },
+      downloadFormat: "docx",
+      downloadUrl: "https://downloads.example/resume.docx",
+      downloads: {
+        pdf: "https://downloads.example/resume.pdf",
+        docx: "https://downloads.example/resume.docx",
+      },
+    },
+  });
+
+  assert.deepEqual(restoredHistoryDownloadSelection(item, freeEntitlement), {
+    format: "pdf",
+    url: "https://downloads.example/resume.pdf",
+  });
+  assert.deepEqual(restoredHistoryDownloadSelection(item, premiumEntitlement), {
+    format: "docx",
+    url: "https://downloads.example/resume.docx",
+  });
+});
+
+test("falls back to PDF when restoring a locked premium run without an allowed download", () => {
+  const item = historyItem({
+    downloadFormat: "txt",
+    downloadUrl: "https://downloads.example/resume.txt",
+    snapshot: {
+      result: { tailored_text: "Saved tailored draft" },
+      downloadFormat: "txt",
+      downloadUrl: "https://downloads.example/resume.txt",
+    },
+  });
+
+  assert.deepEqual(restoredHistoryDownloadSelection(item, freeEntitlement), {
+    format: "pdf",
+    url: null,
   });
 });
 

@@ -93,6 +93,15 @@ export function primaryHistoryDownload(item: HistoryItem, entitlement?: ExportEn
   return downloads.find((download) => download.format === latestFormat) ?? downloads[0] ?? null;
 }
 
+export function restoredHistoryDownloadSelection(item: HistoryItem, entitlement?: ExportEntitlement | null) {
+  const download = primaryHistoryDownload(item, entitlement);
+  if (download) return { format: download.format, url: download.url };
+
+  const savedFormat = item.snapshot?.downloadFormat ?? item.downloadFormat ?? "pdf";
+  const fallbackFormat = exportFormatAllowed(savedFormat, entitlement) ? savedFormat : "pdf";
+  return { format: fallbackFormat, url: null };
+}
+
 export function isAccountHistoryItem(item: HistoryItem, syncedIds: string[] = []) {
   return Boolean(item.saved || item.source === "account" || syncedIds.includes(item.id) || (item.accountRunId && syncedIds.includes(item.accountRunId)));
 }
