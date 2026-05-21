@@ -3624,6 +3624,7 @@ export default function Page() {
                         {exportFormats.map((format) => {
                           const label = format.format.toUpperCase();
                           const exporting = historyExportRequest?.id === visibleSelectedHistoryItem.id && historyExportRequest.format === format.format;
+                          const locked = !format.enabled;
                           const blocked = !hasRestorableSnapshot(visibleSelectedHistoryItem);
                           const existingDownloadReady =
                             Boolean(historyDownloads(visibleSelectedHistoryItem)[format.format]) &&
@@ -3635,10 +3636,11 @@ export default function Page() {
                               key={`history-export-${visibleSelectedHistoryItem.id}-${format.format}`}
                               onClick={() => void exportHistoryItem(visibleSelectedHistoryItem, format.format)}
                               disabled={blocked || Boolean(historyExportRequest)}
-                              title={format.enabled ? `Export ${label}` : `${label} exports unlock with Premium`}
+                              title={locked ? `${label} exports unlock with Premium` : `Export ${label}`}
+                              aria-label={locked ? `${label} export requires Premium` : `Export ${label}`}
                             >
-                              {!format.enabled ? <RoleForgeIcon name="lock" size={12} /> : null}
-                              {exporting ? `Exporting ${label}` : existingDownloadReady ? `Refresh ${label}` : `Export ${label}`}
+                              {locked ? <RoleForgeIcon name="lock" size={12} /> : null}
+                              {exporting ? `Exporting ${label}` : locked ? `Premium ${label}` : existingDownloadReady ? `Refresh ${label}` : `Export ${label}`}
                             </button>
                           );
                         })}

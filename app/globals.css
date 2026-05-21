@@ -3975,6 +3975,8 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
 
 .history-export-actions .btn.locked {
   border-style: dashed;
+  background: color-mix(in srgb, var(--warn) 9%, var(--surface));
+  color: color-mix(in srgb, var(--warn) 76%, var(--ink-1));
 }
 
 .history-download-panel {
