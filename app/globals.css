@@ -3370,6 +3370,7 @@ html[data-theme="dark"] .result-box {
   align-items: start;
   gap: 14px 18px;
   border-radius: 14px;
+  min-width: 0;
 }
 
 .history-item-main {
@@ -3731,16 +3732,29 @@ html[data-theme="dark"] .result-box {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  justify-self: end;
   gap: 8px;
   flex-wrap: wrap;
   max-width: 560px;
+  min-width: 0;
 }
 
 .history-actions .ghost-button {
+  flex: 0 1 auto;
   min-height: 38px;
   min-width: 0;
   justify-content: center;
+  text-align: center;
   white-space: nowrap;
+}
+
+.history-action-details,
+.history-action-restore {
+  min-width: 104px;
+}
+
+.history-action-download {
+  min-width: 132px;
 }
 
 .history-confirm-actions {
@@ -3805,6 +3819,7 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
   border: 1px solid var(--line);
   border-radius: 14px;
   background: color-mix(in srgb, var(--surface) 82%, var(--bg-alt));
+  min-width: 0;
 }
 
 .history-detail-panel:focus {
@@ -4076,6 +4091,7 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
 .history-version-list span {
   color: var(--ink-3);
   font-size: 0.78rem;
+  overflow-wrap: anywhere;
 }
 
 .history-version-formats {
@@ -4105,6 +4121,7 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
   justify-content: flex-end;
   gap: 8px;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 .history-version-more {
@@ -8912,6 +8929,7 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     width: 100%;
     max-width: none;
     justify-content: stretch;
+    justify-self: stretch;
   }
 
   .history-actions .ghost-button,
@@ -9179,6 +9197,7 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
     gap: 8px;
+    justify-self: stretch;
   }
 
   .history-content-grid.has-detail .history-actions {
@@ -9213,6 +9232,7 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     gap: 6px;
     font-size: 0.78rem;
     line-height: 1.1;
+    white-space: normal;
   }
 
   .history-download-prefix {
@@ -9354,6 +9374,68 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   .settings-metric strong,
   .settings-plan-active-card strong {
     font-size: 1.9rem;
+  }
+
+  .history-content-grid {
+    padding: 10px;
+  }
+
+  .history-item {
+    padding: 14px;
+  }
+
+  .history-title-row {
+    gap: 7px;
+  }
+
+  .history-sync-badge {
+    min-height: 26px;
+    padding-inline: 7px;
+    font-size: 0.66rem;
+  }
+
+  .history-overview,
+  .history-overview.compact {
+    grid-template-columns: 1fr;
+  }
+
+  .history-overview > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .history-overview span {
+    margin-top: 0;
+    text-align: right;
+  }
+
+  .history-project-meta span {
+    width: 100%;
+  }
+
+  .history-project-meta span + span::before {
+    display: none;
+  }
+
+  .history-actions,
+  .history-content-grid.has-detail .history-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .history-action-download {
+    grid-column: auto;
+  }
+
+  .history-confirm-actions,
+  .history-confirm-inline > div:last-child {
+    grid-template-columns: 1fr;
+  }
+
+  .history-export-actions {
+    display: grid;
+    grid-template-columns: 1fr;
   }
 
   .rf-live-card .studio-card-head {

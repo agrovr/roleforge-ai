@@ -7,9 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test app/lib/billing/entitlements.test.ts app/lib/exportFormats.test.ts app/lib/safeRedirect.test.ts",
+    "test": "tsx --test app/lib/billing/display.test.ts app/lib/billing/entitlements.test.ts app/lib/exportFormats.test.ts app/lib/history.test.ts app/lib/safeRedirect.test.ts",
     "test:billing": "tsx --test app/lib/billing/entitlements.test.ts",
+    "test:billing-display": "tsx --test app/lib/billing/display.test.ts",
     "test:exports": "tsx --test app/lib/exportFormats.test.ts",
+    "test:history": "tsx --test app/lib/history.test.ts",
     "test:redirects": "tsx --test app/lib/safeRedirect.test.ts"
   },
   "dependencies": {
