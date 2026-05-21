@@ -30,7 +30,7 @@ function billingNotice(value: string | undefined) {
     case "checkout-success":
       return {
         tone: "success",
-        text: "Stripe checkout is complete. Premium access updates as soon as Stripe confirms the subscription.",
+        text: "Checkout is complete. Premium access will appear here as soon as the subscription syncs.",
       };
     case "checkout-canceled":
       return {
@@ -40,12 +40,12 @@ function billingNotice(value: string | undefined) {
     case "portal-return":
       return {
         tone: "success",
-        text: "Billing details refreshed. Plan changes can take a moment to sync from Stripe.",
+        text: "Billing details refreshed. Plan changes can take a moment to sync.",
       };
     case "no-customer":
       return {
         tone: "neutral",
-        text: "No Stripe customer is connected yet. Start Premium checkout before opening billing management.",
+        text: "Start Premium first, then billing management will open here.",
       };
     default:
       return null;
@@ -331,8 +331,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     ? "Use Manage billing if you want to reactivate or review invoices."
                     : "Use Manage billing for subscription changes and invoices."
                   : billingReady
-                  ? "Checkout opens in Stripe. Premium access updates after Stripe confirms the subscription."
-                  : "Premium checkout is not open yet."}
+                  ? "Checkout opens securely in Stripe. Premium access updates after the subscription syncs."
+                  : "Premium checkout is not available right now."}
               </p>
             </div>
           </section>

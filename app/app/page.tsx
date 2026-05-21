@@ -1058,7 +1058,7 @@ function accountNoticeLabel(value: string, detail = "") {
     case "signed-out":
       return "You are signed out.";
     case "account-not-configured":
-      return "Sign-in is temporarily unavailable here.";
+      return "Sign-in is unavailable right now.";
     case "signin-error":
       if (safeDetail) return `Sign-in could not finish: ${safeDetail}`;
       return "Sign-in could not start. Check the email and try again.";
@@ -2422,7 +2422,7 @@ export default function Page() {
   const accountItems = [
     {
       label: "Saved projects",
-      detail: signedIn ? "Completed runs sync here and reopen in the studio." : "Sign in first, then completed runs can sync across browsers.",
+      detail: signedIn ? "Completed runs save to History and reopen in the studio." : "Sign in first, then completed runs can follow you across browsers.",
     },
     {
       label: "Usage",
@@ -2430,7 +2430,7 @@ export default function Page() {
         ? accountStatus.usage.monthlyRunLimit === null
           ? `${accountStatus.usage.monthlyRuns} runs this month. Premium is unlimited.`
           : `${accountStatus.usage.monthlyRuns}/${accountStatus.usage.monthlyRunLimit} free runs used this month.`
-        : "Usage appears after sign-in.",
+        : "Sign in to see run usage.",
     },
     {
       label: "Plan",
@@ -2439,16 +2439,16 @@ export default function Page() {
             ? `Premium access ends ${accountPremiumEndLabel}. PDF, DOCX, and TXT remain available until then.`
           : accountPremiumActive
             ? "Premium workspace. PDF, DOCX, and TXT exports are available."
-            : "Free workspace. PDF export is available now."
+            : "Free workspace. PDF export is included."
         : "Sign in to connect plan and saved project state.",
     },
     {
       label: "Exports",
       detail: accountStatus?.entitlement?.exportFormats.docx
         ? "PDF, DOCX, and TXT exports are available for this account."
-        : "PDF is live for the free workflow. DOCX and TXT unlock with premium.",
+        : "PDF exports are included. DOCX and TXT unlock with Premium.",
     },
-    { label: "Billing", detail: "Stripe checkout and billing management are connected for plan changes." },
+    { label: "Billing", detail: "Manage plan changes and invoices from Settings." },
   ];
   const localHistoryCount = history.filter((entry) => !isAccountHistoryItem(entry, syncedHistoryIds)).length;
   const savedProjectCount = history.filter((entry) => isAccountHistoryItem(entry, syncedHistoryIds)).length;
@@ -2631,7 +2631,7 @@ export default function Page() {
                   {signedIn ? (
                     <>
                       <strong className="studio-account-email" title={accountUser?.email || "Signed in"}>{accountUser?.email || "Signed in"}</strong>
-                      <p>Your session is active. Completed runs sync to saved projects.</p>
+                      <p>You are signed in and ready. Completed runs save to your project history.</p>
                       <small className={`studio-account-sync ${historySyncState}`}>{historySyncMessage}</small>
                       <div className="studio-account-shortcuts">
                         <Link href="/settings" onClick={() => setAccountPanelOpen(false)}>
@@ -2676,7 +2676,7 @@ export default function Page() {
                   ) : (
                     <>
                       <strong>Sign-in unavailable</strong>
-                      <p>Account access is temporarily unavailable here.</p>
+                      <p>Account access is unavailable right now.</p>
                     </>
                   )}
                   <div className="studio-account-list">
