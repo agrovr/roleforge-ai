@@ -12,6 +12,7 @@ import {
   type ExportCapability,
   type ExportFormat,
 } from "../lib/exportFormats";
+import { parseTargetUrl } from "../lib/targetLabel";
 import {
   formatHistoryTimestamp,
   groupHistoryItems,
@@ -1147,40 +1148,6 @@ function StudioAccountGate({ state }: { state: "loading" | "required" }) {
       </section>
     </main>
   );
-}
-
-function isUrlTarget(value: string) {
-  return /^(https?:\/\/|www\.)/i.test(value.trim());
-}
-
-function readableDomainName(hostname: string) {
-  const clean = hostname.replace(/^www\./i, "");
-  const firstSegment = clean.split(".").find(Boolean) || clean;
-  return firstSegment
-    .split(/[-_]+/)
-    .filter(Boolean)
-    .map((part) => (part.length <= 3 ? part.toUpperCase() : `${part.charAt(0).toUpperCase()}${part.slice(1)}`))
-    .join(" ");
-}
-
-function parseTargetUrl(value: string) {
-  const trimmed = value.trim();
-  if (!trimmed || !isUrlTarget(trimmed)) return null;
-
-  try {
-    const url = new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
-    const host = url.hostname.replace(/^www\./i, "");
-
-    return {
-      host,
-      label: `${readableDomainName(host)} job target`,
-    };
-  } catch {
-    return {
-      host: "Job URL",
-      label: "Job URL target",
-    };
-  }
 }
 
 export default function Page() {

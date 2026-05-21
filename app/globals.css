@@ -6359,7 +6359,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .rf-resume-paper {
   position: relative;
-  min-height: 560px;
+  min-height: clamp(420px, 44vh, 520px);
   width: 100%;
   overflow: visible;
   overflow-wrap: anywhere;
@@ -6433,7 +6433,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .rf-resume-paper-plain {
-  min-height: 520px;
+  min-height: clamp(380px, 40vh, 500px);
 }
 
 .rf-resume-plain-lines {
@@ -6474,7 +6474,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .rf-resume-paper-empty {
-  min-height: 420px;
+  min-height: clamp(320px, 34vh, 400px);
 }
 
 .rf-resume-paper-empty section p {
