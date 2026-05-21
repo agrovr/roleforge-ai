@@ -50,7 +50,7 @@ create table if not exists public.resume_projects (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   title text not null default 'Untitled resume',
-  status text not null default 'draft' check (status in ('draft', 'tailored', 'exported', 'archived')),
+  status text not null default 'draft' check (status in ('active', 'draft', 'generated', 'tailored', 'exported', 'archived')),
   source_filename text,
   source_name text,
   source_mime_type text,
