@@ -9086,6 +9086,12 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .rf-preview-empty-steps,
+  .rf-diff-readiness,
+  .rf-diff-grid {
+    grid-template-columns: 1fr;
+  }
+
   .history-filter-bar {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
