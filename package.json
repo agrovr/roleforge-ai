@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test app/lib/billing/display.test.ts app/lib/billing/entitlements.test.ts app/lib/downloadStatus.test.ts app/lib/downloadUrls.test.ts app/lib/exportFormats.test.ts app/lib/history.test.ts app/lib/previewResume.test.ts app/lib/safeRedirect.test.ts app/lib/supabase/savedProjects.test.ts app/lib/targetLabel.test.ts app/lib/usage.test.ts",
+    "test": "tsx --test app/lib/billing/display.test.ts app/lib/billing/entitlements.test.ts app/lib/billing/readiness.test.ts app/lib/downloadStatus.test.ts app/lib/downloadUrls.test.ts app/lib/exportFormats.test.ts app/lib/history.test.ts app/lib/previewResume.test.ts app/lib/safeRedirect.test.ts app/lib/supabase/savedProjects.test.ts app/lib/targetLabel.test.ts app/lib/usage.test.ts",
     "test:billing": "tsx --test app/lib/billing/entitlements.test.ts",
     "test:billing-display": "tsx --test app/lib/billing/display.test.ts",
     "test:exports": "tsx --test app/lib/exportFormats.test.ts",

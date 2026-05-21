@@ -6,6 +6,7 @@ import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { billingStatusDetail, billingStatusLabel, billingStatusTone } from "../lib/billing/display";
 import { reconcileUserSubscriptionEntitlement } from "../lib/billing/entitlements";
+import { billingReadiness } from "../lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
@@ -104,9 +105,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const premiumEnding = premiumActive && entitlement.cancelAtPeriodEnd;
   const premiumEndLabel = formatPlanDate(entitlement.cancelAt || entitlement.currentPeriodEnd);
   const usageResetLabel = formatPlanDate(usage.currentPeriodEnd);
-  const billingServiceReady = Boolean(billingConfig.secretKey && process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
-  const checkoutReady = billingConfig.checkoutConfigured && billingServiceReady;
-  const portalReady = billingServiceReady && Boolean(entitlement.billingStatus !== "none");
+  const { checkoutReady, portalReady } = billingReadiness(billingConfig, {
+    hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()),
+    billingStatus: entitlement.billingStatus,
+  });
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName =
     typeof user.user_metadata?.name === "string"
