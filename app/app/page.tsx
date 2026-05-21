@@ -1037,6 +1037,23 @@ function compactLabel(value: string, maxLength = 46) {
   return `${normalized.slice(0, maxLength - 1).trimEnd()}...`;
 }
 
+function workflowDownloadUrl(filename: string) {
+  return `/api/workflow/download/${encodeURIComponent(filename)}`;
+}
+
+function normalizeWorkflowDownloadUrl(url: string) {
+  try {
+    const parsed = new URL(url, "https://roleforge.local");
+    const match = parsed.pathname.match(/(?:\/api\/workflow)?\/download\/([^/]+)$/);
+    if (match?.[1]) return workflowDownloadUrl(decodeURIComponent(match[1]));
+  } catch {
+    const match = url.match(/(?:\/api\/workflow)?\/download\/([^/?#]+)/);
+    if (match?.[1]) return workflowDownloadUrl(decodeURIComponent(match[1]));
+  }
+
+  return url;
+}
+
 function accountInitials(user: AccountUser | null) {
   const label = user?.name || user?.email || "RF";
   const parts = label
@@ -1707,7 +1724,7 @@ export default function Page() {
     if (!response.ok) throw await readApiError(response, "Export failed");
 
     const data = (await response.json()) as ExportResponse;
-    const url = `${baseUrl}/download/${data.download_filename}`;
+    const url = workflowDownloadUrl(data.download_filename);
     if (options.updateActiveDownload ?? true) {
       setDownloadUrl(url);
       setDownloadFormat(format);
@@ -1950,7 +1967,8 @@ export default function Page() {
     setPreviewUploadError("");
     setSourcePreviewText(snapshot.sourcePreviewText ?? "");
     setResult(snapshot.result);
-    setDownloadUrl(snapshot.downloadUrl || entry.downloadUrl || null);
+    const restoredDownloadUrl = snapshot.downloadUrl || entry.downloadUrl || "";
+    setDownloadUrl(restoredDownloadUrl ? normalizeWorkflowDownloadUrl(restoredDownloadUrl) : null);
     setDownloadFormat(snapshot.downloadFormat ?? entry.downloadFormat ?? "pdf");
     setSelectedExportFormat(snapshot.downloadFormat ?? entry.downloadFormat ?? "pdf");
     setJdText(snapshot.jdText ?? "");
@@ -2516,7 +2534,15 @@ export default function Page() {
         : signedIn
           ? "Complete a tailor run and it will save here with resume preview, target details, scores, and a one-click studio restore."
           : "Complete a tailor run and it will stay in this browser with the preview, target, scores, and download ready to reopen.";
-  const historyDownloadEntriesFor = (entry: HistoryItem) => historyDownloadEntries(entry, accountStatus?.entitlement);
+  const historyDownloadEntriesFor = (entry: HistoryItem) =>
+    historyDownloadEntries(entry, accountStatus?.entitlement).map((download) => ({
+      ...download,
+      url: normalizeWorkflowDownloadUrl(download.url),
+    }));
+  const primaryHistoryDownloadFor = (entry: HistoryItem) => {
+    const download = primaryHistoryDownload(entry, accountStatus?.entitlement);
+    return download ? { ...download, url: normalizeWorkflowDownloadUrl(download.url) } : null;
+  };
   const canDownloadHistoryItem = (entry: HistoryItem) => historyDownloadEntriesFor(entry).length > 0;
   const visibleRunCount = visibleHistoryGroups.reduce((total, group) => total + group.items.length, 0);
   const visibleAccountProjectCount = visibleHistoryGroups.filter((group) => group.accountCount > 0).length;
@@ -2542,7 +2568,7 @@ export default function Page() {
   const selectedHistoryDownloadCount = visibleSelectedHistoryDownloads.length;
   const selectedHistoryRestorable = visibleSelectedHistoryItem ? hasRestorableSnapshot(visibleSelectedHistoryItem) : false;
   const selectedHistoryPrimaryDownload = visibleSelectedHistoryItem
-    ? primaryHistoryDownload(visibleSelectedHistoryItem, accountStatus?.entitlement)
+    ? primaryHistoryDownloadFor(visibleSelectedHistoryItem)
     : null;
   const selectedHistoryPrimaryDownloadLabel =
     selectedHistoryPrimaryDownload?.format.toUpperCase() ?? visibleSelectedHistoryItem?.downloadFormat?.toUpperCase() ?? "PDF";
@@ -3225,7 +3251,7 @@ export default function Page() {
                       const entry = group.latest;
                       const manageEntry = group.accountItem ?? entry;
                       const restorable = hasRestorableSnapshot(entry);
-                      const primaryDownload = primaryHistoryDownload(entry, accountStatus?.entitlement);
+                      const primaryDownload = primaryHistoryDownloadFor(entry);
                       const availableDownloadCount = historyDownloadEntriesFor(entry).length;
                       const canManageProject = Boolean(group.accountItem?.projectId && signedIn);
                       const isEditingProject = Boolean(canManageProject && editingProjectId === group.accountItem?.projectId);
