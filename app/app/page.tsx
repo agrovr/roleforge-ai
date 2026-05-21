@@ -986,6 +986,17 @@ export default function Page() {
     return { ...extra, Authorization: `Bearer ${token}` };
   }, [supabaseClient]);
 
+  const refreshAccountStatus = useCallback(async (signal?: AbortSignal) => {
+    const response = await fetch("/api/auth/status", {
+      credentials: "include",
+      signal,
+    });
+    if (!response.ok) throw new Error("Account status failed");
+    const data = (await response.json()) as AccountStatus;
+    setAccountStatus(data);
+    return data;
+  }, []);
+
   useEffect(() => {
     setHistory(loadHistory());
     setSyncedHistoryIds(loadSyncedHistoryIds());
@@ -1177,15 +1188,7 @@ export default function Page() {
   useEffect(() => {
     const controller = new AbortController();
 
-    fetch("/api/auth/status", {
-      credentials: "include",
-      signal: controller.signal,
-    })
-      .then(async (response) => {
-        if (!response.ok) throw new Error("Account status failed");
-        return (await response.json()) as AccountStatus;
-      })
-      .then((data) => setAccountStatus(data))
+    refreshAccountStatus(controller.signal)
       .catch((caught) => {
         if ((caught as Error).name !== "AbortError") {
           setAccountStatus({
@@ -1199,7 +1202,7 @@ export default function Page() {
       });
 
     return () => controller.abort();
-  }, []);
+  }, [refreshAccountStatus]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -1507,6 +1510,12 @@ export default function Page() {
       setHistorySyncState("synced");
       setHistorySyncMessage(options.countUsage === false ? `${item.downloadFormat?.toUpperCase() ?? "Export"} saved to this project` : "Saved to your account and ready to restore");
       if (options.countUsage === false) return;
+
+      const refreshed = await refreshAccountStatus()
+        .then(() => true)
+        .catch(() => false);
+
+      if (refreshed) return;
 
       setAccountStatus((current) => {
         if (!current?.usage) return current;
@@ -1843,12 +1852,15 @@ export default function Page() {
     setSelectedExportFormat("pdf");
     setCopyState("");
 
+    let tailoredOutput: TailorResult | null = null;
+
     try {
       setStage("uploading");
       const uploadData = await upload();
       const id = uploadData.resume_id;
       setStage("tailoring");
       const output = await tailor(id);
+      tailoredOutput = output;
       setStage("exporting");
       const url = await exportResume(output.tailored_text, "pdf");
       const snapshot = buildRunSnapshot(output, uploadData, url);
@@ -1896,6 +1908,8 @@ export default function Page() {
               },
             }
           : current);
+      } else if (tailoredOutput && signedIn && accountReady) {
+        void refreshAccountStatus().catch(() => undefined);
       }
       setStage("error");
     } finally {
