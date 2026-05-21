@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
-import { billingStatusDetail, billingStatusLabel } from "../lib/billing/display";
+import { billingStatusDetail, billingStatusLabel, billingStatusTone } from "../lib/billing/display";
 import { reconcileUserSubscriptionEntitlement } from "../lib/billing/entitlements";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
@@ -97,6 +97,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const planLabel = premiumActive ? "Premium" : "Free";
   const billingLabel = billingStatusLabel(entitlement.billingStatus);
   const billingDetail = billingStatusDetail(entitlement.billingStatus);
+  const billingTone = billingStatusTone(entitlement.billingStatus);
   const premiumEnding = premiumActive && entitlement.cancelAtPeriodEnd;
   const premiumEndLabel = formatPlanDate(entitlement.cancelAt || entitlement.currentPeriodEnd);
   const usageResetLabel = formatPlanDate(usage.currentPeriodEnd);
@@ -276,7 +277,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
             </div>
             <div className="settings-section-panel settings-billing-panel">
               <div className="settings-billing-head">
-                <span className={`settings-status-pill ${premiumEnding ? "ready" : premiumActive ? "good" : "muted"}`}>
+                <span className={`settings-status-pill ${premiumEnding ? "ready" : billingTone}`}>
                   {premiumEnding ? "Canceling" : billingLabel}
                 </span>
                 <form action="/api/billing/portal" method="post">

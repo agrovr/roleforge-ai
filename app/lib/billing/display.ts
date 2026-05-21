@@ -48,3 +48,21 @@ export function billingStatusDetail(status: BillingStatus) {
       return "Review billing in Stripe for the latest plan status.";
   }
 }
+
+export function billingStatusTone(status: BillingStatus) {
+  switch (status) {
+    case "trialing":
+    case "active":
+      return "good";
+    case "past_due":
+    case "incomplete":
+    case "unpaid":
+    case "paused":
+      return "warn";
+    case "none":
+    case "canceled":
+    case "incomplete_expired":
+    default:
+      return "muted";
+  }
+}

@@ -5004,6 +5004,12 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--brand-dark);
 }
 
+.settings-status-pill.warn {
+  border-color: color-mix(in srgb, var(--warn) 42%, var(--line));
+  background: color-mix(in srgb, var(--warn) 12%, var(--surface));
+  color: var(--warn);
+}
+
 .settings-status-pill.muted {
   border-color: var(--line);
   background: color-mix(in srgb, var(--surface-2) 78%, var(--surface));
@@ -8490,6 +8496,12 @@ html[data-theme="dark"] .settings-status-pill.ready {
   border-color: rgba(222, 162, 79, 0.34);
   background: rgba(222, 162, 79, 0.14);
   color: #f3c16d;
+}
+
+html[data-theme="dark"] .settings-status-pill.warn {
+  border-color: rgba(230, 183, 103, 0.38);
+  background: rgba(230, 183, 103, 0.14);
+  color: #f0c978;
 }
 
 html[data-theme="dark"] .settings-status-pill.muted {
