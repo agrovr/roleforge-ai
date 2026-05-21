@@ -37,7 +37,7 @@ export async function GET() {
   }
 
   const entitlement = user && supabase ? await loadAccountEntitlement(supabase, user.id) : FREE_ENTITLEMENT;
-  const usage = user && supabase ? await loadAccountUsage(supabase, entitlement) : null;
+  const usage = user && supabase ? await loadAccountUsage(supabase, user.id, entitlement) : null;
 
   return NextResponse.json({
     configured: true,

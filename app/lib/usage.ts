@@ -27,12 +27,14 @@ export function currentUsagePeriod(now = new Date()) {
 
 export async function loadAccountUsage(
   client: SupabaseClient,
+  userId: string,
   entitlement: AccountEntitlement,
 ): Promise<AccountUsage> {
   const period = currentUsagePeriod();
   const { count, error } = await client
     .from("tailor_runs")
     .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
     .gte("created_at", period.startIso)
     .lt("created_at", period.endIso) as CountResult;
   const monthlyRuns = error ? 0 : count ?? 0;

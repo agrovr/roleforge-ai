@@ -62,8 +62,12 @@ function formatPlanDate(value: string | null) {
 async function countRows(
   supabase: NonNullable<Awaited<ReturnType<typeof createRoleForgeServerClient>>>,
   table: "resume_projects" | "tailor_runs",
+  userId: string,
 ) {
-  const { count, error } = await supabase.from(table).select("id", { count: "exact", head: true }) as CountResult;
+  const { count, error } = await supabase
+    .from(table)
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId) as CountResult;
   return error ? 0 : count ?? 0;
 }
 
@@ -85,12 +89,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   }
 
   const [projectCount, runCount] = await Promise.all([
-    countRows(supabase, "resume_projects"),
-    countRows(supabase, "tailor_runs"),
+    countRows(supabase, "resume_projects", user.id),
+    countRows(supabase, "tailor_runs", user.id),
     reconcileUserSubscriptionEntitlement(user.id).catch(() => false),
   ]);
   const entitlement = await loadAccountEntitlement(supabase, user.id);
-  const usage = await loadAccountUsage(supabase, entitlement);
+  const usage = await loadAccountUsage(supabase, user.id, entitlement);
   const billingConfig = getStripeBillingConfig();
   const billingReady = billingConfig.checkoutConfigured && Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
   const premiumActive = entitlement.plan === "premium" && ["active", "trialing"].includes(entitlement.billingStatus);
