@@ -3513,16 +3513,28 @@ export default function Page() {
                   </div>
                   {visibleSelectedHistoryItem && selectedHistoryGroup ? (
                     <aside className="history-detail-panel" aria-label="Saved project details" ref={historyDetailRef} tabIndex={-1}>
-                    <div>
-                      <div className="eyebrow">Project detail</div>
-                      <h3>{selectedHistoryGroup.title}</h3>
-                      <p>{selectedHistoryGroup.target}</p>
-                      <div className="history-detail-badges" aria-label="Selected project state">
-                        <span>{historyStorageLabel(selectedHistoryGroup)}</span>
-                        <span>{selectedHistoryVersionLabel}</span>
-                        <span>{hasRestorableSnapshot(visibleSelectedHistoryItem) ? "Restores to studio" : "Download only"}</span>
+                      <div>
+                        <div className="history-detail-heading">
+                          <div>
+                            <div className="eyebrow">Project detail</div>
+                            <h3>{selectedHistoryGroup.title}</h3>
+                          </div>
+                          <button
+                            className="ghost-button history-detail-close"
+                            type="button"
+                            onClick={closeHistoryDetails}
+                            aria-label={`Close details for ${selectedHistoryGroup.title}`}
+                          >
+                            Close <RoleForgeIcon name="x" size={12} />
+                          </button>
+                        </div>
+                        <p>{selectedHistoryGroup.target}</p>
+                        <div className="history-detail-badges" aria-label="Selected project state">
+                          <span>{historyStorageLabel(selectedHistoryGroup)}</span>
+                          <span>{selectedHistoryVersionLabel}</span>
+                          <span>{hasRestorableSnapshot(visibleSelectedHistoryItem) ? "Restores to studio" : "Download only"}</span>
+                        </div>
                       </div>
-                    </div>
                     <dl>
                       <div>
                         <dt>Runs</dt>

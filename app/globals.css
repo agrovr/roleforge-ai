@@ -3786,6 +3786,26 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
   outline-offset: 3px;
 }
 
+.history-detail-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.history-detail-heading > div {
+  min-width: 0;
+}
+
+.history-detail-close {
+  min-height: 34px;
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
 .history-detail-panel h3 {
   margin: 5px 0 6px;
   color: var(--ink-0);
@@ -8951,6 +8971,17 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     padding: 14px;
     border-radius: 12px;
     scroll-margin-top: 14px;
+  }
+
+  .history-detail-heading {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .history-detail-close {
+    width: 100%;
+    justify-content: center;
   }
 
   .history-detail-panel h3 {
