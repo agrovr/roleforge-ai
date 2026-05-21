@@ -8,3 +8,10 @@ export function safeRedirectPath(value: FormDataEntryValue | string | null, fall
 
   return trimmed;
 }
+
+export function redirectPathWithParam(path: string, key: string, value: string) {
+  const url = new URL(path, "https://roleforge.local");
+  url.searchParams.set(key, value);
+
+  return `${url.pathname}${url.search}${url.hash}`;
+}

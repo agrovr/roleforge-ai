@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { safeRedirectPath } from "@/app/lib/safeRedirect";
+import { redirectPathWithParam, safeRedirectPath } from "@/app/lib/safeRedirect";
 import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
 
 export async function POST(request: Request) {
@@ -12,5 +12,5 @@ export async function POST(request: Request) {
     await supabase.auth.signOut();
   }
 
-  redirect(`${next}?account=signed-out`);
+  redirect(redirectPathWithParam(next, "account", "signed-out"));
 }
