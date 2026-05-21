@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { readDownloadProxyError } from "@/app/lib/downloadProxy";
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
 
 type DownloadContext = {
@@ -82,8 +83,9 @@ async function proxyDownload(request: Request, context: DownloadContext) {
   });
 
   if (!upstream.ok) {
+    const errorPayload = await readDownloadProxyError(upstream);
     return withSupabaseCookies(
-      NextResponse.json({ error: "This export could not be downloaded." }, { status: upstream.status }),
+      NextResponse.json(errorPayload, { status: upstream.status }),
       account.routeClient.cookiesToSet,
     );
   }
