@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
+import { createRoleForgeServiceClient } from "@/app/lib/supabase/service";
 import { deleteSavedProject, renameSavedProject } from "@/app/lib/supabase/savedProjects";
 
 type RouteContext = {
@@ -30,7 +31,7 @@ async function requireAccount() {
     };
   }
 
-  return { routeClient };
+  return { routeClient, user };
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
@@ -41,7 +42,8 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   try {
     const payload = (await request.json()) as { title?: string };
-    const title = await renameSavedProject(account.routeClient.supabase, projectId, payload.title ?? "");
+    const dbClient = createRoleForgeServiceClient() ?? account.routeClient.supabase;
+    const title = await renameSavedProject(dbClient, projectId, payload.title ?? "", account.user.id);
     return withSupabaseCookies(NextResponse.json({ title }), account.routeClient.cookiesToSet);
   } catch {
     return withSupabaseCookies(
@@ -58,7 +60,8 @@ export async function DELETE(_request: Request, context: RouteContext) {
   const { projectId } = await context.params;
 
   try {
-    await deleteSavedProject(account.routeClient.supabase, projectId);
+    const dbClient = createRoleForgeServiceClient() ?? account.routeClient.supabase;
+    await deleteSavedProject(dbClient, projectId, account.user.id);
     return withSupabaseCookies(NextResponse.json({ ok: true }), account.routeClient.cookiesToSet);
   } catch {
     return withSupabaseCookies(

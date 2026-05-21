@@ -32,6 +32,15 @@ export type CompletedRunSaveInput = SavedHistoryItem & {
   payload?: Record<string, unknown>;
 };
 
+export type SavedProjectUser = {
+  id: string;
+  email?: string | null;
+  user_metadata?: {
+    name?: unknown;
+    full_name?: unknown;
+  } | null;
+};
+
 type TailorRunRow = {
   id: string;
   client_history_id: string | null;
@@ -67,10 +76,11 @@ function readSnapshotDownloads(snapshot: Record<string, unknown> | undefined) {
   }, {});
 }
 
-export async function loadSavedRuns(client: SupabaseClient): Promise<SavedHistoryItem[]> {
+export async function loadSavedRuns(client: SupabaseClient, userId: string): Promise<SavedHistoryItem[]> {
   const { data, error } = await client
     .from("tailor_runs")
     .select("id, client_history_id, project_id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url, payload, resume_projects!tailor_runs_project_id_fkey(title, updated_at)")
+    .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(12);
 
@@ -103,7 +113,7 @@ export async function loadSavedRuns(client: SupabaseClient): Promise<SavedHistor
   });
 }
 
-export async function renameSavedProject(client: SupabaseClient, projectId: string, title: string) {
+export async function renameSavedProject(client: SupabaseClient, projectId: string, title: string, userId: string) {
   const cleanTitle = title.replace(/\s+/g, " ").trim();
   if (!cleanTitle) throw new Error("Project name is required");
 
@@ -114,26 +124,29 @@ export async function renameSavedProject(client: SupabaseClient, projectId: stri
       target_title: cleanTitle,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", projectId);
+    .eq("id", projectId)
+    .eq("user_id", userId);
 
   if (error) throw error;
   return cleanTitle;
 }
 
-export async function deleteSavedProject(client: SupabaseClient, projectId: string) {
+export async function deleteSavedProject(client: SupabaseClient, projectId: string, userId: string) {
   const { error } = await client
     .from("resume_projects")
     .delete()
-    .eq("id", projectId);
+    .eq("id", projectId)
+    .eq("user_id", userId);
 
   if (error) throw error;
 }
 
-export async function saveCompletedRun(client: SupabaseClient, input: CompletedRunSaveInput) {
-  const { data: userResult, error: userError } = await client.auth.getUser();
-  if (userError) throw userError;
-
-  const user = userResult.user;
+export async function saveCompletedRun(
+  client: SupabaseClient,
+  input: CompletedRunSaveInput,
+  accountUser?: SavedProjectUser,
+) {
+  const user = accountUser ?? (await client.auth.getUser()).data.user;
   if (!user) throw new Error("Not signed in");
 
   const email = user.email ?? "";
@@ -153,7 +166,9 @@ export async function saveCompletedRun(client: SupabaseClient, input: CompletedR
     },
     { onConflict: "id" },
   );
-  if (profileError) throw profileError;
+  // Profiles are useful account decoration, but saved-run persistence should not
+  // fail if an older Supabase project has not created the optional table yet.
+  void profileError;
 
   const projectTitle = titleFromTarget(input.jobTarget || input.roleHint || input.filename);
   const runPayload = {
@@ -201,6 +216,7 @@ export async function saveCompletedRun(client: SupabaseClient, input: CompletedR
         target_source: input.jobTarget || input.roleHint,
         last_target_summary: input.roleHint,
         latest_run_id: runRecord.id,
+        status: "exported",
         updated_at: new Date().toISOString(),
       })
       .eq("id", runRecord.project_id)
@@ -215,7 +231,7 @@ export async function saveCompletedRun(client: SupabaseClient, input: CompletedR
     .insert({
       user_id: user.id,
       title: projectTitle,
-      status: "active",
+      status: "exported",
       source_filename: input.filename,
       source_name: input.sourceResumeName || input.filename,
       target_title: projectTitle,
@@ -244,8 +260,9 @@ export async function saveCompletedRun(client: SupabaseClient, input: CompletedR
 
   const { error: updateError } = await client
     .from("resume_projects")
-    .update({ latest_run_id: runId, updated_at: new Date().toISOString() })
-    .eq("id", projectId);
+    .update({ latest_run_id: runId, status: "exported", updated_at: new Date().toISOString() })
+    .eq("id", projectId)
+    .eq("user_id", user.id);
 
   if (updateError) throw updateError;
 

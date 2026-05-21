@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
+import { createRoleForgeServiceClient } from "@/app/lib/supabase/service";
 import { loadSavedRuns, saveCompletedRun, type CompletedRunSaveInput } from "@/app/lib/supabase/savedProjects";
 
 async function requireAccount() {
@@ -26,7 +27,7 @@ async function requireAccount() {
     };
   }
 
-  return { routeClient };
+  return { routeClient, user };
 }
 
 export async function GET() {
@@ -34,7 +35,8 @@ export async function GET() {
   if ("error" in account) return account.error;
 
   try {
-    const runs = await loadSavedRuns(account.routeClient.supabase);
+    const dbClient = createRoleForgeServiceClient() ?? account.routeClient.supabase;
+    const runs = await loadSavedRuns(dbClient, account.user.id);
     return withSupabaseCookies(NextResponse.json({ runs }), account.routeClient.cookiesToSet);
   } catch {
     return withSupabaseCookies(
@@ -50,7 +52,8 @@ export async function POST(request: Request) {
 
   try {
     const input = (await request.json()) as CompletedRunSaveInput;
-    const savedRun = await saveCompletedRun(account.routeClient.supabase, input);
+    const dbClient = createRoleForgeServiceClient() ?? account.routeClient.supabase;
+    const savedRun = await saveCompletedRun(dbClient, input, account.user);
     return withSupabaseCookies(NextResponse.json(savedRun), account.routeClient.cookiesToSet);
   } catch {
     return withSupabaseCookies(
