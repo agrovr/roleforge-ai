@@ -408,18 +408,18 @@ function Pricing({ studioHref, premiumHref }: Pick<LandingLinks, "studioHref" | 
             <div className="eyebrow">Pricing</div>
             <h2 className="display h2">Start lean, upgrade when you need exports.</h2>
           </div>
-          <p className="lede">Free covers the core PDF workflow. Premium is intentionally priced lower while RoleForge is early.</p>
+          <p className="lede">Free covers the core PDF workflow with a monthly run limit. Premium is intentionally priced lower while RoleForge is early.</p>
         </div>
         <div className="pricing-grid two">
           <article className="price-card">
             <div className="price-name">Studio</div>
             <div className="price-amount"><span className="v">$0</span></div>
-            <div className="price-desc">Use the current resume tailoring workflow for upload, targeting, review, and export.</div>
+            <div className="price-desc">Start with 5 tailoring runs each month for upload, targeting, review, and PDF export.</div>
             <ul className="price-list">
+              <li><RoleForgeIcon name="check" size={14} />5 tailoring runs each month</li>
               <li><RoleForgeIcon name="check" size={14} />DOCX, PDF, and TXT upload</li>
               <li><RoleForgeIcon name="check" size={14} />PDF export</li>
               <li><RoleForgeIcon name="check" size={14} />Job description or public URL targeting</li>
-              <li><RoleForgeIcon name="check" size={14} />Review tabs for generated results</li>
             </ul>
             <Link className="btn btn-soft btn-lg" href={studioHref}>Open studio</Link>
           </article>

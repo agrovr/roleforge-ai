@@ -7,8 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "tsx --test app/lib/billing/entitlements.test.ts app/lib/exportFormats.test.ts app/lib/safeRedirect.test.ts",
     "test:billing": "tsx --test app/lib/billing/entitlements.test.ts",
-    "test:exports": "tsx --test app/lib/exportFormats.test.ts"
+    "test:exports": "tsx --test app/lib/exportFormats.test.ts",
+    "test:redirects": "tsx --test app/lib/safeRedirect.test.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
