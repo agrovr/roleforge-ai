@@ -255,13 +255,14 @@ export function buildPlainResumeLines(text?: string): PlainResumeLine[] {
     .map(normalizeResumeLine)
     .filter(Boolean)
     .slice(0, 90)
-    .flatMap((line) => {
+    .flatMap((line): PlainResumeLine[] => {
       const marker = getSectionMarker(line);
       if (marker || (/^[A-Z][A-Z\s/&+-]{3,34}$/.test(line) && line.length <= 36)) {
         const heading: PlainResumeLine = { text: marker?.title ?? line, kind: "heading" };
         return marker?.rest ? [heading, { text: marker.rest, kind: "body" }] : [heading];
       }
-      if (isBulletLine(line)) return { text: cleanBulletLine(line), kind: "bullet" };
-      return { text: line, kind: "body" };
-    });
+      if (isBulletLine(line)) return [{ text: cleanBulletLine(line), kind: "bullet" }];
+      return [{ text: line, kind: "body" }];
+    })
+    .slice(0, 90);
 }

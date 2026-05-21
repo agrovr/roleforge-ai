@@ -86,3 +86,9 @@ test("caps plain preview lines so long restored runs cannot overgrow the card", 
 
   assert.equal(buildPlainResumeLines(lines).length, 90);
 });
+
+test("caps plain preview after inline headings expand into content lines", () => {
+  const lines = Array.from({ length: 70 }, (_, index) => `Skills: Tool ${index + 1}`).join("\n");
+
+  assert.equal(buildPlainResumeLines(lines).length, 90);
+});
