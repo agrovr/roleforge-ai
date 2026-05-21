@@ -2442,7 +2442,7 @@ export default function Page() {
   const readSeconds = result?.tailored_text ? Math.max(20, Math.round((result.tailored_text.split(/\s+/).length / 220) * 60)) : 0;
   const scoreDetail = result?.score_summary?.fit_delta ? `${formatDelta(result.score_summary.fit_delta)} from baseline` : result ? "Run complete" : "Run needed";
   const atsDetail = result?.score_summary?.issues_resolved ? `${result.score_summary.issues_resolved} issues fixed` : result ? "Parser notes returned" : "Waiting for run";
-  const keywordDetail = keywordTotal ? `${missingKeywords.length} missing` : "Target terms pending";
+  const keywordDetail = keywordTotal ? `${missingKeywords.length} missing` : "Waiting for target terms";
   const runLabel = accountStatus?.configured && !signedIn
     ? "Sign in to run"
     : limitReached
@@ -2559,7 +2559,7 @@ export default function Page() {
                   ? "Tailored draft is generating"
                   : "Run Tailor to generate a draft",
             },
-            { label: "Keywords", value: keywordTotal ? `${presentKeywords.length}/${keywordTotal} keywords matched` : "Keywords pending" },
+            { label: "Keywords", value: keywordTotal ? `${presentKeywords.length}/${keywordTotal} keywords matched` : "Run needed for keyword match" },
             { label: "Export", value: restoredRunOpen ? "Saved run open" : downloadReady ? `${downloadFormat.toUpperCase()} export ready` : "Review before export" },
           ];
   const previewStatusTone = (value: string, index: number) => {
@@ -2963,7 +2963,7 @@ export default function Page() {
             <div className="rf-studio-stats">
               <StudioMetric label="Fit score" value={score ? `${score}` : "Run"} unit={score ? "/100" : "needed"} detail={scoreDetail} progress={score || readiness} tone="brand" />
               <StudioMetric label="ATS readability" value={atsScore ? `${atsScore}` : "Review"} unit={atsScore ? "/100" : "notes"} detail={atsDetail} progress={atsScore || readiness} tone="good" />
-              <StudioMetric label="Keyword match" value={keywordTotal ? `${presentKeywords.length}` : "Terms"} unit={keywordTotal ? `/${keywordTotal} matched` : "pending"} detail={keywordDetail} progress={keywordTotal ? (presentKeywords.length / keywordTotal) * 100 : readiness} tone="accent" />
+              <StudioMetric label="Keyword match" value={keywordTotal ? `${presentKeywords.length}` : "Terms"} unit={keywordTotal ? `/${keywordTotal} matched` : "needed"} detail={keywordDetail} progress={keywordTotal ? (presentKeywords.length / keywordTotal) * 100 : readiness} tone="accent" />
               <StudioMetric label="Read time" value={readSeconds ? `${readSeconds}` : "Draft"} unit={readSeconds ? "seconds" : "waiting"} detail={result ? "Review before export" : "Generated after run"} progress={readSeconds ? 72 : readiness} tone="sky" />
             </div>
 
@@ -3135,7 +3135,7 @@ export default function Page() {
                     <>
                       <article className="ats-item good"><div className="ats-dot"><RoleForgeIcon name="check" size={11} /></div><div><strong>Headings ready for review</strong><p>Run the workflow to surface parser notes.</p></div></article>
                       <article className="ats-item good"><div className="ats-dot"><RoleForgeIcon name="check" size={11} /></div><div><strong>Single-column check</strong><p>Formatting notes will appear when the run completes.</p></div></article>
-                      <article className="ats-item warn"><div className="ats-dot"><RoleForgeIcon name="sparkle" size={11} /></div><div><strong>Keyword coverage pending</strong><p>Matched and missing terms need a resume and target.</p></div></article>
+                      <article className="ats-item warn"><div className="ats-dot"><RoleForgeIcon name="sparkle" size={11} /></div><div><strong>Keyword coverage waiting</strong><p>Matched and missing terms need a resume and target.</p></div></article>
                     </>
                   )}
                 </div>
