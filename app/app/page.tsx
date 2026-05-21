@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { downloadStatusFromHead } from "../lib/downloadStatus";
 import { normalizeWorkflowDownloadUrl, workflowDownloadUrl } from "../lib/downloadUrls";
 import type { AccountEntitlement } from "../lib/entitlements";
 import {
@@ -1324,16 +1325,9 @@ export default function Page() {
     })
       .then((response) => {
         if (controller.signal.aborted) return;
-        if (response.ok) {
-          setDownloadState("ready");
-          setDownloadMessage(`${downloadFormat.toUpperCase()} download is ready`);
-        } else if (response.status === 402) {
-          setDownloadState("expired");
-          setDownloadMessage(`${downloadFormat.toUpperCase()} download requires an active Premium plan. Switch to PDF or reopen Premium to use this file.`);
-        } else {
-          setDownloadState("expired");
-          setDownloadMessage(`This ${downloadFormat.toUpperCase()} link expired. Run the export again to create a fresh file.`);
-        }
+        const status = downloadStatusFromHead(downloadFormat, response.status);
+        setDownloadState(status.state);
+        setDownloadMessage(status.message);
       })
       .catch((caught) => {
         if ((caught as Error).name === "AbortError") return;
