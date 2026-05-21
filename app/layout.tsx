@@ -46,7 +46,7 @@ export default function RootLayout({
       <body>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var p=new URLSearchParams(location.search).get("theme");var s=localStorage.getItem("roleforge-theme");var t=p==="dark"||p==="light"?p:s;if(t!=="dark"&&t!=="light"){t=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;}catch(e){}})();`,
+            __html: `(function(){try{var p=new URLSearchParams(location.search).get("theme");var s=localStorage.getItem("roleforge-theme");var t=p==="dark"||p==="light"?p:s;if(t!=="dark"&&t!=="light"){t="light"}document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;}catch(e){}})();`,
           }}
         />
         {children}
