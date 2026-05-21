@@ -2774,7 +2774,7 @@ export default function Page() {
 
             <div className="rf-studio-grid">
               <section className="studio-card rf-live-card" id="preview">
-                <div className="studio-card-head">
+                <div className="studio-card-head history-card-head">
                   <div>
                     <div className="eyebrow">Live preview</div>
                     <h2 className="panel-title">{previewTitle}</h2>
