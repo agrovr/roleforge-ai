@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { normalizeWorkflowDownloadUrl, workflowDownloadUrl } from "../lib/downloadUrls";
 import type { AccountEntitlement } from "../lib/entitlements";
 import {
   customerExportFormats,
@@ -785,23 +786,6 @@ function compactLabel(value: string, maxLength = 46) {
   const normalized = value.replace(/\s+/g, " ").trim();
   if (normalized.length <= maxLength) return normalized;
   return `${normalized.slice(0, maxLength - 1).trimEnd()}...`;
-}
-
-function workflowDownloadUrl(filename: string) {
-  return `/api/workflow/download/${encodeURIComponent(filename)}`;
-}
-
-function normalizeWorkflowDownloadUrl(url: string) {
-  try {
-    const parsed = new URL(url, "https://roleforge.local");
-    const match = parsed.pathname.match(/(?:\/api\/workflow)?\/download\/([^/]+)$/);
-    if (match?.[1]) return workflowDownloadUrl(decodeURIComponent(match[1]));
-  } catch {
-    const match = url.match(/(?:\/api\/workflow)?\/download\/([^/?#]+)/);
-    if (match?.[1]) return workflowDownloadUrl(decodeURIComponent(match[1]));
-  }
-
-  return url;
 }
 
 function accountInitials(user: AccountUser | null) {
