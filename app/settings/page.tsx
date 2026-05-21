@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { billingStatusDetail, billingStatusLabel } from "../lib/billing/display";
 import { reconcileUserSubscriptionEntitlement } from "../lib/billing/entitlements";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
@@ -94,10 +95,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const billingReady = billingConfig.checkoutConfigured && Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim());
   const premiumActive = entitlement.plan === "premium" && ["active", "trialing"].includes(entitlement.billingStatus);
   const planLabel = premiumActive ? "Premium" : "Free";
-  const billingLabel =
-    entitlement.billingStatus === "none"
-      ? "No billing active"
-      : entitlement.billingStatus.replace(/_/g, " ");
+  const billingLabel = billingStatusLabel(entitlement.billingStatus);
+  const billingDetail = billingStatusDetail(entitlement.billingStatus);
   const premiumEnding = premiumActive && entitlement.cancelAtPeriodEnd;
   const premiumEndLabel = formatPlanDate(entitlement.cancelAt || entitlement.currentPeriodEnd);
   const usageResetLabel = formatPlanDate(usage.currentPeriodEnd);
@@ -183,6 +182,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <span>{usage.monthlyRunLimit === null ? "Runs available" : "Runs left"}</span>
                 </div>
               </div>
+              <p className="settings-billing-note">{billingDetail}</p>
               <form action="/auth/signout" method="post">
                 <input type="hidden" name="next" value="/login?account=signed-out" />
                 <button className="ghost-button" type="submit">Sign out</button>
