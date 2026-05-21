@@ -45,6 +45,19 @@ test("loads saved runs with project titles without embedded relationship names",
                               download_url: "/api/workflow/download/run-1.pdf",
                               payload: { studioSnapshot: { downloads: {} } },
                             },
+                            {
+                              id: "run-2",
+                              client_history_id: "history-2",
+                              project_id: "project-2",
+                              created_at: "2026-05-21T12:01:00.000Z",
+                              source_resume_name: "server-recorded.pdf",
+                              job_target: "Server-recorded usage row",
+                              mode: "balanced",
+                              fit_score: 72,
+                              download_format: "pdf",
+                              download_url: null,
+                              payload: { serverRecorded: true },
+                            },
                           ],
                           error: null,
                         };
@@ -89,6 +102,7 @@ test("loads saved runs with project titles without embedded relationship names",
   const runs = await loadSavedRuns(client, "user-123");
 
   assert.deepEqual(calls, ["tailor_runs", "resume_projects"]);
+  assert.equal(runs.length, 1);
   assert.equal(runs[0].projectTitle, "Senior backend role");
   assert.equal(runs[0].source, "account");
 });

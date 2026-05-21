@@ -77,6 +77,12 @@ function readSnapshotDownloads(snapshot: Record<string, unknown> | undefined) {
   }, {});
 }
 
+function hasSavedProjectSurface(run: TailorRunRow) {
+  if (run.download_url && run.download_url !== "#") return true;
+  const snapshot = run.payload?.studioSnapshot;
+  return Boolean(snapshot && typeof snapshot === "object");
+}
+
 export async function loadSavedRuns(client: SupabaseClient, userId: string): Promise<SavedHistoryItem[]> {
   const { data, error } = await client
     .from("tailor_runs")
@@ -88,7 +94,8 @@ export async function loadSavedRuns(client: SupabaseClient, userId: string): Pro
   if (error) throw error;
 
   const runs = (data ?? []) as TailorRunRow[];
-  const projectIds = Array.from(new Set(runs.map((run) => run.project_id).filter(Boolean)));
+  const visibleRuns = runs.filter(hasSavedProjectSurface);
+  const projectIds = Array.from(new Set(visibleRuns.map((run) => run.project_id).filter(Boolean)));
   const projectTitles = new Map<string, string>();
 
   if (projectIds.length) {
@@ -105,7 +112,7 @@ export async function loadSavedRuns(client: SupabaseClient, userId: string): Pro
     });
   }
 
-  return runs.map((run) => {
+  return visibleRuns.map((run) => {
     const snapshot = (run.payload?.studioSnapshot as Record<string, unknown> | undefined) ?? undefined;
     const downloadFormat = run.download_format || "pdf";
     const downloads = readSnapshotDownloads(snapshot);
