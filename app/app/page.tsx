@@ -2582,6 +2582,7 @@ export default function Page() {
     accountStatus?.entitlement?.plan === "premium" &&
       ["active", "trialing"].includes(accountStatus.entitlement.billingStatus),
   );
+  const premiumExportSyncing = Boolean(premiumExportRequested && accountPremiumActive);
   const accountPremiumEnding = Boolean(accountPremiumActive && accountStatus?.entitlement?.cancelAtPeriodEnd);
   const accountPremiumEndLabel = formatResetDate(accountStatus?.entitlement?.cancelAt || accountStatus?.entitlement?.currentPeriodEnd || "");
   const railPlanCard = accountPremiumActive
@@ -3249,10 +3250,20 @@ export default function Page() {
                 </article>
                 {premiumExportRequested ? (
                   <div className="rf-callout upgrade">
-                    <strong>{premiumExportRequested.label} export is included with Premium</strong>
-                    <p>Upgrade to export DOCX and TXT files, or keep using PDF on the free plan.</p>
+                    <strong>
+                      {premiumExportSyncing
+                        ? `${premiumExportRequested.label} export is still syncing with your Premium plan`
+                        : `${premiumExportRequested.label} export is included with Premium`}
+                    </strong>
+                    <p>
+                      {premiumExportSyncing
+                        ? "Try again in a moment, or open Settings to refresh your plan state. PDF remains available while your export access catches up."
+                        : "Upgrade to export DOCX and TXT files, or keep using PDF on the free plan."}
+                    </p>
                     <div className="rf-callout-actions">
-                      <Link className="primary-button" href="/settings#billing">View premium <RoleForgeIcon name="sparkle" size={14} /></Link>
+                      <Link className="primary-button" href="/settings#billing">
+                        {premiumExportSyncing ? "Open settings" : "View premium"} <RoleForgeIcon name="sparkle" size={14} />
+                      </Link>
                       <button
                         className="ghost-button"
                         type="button"
