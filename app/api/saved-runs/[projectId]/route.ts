@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { withAccountDatabase } from "@/app/lib/supabase/accountDatabase";
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
-import { createRoleForgeServiceClient } from "@/app/lib/supabase/service";
 import { deleteSavedProject, renameSavedProject } from "@/app/lib/supabase/savedProjects";
 
 type RouteContext = {
@@ -42,10 +42,14 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   try {
     const payload = (await request.json()) as { title?: string };
-    const dbClient = createRoleForgeServiceClient() ?? account.routeClient.supabase;
-    const title = await renameSavedProject(dbClient, projectId, payload.title ?? "", account.user.id);
+    const title = await withAccountDatabase(
+      account.routeClient.supabase,
+      (dbClient) => renameSavedProject(dbClient, projectId, payload.title ?? "", account.user.id),
+      { label: "Saved project rename database operation" },
+    );
     return withSupabaseCookies(NextResponse.json({ title }), account.routeClient.cookiesToSet);
-  } catch {
+  } catch (error) {
+    console.error("Saved project rename failed", error);
     return withSupabaseCookies(
       NextResponse.json({ error: "Project name could not be saved." }, { status: 500 }),
       account.routeClient.cookiesToSet,
@@ -60,10 +64,14 @@ export async function DELETE(_request: Request, context: RouteContext) {
   const { projectId } = await context.params;
 
   try {
-    const dbClient = createRoleForgeServiceClient() ?? account.routeClient.supabase;
-    await deleteSavedProject(dbClient, projectId, account.user.id);
+    await withAccountDatabase(
+      account.routeClient.supabase,
+      (dbClient) => deleteSavedProject(dbClient, projectId, account.user.id),
+      { label: "Saved project delete database operation" },
+    );
     return withSupabaseCookies(NextResponse.json({ ok: true }), account.routeClient.cookiesToSet);
-  } catch {
+  } catch (error) {
+    console.error("Saved project delete failed", error);
     return withSupabaseCookies(
       NextResponse.json({ error: "Saved project could not be deleted." }, { status: 500 }),
       account.routeClient.cookiesToSet,

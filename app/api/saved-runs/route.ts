@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { withAccountDatabase } from "@/app/lib/supabase/accountDatabase";
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
-import { createRoleForgeServiceClient } from "@/app/lib/supabase/service";
 import { loadSavedRuns, saveCompletedRun, type CompletedRunSaveInput } from "@/app/lib/supabase/savedProjects";
 
 async function requireAccount() {
@@ -35,10 +35,14 @@ export async function GET() {
   if ("error" in account) return account.error;
 
   try {
-    const dbClient = createRoleForgeServiceClient() ?? account.routeClient.supabase;
-    const runs = await loadSavedRuns(dbClient, account.user.id);
+    const runs = await withAccountDatabase(
+      account.routeClient.supabase,
+      (dbClient) => loadSavedRuns(dbClient, account.user.id),
+      { label: "Saved projects database operation" },
+    );
     return withSupabaseCookies(NextResponse.json({ runs }), account.routeClient.cookiesToSet);
-  } catch {
+  } catch (error) {
+    console.error("Saved projects refresh failed", error);
     return withSupabaseCookies(
       NextResponse.json({ error: "Saved projects could not refresh." }, { status: 500 }),
       account.routeClient.cookiesToSet,
@@ -52,10 +56,14 @@ export async function POST(request: Request) {
 
   try {
     const input = (await request.json()) as CompletedRunSaveInput;
-    const dbClient = createRoleForgeServiceClient() ?? account.routeClient.supabase;
-    const savedRun = await saveCompletedRun(dbClient, input, account.user);
+    const savedRun = await withAccountDatabase(
+      account.routeClient.supabase,
+      (dbClient) => saveCompletedRun(dbClient, input, account.user),
+      { label: "Saved project save database operation" },
+    );
     return withSupabaseCookies(NextResponse.json(savedRun), account.routeClient.cookiesToSet);
-  } catch {
+  } catch (error) {
+    console.error("Saved project save failed", error);
     return withSupabaseCookies(
       NextResponse.json({ error: "This run could not be saved to your account." }, { status: 500 }),
       account.routeClient.cookiesToSet,
