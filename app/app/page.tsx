@@ -2040,6 +2040,17 @@ export default function Page() {
     if (droppedFile) setFile(droppedFile);
   }
 
+  function selectGeneratedAssetText(elementId: string) {
+    const element = document.getElementById(elementId);
+    const selection = window.getSelection();
+    if (!element || !selection) return false;
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    return !selection.isCollapsed;
+  }
+
   async function copyCoverLetter(text: string) {
     const letter = text.trim();
     if (!letter) return;
@@ -2049,7 +2060,12 @@ export default function Page() {
       window.setTimeout(() => setAssetCopyState(""), 1800);
       return;
     }
-    setAssetCopyState("Copy failed");
+    if (selectGeneratedAssetText("generated-cover-letter-copy")) {
+      setAssetCopyState("Cover letter selected");
+      window.setTimeout(() => setAssetCopyState(""), 2400);
+      return;
+    }
+    setAssetCopyState("Copy unavailable");
   }
 
   async function copyInterviewPrep() {
@@ -2061,7 +2077,12 @@ export default function Page() {
       window.setTimeout(() => setAssetCopyState(""), 1800);
       return;
     }
-    setAssetCopyState("Copy failed");
+    if (selectGeneratedAssetText("generated-interview-prep-copy")) {
+      setAssetCopyState("Interview prep selected");
+      window.setTimeout(() => setAssetCopyState(""), 2400);
+      return;
+    }
+    setAssetCopyState("Copy unavailable");
   }
 
   const firstTargetLine = (jdText || jdUrl).split(/\r?\n/).map((line) => line.trim()).find(Boolean) || "";
@@ -2851,7 +2872,10 @@ export default function Page() {
               <div className={`generated-grid rf-generated-grid${coverRailActive ? " focus-cover" : interviewRailActive ? " focus-interview" : ""}`}>
                 <article className={`generated-card ${coverRailActive ? "active" : ""}${coverLetterText ? " filled" : ""}`}>
                   <div className="generated-head"><RoleForgeIcon name="mail" size={14} /> Cover letter</div>
-                  <div className={`generated-body${coverLetterText ? " generated-scroll" : ""}`}>
+                  <div
+                    className={`generated-body${coverLetterText ? " generated-scroll" : ""}`}
+                    id="generated-cover-letter-copy"
+                  >
                     {coverLetterText || "After tailoring, the generated cover letter will appear here for review."}
                   </div>
                   <div className="suggestion-actions">
@@ -2868,7 +2892,7 @@ export default function Page() {
                 <article className={`generated-card ${interviewRailActive ? "active" : ""}${interviewPrep.length ? " filled" : ""}`}>
                   <div className="generated-head"><RoleForgeIcon name="briefcase" size={14} /> Likely interview questions</div>
                   {interviewPrep.length ? (
-                    <ul className="generated-list">
+                    <ul className="generated-list" id="generated-interview-prep-copy">
                       {interviewPrep.slice(0, 5).map((item, index) => (
                         <li key={`${item.question}-${index}`}><strong>{item.question}</strong><span>{item.answer_bullets.slice(0, 3).join(" · ")}</span></li>
                       ))}
