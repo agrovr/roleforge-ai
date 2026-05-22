@@ -6368,6 +6368,10 @@ html[data-theme="dark"] input::file-selector-button {
   padding: 28px 28px 0;
 }
 
+.rf-live-card {
+  scroll-margin-top: 128px;
+}
+
 .rf-live-card .panel-title {
   font-family: var(--font-sans);
   font-size: 2rem;

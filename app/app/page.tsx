@@ -1157,6 +1157,36 @@ export default function Page() {
     window.setTimeout(scrollWhenReady, 30);
   }, []);
 
+  const openPreviewMode = useCallback((mode: PreviewMode, options: { behavior?: ScrollBehavior; updateHash?: boolean } = {}) => {
+    const nextHash =
+      mode === "original"
+        ? "#preview-original"
+        : mode === "diff"
+          ? "#preview-changes"
+          : "#preview-tailored";
+    setPreviewMode(mode);
+    setActiveTab(mode === "diff" ? "changes" : "resume");
+
+    if (options.updateHash !== false && window.location.hash !== nextHash) {
+      window.history.pushState(null, "", `${window.location.pathname}${window.location.search}${nextHash}`);
+    }
+
+    let attempts = 0;
+    const scrollWhenReady = () => {
+      document.getElementById("preview")?.scrollIntoView({
+        behavior: attempts === 0 ? options.behavior ?? "smooth" : "auto",
+        block: "start",
+      });
+
+      attempts += 1;
+      if (attempts <= 8) {
+        window.setTimeout(scrollWhenReady, 80);
+      }
+    };
+
+    window.setTimeout(scrollWhenReady, 30);
+  }, []);
+
   useEffect(() => {
     function openHashTarget() {
       if (window.location.hash === "#history") {
@@ -1169,6 +1199,18 @@ export default function Page() {
       }
       if (window.location.hash === "#interview-prep") {
         openGeneratedAsset("interview", { behavior: "auto", updateHash: false });
+        return;
+      }
+      if (window.location.hash === "#preview-tailored") {
+        openPreviewMode("tailored", { behavior: "auto", updateHash: false });
+        return;
+      }
+      if (window.location.hash === "#preview-original") {
+        openPreviewMode("original", { behavior: "auto", updateHash: false });
+        return;
+      }
+      if (window.location.hash === "#preview-changes") {
+        openPreviewMode("diff", { behavior: "auto", updateHash: false });
       }
     }
 
@@ -1176,10 +1218,10 @@ export default function Page() {
     window.addEventListener("hashchange", openHashTarget);
 
     return () => window.removeEventListener("hashchange", openHashTarget);
-  }, [openGeneratedAsset, openHistoryPanel]);
+  }, [openGeneratedAsset, openHistoryPanel, openPreviewMode]);
 
   function clearHistoryHash() {
-    if (!["#history", "#cover-letter", "#interview-prep"].includes(window.location.hash)) return;
+    if (!["#history", "#cover-letter", "#interview-prep", "#preview-tailored", "#preview-original", "#preview-changes"].includes(window.location.hash)) return;
     window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
   }
 
@@ -1201,15 +1243,6 @@ export default function Page() {
     };
 
     window.setTimeout(scrollWhenReady, 30);
-  }
-
-  function openPreviewMode(mode: PreviewMode) {
-    clearHistoryHash();
-    setPreviewMode(mode);
-    setActiveTab(mode === "diff" ? "changes" : "resume");
-    window.setTimeout(() => {
-      document.getElementById("preview")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 30);
   }
 
   useEffect(() => {
@@ -2726,7 +2759,7 @@ export default function Page() {
                       role="tab"
                       aria-selected={previewMode === "tailored"}
                       aria-controls="preview-panel"
-                      onClick={() => setPreviewMode("tailored")}
+                      onClick={() => openPreviewMode("tailored")}
                     >
                       <span>Tailored</span>
                       <small className="preview-tab-state">{previewTabState.tailored}</small>
@@ -2738,7 +2771,7 @@ export default function Page() {
                       role="tab"
                       aria-selected={previewMode === "original"}
                       aria-controls="preview-panel"
-                      onClick={() => setPreviewMode("original")}
+                      onClick={() => openPreviewMode("original")}
                     >
                       <span>Original</span>
                       <small className="preview-tab-state">{previewTabState.original}</small>
@@ -2750,7 +2783,7 @@ export default function Page() {
                       role="tab"
                       aria-selected={previewMode === "diff"}
                       aria-controls="preview-panel"
-                      onClick={() => setPreviewMode("diff")}
+                      onClick={() => openPreviewMode("diff")}
                     >
                       <span>Changes</span>
                       <small className="preview-tab-state">{previewTabState.diff}</small>
