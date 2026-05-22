@@ -1998,7 +1998,30 @@ export default function Page() {
             ? "Upload to re-tailor"
           : result
             ? "Re-tailor"
+            : !file
+              ? "Upload to run"
+              : !hasTarget
+                ? "Add target to run"
             : "Run Tailor";
+  const runDisabledReason = canRun
+    ? ""
+    : accountStatus?.configured && !signedIn
+      ? "Sign in before running the studio workflow."
+      : limitReached
+        ? "Your free monthly run limit is reached. Upgrade or wait for the next cycle."
+        : busy
+          ? "The current workflow is still running."
+          : previewUploadState === "reading"
+            ? "The resume is still being read."
+            : result && !file
+              ? "Upload the source resume again before re-tailoring this restored run."
+              : !file
+                ? "Upload a resume file before running Tailor."
+                : !hasTarget
+                  ? "Add a job target before running Tailor."
+                  : !baseUrl
+                    ? "Resume tailoring is unavailable right now."
+                    : "Complete the required fields before running Tailor.";
   const downloadReady = Boolean(downloadUrl && downloadState === "ready");
   const coverLetterText = result?.cover_letter?.trim() ?? "";
   const canDuplicateCurrentRun = Boolean(result?.tailored_text?.trim() && uploadMeta && downloadUrl);
@@ -2462,7 +2485,7 @@ export default function Page() {
                 <p>{activeDetail}</p>
               </div>
               <div className="studio-hero-actions">
-                <button className="ghost-button" type="button" onClick={onRun} disabled={!canRun}>{runLabel}</button>
+                <button className="ghost-button" type="button" onClick={onRun} disabled={!canRun} title={runDisabledReason || undefined}>{runLabel}</button>
                 {selectedDownloadReady && downloadUrl ? (
                   <a className="primary-button" href={downloadUrl} download>{exportLabel} <RoleForgeIcon name="download" size={14} /></a>
                 ) : (
@@ -2796,7 +2819,7 @@ export default function Page() {
                         <input value={companyUrl} onChange={(event) => setCompanyUrl(event.target.value)} placeholder="Optional company URL" aria-label="Company URL" />
                       </label>
                       <span className="sr-only" aria-live="polite">Workflow status: {stage}</span>
-                      <button className="primary-button" type="button" onClick={onRun} disabled={!canRun}>{runLabel} <RoleForgeIcon name="sparkle" size={14} /></button>
+                      <button className="primary-button" type="button" onClick={onRun} disabled={!canRun} title={runDisabledReason || undefined}>{runLabel} <RoleForgeIcon name="sparkle" size={14} /></button>
                       {copyState ? <span className="copy-state">{copyState}</span> : null}
                     </div>
                   </div>
