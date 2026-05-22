@@ -1964,7 +1964,9 @@ export default function Page() {
   const activeRole = targetUrlInfo?.label || firstTargetLine || (hasTarget ? "Role target loaded" : "Add a role target");
   const activeTitle = hasTarget && firstTargetLine ? firstTargetLine : activeResumeName;
   const activeDetail = result
-    ? targetUrlInfo?.host
+    ? restoredHistoryId && !file
+      ? "Saved run restored · upload the source file to re-tailor"
+      : targetUrlInfo?.host
       ? `Tailored and exported for ${targetUrlInfo.host}`
       : "Tailored and exported from the current workflow"
     : (file || uploadMeta) && hasTarget
@@ -1992,6 +1994,8 @@ export default function Page() {
         ? "Tailoring..."
         : previewUploadState === "reading"
           ? "Reading resume..."
+          : result && !file
+            ? "Upload to re-tailor"
           : result
             ? "Re-tailor"
             : "Run Tailor";
