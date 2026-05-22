@@ -1120,19 +1120,6 @@ export default function Page() {
     scrollToHistoryPanel("auto");
   }, [activeTab, historyScrollRequest, scrollToHistoryPanel]);
 
-  useEffect(() => {
-    function openHashTarget() {
-      if (window.location.hash === "#history") {
-        openHistoryPanel();
-      }
-    }
-
-    openHashTarget();
-    window.addEventListener("hashchange", openHashTarget);
-
-    return () => window.removeEventListener("hashchange", openHashTarget);
-  }, [openHistoryPanel]);
-
   function openHistoryDetails(entry: HistoryItem) {
     setSelectedHistoryId(entry.id);
     setAccountPanelOpen(false);
@@ -1145,8 +1132,43 @@ export default function Page() {
     setProjectActionMessage("");
   }
 
+  const openGeneratedAsset = useCallback((asset: "cover" | "interview", options: { behavior?: ScrollBehavior; updateHash?: boolean } = {}) => {
+    const targetId = asset === "cover" ? "cover-letter" : "interview-prep";
+    const nextHash = `#${targetId}`;
+    setActiveTab(asset);
+
+    if (options.updateHash !== false && window.location.hash !== nextHash) {
+      window.history.pushState(null, "", `${window.location.pathname}${window.location.search}${nextHash}`);
+    }
+
+    window.setTimeout(() => {
+      document.getElementById(targetId)?.scrollIntoView({ behavior: options.behavior ?? "smooth", block: "start" });
+    }, 30);
+  }, []);
+
+  useEffect(() => {
+    function openHashTarget() {
+      if (window.location.hash === "#history") {
+        openHistoryPanel();
+        return;
+      }
+      if (window.location.hash === "#cover-letter") {
+        openGeneratedAsset("cover", { behavior: "auto", updateHash: false });
+        return;
+      }
+      if (window.location.hash === "#interview-prep") {
+        openGeneratedAsset("interview", { behavior: "auto", updateHash: false });
+      }
+    }
+
+    openHashTarget();
+    window.addEventListener("hashchange", openHashTarget);
+
+    return () => window.removeEventListener("hashchange", openHashTarget);
+  }, [openGeneratedAsset, openHistoryPanel]);
+
   function clearHistoryHash() {
-    if (window.location.hash !== "#history") return;
+    if (!["#history", "#cover-letter", "#interview-prep"].includes(window.location.hash)) return;
     window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
   }
 
@@ -2598,8 +2620,8 @@ export default function Page() {
             <a className={`rail-item ${targetRailActive ? "active" : ""}`} href="#target" onClick={() => setActiveTab("gap")}><RoleForgeIcon name="target" size={15} /> Job target</a>
             <a className={`rail-item ${suggestionsRailActive ? "active" : ""}`} href="#suggestions" onClick={() => setActiveTab("changes")}><RoleForgeIcon name="sparkle" size={15} /> AI tailor <span className="rail-pill">{suggestionCards.length || 0}</span></a>
             <a className={`rail-item ${atsRailActive ? "active" : ""}`} href="#ats" onClick={() => setActiveTab("ats")}><RoleForgeIcon name="scan" size={15} /> ATS check</a>
-            <a className={`rail-item ${coverRailActive ? "active" : ""}`} href="#assets" onClick={() => setActiveTab("cover")}><RoleForgeIcon name="mail" size={15} /> Cover letter</a>
-            <a className={`rail-item ${interviewRailActive ? "active" : ""}`} href="#assets" onClick={() => setActiveTab("interview")}><RoleForgeIcon name="briefcase" size={15} /> Interview prep</a>
+            <a className={`rail-item ${coverRailActive ? "active" : ""}`} href="#cover-letter" onClick={(event) => { event.preventDefault(); openGeneratedAsset("cover"); }}><RoleForgeIcon name="mail" size={15} /> Cover letter</a>
+            <a className={`rail-item ${interviewRailActive ? "active" : ""}`} href="#interview-prep" onClick={(event) => { event.preventDefault(); openGeneratedAsset("interview"); }}><RoleForgeIcon name="briefcase" size={15} /> Interview prep</a>
             <div className="rail-divider" />
             <div className="rail-section-title">Workspace</div>
             <Link className="rail-item" href="/#templates"><RoleForgeIcon name="layers" size={15} /> Templates</Link>
@@ -2870,7 +2892,7 @@ export default function Page() {
                 ))}
               </div>
               <div className={`generated-grid rf-generated-grid${coverRailActive ? " focus-cover" : interviewRailActive ? " focus-interview" : ""}`}>
-                <article className={`generated-card ${coverRailActive ? "active" : ""}${coverLetterText ? " filled" : ""}`}>
+                <article className={`generated-card ${coverRailActive ? "active" : ""}${coverLetterText ? " filled" : ""}`} id="cover-letter">
                   <div className="generated-head"><RoleForgeIcon name="mail" size={14} /> Cover letter</div>
                   <div
                     className={`generated-body${coverLetterText ? " generated-scroll" : ""}`}
@@ -2881,7 +2903,7 @@ export default function Page() {
                   <div className="suggestion-actions">
                     {coverLetterText ? (
                       <>
-                        <button className="btn btn-soft btn-sm" type="button" onClick={() => setActiveTab("cover")}><RoleForgeIcon name="edit" size={12} />Open</button>
+                        <button className="btn btn-soft btn-sm" type="button" onClick={() => openGeneratedAsset("cover")}><RoleForgeIcon name="edit" size={12} />Open</button>
                         <button className="btn btn-soft btn-sm" type="button" onClick={() => copyCoverLetter(coverLetterText)}><RoleForgeIcon name="copy" size={12} />Copy letter</button>
                       </>
                     ) : (
@@ -2889,7 +2911,7 @@ export default function Page() {
                     )}
                   </div>
                 </article>
-                <article className={`generated-card ${interviewRailActive ? "active" : ""}${interviewPrep.length ? " filled" : ""}`}>
+                <article className={`generated-card ${interviewRailActive ? "active" : ""}${interviewPrep.length ? " filled" : ""}`} id="interview-prep">
                   <div className="generated-head"><RoleForgeIcon name="briefcase" size={14} /> Likely interview questions</div>
                   {interviewPrep.length ? (
                     <ul className="generated-list" id="generated-interview-prep-copy">
@@ -2903,7 +2925,7 @@ export default function Page() {
                   <div className="suggestion-actions">
                     {interviewPrep.length ? (
                       <>
-                        <button className="btn btn-soft btn-sm" type="button" onClick={() => setActiveTab("interview")}><RoleForgeIcon name="edit" size={12} />Open</button>
+                        <button className="btn btn-soft btn-sm" type="button" onClick={() => openGeneratedAsset("interview")}><RoleForgeIcon name="edit" size={12} />Open</button>
                         <button className="btn btn-soft btn-sm" type="button" onClick={() => void copyInterviewPrep()}><RoleForgeIcon name="copy" size={12} />Copy prep</button>
                       </>
                     ) : (

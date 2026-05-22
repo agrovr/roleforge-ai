@@ -6994,6 +6994,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .generated-card {
+  scroll-margin-top: 128px;
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 12px;
