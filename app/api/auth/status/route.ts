@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { accountDisplayName } from "@/app/lib/accountUser";
 import { reconcileUserSubscriptionEntitlement } from "@/app/lib/billing/entitlements";
 import { FREE_ENTITLEMENT, loadAccountEntitlement } from "@/app/lib/entitlements";
 import { getSupabaseConfig } from "@/app/lib/supabase/config";
@@ -28,7 +29,7 @@ export async function GET() {
     ? {
         id: data.user.id,
         email: data.user.email ?? "",
-        name: typeof data.user.user_metadata?.name === "string" ? data.user.user_metadata.name : "",
+        name: accountDisplayName(data.user),
       }
     : null;
 

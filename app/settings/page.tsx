@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { accountDisplayName } from "../lib/accountUser";
 import { billingStateDetail, billingStateLabel, billingStatusTone } from "../lib/billing/display";
 import { reconcileUserSubscriptionEntitlement } from "../lib/billing/entitlements";
 import { billingReadiness } from "../lib/billing/readiness";
@@ -110,12 +111,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     billingStatus: entitlement.billingStatus,
   });
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
-  const displayName =
-    typeof user.user_metadata?.name === "string"
-      ? user.user_metadata.name
-      : typeof user.user_metadata?.full_name === "string"
-        ? user.user_metadata.full_name
-        : "";
+  const displayName = accountDisplayName(user);
   const planFeatures = premiumActive
     ? ["Unlimited runs", "DOCX and TXT exports", premiumEnding && premiumEndLabel ? `Access until ${premiumEndLabel}` : "Saved projects"]
     : ["5 runs each month", "PDF export", "Saved projects"];

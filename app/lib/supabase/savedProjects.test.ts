@@ -230,12 +230,17 @@ test("updates a server-recorded run instead of inserting a duplicate", async () 
     {
       id: "user-123",
       email: "person@example.com",
-      user_metadata: { name: "Person" },
+      user_metadata: { full_name: "Person From Google" },
     },
   );
 
   assert.deepEqual(saved, { projectId: "project-existing", runId: "run-existing" });
   assert.equal(tailorRunUpdated, true);
   assert.equal(projectUpdated, true);
+  const profileCall = calls.find((call) => call.table === "profiles");
+  const profilePayload = profileCall?.payload as { payload: { display_name: string; updated_at: string } } | undefined;
+  assert.equal(profileCall?.action, "upsert");
+  assert.equal(profilePayload?.payload.display_name, "Person From Google");
+  assert.match(profilePayload?.payload.updated_at ?? "", /^\d{4}-\d{2}-\d{2}T/);
   assert.equal(calls.some((call) => call.action === "insert"), false);
 });

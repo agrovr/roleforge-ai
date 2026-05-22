@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { accountDisplayName } from "../accountUser";
+
 type ExportFormat = "pdf" | "docx" | "txt";
 type SavedDownloadMap = Partial<Record<ExportFormat, string>>;
 
@@ -175,12 +177,7 @@ export async function saveCompletedRun(
   if (!user) throw new Error("Not signed in");
 
   const email = user.email ?? "";
-  const displayName =
-    typeof user.user_metadata?.name === "string"
-      ? user.user_metadata.name
-      : typeof user.user_metadata?.full_name === "string"
-        ? user.user_metadata.full_name
-        : "";
+  const displayName = accountDisplayName(user);
 
   const { error: profileError } = await client.from("profiles").upsert(
     {
