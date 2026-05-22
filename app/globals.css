@@ -3216,6 +3216,16 @@ html[data-theme="dark"] .result-box {
   font-weight: 800;
 }
 
+.generated-copy-state {
+  border: 1px solid color-mix(in srgb, var(--good) 34%, var(--line));
+  border-radius: 999px;
+  padding: 7px 12px;
+  background: color-mix(in srgb, var(--good) 12%, transparent);
+  color: var(--good);
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
 .analysis-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

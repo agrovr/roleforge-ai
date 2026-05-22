@@ -910,6 +910,7 @@ export default function Page() {
   const [accountStatus, setAccountStatus] = useState<AccountStatus | null>(null);
   const [accountNotice, setAccountNotice] = useState("");
   const [copyState, setCopyState] = useState("");
+  const [assetCopyState, setAssetCopyState] = useState("");
   const [error, setError] = useState("");
   const [workflowError, setWorkflowError] = useState<WorkflowErrorState | null>(null);
   const [exportNotice, setExportNotice] = useState<ExportNotice | null>(null);
@@ -2039,22 +2040,22 @@ export default function Page() {
     const letter = text.trim();
     if (!letter) return;
     if (await writeClipboardText(letter)) {
-      setCopyState("Cover letter copied");
-      window.setTimeout(() => setCopyState(""), 1600);
+      setAssetCopyState("Cover letter copied");
+      window.setTimeout(() => setAssetCopyState(""), 1800);
       return;
     }
-    setCopyState("Copy failed");
+    setAssetCopyState("Copy failed");
   }
 
   async function copyInterviewPrep() {
     const prep = formatInterviewPrepForClipboard(interviewPrep);
     if (!prep) return;
     if (await writeClipboardText(prep)) {
-      setCopyState("Interview prep copied");
-      window.setTimeout(() => setCopyState(""), 1600);
+      setAssetCopyState("Interview prep copied");
+      window.setTimeout(() => setAssetCopyState(""), 1800);
       return;
     }
-    setCopyState("Copy failed");
+    setAssetCopyState("Copy failed");
   }
 
   const firstTargetLine = (jdText || jdUrl).split(/\r?\n/).map((line) => line.trim()).find(Boolean) || "";
@@ -2811,6 +2812,7 @@ export default function Page() {
                   <div className="eyebrow">Generated assets</div>
                   <h2 className="panel-title">Cover letter · interview prep</h2>
                 </div>
+                {assetCopyState ? <span className="copy-state generated-copy-state" role="status">{assetCopyState}</span> : null}
               </div>
               <div className="generated-grid rf-generated-grid">
                 <article className={`generated-card ${coverRailActive ? "active" : ""}`}>
