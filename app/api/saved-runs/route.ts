@@ -9,7 +9,7 @@ async function requireAccount() {
 
   if (!routeClient) {
     return {
-      error: NextResponse.json({ error: "Account sync is not enabled yet." }, { status: 503 }),
+      error: NextResponse.json({ error: "Saved projects are temporarily unavailable." }, { status: 503 }),
     };
   }
 

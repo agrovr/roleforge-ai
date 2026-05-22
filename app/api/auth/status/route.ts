@@ -17,7 +17,7 @@ export async function GET() {
       provider: "supabase",
       user: null,
       entitlement: FREE_ENTITLEMENT,
-      next: "Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY before enabling account features.",
+      next: "Account sync is temporarily unavailable. Local history still works in this browser.",
     });
   }
 
