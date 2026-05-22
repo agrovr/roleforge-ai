@@ -1793,8 +1793,12 @@ export default function Page() {
     setRestoredHistoryId(item.id);
     setHistoryFilter("all");
     setHistorySyncState("local");
-    setHistorySyncMessage(`${item.filename} duplicated in saved projects`);
-    setCopyState("Duplicated to saved projects");
+    setHistorySyncMessage(
+      signedIn
+        ? `${item.filename} duplicated in this browser. Use Save local to add it to your account.`
+        : `${item.filename} duplicated in this browser.`,
+    );
+    setCopyState("Duplicated in this browser");
     openHistoryPanel();
   }
 
