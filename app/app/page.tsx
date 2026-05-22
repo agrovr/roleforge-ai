@@ -2057,9 +2057,23 @@ export default function Page() {
   const selectedExportAllowed = Boolean(selectedExportCapability?.enabled);
   const currentDownloadAllowed = exportFormatAllowed(downloadFormat, accountStatus?.entitlement);
   const selectedDownloadReady = Boolean(downloadReady && downloadUrl && downloadFormat === selectedExportFormat && currentDownloadAllowed);
+  const topDownloadReady = Boolean(downloadReady && downloadUrl && currentDownloadAllowed);
   const selectedFormatLabel = selectedExportFormat.toUpperCase();
+  const currentDownloadLabel = downloadFormat.toUpperCase();
   const premiumExportFormat = stringDetail(workflowError?.details, "format")?.toUpperCase() ?? selectedFormatLabel;
   const premiumExportRequested = exportNotice ?? (workflowError?.code === "premium_required" ? { format: selectedExportFormat, label: premiumExportFormat } : null);
+  const topExportLabel = topDownloadReady
+    ? `Download ${currentDownloadLabel}`
+    : result?.tailored_text?.trim()
+      ? `Export ${selectedFormatLabel}`
+      : "Export";
+  const topExportTitle = topDownloadReady
+    ? `Download the ready ${currentDownloadLabel} file`
+    : result?.tailored_text?.trim()
+      ? selectedExportAllowed
+        ? `Create a ${selectedFormatLabel} export`
+        : `${selectedFormatLabel} exports require Premium`
+      : "Run Tailor before exporting";
   const exportLabel = selectedDownloadReady
     ? `Download ${selectedFormatLabel}`
     : downloadFormat === selectedExportFormat && downloadState === "checking"
@@ -2386,16 +2400,23 @@ export default function Page() {
               type="button"
               onClick={duplicateCurrentRun}
               disabled={!canDuplicateCurrentRun}
+              title={canDuplicateCurrentRun ? "Duplicate this completed run in History" : "Complete a run before duplicating it"}
             >
               <RoleForgeIcon name="copy" size={16} /> Duplicate
             </button>
-            {downloadReady && downloadUrl && currentDownloadAllowed ? (
-              <a className="ghost-button studio-top-button" href={downloadUrl} download>
-                <RoleForgeIcon name="download" size={16} /> Export
+            {topDownloadReady && downloadUrl ? (
+              <a className="ghost-button studio-top-button" href={downloadUrl} download title={topExportTitle}>
+                <RoleForgeIcon name="download" size={16} /> {topExportLabel}
               </a>
             ) : (
-              <button className="ghost-button studio-top-button" type="button" disabled>
-                <RoleForgeIcon name="download" size={16} /> Export
+              <button
+                className="ghost-button studio-top-button"
+                type="button"
+                onClick={() => void onExportSelectedFormat()}
+                disabled={!result?.tailored_text || !selectedExportAllowed || busy}
+                title={topExportTitle}
+              >
+                <RoleForgeIcon name="download" size={16} /> {topExportLabel}
               </button>
             )}
             <ThemeToggle />
