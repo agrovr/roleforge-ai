@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 
 const settingsSections = [
@@ -22,6 +22,39 @@ export function SettingsSectionNav() {
   const scrollToSection = useCallback((sectionId: SettingsSectionId, behavior: ScrollBehavior = "smooth") => {
     document.getElementById(sectionId)?.scrollIntoView({ behavior, block: "start" });
   }, []);
+  const navigateToSection = useCallback((sectionId: SettingsSectionId, behavior: ScrollBehavior = "smooth") => {
+    window.history.pushState(null, "", `#${sectionId}`);
+    scrollSpyLockUntilRef.current = Date.now() + 1200;
+    setActiveSection(sectionId);
+    scrollToSection(sectionId, behavior);
+  }, [scrollToSection]);
+
+  const focusSectionLink = useCallback((sectionId: SettingsSectionId) => {
+    window.setTimeout(() => linkRefs.current[sectionId]?.focus({ preventScroll: true }), 40);
+  }, []);
+
+  const moveSectionFocus = useCallback((sectionId: SettingsSectionId) => {
+    navigateToSection(sectionId, "auto");
+    focusSectionLink(sectionId);
+  }, [focusSectionLink, navigateToSection]);
+
+  function onSectionKeyDown(event: KeyboardEvent<HTMLAnchorElement>, sectionId: SettingsSectionId) {
+    const currentIndex = settingsSections.findIndex((section) => section.id === sectionId);
+    const previousSection = settingsSections[(currentIndex - 1 + settingsSections.length) % settingsSections.length].id;
+    const nextSection = settingsSections[(currentIndex + 1) % settingsSections.length].id;
+    const keyActions: Record<string, SettingsSectionId> = {
+      ArrowLeft: previousSection,
+      ArrowUp: previousSection,
+      ArrowRight: nextSection,
+      ArrowDown: nextSection,
+      Home: settingsSections[0].id,
+      End: settingsSections[settingsSections.length - 1].id,
+    };
+    const nextSectionId = keyActions[event.key];
+    if (!nextSectionId) return;
+    event.preventDefault();
+    moveSectionFocus(nextSectionId);
+  }
 
   useEffect(() => {
     let frame = 0;
@@ -105,13 +138,12 @@ export function SettingsSectionNav() {
           className={activeSection === section.id ? "active" : ""}
           href={`#${section.id}`}
           key={section.id}
+          aria-current={activeSection === section.id ? "location" : undefined}
           onClick={(event) => {
             event.preventDefault();
-            window.history.pushState(null, "", `#${section.id}`);
-            scrollSpyLockUntilRef.current = Date.now() + 1200;
-            setActiveSection(section.id);
-            scrollToSection(section.id);
+            navigateToSection(section.id);
           }}
+          onKeyDown={(event) => onSectionKeyDown(event, section.id)}
           ref={(element) => {
             linkRefs.current[section.id] = element;
           }}
