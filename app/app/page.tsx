@@ -45,6 +45,7 @@ import {
 } from "../lib/previewResume";
 import { createRoleForgeBrowserClient } from "../lib/supabase/client";
 import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun } from "../lib/supabase/savedProjectClient";
+import { tailorActionState } from "../lib/tailorAction";
 
 type AtsIssue = { severity: string; issue: string; fix: string };
 type AtsReport = { issues: AtsIssue[] };
@@ -1341,7 +1342,19 @@ export default function Page() {
   const hasTarget = Boolean(jdUrl.trim() || jdText.trim());
   const readyItems = [Boolean(baseUrl), Boolean(file), hasTarget];
   const readiness = Math.round((readyItems.filter(Boolean).length / readyItems.length) * 100);
-  const canRun = Boolean(baseUrl && file && hasTarget && !busy && previewUploadState !== "reading" && (!accountStatus?.configured || signedIn) && !limitReached);
+  const tailorAction = tailorActionState({
+    accountConfigured: Boolean(accountStatus?.configured),
+    signedIn,
+    limitReached,
+    busy,
+    readingResume: previewUploadState === "reading",
+    restoredWithoutFile: Boolean(result && !file),
+    hasResult: Boolean(result),
+    hasFile: Boolean(file),
+    hasTarget,
+    backendReady: Boolean(baseUrl),
+  });
+  const canRun = tailorAction.canRun;
 
   const score = result?.score_summary?.fit_after ?? result?.fit_score_after?.score ?? result?.fit_score?.score ?? 0;
   const presentKeywords = result?.fit_score_after?.present ?? result?.fit_score?.present ?? [];
@@ -1986,42 +1999,8 @@ export default function Page() {
   const scoreDetail = result?.score_summary?.fit_delta ? `${formatDelta(result.score_summary.fit_delta)} from baseline` : result ? "Run complete" : "Run needed";
   const atsDetail = result?.score_summary?.issues_resolved ? `${result.score_summary.issues_resolved} issues fixed` : result ? "Parser notes returned" : "Waiting for run";
   const keywordDetail = keywordTotal ? `${missingKeywords.length} missing` : "Waiting for target terms";
-  const runLabel = accountStatus?.configured && !signedIn
-    ? "Sign in to run"
-    : limitReached
-      ? "Monthly limit reached"
-      : busy
-        ? "Tailoring..."
-        : previewUploadState === "reading"
-          ? "Reading resume..."
-          : result && !file
-            ? "Upload to re-tailor"
-          : result
-            ? "Re-tailor"
-            : !file
-              ? "Upload to run"
-              : !hasTarget
-                ? "Add target to run"
-            : "Run Tailor";
-  const runDisabledReason = canRun
-    ? ""
-    : accountStatus?.configured && !signedIn
-      ? "Sign in before running the studio workflow."
-      : limitReached
-        ? "Your free monthly run limit is reached. Upgrade or wait for the next cycle."
-        : busy
-          ? "The current workflow is still running."
-          : previewUploadState === "reading"
-            ? "The resume is still being read."
-            : result && !file
-              ? "Upload the source resume again before re-tailoring this restored run."
-              : !file
-                ? "Upload a resume file before running Tailor."
-                : !hasTarget
-                  ? "Add a job target before running Tailor."
-                  : !baseUrl
-                    ? "Resume tailoring is unavailable right now."
-                    : "Complete the required fields before running Tailor.";
+  const runLabel = tailorAction.label;
+  const runDisabledReason = tailorAction.disabledReason;
   const downloadReady = Boolean(downloadUrl && downloadState === "ready");
   const coverLetterText = result?.cover_letter?.trim() ?? "";
   const canDuplicateCurrentRun = Boolean(result?.tailored_text?.trim() && uploadMeta && downloadUrl);
