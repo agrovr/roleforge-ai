@@ -2123,6 +2123,32 @@ export default function Page() {
     }
   }
 
+  function onSelectExportFormat(format: ExportCapability) {
+    const label = format.label || format.format.toUpperCase();
+
+    if (!format.enabled) {
+      setExportNotice({ format: format.format, label });
+      setError("");
+      setWorkflowError(null);
+      return;
+    }
+
+    setSelectedExportFormat(format.format);
+    setExportNotice(null);
+
+    const restoredEntry = restoredHistoryId ? history.find((entry) => entry.id === restoredHistoryId) : null;
+    const restoredDownloadUrl = restoredEntry ? historyDownloads(restoredEntry)[format.format] : null;
+    if (!restoredDownloadUrl) return;
+
+    const normalizedDownloadUrl = normalizeWorkflowDownloadUrl(restoredDownloadUrl);
+    if (normalizedDownloadUrl !== downloadUrl || downloadFormat !== format.format) {
+      setDownloadUrl(normalizedDownloadUrl);
+      setDownloadFormat(format.format);
+      setDownloadState("checking");
+      setDownloadMessage(`Checking ${label} download...`);
+    }
+  }
+
   function onDrop(event: React.DragEvent<HTMLLabelElement>) {
     event.preventDefault();
     setDragActive(false);
@@ -2240,6 +2266,7 @@ export default function Page() {
         : result?.tailored_text
           ? `Export ${selectedFormatLabel}`
           : `Export ${selectedFormatLabel}`;
+  const selectedDownloadMessage = downloadFormat === selectedExportFormat ? downloadMessage : "";
   const enabledUploadFormats = uploadFormats.filter((format) => format.enabled);
   const uploadAccept = enabledUploadFormats.length
     ? enabledUploadFormats.map((format) => `.${format.format}`).join(",")
@@ -2736,16 +2763,7 @@ export default function Page() {
                         aria-pressed={selected}
                         type="button"
                         title={!format.enabled ? `${format.label} requires Premium` : `${format.label} export available`}
-                        onClick={() => {
-                          if (!format.enabled) {
-                            setExportNotice({ format: format.format, label: format.label });
-                            setError("");
-                            setWorkflowError(null);
-                            return;
-                          }
-                          setSelectedExportFormat(format.format);
-                          setExportNotice(null);
-                        }}
+                        onClick={() => onSelectExportFormat(format)}
                       >
                         {!format.enabled ? <RoleForgeIcon name="lock" size={12} /> : null}
                         {format.label} <small>{badgeLabel}</small>
@@ -2753,9 +2771,9 @@ export default function Page() {
                     );
                   })}
                 </div>
-                {downloadMessage ? (
+                {selectedDownloadMessage ? (
                   <span className={`export-status-note ${downloadState}`} role="status">
-                    {downloadMessage}
+                    {selectedDownloadMessage}
                   </span>
                 ) : null}
               </div>
