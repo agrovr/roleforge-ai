@@ -1452,7 +1452,7 @@ export default function Page() {
     item: HistoryItem,
     output: TailorResult,
     url: string,
-    options: { countUsage?: boolean; preserveSuccessOnFailure?: boolean } = {},
+    options: { countUsage?: boolean; preserveSuccessOnFailure?: boolean; successMessage?: string } = {},
   ) {
     if (!signedIn || !accountReady) {
       setHistorySyncState("local");
@@ -1505,7 +1505,10 @@ export default function Page() {
         return next;
       });
       setHistorySyncState("synced");
-      setHistorySyncMessage(options.countUsage === false ? `${item.downloadFormat?.toUpperCase() ?? "Export"} saved to this project` : "Saved to your account and ready to restore");
+      setHistorySyncMessage(
+        options.successMessage ??
+          (options.countUsage === false ? `${item.downloadFormat?.toUpperCase() ?? "Export"} saved to this project` : "Saved to your account and ready to restore"),
+      );
       if (options.countUsage === false) return true;
 
       const refreshed = await refreshAccountStatus()
@@ -1756,7 +1759,7 @@ export default function Page() {
     openPreviewMode("tailored");
   }
 
-  function duplicateCurrentRun() {
+  async function duplicateCurrentRun() {
     if (!result?.tailored_text?.trim() || !uploadMeta || !downloadUrl) return;
 
     const sourceHistoryItem = restoredHistoryId ? history.find((entry) => entry.id === restoredHistoryId) : null;
@@ -1793,13 +1796,33 @@ export default function Page() {
     setRestoredHistoryId(item.id);
     setHistoryFilter("all");
     setHistorySyncState("local");
-    setHistorySyncMessage(
-      signedIn
-        ? `${item.filename} duplicated in this browser. Use Save local to add it to your account.`
-        : `${item.filename} duplicated in this browser.`,
-    );
     setCopyState("Duplicated in this browser");
     openHistoryPanel();
+
+    if (!signedIn || !accountReady) {
+      setHistorySyncMessage(
+        signedIn
+          ? `${item.filename} duplicated in this browser. Account sync is reconnecting.`
+          : `${item.filename} duplicated in this browser.`,
+      );
+      return;
+    }
+
+    setHistorySyncState("saving");
+    setHistorySyncMessage(`${item.filename} duplicated in this browser. Saving to your account...`);
+    const saved = await syncCompletedRun(item, result, downloadUrl, {
+      countUsage: false,
+      preserveSuccessOnFailure: true,
+      successMessage: `${item.filename} duplicated to your account.`,
+    });
+
+    if (saved) {
+      setCopyState("Duplicated to account");
+      return;
+    }
+
+    setHistorySyncState("local");
+    setHistorySyncMessage(`${item.filename} duplicated in this browser. Use Save local to add it to your account.`);
   }
 
   function clearLocalHistory() {
@@ -2402,7 +2425,7 @@ export default function Page() {
             <button
               className="ghost-button studio-top-button"
               type="button"
-              onClick={duplicateCurrentRun}
+              onClick={() => void duplicateCurrentRun()}
               disabled={!canDuplicateCurrentRun}
               title={canDuplicateCurrentRun ? "Duplicate this completed run in History" : "Complete a run before duplicating it"}
             >
