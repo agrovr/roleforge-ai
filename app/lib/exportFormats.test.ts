@@ -33,6 +33,7 @@ test("enables premium export formats from entitlement", () => {
   const formats = customerExportFormats(undefined, premiumEntitlement);
 
   assert.equal(formats.find((format) => format.format === "pdf")?.enabled, true);
+  assert.equal(formats.find((format) => format.format === "pdf")?.reason, "Included");
   assert.equal(formats.find((format) => format.format === "docx")?.enabled, true);
   assert.equal(formats.find((format) => format.format === "txt")?.enabled, true);
 });

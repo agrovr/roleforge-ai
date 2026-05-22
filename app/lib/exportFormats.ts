@@ -34,7 +34,11 @@ export function customerExportFormats(formats?: ExportCapability[], entitlement?
 
   return DEFAULT_EXPORT_FORMATS.map((format) =>
     format.format === "pdf"
-      ? { ...format, enabled: pdfCapability?.enabled ?? format.enabled, reason: pdfCapability?.reason }
+      ? {
+          ...format,
+          enabled: pdfCapability?.enabled ?? format.enabled,
+          reason: pdfCapability?.reason ?? (entitlement?.plan === "premium" ? "Included" : "Free"),
+        }
       : {
           ...format,
           enabled: premiumFormats.includes(format.format) && exportFormatAllowed(format.format, entitlement),
