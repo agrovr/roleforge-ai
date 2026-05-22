@@ -3015,17 +3015,18 @@ export default function Page() {
                         Save local <span>{syncableLocalHistoryCount}</span>
                       </button>
                     ) : null}
-                    <button
-                      className="btn btn-soft btn-sm"
-                      type="button"
-                      onClick={() => setConfirmingClearHistory(true)}
-                      disabled={!clearHistoryTargetCount}
-                    >
-                      {clearHistoryLabel}
-                    </button>
+                    {clearHistoryTargetCount ? (
+                      <button
+                        className="btn btn-soft btn-sm"
+                        type="button"
+                        onClick={() => setConfirmingClearHistory(true)}
+                      >
+                        {clearHistoryLabel}
+                      </button>
+                    ) : null}
                   </div>
                 </div>
-                {confirmingClearHistory ? (
+                {confirmingClearHistory && clearHistoryTargetCount ? (
                   <div className="history-confirm-inline" role="alert">
                     <div>
                       <strong>Clear {clearHistoryRunLabel}?</strong>
