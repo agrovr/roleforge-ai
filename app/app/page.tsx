@@ -14,6 +14,7 @@ import {
   type ExportCapability,
   type ExportFormat,
 } from "../lib/exportFormats";
+import { formatInterviewPrepForClipboard } from "../lib/generatedAssets";
 import { parseTargetUrl } from "../lib/targetLabel";
 import {
   formatHistoryTimestamp,
@@ -2045,6 +2046,18 @@ export default function Page() {
     }
   }
 
+  async function copyInterviewPrep() {
+    const prep = formatInterviewPrepForClipboard(interviewPrep);
+    if (!prep) return;
+    try {
+      await navigator.clipboard.writeText(prep);
+      setCopyState("Interview prep copied");
+      window.setTimeout(() => setCopyState(""), 1600);
+    } catch {
+      setCopyState("Copy failed");
+    }
+  }
+
   const firstTargetLine = (jdText || jdUrl).split(/\r?\n/).map((line) => line.trim()).find(Boolean) || "";
   const activeResumeName = (file?.name || uploadMeta?.filename)?.replace(/\.(docx|pdf|txt)$/i, "") || "Resume studio";
   const targetUrlInfo = parseTargetUrl(firstTargetLine);
@@ -2828,6 +2841,16 @@ export default function Page() {
                   ) : (
                     <div className="generated-body">Interview prompts will appear here when preparation notes are ready.</div>
                   )}
+                  <div className="suggestion-actions">
+                    {interviewPrep.length ? (
+                      <>
+                        <button className="btn btn-soft btn-sm" type="button" onClick={() => setActiveTab("interview")}><RoleForgeIcon name="edit" size={12} />Open</button>
+                        <button className="btn btn-soft btn-sm" type="button" onClick={() => void copyInterviewPrep()}><RoleForgeIcon name="copy" size={12} />Copy prep</button>
+                      </>
+                    ) : (
+                      <span className="generated-action-note">Ready after tailoring</span>
+                    )}
+                  </div>
                 </article>
               </div>
             </section>
