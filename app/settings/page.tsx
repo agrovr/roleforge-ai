@@ -233,7 +233,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                       ? `${usage.monthlyRuns} runs used`
                       : `${usage.monthlyRuns}/${usage.monthlyRunLimit} runs used`}
                   </strong>
-                  <small>{usage.monthlyRunLimit === null ? "No monthly cap" : `${usage.remainingRuns} remaining`}</small>
+                  <small>{usage.monthlyRunLimit === null ? " - No monthly cap" : ` - ${usage.remainingRuns} remaining`}</small>
                 </div>
                 {usage.monthlyRunLimit === null ? (
                   <div className="settings-usage-track unlimited"><span style={{ width: "100%" }} /></div>
