@@ -2789,6 +2789,7 @@ export default function Page() {
                       onKeyDown={onPreviewTabKeyDown}
                     >
                       <span>Tailored</span>
+                      <span className="preview-tab-separator" aria-hidden="true">·</span>
                       <small className="preview-tab-state">{previewTabState.tailored}</small>
                     </button>
                     <button
@@ -2804,6 +2805,7 @@ export default function Page() {
                       onKeyDown={onPreviewTabKeyDown}
                     >
                       <span>Original</span>
+                      <span className="preview-tab-separator" aria-hidden="true">·</span>
                       <small className="preview-tab-state">{previewTabState.original}</small>
                     </button>
                     <button
@@ -2819,6 +2821,7 @@ export default function Page() {
                       onKeyDown={onPreviewTabKeyDown}
                     >
                       <span>Changes</span>
+                      <span className="preview-tab-separator" aria-hidden="true">·</span>
                       <small className="preview-tab-state">{previewTabState.diff}</small>
                     </button>
                   </div>
