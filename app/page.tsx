@@ -147,7 +147,7 @@ function HowItWorks() {
         <div className="section-head">
           <div>
             <div className="eyebrow">How it works</div>
-            <h2 className="display h2">Three steps. <span className="italic">One</span> tailored resume.</h2>
+            <h2 className="display h2">Four steps. <span className="italic">One</span> tailored resume.</h2>
           </div>
           <p className="lede">Drop your resume, point at the role, review the suggested changes, and export a cleaner draft from the same workspace.</p>
         </div>
@@ -206,7 +206,7 @@ function StudioPreview({ studioHref }: Pick<LandingLinks, "studioHref">) {
         <div className="dash-mock">
           <div className="dash-mock-head">
             <div className="dash-traffic"><span /><span /><span /></div>
-            <div className="dash-mock-url">app.roleforge.ai/studio</div>
+            <div className="dash-mock-url">roleforgeai.vercel.app/app</div>
           </div>
           <div className="dash-mock-body">
             <aside className="dash-side">
@@ -406,7 +406,7 @@ function Pricing({ studioHref, premiumHref }: Pick<LandingLinks, "studioHref" | 
         <div className="section-head">
           <div>
             <div className="eyebrow">Pricing</div>
-            <h2 className="display h2">Start lean, upgrade when you need exports.</h2>
+            <h2 className="display h2">Start lean, upgrade when you need more room.</h2>
           </div>
           <p className="lede">Free covers the core PDF workflow with a monthly run limit. Premium is intentionally priced lower while RoleForge is early.</p>
         </div>
