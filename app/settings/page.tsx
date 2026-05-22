@@ -138,6 +138,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     usage.monthlyRunLimit === null
       ? "No monthly cap"
       : `${usage.remainingRuns} ${remainingRunWord} left`;
+  const projectCountLabel = projectCount === 1 ? "Project" : "Projects";
+  const runCountLabel = runCount === 1 ? "Run" : "Runs";
 
   return (
     <main className="settings-page-shell">
@@ -222,11 +224,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               <div className="settings-metric-row">
                 <div className="settings-metric">
                   <strong>{projectCount}</strong>
-                  <span>Projects</span>
+                  <span>{projectCountLabel}</span>
                 </div>
                 <div className="settings-metric">
                   <strong>{runCount}</strong>
-                  <span>Runs</span>
+                  <span>{runCountLabel}</span>
                 </div>
               </div>
               <Link className="btn btn-soft btn-sm settings-inline-link" href="/app#history">Open history</Link>

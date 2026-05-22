@@ -3002,7 +3002,7 @@ export default function Page() {
                     {showAccountHistorySummary ? (
                       <div>
                         <strong>{visibleAccountProjectCount}</strong>
-                        <span>Account projects</span>
+                        <span>{visibleAccountProjectCount === 1 ? "Account project" : "Account projects"}</span>
                       </div>
                     ) : null}
                     <div>
