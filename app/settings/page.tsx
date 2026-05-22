@@ -124,6 +124,20 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     { label: "DOCX", enabled: entitlement.exportFormats.docx, included: "Included with Premium", locked: "Premium" },
     { label: "TXT", enabled: entitlement.exportFormats.txt, included: "Included with Premium", locked: "Premium" },
   ];
+  const usedRunWord = usage.monthlyRuns === 1 ? "run" : "runs";
+  const remainingRunWord = usage.remainingRuns === 1 ? "run" : "runs";
+  const usageUsedLabel =
+    usage.monthlyRunLimit === null
+      ? `${usage.monthlyRuns} ${usedRunWord} used`
+      : `${usage.monthlyRuns}/${usage.monthlyRunLimit} runs used`;
+  const usageHelperLabel =
+    usage.monthlyRunLimit === null
+      ? "Premium unlimited"
+      : `${usage.remainingRuns} ${remainingRunWord} remaining`;
+  const usageMetaLabel =
+    usage.monthlyRunLimit === null
+      ? "No monthly cap"
+      : `${usage.remainingRuns} ${remainingRunWord} left`;
 
   return (
     <main className="settings-page-shell">
@@ -228,12 +242,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               <div className="settings-usage-card">
                 <div>
                   <span className="settings-price-kicker">This month</span>
-                  <strong>
-                    {usage.monthlyRunLimit === null
-                      ? `${usage.monthlyRuns} runs used`
-                      : `${usage.monthlyRuns}/${usage.monthlyRunLimit} runs used`}
-                  </strong>
-                  <small>{usage.monthlyRunLimit === null ? " - No monthly cap" : ` - ${usage.remainingRuns} remaining`}</small>
+                  <strong>{usageUsedLabel}</strong>
+                  <small> - {usageHelperLabel}</small>
                 </div>
                 {usage.monthlyRunLimit === null ? (
                   <div className="settings-usage-track unlimited"><span style={{ width: "100%" }} /></div>
@@ -243,7 +253,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   </div>
                 )}
                 <div className="settings-usage-meta">
-                  <span>{usage.monthlyRunLimit === null ? "No monthly cap" : `${usage.remainingRuns} runs left`}</span>
+                  <span>{usageMetaLabel}</span>
                   <span>{usageResetLabel ? `Resets ${usageResetLabel}` : "Resets monthly"}</span>
                 </div>
               </div>
