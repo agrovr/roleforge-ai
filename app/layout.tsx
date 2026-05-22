@@ -4,8 +4,40 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "RoleForge AI",
-  description: "Build stronger resumes with AI-assisted guidance for clarity, structure, and role targeting.",
+  metadataBase: new URL("https://roleforgeai.vercel.app"),
+  applicationName: "RoleForge AI",
+  title: {
+    default: "RoleForge AI",
+    template: "%s | RoleForge AI",
+  },
+  description:
+    "AI-assisted resume tailoring for focused applications, with protected saved projects, role targeting, review notes, and clean exports.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "RoleForge AI",
+    description:
+      "Upload a resume, target a role, review AI-assisted guidance, and export a cleaner draft from a protected workspace.",
+    url: "/",
+    siteName: "RoleForge AI",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "RoleForge AI",
+    description:
+      "AI-assisted resume tailoring for focused applications, saved projects, and cleaner exports.",
+  },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 const fraunces = Fraunces({
