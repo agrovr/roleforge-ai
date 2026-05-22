@@ -1187,6 +1187,30 @@ export default function Page() {
     window.setTimeout(scrollWhenReady, 30);
   }, []);
 
+  const movePreviewTab = useCallback((mode: PreviewMode) => {
+    openPreviewMode(mode, { behavior: "auto" });
+    window.setTimeout(() => {
+      document.getElementById(`preview-tab-${mode}`)?.focus({ preventScroll: true });
+    }, 40);
+  }, [openPreviewMode]);
+
+  function onPreviewTabKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
+    const modes: PreviewMode[] = ["tailored", "original", "diff"];
+    const currentIndex = modes.indexOf(previewMode);
+    const keyActions: Record<string, PreviewMode> = {
+      ArrowRight: modes[(currentIndex + 1) % modes.length],
+      ArrowDown: modes[(currentIndex + 1) % modes.length],
+      ArrowLeft: modes[(currentIndex - 1 + modes.length) % modes.length],
+      ArrowUp: modes[(currentIndex - 1 + modes.length) % modes.length],
+      Home: modes[0],
+      End: modes[modes.length - 1],
+    };
+    const nextMode = keyActions[event.key];
+    if (!nextMode) return;
+    event.preventDefault();
+    movePreviewTab(nextMode);
+  }
+
   useEffect(() => {
     function openHashTarget() {
       if (window.location.hash === "#history") {
@@ -2759,7 +2783,9 @@ export default function Page() {
                       role="tab"
                       aria-selected={previewMode === "tailored"}
                       aria-controls="preview-panel"
+                      tabIndex={previewMode === "tailored" ? 0 : -1}
                       onClick={() => openPreviewMode("tailored")}
+                      onKeyDown={onPreviewTabKeyDown}
                     >
                       <span>Tailored</span>
                       <small className="preview-tab-state">{previewTabState.tailored}</small>
@@ -2771,7 +2797,9 @@ export default function Page() {
                       role="tab"
                       aria-selected={previewMode === "original"}
                       aria-controls="preview-panel"
+                      tabIndex={previewMode === "original" ? 0 : -1}
                       onClick={() => openPreviewMode("original")}
+                      onKeyDown={onPreviewTabKeyDown}
                     >
                       <span>Original</span>
                       <small className="preview-tab-state">{previewTabState.original}</small>
@@ -2783,7 +2811,9 @@ export default function Page() {
                       role="tab"
                       aria-selected={previewMode === "diff"}
                       aria-controls="preview-panel"
+                      tabIndex={previewMode === "diff" ? 0 : -1}
                       onClick={() => openPreviewMode("diff")}
+                      onKeyDown={onPreviewTabKeyDown}
                     >
                       <span>Changes</span>
                       <small className="preview-tab-state">{previewTabState.diff}</small>
