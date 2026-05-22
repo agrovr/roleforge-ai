@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { writeClipboardText } from "../lib/clipboard";
 import { downloadStatusFromHead } from "../lib/downloadStatus";
 import { normalizeWorkflowDownloadUrl, workflowDownloadUrl } from "../lib/downloadUrls";
 import type { AccountEntitlement } from "../lib/entitlements";
@@ -2037,25 +2038,23 @@ export default function Page() {
   async function copyCoverLetter(text: string) {
     const letter = text.trim();
     if (!letter) return;
-    try {
-      await navigator.clipboard.writeText(letter);
+    if (await writeClipboardText(letter)) {
       setCopyState("Cover letter copied");
       window.setTimeout(() => setCopyState(""), 1600);
-    } catch {
-      setCopyState("Copy failed");
+      return;
     }
+    setCopyState("Copy failed");
   }
 
   async function copyInterviewPrep() {
     const prep = formatInterviewPrepForClipboard(interviewPrep);
     if (!prep) return;
-    try {
-      await navigator.clipboard.writeText(prep);
+    if (await writeClipboardText(prep)) {
       setCopyState("Interview prep copied");
       window.setTimeout(() => setCopyState(""), 1600);
-    } catch {
-      setCopyState("Copy failed");
+      return;
     }
+    setCopyState("Copy failed");
   }
 
   const firstTargetLine = (jdText || jdUrl).split(/\r?\n/).map((line) => line.trim()).find(Boolean) || "";
