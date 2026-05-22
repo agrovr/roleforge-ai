@@ -11,6 +11,7 @@ import {
   mergeHistory,
   primaryHistoryDownload,
   restoredHistoryDownloadSelection,
+  syncableLocalHistoryItems,
   type HistoryItem,
 } from "./history";
 import type { ExportEntitlement } from "./exportFormats";
@@ -225,6 +226,29 @@ test("merges account metadata into matching local history", () => {
     docx: "https://downloads.example/account.docx",
   });
   assert.equal(merged.snapshot?.result?.tailored_text, "Local tailored draft");
+});
+
+test("selects only restorable local runs for account backfill", () => {
+  const syncable = historyItem({
+    id: "syncable-local",
+    snapshot: { result: { tailored_text: "Local tailored draft" } },
+  });
+  const downloadOnly = historyItem({
+    id: "download-only",
+    snapshot: undefined,
+  });
+  const alreadySaved = historyItem({
+    id: "already-saved",
+    saved: true,
+    source: "account",
+    snapshot: { result: { tailored_text: "Account tailored draft" } },
+  });
+  const syncedById = historyItem({
+    id: "synced-by-id",
+    snapshot: { result: { tailored_text: "Already synced tailored draft" } },
+  });
+
+  assert.deepEqual(syncableLocalHistoryItems([syncable, downloadOnly, alreadySaved, syncedById], ["synced-by-id"]), [syncable]);
 });
 
 test("labels history versions from newest to oldest", () => {

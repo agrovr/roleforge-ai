@@ -30,6 +30,7 @@ import {
   mergeHistory,
   primaryHistoryDownload,
   restoredHistoryDownloadSelection,
+  syncableLocalHistoryItems,
   type HistoryDownloads,
   type HistoryItem as BaseHistoryItem,
 } from "../lib/history";
@@ -1456,7 +1457,7 @@ export default function Page() {
     if (!signedIn || !accountReady) {
       setHistorySyncState("local");
       setHistorySyncMessage(signedIn ? "Saved projects are reconnecting. Local history still works." : "Sign in to sync completed runs");
-      return;
+      return false;
     }
 
     const outputPresent = output.fit_score_after?.present ?? output.fit_score?.present ?? [];
@@ -1472,7 +1473,7 @@ export default function Page() {
     try {
       const savedRun = await saveCompletedRun({
         ...item,
-        sourceResumeName: file?.name ?? item.filename,
+        sourceResumeName: item.filename,
         jobTarget: item.snapshot?.jdText?.trim() || item.snapshot?.jdUrl?.trim() || jdText.trim() || jdUrl.trim() || item.roleHint,
         companyUrl: item.snapshot?.companyUrl?.trim() || companyUrl.trim() || undefined,
         atsScore: output.score_summary?.ats_after,
@@ -1489,9 +1490,11 @@ export default function Page() {
         },
       });
 
-      const nextIds = [item.id, savedRun.runId, ...syncedHistoryIds.filter((id) => id !== item.id && id !== savedRun.runId)].slice(0, 40);
-      setSyncedHistoryIds(nextIds);
-      saveSyncedHistoryIds(nextIds);
+      setSyncedHistoryIds((currentIds) => {
+        const nextIds = [item.id, savedRun.runId, ...currentIds.filter((id) => id !== item.id && id !== savedRun.runId)].slice(0, 40);
+        saveSyncedHistoryIds(nextIds);
+        return nextIds;
+      });
       setHistory((current) => {
         const next = current.map((entry) =>
           entry.id === item.id
@@ -1503,13 +1506,13 @@ export default function Page() {
       });
       setHistorySyncState("synced");
       setHistorySyncMessage(options.countUsage === false ? `${item.downloadFormat?.toUpperCase() ?? "Export"} saved to this project` : "Saved to your account and ready to restore");
-      if (options.countUsage === false) return;
+      if (options.countUsage === false) return true;
 
       const refreshed = await refreshAccountStatus()
         .then(() => true)
         .catch(() => false);
 
-      if (refreshed) return;
+      if (refreshed) return true;
 
       setAccountStatus((current) => {
         if (!current?.usage) return current;
@@ -1529,14 +1532,58 @@ export default function Page() {
           },
         };
       });
+      return true;
     } catch {
       if (options.preserveSuccessOnFailure) {
         setHistorySyncState(isAccountHistoryItem(item, syncedHistoryIds) ? "synced" : "local");
-        return;
+        return false;
       }
       setHistorySyncState("error");
       setHistorySyncMessage("Could not sync this run. It is still saved locally.");
+      return false;
     }
+  }
+
+  async function syncLocalHistoryToAccount() {
+    if (!signedIn || !accountReady) {
+      setHistorySyncState("error");
+      setHistorySyncMessage(signedIn ? "Saved projects are reconnecting. Local history still works." : "Sign in to sync local runs.");
+      return;
+    }
+
+    const syncableItems = syncableLocalHistoryItems(history, syncedHistoryIds);
+    if (!syncableItems.length) {
+      setHistorySyncState("synced");
+      setHistorySyncMessage("No restore-ready local runs need account sync.");
+      return;
+    }
+
+    setHistorySyncState("saving");
+    setHistorySyncMessage(`Saving ${syncableItems.length} local run${syncableItems.length === 1 ? "" : "s"} to your account...`);
+
+    let savedCount = 0;
+    for (const item of syncableItems) {
+      const output = item.snapshot?.result;
+      if (!output?.tailored_text?.trim()) continue;
+
+      const download = primaryHistoryDownload(item, accountStatus?.entitlement);
+      const url = normalizeWorkflowDownloadUrl(download?.url || item.downloadUrl || item.snapshot?.downloadUrl || "#");
+      const saved = await syncCompletedRun(item, output, url, {
+        countUsage: false,
+        preserveSuccessOnFailure: true,
+      });
+      if (saved) savedCount += 1;
+    }
+
+    if (savedCount) {
+      await refreshSavedRuns({ quiet: true });
+      setHistorySyncState("synced");
+      setHistorySyncMessage(`${savedCount} local run${savedCount === 1 ? "" : "s"} saved to your account.`);
+      return;
+    }
+
+    setHistorySyncState("error");
+    setHistorySyncMessage("Local runs could not sync. They are still saved in this browser.");
   }
 
   function updateCurrentHistoryExport(url: string, format: ExportFormat) {
@@ -2186,6 +2233,7 @@ export default function Page() {
     { label: "Billing", detail: "Manage plan changes and invoices from Settings." },
   ];
   const localHistoryCount = history.filter((entry) => !isAccountHistoryItem(entry, syncedHistoryIds)).length;
+  const syncableLocalHistoryCount = syncableLocalHistoryItems(history, syncedHistoryIds).length;
   const savedProjectCount = history.filter((entry) => isAccountHistoryItem(entry, syncedHistoryIds)).length;
   const historyGroups = groupHistoryItems(history, syncedHistoryIds);
   const accountHistoryGroups = historyGroups.filter((group) => group.accountCount > 0);
@@ -2912,6 +2960,11 @@ export default function Page() {
                     {signedIn ? (
                       <button className="btn btn-soft btn-sm" type="button" onClick={() => void refreshSavedRuns()} disabled={historySyncState === "loading"}>
                         Refresh
+                      </button>
+                    ) : null}
+                    {signedIn && syncableLocalHistoryCount ? (
+                      <button className="btn btn-soft btn-sm" type="button" onClick={() => void syncLocalHistoryToAccount()} disabled={historySyncState === "saving"}>
+                        Save local <span>{syncableLocalHistoryCount}</span>
                       </button>
                     ) : null}
                     <button

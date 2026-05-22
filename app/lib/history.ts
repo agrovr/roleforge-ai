@@ -158,6 +158,13 @@ export function historyVersionLabel(total: number, index: number) {
   return index === 0 ? `Version ${versionNumber} · Latest` : `Version ${versionNumber}`;
 }
 
+export function syncableLocalHistoryItems<TSnapshot extends HistorySnapshot>(
+  items: HistoryItem<TSnapshot>[],
+  syncedIds: string[] = [],
+) {
+  return items.filter((item) => !isAccountHistoryItem(item, syncedIds) && hasRestorableSnapshot(item));
+}
+
 export function formatHistoryTimestamp(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Recent run";
