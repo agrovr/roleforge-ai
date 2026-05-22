@@ -2421,7 +2421,7 @@ export default function Page() {
       }
     : signedIn
       ? {
-          title: "Premium workspace",
+          title: "Upgrade workspace",
           detail: "Unlock unlimited tailoring runs plus DOCX and TXT exports.",
           href: "/settings#billing",
           action: "View plans",
@@ -3128,7 +3128,7 @@ export default function Page() {
                     </p>
                     <div className="rf-callout-actions">
                       <Link className="primary-button" href="/settings#billing">
-                        {premiumExportSyncing ? "Open settings" : "View premium"} <RoleForgeIcon name="sparkle" size={14} />
+                        {premiumExportSyncing ? "Open settings" : "View plans"} <RoleForgeIcon name="sparkle" size={14} />
                       </Link>
                       <button
                         className="ghost-button"
@@ -3520,7 +3520,7 @@ export default function Page() {
                       {premiumExportRequested && !accountPremiumActive ? (
                         <div className="history-export-upgrade" role="status">
                           <span>{premiumExportRequested.label} is a Premium export.</span>
-                          <Link href="/settings#billing">View premium</Link>
+                          <Link href="/settings#billing">View plans</Link>
                         </div>
                       ) : null}
                     </div>
