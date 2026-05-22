@@ -44,6 +44,8 @@ app/
   layout.tsx                      # Root layout and metadata
 docs/
   supabase-account-foundation.sql # Draft RLS schema for saved projects
+  plan-rules.md                   # Current free and premium entitlement rules
+  stripe-billing-foundation.md    # Stripe checkout, portal, webhook, and entitlement behavior
 ```
 
 ## Local Development
@@ -84,7 +86,7 @@ The studio expects the backend to provide:
 
 The studio is protected behind Supabase Auth. Email magic-link sign-in and Google OAuth are wired through Supabase Auth, and completed runs can sync into account-backed saved projects when the user is signed in. Saved runs can restore the studio state when they include a snapshot.
 
-Plan rules live in `docs/pre-payment-plan-rules.md`, and Stripe setup notes live in `docs/stripe-billing-foundation.md`. The app uses `account_entitlements` as the account-level source of truth so signed-in users can read their current plan while client-side writes remain blocked.
+Plan rules live in `docs/plan-rules.md`, and Stripe billing behavior lives in `docs/stripe-billing-foundation.md`. The app uses `account_entitlements` as the account-level source of truth so signed-in users can read their current plan while client-side writes remain blocked.
 
 The Supabase-ready frontend foundation is in place:
 

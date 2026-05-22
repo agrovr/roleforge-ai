@@ -1,27 +1,28 @@
 # RoleForge AI Plan Rules
 
-These rules keep the app honest now that Stripe billing and entitlement state are connected.
+These rules keep the app honest now that Supabase auth, Stripe checkout, customer portal access, webhooks, and entitlement state are connected.
 
-## Free plan
+## Free Plan
 
-- Account required for studio access.
+- Account sign-in is required before studio access.
 - Resume upload, job target input, AI tailoring, review tabs, saved project sync, restore, and PDF export stay available.
 - Saved projects are tied to the signed-in Supabase account.
 - Free includes 5 completed tailoring runs per calendar month.
+- DOCX and TXT exports stay locked unless a premium entitlement is active.
 
-## Premium
+## Premium Plan
 
 - Launch price is `$9/month` or `$72/year` for early users.
 - Stripe test-mode product: `prod_UX0qgAJCKf6dwt`.
 - Stripe test-mode prices:
   - Monthly: `price_1TXwpIRpyJeACd6qTXDo2gyr`
   - Yearly: `price_1TXwpJRpyJeACd6qp7hWyWIJ`
-- DOCX and TXT exports remain locked unless Stripe confirms a subscription and the entitlement row is premium active/trialing.
-- Premium has no monthly tailoring run cap at launch.
-- Premium templates and other premium-only workflow upgrades remain disabled until their product rules and implementation are real.
-- The UI may show the current plan state, but must not claim an active paid subscription unless `account_entitlements.plan = 'premium'` and billing state is active/trialing.
+- Premium is granted only when Stripe confirms a subscription and the entitlement row is premium active or trialing.
+- Premium unlocks DOCX and TXT exports and removes the monthly tailoring run cap.
+- Premium templates and additional workflow upgrades should stay hidden or disabled until their product behavior is implemented.
+- The UI may show the current plan state, but must not claim an active paid subscription unless `account_entitlements.plan = 'premium'` and billing state is active or trialing.
 
-## Entitlement source
+## Entitlement Source
 
 - `public.account_entitlements` is the account-level source of truth.
 - Authenticated users can read only their own entitlement row.
@@ -29,7 +30,7 @@ These rules keep the app honest now that Stripe billing and entitlement state ar
 - Stripe webhook handlers update this table with server-side credentials only.
 - Entitlement `features.monthly_run_limit` is `5` for free accounts and `null` for active/trialing premium accounts.
 
-## Billing environment
+## Billing Environment
 
 - `STRIPE_SECRET_KEY`: server-only Stripe key.
 - `STRIPE_WEBHOOK_SECRET`: signing secret for `/api/billing/webhook`.
