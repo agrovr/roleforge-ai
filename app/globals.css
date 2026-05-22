@@ -6959,17 +6959,62 @@ html[data-theme="dark"] input::file-selector-button {
   padding: 16px;
 }
 
+.generated-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 16px 2px;
+}
+
+.generated-summary span {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: var(--surface-2);
+  color: var(--ink-3);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.generated-summary span.ready {
+  border-color: color-mix(in srgb, var(--good) 32%, var(--line));
+  background: color-mix(in srgb, var(--good) 10%, var(--surface-2));
+  color: var(--ink-1);
+}
+
+.generated-summary strong {
+  color: var(--ink-0);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .generated-card {
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--surface-2);
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
 }
 
 .generated-card.active {
   border-color: color-mix(in srgb, var(--brand) 48%, var(--line));
   background: color-mix(in srgb, var(--brand) 8%, var(--surface-2));
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand) 22%, transparent);
+}
+
+.rf-generated-grid.focus-cover .generated-card.active,
+.rf-generated-grid.focus-interview .generated-card.active {
+  grid-column: 1 / -1;
+}
+
+.rf-generated-grid.focus-cover .generated-card:not(.active),
+.rf-generated-grid.focus-interview .generated-card:not(.active) {
+  background: color-mix(in srgb, var(--surface-2) 72%, transparent);
 }
 
 .generated-head {
@@ -6988,6 +7033,17 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--ink-1);
   line-height: 1.65;
   white-space: pre-wrap;
+}
+
+.generated-scroll {
+  max-height: 360px;
+  overflow: auto;
+  padding-right: 8px;
+  scrollbar-width: thin;
+}
+
+.generated-card.active .generated-scroll {
+  max-height: 520px;
 }
 
 .generated-action-note {

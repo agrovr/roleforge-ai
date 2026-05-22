@@ -219,6 +219,10 @@ function countReadableLines(text?: string) {
   return (text ?? "").split(/\r?\n/).filter((line) => line.trim()).length;
 }
 
+function countReadableWords(text?: string) {
+  return (text ?? "").trim().split(/\s+/).filter(Boolean).length;
+}
+
 function PlainResumeDocument({
   text,
   keywords,
@@ -2134,8 +2138,11 @@ export default function Page() {
     : "DOCX, PDF, or TXT. Drop your file here or browse from your computer.";
   const sourceLineCount = countReadableLines(sourcePreviewText);
   const tailoredLineCount = countReadableLines(result?.tailored_text);
+  const coverLetterWordCount = countReadableWords(coverLetterText);
+  const interviewQuestionCount = interviewPrep.length;
   const hasSourcePreview = Boolean(sourcePreviewText.trim());
   const hasTailoredPreview = Boolean(result?.tailored_text?.trim());
+  const hasGeneratedAssets = Boolean(coverLetterText || interviewQuestionCount);
   const restoredRunOpen = Boolean(restoredHistoryId);
   const restoredSourceMissing = restoredRunOpen && hasTailoredPreview && !hasSourcePreview;
   const sourcePreviewUnavailable = Boolean((uploadMeta || file) && previewUploadState === "ready" && !hasSourcePreview);
@@ -2227,6 +2234,23 @@ export default function Page() {
       ? "warn"
       : "";
   };
+  const generatedAssetSummary = [
+    {
+      label: "Letter",
+      value: coverLetterWordCount ? `${coverLetterWordCount} words` : "Waiting",
+      ready: Boolean(coverLetterWordCount),
+    },
+    {
+      label: "Interview prep",
+      value: interviewQuestionCount ? `${interviewQuestionCount} question${interviewQuestionCount === 1 ? "" : "s"}` : "Waiting",
+      ready: Boolean(interviewQuestionCount),
+    },
+    {
+      label: "State",
+      value: hasGeneratedAssets ? "Ready to use" : "Ready after run",
+      ready: hasGeneratedAssets,
+    },
+  ];
   const accountButtonLabel = signedIn ? accountInitials(accountUser) : "IN";
   const accountPremiumActive = Boolean(
     accountStatus?.entitlement?.plan === "premium" &&
@@ -2816,10 +2840,18 @@ export default function Page() {
                 </div>
                 {assetCopyState ? <span className="copy-state generated-copy-state" role="status">{assetCopyState}</span> : null}
               </div>
-              <div className="generated-grid rf-generated-grid">
-                <article className={`generated-card ${coverRailActive ? "active" : ""}`}>
+              <div className="generated-summary" aria-label="Generated asset status">
+                {generatedAssetSummary.map((item) => (
+                  <span className={item.ready ? "ready" : ""} key={`${item.label}-${item.value}`}>
+                    <strong>{item.label}</strong>
+                    {item.value}
+                  </span>
+                ))}
+              </div>
+              <div className={`generated-grid rf-generated-grid${coverRailActive ? " focus-cover" : interviewRailActive ? " focus-interview" : ""}`}>
+                <article className={`generated-card ${coverRailActive ? "active" : ""}${coverLetterText ? " filled" : ""}`}>
                   <div className="generated-head"><RoleForgeIcon name="mail" size={14} /> Cover letter</div>
-                  <div className="generated-body">
+                  <div className={`generated-body${coverLetterText ? " generated-scroll" : ""}`}>
                     {coverLetterText || "After tailoring, the generated cover letter will appear here for review."}
                   </div>
                   <div className="suggestion-actions">
@@ -2833,7 +2865,7 @@ export default function Page() {
                     )}
                   </div>
                 </article>
-                <article className={`generated-card ${interviewRailActive ? "active" : ""}`}>
+                <article className={`generated-card ${interviewRailActive ? "active" : ""}${interviewPrep.length ? " filled" : ""}`}>
                   <div className="generated-head"><RoleForgeIcon name="briefcase" size={14} /> Likely interview questions</div>
                   {interviewPrep.length ? (
                     <ul className="generated-list">
