@@ -1141,9 +1141,20 @@ export default function Page() {
       window.history.pushState(null, "", `${window.location.pathname}${window.location.search}${nextHash}`);
     }
 
-    window.setTimeout(() => {
-      document.getElementById(targetId)?.scrollIntoView({ behavior: options.behavior ?? "smooth", block: "start" });
-    }, 30);
+    let attempts = 0;
+    const scrollWhenReady = () => {
+      document.getElementById(targetId)?.scrollIntoView({
+        behavior: attempts === 0 ? options.behavior ?? "smooth" : "auto",
+        block: "start",
+      });
+
+      attempts += 1;
+      if (attempts <= 8) {
+        window.setTimeout(scrollWhenReady, 80);
+      }
+    };
+
+    window.setTimeout(scrollWhenReady, 30);
   }, []);
 
   useEffect(() => {
