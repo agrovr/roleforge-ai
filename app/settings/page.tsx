@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
-import { billingStatusDetail, billingStatusLabel, billingStatusTone } from "../lib/billing/display";
+import { billingStateDetail, billingStateLabel, billingStatusTone } from "../lib/billing/display";
 import { reconcileUserSubscriptionEntitlement } from "../lib/billing/entitlements";
 import { billingReadiness } from "../lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
@@ -99,11 +99,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const billingConfig = getStripeBillingConfig();
   const premiumActive = entitlement.plan === "premium" && ["active", "trialing"].includes(entitlement.billingStatus);
   const planLabel = premiumActive ? "Premium" : "Free";
-  const billingLabel = billingStatusLabel(entitlement.billingStatus);
-  const billingDetail = billingStatusDetail(entitlement.billingStatus);
-  const billingTone = billingStatusTone(entitlement.billingStatus);
   const premiumEnding = premiumActive && entitlement.cancelAtPeriodEnd;
   const premiumEndLabel = formatPlanDate(entitlement.cancelAt || entitlement.currentPeriodEnd);
+  const billingLabel = billingStateLabel(entitlement.billingStatus, { premiumEnding });
+  const billingDetail = billingStateDetail(entitlement.billingStatus, { premiumEnding, premiumEndLabel });
+  const billingTone = billingStatusTone(entitlement.billingStatus);
   const usageResetLabel = formatPlanDate(usage.currentPeriodEnd);
   const { checkoutReady, portalReady } = billingReadiness(billingConfig, {
     hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()),
@@ -298,7 +298,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
             <div className="settings-section-panel settings-billing-panel">
               <div className="settings-billing-head">
                 <span className={`settings-status-pill ${premiumEnding ? "ready" : billingTone}`}>
-                  {premiumEnding ? "Canceling" : billingLabel}
+                  {billingLabel}
                 </span>
                 <form action="/api/billing/portal" method="post">
                   <button className="ghost-button" type="submit" disabled={!portalReady}>

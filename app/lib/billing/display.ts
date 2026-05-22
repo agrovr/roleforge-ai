@@ -49,6 +49,21 @@ export function billingStatusDetail(status: BillingStatus) {
   }
 }
 
+export function billingStateLabel(status: BillingStatus, options?: { premiumEnding?: boolean }) {
+  if (options?.premiumEnding) return "Canceling";
+  return billingStatusLabel(status);
+}
+
+export function billingStateDetail(
+  status: BillingStatus,
+  options?: { premiumEnding?: boolean; premiumEndLabel?: string },
+) {
+  if (!options?.premiumEnding) return billingStatusDetail(status);
+  return options.premiumEndLabel
+    ? `Premium access remains available until ${options.premiumEndLabel}.`
+    : "Premium access remains available until the current billing period ends.";
+}
+
 export function billingStatusTone(status: BillingStatus) {
   switch (status) {
     case "trialing":

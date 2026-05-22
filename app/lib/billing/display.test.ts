@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { billingStatusDetail, billingStatusLabel, billingStatusTone } from "./display";
+import { billingStateDetail, billingStateLabel, billingStatusDetail, billingStatusLabel, billingStatusTone } from "./display";
 import type { BillingStatus } from "../entitlements";
 
 const expectedLabels: Record<BillingStatus, string> = {
@@ -38,4 +38,16 @@ test("assigns billing status tones for settings pills", () => {
   assert.equal(billingStatusTone("none"), "muted");
   assert.equal(billingStatusTone("canceled"), "muted");
   assert.equal(billingStatusTone("incomplete_expired"), "muted");
+});
+
+test("clarifies cancel-at-period-end subscriptions", () => {
+  assert.equal(billingStateLabel("active", { premiumEnding: true }), "Canceling");
+  assert.equal(
+    billingStateDetail("active", { premiumEnding: true, premiumEndLabel: "Jun 18, 2026" }),
+    "Premium access remains available until Jun 18, 2026.",
+  );
+  assert.equal(
+    billingStateDetail("active", { premiumEnding: true }),
+    "Premium access remains available until the current billing period ends.",
+  );
 });
