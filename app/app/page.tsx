@@ -2039,6 +2039,7 @@ export default function Page() {
   async function copyCoverLetter(text: string) {
     const letter = text.trim();
     if (!letter) return;
+    setAssetCopyState("Copying cover letter...");
     if (await writeClipboardText(letter)) {
       setAssetCopyState("Cover letter copied");
       window.setTimeout(() => setAssetCopyState(""), 1800);
@@ -2050,6 +2051,7 @@ export default function Page() {
   async function copyInterviewPrep() {
     const prep = formatInterviewPrepForClipboard(interviewPrep);
     if (!prep) return;
+    setAssetCopyState("Copying interview prep...");
     if (await writeClipboardText(prep)) {
       setAssetCopyState("Interview prep copied");
       window.setTimeout(() => setAssetCopyState(""), 1800);

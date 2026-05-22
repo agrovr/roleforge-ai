@@ -3,15 +3,19 @@ export async function writeClipboardText(text: string) {
   if (!value) return false;
 
   try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(value);
-      return true;
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      const copied = await Promise.race([
+        navigator.clipboard.writeText(value).then(() => true),
+        new Promise<boolean>((resolve) => window.setTimeout(() => resolve(false), 900)),
+      ]);
+      if (copied) return true;
     }
   } catch {
     // Some embedded browsers block navigator.clipboard; fall back below.
   }
 
   try {
+    if (typeof document === "undefined") return false;
     const textArea = document.createElement("textarea");
     textArea.value = value;
     textArea.setAttribute("readonly", "");
