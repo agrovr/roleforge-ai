@@ -266,3 +266,8 @@ export function buildPlainResumeLines(text?: string): PlainResumeLine[] {
     })
     .slice(0, 90);
 }
+
+export function isSourcePreviewSample(text?: string, characterCount?: number) {
+  const previewLength = text?.length ?? 0;
+  return Boolean(previewLength && characterCount && characterCount > previewLength);
+}

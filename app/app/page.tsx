@@ -40,6 +40,7 @@ import {
   buildPlainResumeLines,
   buildResumeEntries,
   cleanBulletLine,
+  isSourcePreviewSample,
   isBulletLine,
   isStructuredResumeSection,
   parseResumeText,
@@ -240,8 +241,15 @@ function PlainResumeDocument({
 }) {
   const lines = buildPlainResumeLines(text);
   const documentName = filename ? filename.replace(/\.(docx|pdf|txt)$/i, "") : mode === "original" ? "Original resume" : "Generated draft";
+  const sourceSample = mode === "original" && isSourcePreviewSample(text, characterCount);
   const meta = [
-    uploadFormat ? `${uploadFormat.toUpperCase()} source` : mode === "original" ? "Source preview" : "Generated resume",
+    uploadFormat
+      ? `${uploadFormat.toUpperCase()} ${sourceSample ? "source sample" : "source"}`
+      : mode === "original"
+        ? sourceSample
+          ? "Source sample"
+          : "Source preview"
+        : "Generated resume",
     characterCount ? `${characterCount.toLocaleString()} characters processed` : "",
   ].filter(Boolean).join(" · ");
 
@@ -253,7 +261,7 @@ function PlainResumeDocument({
         {meta ? <span>{meta}</span> : null}
       </div>
       <section>
-        <h4>{mode === "original" ? "Source text" : "Generated content"}</h4>
+        <h4>{mode === "original" ? (sourceSample ? "Source sample" : "Source text") : "Generated content"}</h4>
         {lines.length ? (
           <div className="rf-resume-plain-lines">
             {lines.map((line, index) => {
@@ -2284,10 +2292,13 @@ export default function Page() {
   const restoredRunOpen = Boolean(restoredHistoryId);
   const restoredSourceMissing = restoredRunOpen && hasTailoredPreview && !hasSourcePreview;
   const sourcePreviewUnavailable = Boolean((uploadMeta || file) && previewUploadState === "ready" && !hasSourcePreview);
+  const sourcePreviewSample = isSourcePreviewSample(sourcePreviewText, uploadMeta?.character_count);
   const previewTabState = {
     tailored: hasTailoredPreview ? "Ready" : stage === "tailoring" ? "Running" : "Waiting",
     original: hasSourcePreview
-      ? "Ready"
+      ? sourcePreviewSample
+        ? "Sample"
+        : "Ready"
       : previewUploadState === "reading"
         ? "Reading"
         : sourcePreviewUnavailable || restoredSourceMissing
@@ -2313,7 +2324,9 @@ export default function Page() {
         ? "Original resume · preview unavailable"
         : restoredSourceMissing
           ? "Original resume · source not saved"
-        : "Original resume · before tailoring"
+        : sourcePreviewSample
+          ? "Original resume · source sample"
+          : "Original resume · before tailoring"
       : previewMode === "diff"
         ? "Change notes · before export"
         : hasTailoredPreview
@@ -2325,7 +2338,7 @@ export default function Page() {
           {
             label: "Source",
             value: hasSourcePreview
-              ? `${sourceLineCount || 1} source line${sourceLineCount === 1 ? "" : "s"} extracted`
+              ? `${sourceLineCount || 1} source line${sourceLineCount === 1 ? "" : "s"} ${sourcePreviewSample ? "shown from sample" : "extracted"}`
               : previewUploadState === "reading"
                 ? "Reading source document"
                 : previewUploadState === "error"

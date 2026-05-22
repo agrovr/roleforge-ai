@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildPlainResumeLines, buildResumeEntries, parseResumeText } from "./previewResume";
+import { buildPlainResumeLines, buildResumeEntries, isSourcePreviewSample, parseResumeText } from "./previewResume";
 
 const tailoredDraft = [
   "# Tailored Resume",
@@ -91,4 +91,11 @@ test("caps plain preview after inline headings expand into content lines", () =>
   const lines = Array.from({ length: 70 }, (_, index) => `Skills: Tool ${index + 1}`).join("\n");
 
   assert.equal(buildPlainResumeLines(lines).length, 90);
+});
+
+test("detects when original source preview is only a sample", () => {
+  assert.equal(isSourcePreviewSample("Avery Stone", 40000), true);
+  assert.equal(isSourcePreviewSample("Avery Stone", "Avery Stone".length), false);
+  assert.equal(isSourcePreviewSample("", 40000), false);
+  assert.equal(isSourcePreviewSample("Avery Stone"), false);
 });
