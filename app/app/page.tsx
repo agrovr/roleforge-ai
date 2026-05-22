@@ -3182,7 +3182,7 @@ export default function Page() {
                       </div>
                     <dl>
                       <div>
-                        <dt>Runs</dt>
+                        <dt>{selectedHistoryGroup.items.length === 1 ? "Run" : "Runs"}</dt>
                         <dd>{selectedHistoryGroup.items.length}</dd>
                       </div>
                       <div>
