@@ -2781,6 +2781,7 @@ export default function Page() {
                       id="preview-tab-tailored"
                       type="button"
                       role="tab"
+                      aria-label={`Tailored preview, ${previewTabState.tailored}`}
                       aria-selected={previewMode === "tailored"}
                       aria-controls="preview-panel"
                       tabIndex={previewMode === "tailored" ? 0 : -1}
@@ -2795,6 +2796,7 @@ export default function Page() {
                       id="preview-tab-original"
                       type="button"
                       role="tab"
+                      aria-label={`Original preview, ${previewTabState.original}`}
                       aria-selected={previewMode === "original"}
                       aria-controls="preview-panel"
                       tabIndex={previewMode === "original" ? 0 : -1}
@@ -2809,6 +2811,7 @@ export default function Page() {
                       id="preview-tab-diff"
                       type="button"
                       role="tab"
+                      aria-label={`Changes preview, ${previewTabState.diff}`}
                       aria-selected={previewMode === "diff"}
                       aria-controls="preview-panel"
                       tabIndex={previewMode === "diff" ? 0 : -1}
