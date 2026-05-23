@@ -15,6 +15,7 @@ import {
   type ExportCapability,
   type ExportFormat,
 } from "../lib/exportFormats";
+import { buildWorkflowExportPayload } from "../lib/exportPayload";
 import { formatInterviewPrepForClipboard } from "../lib/generatedAssets";
 import {
   RESUME_TEMPLATE_COOKIE,
@@ -1599,13 +1600,7 @@ export default function Page() {
     const response = await fetch(`${baseUrl}/export`, {
       method: "POST",
       headers: await workflowHeaders({ "Content-Type": "application/json" }),
-      body: JSON.stringify({
-        filename: `tailored_resume.${format}`,
-        title: "TAILORED RESUME",
-        content: tailoredText,
-        format,
-        template: templateSlug,
-      }),
+      body: JSON.stringify(buildWorkflowExportPayload(tailoredText, format, templateSlug)),
     });
     if (!response.ok) throw await readApiError(response, "The export could not be created. Try again in a moment.");
 
