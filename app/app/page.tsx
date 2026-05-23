@@ -145,6 +145,8 @@ type SavedRunSnapshot = {
   downloadUrl?: string;
   downloadFormat?: ExportFormat;
   downloads?: HistoryDownloads;
+  templateSlug?: ResumeTemplateSlug;
+  templateName?: string;
 };
 type HistoryItem = BaseHistoryItem<SavedRunSnapshot>;
 type AccountUser = { id: string; email?: string; name?: string };
@@ -1881,6 +1883,8 @@ export default function Page() {
       downloadUrl: url,
       downloadFormat: format,
       downloads: { [format]: url },
+      templateSlug: selectedTemplateSlug,
+      templateName: getResumeTemplate(selectedTemplateSlug).name,
     };
   }
 
@@ -1913,6 +1917,10 @@ export default function Page() {
     setCompanyUrl(snapshot.companyUrl ?? "");
     setInputMode(snapshot.inputMode ?? (snapshot.jdUrl ? "url" : "text"));
     setTailoringMode(snapshot.tailoringMode ?? entry.mode);
+    if (isResumeTemplateSlug(snapshot.templateSlug)) {
+      setSelectedTemplateSlug(snapshot.templateSlug);
+      saveResumeTemplatePreference(snapshot.templateSlug);
+    }
     setStage("ready");
     setError("");
     setWorkflowError(null);
@@ -2649,6 +2657,11 @@ export default function Page() {
     const download = primaryHistoryDownload(entry, accountStatus?.entitlement);
     return download ? { ...download, url: normalizeWorkflowDownloadUrl(download.url) } : null;
   };
+  const historyTemplateNameFor = (entry: HistoryItem) => {
+    if (entry.snapshot?.templateName) return entry.snapshot.templateName;
+    if (isResumeTemplateSlug(entry.snapshot?.templateSlug)) return getResumeTemplate(entry.snapshot.templateSlug).name;
+    return "";
+  };
   const canDownloadHistoryItem = (entry: HistoryItem) => historyDownloadEntriesFor(entry).length > 0;
   const visibleRunCount = visibleHistoryGroups.reduce((total, group) => total + group.items.length, 0);
   const visibleAccountProjectCount = visibleHistoryGroups.filter((group) => group.accountCount > 0).length;
@@ -2678,6 +2691,7 @@ export default function Page() {
     : null;
   const selectedHistoryPrimaryDownloadLabel =
     selectedHistoryPrimaryDownload?.format.toUpperCase() ?? visibleSelectedHistoryItem?.downloadFormat?.toUpperCase() ?? "PDF";
+  const selectedHistoryTemplateName = visibleSelectedHistoryItem ? historyTemplateNameFor(visibleSelectedHistoryItem) : "";
   const editorRailActive = activeTab === "score" || activeTab === "resume";
   const targetRailActive = activeTab === "gap";
   const suggestionsRailActive = activeTab === "changes";
@@ -3413,6 +3427,7 @@ export default function Page() {
                       const selected = group.items.some((item) => selectedHistoryId === item.id);
                       const active = group.items.some((item) => restoredHistoryId === item.id);
                       const latestDownloadLabel = primaryDownload?.format.toUpperCase() ?? entry.downloadFormat?.toUpperCase() ?? "PDF";
+                      const entryTemplateName = historyTemplateNameFor(entry);
                       return (
                         <article className={`history-item${active ? " active" : ""}${selected ? " selected" : ""}`} key={group.key}>
                           <div className="history-item-main">
@@ -3460,6 +3475,7 @@ export default function Page() {
                             <div className="history-project-meta" aria-label="Project run summary">
                               <span>{historyGroupSummary(group)}</span>
                               <span>{entry.mode} mode</span>
+                              {entryTemplateName ? <span>{entryTemplateName} direction</span> : null}
                             </div>
                             {projectActionMessage && actionBusy ? <small className="history-action-note error" role="alert">{projectActionMessage}</small> : null}
                           </div>
@@ -3562,6 +3578,7 @@ export default function Page() {
                           <span>{historyStorageLabel(selectedHistoryGroup)}</span>
                           <span>{selectedHistoryVersionLabel}</span>
                           <span>{hasRestorableSnapshot(visibleSelectedHistoryItem) ? "Restores to studio" : "Download only"}</span>
+                          {selectedHistoryTemplateName ? <span>{selectedHistoryTemplateName} direction</span> : null}
                         </div>
                       </div>
                     <dl>
