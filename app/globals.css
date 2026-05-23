@@ -2615,10 +2615,6 @@ html[data-theme="dark"] .status-pill[aria-disabled="true"] {
   color: #9da3bb;
 }
 
-html[data-theme="dark"] .premium-soon {
-  color: #b7bed4;
-}
-
 html[data-theme="dark"] input::placeholder,
 html[data-theme="dark"] textarea::placeholder {
   color: rgba(199, 204, 223, 0.58);
@@ -2946,10 +2942,6 @@ html[data-theme="dark"] .result-box {
   color: var(--ink-2);
   font-size: 0.82rem;
   font-weight: 800;
-}
-
-.premium-soon {
-  color: var(--ink-3);
 }
 
 .status-dot {
@@ -4487,10 +4479,6 @@ html[data-theme="dark"] .status-pill {
   border-color: rgba(255, 247, 233, 0.18);
   background: rgba(255, 247, 233, 0.075);
   color: #d9deee;
-}
-
-html[data-theme="dark"] .status-pill.premium-soon {
-  color: #b7bed4;
 }
 
 html[data-theme="dark"] input::file-selector-button {
