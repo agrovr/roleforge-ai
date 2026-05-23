@@ -1409,6 +1409,92 @@ html[data-theme="dark"] textarea {
   border-radius: 4px;
 }
 
+.templates-page-shell {
+  min-height: 100vh;
+  padding: 28px clamp(18px, 4vw, 54px) 64px;
+  background:
+    radial-gradient(circle at 88% 4%, rgba(222, 162, 79, 0.18), transparent 22rem),
+    radial-gradient(circle at 8% 74%, rgba(137, 209, 190, 0.14), transparent 24rem),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
+}
+
+.templates-page-hero {
+  width: min(1200px, 100%);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 28px;
+  margin: 56px auto 26px;
+  padding: clamp(28px, 5vw, 48px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(255, 253, 248, 0.94), rgba(244, 236, 223, 0.74)),
+    var(--surface-warm);
+  box-shadow: var(--shadow-soft);
+}
+
+.templates-page-hero h1 {
+  max-width: 760px;
+  margin: 8px 0 10px;
+  color: var(--ink-0);
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 5vw, 5rem);
+  font-weight: 650;
+  letter-spacing: 0;
+  line-height: 0.94;
+  text-wrap: balance;
+}
+
+.templates-page-hero p {
+  max-width: 740px;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 1.04rem;
+  line-height: 1.62;
+}
+
+.templates-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.templates-page-grid {
+  width: min(1200px, 100%);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0 auto;
+}
+
+.templates-page-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 253, 248, 0.9);
+  box-shadow: var(--shadow-soft);
+}
+
+.templates-page-card .template-thumb {
+  height: 360px;
+}
+
+.templates-page-card-copy {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+
+.templates-page-card-copy p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
 .template-card {
   flex: 0 0 260px;
   scroll-snap-align: start;
@@ -7600,6 +7686,19 @@ html[data-theme="dark"] .rf-rail-upgrade p {
     grid-template-columns: 1fr;
   }
 
+  .templates-page-hero,
+  .templates-page-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .templates-page-hero {
+    align-items: start;
+  }
+
+  .templates-page-actions {
+    justify-content: flex-start;
+  }
+
   .history-detail-panel,
   .history-content-grid.has-detail,
   .history-detail-panel dl,
@@ -7707,6 +7806,7 @@ html[data-theme="dark"] .rf-rail-upgrade p {
 
   .section,
   .templates,
+  .templates-page-shell,
   .dash-section,
   .footer {
     padding: 58px 16px;
@@ -8023,6 +8123,7 @@ html[data-theme="dark"] .faq-section {
 
 html[data-theme="dark"] .section,
 html[data-theme="dark"] .templates,
+html[data-theme="dark"] .templates-page-shell,
 html[data-theme="dark"] .footer {
   background:
     radial-gradient(circle at 14% 12%, rgba(137, 209, 190, 0.045), transparent 23rem),
@@ -8032,6 +8133,7 @@ html[data-theme="dark"] .footer {
 html[data-theme="dark"] .steps,
 html[data-theme="dark"] .feature-card,
 html[data-theme="dark"] .template-card,
+html[data-theme="dark"] .templates-page-card,
 html[data-theme="dark"] .price-card,
 html[data-theme="dark"] .faq-item,
 html[data-theme="dark"] .dash-mock,
@@ -8042,6 +8144,22 @@ html[data-theme="dark"] .rf-studio-stat {
     var(--surface);
   border-color: rgba(255, 247, 233, 0.16);
   box-shadow: 0 22px 48px -34px rgba(0, 0, 0, 0.82);
+}
+
+html[data-theme="dark"] .templates-page-hero {
+  border-color: rgba(255, 247, 233, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.07), rgba(255, 247, 233, 0.035)),
+    rgba(12, 17, 31, 0.84);
+}
+
+html[data-theme="dark"] .templates-page-hero h1 {
+  color: var(--ink-0);
+}
+
+html[data-theme="dark"] .templates-page-hero p,
+html[data-theme="dark"] .templates-page-card-copy p {
+  color: var(--ink-2);
 }
 
 html[data-theme="dark"] .feature-card:hover,
@@ -9215,6 +9333,25 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
   .settings-page-hero h1 {
     font-size: clamp(3rem, 16vw, 4.2rem);
+  }
+
+  .templates-page-hero {
+    margin-top: 32px;
+    padding: 22px;
+  }
+
+  .templates-page-hero h1 {
+    font-size: clamp(2.8rem, 15vw, 4rem);
+  }
+
+  .templates-page-actions .primary-button,
+  .templates-page-actions .ghost-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .templates-page-card .template-thumb {
+    height: 320px;
   }
 
   .settings-hero-status {

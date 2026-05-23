@@ -2754,7 +2754,7 @@ export default function Page() {
             <a className={`rail-item ${interviewRailActive ? "active" : ""}`} href="#interview-prep" onClick={(event) => { event.preventDefault(); openGeneratedAsset("interview"); }}><RoleForgeIcon name="briefcase" size={15} /> Interview prep</a>
             <div className="rail-divider" />
             <div className="rail-section-title">Workspace</div>
-            <Link className="rail-item" href="/#templates"><RoleForgeIcon name="layers" size={15} /> Templates</Link>
+            <Link className="rail-item" href="/templates"><RoleForgeIcon name="layers" size={15} /> Templates</Link>
             <button className={`rail-item ${activeTab === "history" ? "active" : ""}`} type="button" aria-pressed={activeTab === "history"} onClick={openHistoryPanel}><RoleForgeIcon name="chart" size={15} /> History</button>
             <Link className="rail-item" href="/settings"><RoleForgeIcon name="settings" size={15} /> Settings</Link>
             <div className="rf-rail-upgrade">
