@@ -4816,20 +4816,31 @@ html[data-theme="dark"] input::file-selector-button {
   gap: 8px;
 }
 
-.studio-account-list div {
+.studio-account-summary {
+  display: block;
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background: color-mix(in srgb, var(--surface-2) 82%, white);
+  text-decoration: none;
+  transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
 
-.studio-account-list span {
+.studio-account-summary:hover,
+.studio-account-summary:focus-visible {
+  border-color: color-mix(in srgb, var(--brand) 40%, var(--line));
+  box-shadow: 0 14px 28px -24px var(--shadow);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.studio-account-summary span {
   display: block;
   color: var(--ink-0);
   font-weight: 900;
 }
 
-.studio-account-list small {
+.studio-account-summary small {
   display: block;
   margin-top: 3px;
   color: var(--ink-3);
@@ -8614,7 +8625,7 @@ html[data-theme="dark"] .studio-account-popover-head span {
 html[data-theme="dark"] .studio-account-popover-head button,
 html[data-theme="dark"] .studio-account-shortcuts a,
 html[data-theme="dark"] .studio-account-shortcuts button,
-html[data-theme="dark"] .studio-account-list div {
+html[data-theme="dark"] .studio-account-summary {
   background: rgba(255, 247, 233, 0.06);
   border-color: rgba(255, 247, 233, 0.16);
 }
@@ -8632,8 +8643,14 @@ html[data-theme="dark"] .studio-account-shortcuts button:focus-visible {
   background: rgba(231, 188, 111, 0.1);
 }
 
+html[data-theme="dark"] .studio-account-summary:hover,
+html[data-theme="dark"] .studio-account-summary:focus-visible {
+  border-color: rgba(231, 188, 111, 0.36);
+  background: rgba(231, 188, 111, 0.1);
+}
+
 html[data-theme="dark"] .studio-account-popover > p,
-html[data-theme="dark"] .studio-account-list small {
+html[data-theme="dark"] .studio-account-summary small {
   color: var(--ink-2);
 }
 

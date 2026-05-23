@@ -2436,6 +2436,7 @@ export default function Page() {
     {
       label: "Saved projects",
       detail: signedIn ? "Completed runs save to History and reopen in the studio." : "Sign in first, then completed runs can follow you across browsers.",
+      href: "/app#history",
     },
     {
       label: "Usage",
@@ -2444,6 +2445,7 @@ export default function Page() {
           ? `${accountStatus.usage.monthlyRuns} runs this month. Premium is unlimited.`
           : `${accountStatus.usage.monthlyRuns}/${accountStatus.usage.monthlyRunLimit} free runs used this month.`
         : "Sign in to see run usage.",
+      href: "/settings#usage",
     },
     {
       label: "Plan",
@@ -2454,14 +2456,16 @@ export default function Page() {
             ? "Premium workspace. PDF, DOCX, and TXT exports are available."
             : "Free workspace. PDF export is included."
         : "Sign in to connect plan and saved project state.",
+      href: "/settings#billing",
     },
     {
       label: "Exports",
       detail: accountStatus?.entitlement?.exportFormats.docx
         ? "PDF, DOCX, and TXT exports are available for this account."
         : "PDF exports are included. DOCX and TXT unlock with Premium.",
+      href: "/settings#exports",
     },
-    { label: "Billing", detail: "Manage plan changes and invoices from Settings." },
+    { label: "Billing", detail: "Manage plan changes and invoices from Settings.", href: "/settings#billing" },
   ];
   const localHistoryCount = history.filter((entry) => !isAccountHistoryItem(entry, syncedHistoryIds)).length;
   const syncableLocalHistoryCount = syncableLocalHistoryItems(history, syncedHistoryIds).length;
@@ -2710,10 +2714,15 @@ export default function Page() {
                   )}
                   <div className="studio-account-list">
                     {accountItems.map((item) => (
-                      <div key={item.label}>
+                      <Link
+                        className="studio-account-summary"
+                        href={item.href}
+                        key={item.label}
+                        onClick={() => setAccountPanelOpen(false)}
+                      >
                         <span>{item.label}</span>
                         <small>{item.detail}</small>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </div>
