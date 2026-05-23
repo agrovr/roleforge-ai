@@ -10,6 +10,7 @@ import { reconcileUserSubscriptionEntitlement } from "../lib/billing/entitlement
 import { billingReadiness } from "../lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
+import { savedRunHistoryHref } from "../lib/savedRunLinks";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 import { loadSavedRuns } from "../lib/supabase/savedProjects";
 import { loadAccountUsage } from "../lib/usage";
@@ -66,12 +67,6 @@ function formatSavedRunDate(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-}
-
-function savedRunHistoryHref(run: { id: string; accountRunId?: string }, options: { restore?: boolean } = {}) {
-  const params = new URLSearchParams({ historyRun: run.accountRunId ?? run.id });
-  if (options.restore) params.set("historyAction", "restore");
-  return `/app?${params.toString()}#history`;
 }
 
 function savedRunCanRestore(run: { snapshot?: Record<string, unknown> }) {
