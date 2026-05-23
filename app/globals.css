@@ -1409,6 +1409,12 @@ html[data-theme="dark"] textarea {
   border-radius: 4px;
 }
 
+.templates-actions {
+  display: flex;
+  justify-content: center;
+  padding: 8px 28px 0 0;
+}
+
 .templates-page-shell {
   min-height: 100vh;
   padding: 28px clamp(18px, 4vw, 54px) 64px;

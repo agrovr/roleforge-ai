@@ -32,7 +32,7 @@ function Nav({ signedIn, studioHref }: Pick<LandingLinks, "signedIn" | "studioHr
       <div className="nav-inner">
         <Brand />
         <nav className="nav-links" aria-label="Primary navigation">
-          <a className="nav-link" href="#templates">Templates</a>
+          <Link className="nav-link" href="/templates">Templates</Link>
           <a className="nav-link" href="#how">How it works</a>
           <a className="nav-link" href="#features">Features</a>
           <a className="nav-link" href="#pricing">Pricing</a>
@@ -320,6 +320,9 @@ function Templates() {
           </article>
         ))}
       </div>
+      <div className="templates-actions">
+        <Link className="btn btn-ghost btn-lg" href="/templates">Open template workspace</Link>
+      </div>
     </section>
   );
 }
@@ -477,7 +480,7 @@ function CTABand({ studioHref }: Pick<LandingLinks, "studioHref">) {
             <p>Free to start. No credit card required. Upload your resume, target the role, and review a cleaner draft.</p>
             <div className="cta-cluster">
               <Link className="btn btn-brand btn-lg" href={studioHref}>Build my resume <RoleForgeIcon name="arrow" size={14} /></Link>
-              <a className="btn btn-ghost btn-lg" href="#templates">Browse templates</a>
+              <Link className="btn btn-ghost btn-lg" href="/templates">Browse templates</Link>
             </div>
           </div>
           <div className="cta-visual">
@@ -502,7 +505,7 @@ function Footer() {
           <h3>Product</h3>
           <a href="#features">Tailoring</a>
           <a href="#features">Formatting review</a>
-          <a href="#templates">Templates</a>
+          <Link href="/templates">Templates</Link>
         </div>
         <div className="footer-col">
           <h3>Available now</h3>
