@@ -5386,6 +5386,23 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--ink-3);
 }
 
+.settings-export-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.settings-export-actions span {
+  min-width: 0;
+  color: var(--ink-2);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
 .settings-download-button,
 .settings-coming-soon {
   width: fit-content;
@@ -8866,6 +8883,14 @@ html[data-theme="dark"] .settings-export-item small {
   color: #b7e5c4;
 }
 
+html[data-theme="dark"] .settings-export-actions {
+  border-color: rgba(255, 247, 233, 0.14);
+}
+
+html[data-theme="dark"] .settings-export-actions span {
+  color: var(--ink-2);
+}
+
 html[data-theme="dark"] .settings-export-item.enabled {
   border-color: rgba(146, 191, 160, 0.26);
   background:
@@ -9607,6 +9632,7 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
   .settings-action-row,
   .settings-export-item,
+  .settings-export-actions,
   .settings-billing-head,
   .settings-plan-active-card {
     align-items: stretch;
@@ -9622,6 +9648,7 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   .settings-billing-head .ghost-button,
   .settings-action-row .btn,
   .settings-action-row .ghost-button,
+  .settings-export-actions .btn,
   .settings-action-row .studio-oauth-button {
     width: 100%;
   }

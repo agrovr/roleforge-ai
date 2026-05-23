@@ -327,6 +327,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <small>{row.enabled ? row.included : row.locked}</small>
                 </div>
               ))}
+              <div className="settings-export-actions">
+                <span>Template previews show the resume directions being prepared for export.</span>
+                <Link className="btn btn-soft btn-sm settings-inline-link" href="/templates">Browse templates</Link>
+              </div>
             </div>
           </section>
 
