@@ -17,7 +17,7 @@ export async function GET() {
       provider: "supabase",
       user: null,
       entitlement: FREE_ENTITLEMENT,
-      next: "Account sync is temporarily unavailable. Local history still works in this browser.",
+      next: "Account sync is temporarily unavailable. Browser history still works.",
     });
   }
 

@@ -1066,7 +1066,7 @@ export default function Page() {
 
     if (!accountReady) {
       setHistorySyncState("error");
-      setHistorySyncMessage("Saved projects are reconnecting. Local history still works.");
+      setHistorySyncMessage("Saved projects are reconnecting. Browser history still works.");
       return;
     }
 
@@ -1100,8 +1100,8 @@ export default function Page() {
       setHistorySyncState("error");
       setHistorySyncMessage(
         caught instanceof Error && /sign in/i.test(caught.message)
-          ? "Sign in again to refresh saved projects."
-          : "Saved projects could not refresh. Local history still works.",
+          ? "Sign in again to load saved projects."
+          : "Saved projects are taking a moment to load. Browser history still works.",
       );
     }
   }, [accountReady, signedIn]);
@@ -1595,7 +1595,7 @@ export default function Page() {
   ) {
     if (!signedIn || !accountReady) {
       setHistorySyncState("local");
-      setHistorySyncMessage(signedIn ? "Saved projects are reconnecting. Local history still works." : "Sign in to sync completed runs");
+      setHistorySyncMessage(signedIn ? "Saved projects are reconnecting. Browser history still works." : "Sign in to sync completed runs");
       return false;
     }
 
@@ -1681,7 +1681,7 @@ export default function Page() {
         return false;
       }
       setHistorySyncState("error");
-      setHistorySyncMessage("Could not sync this run. It is still saved locally.");
+      setHistorySyncMessage("This run could not save to your account yet. It is still saved in this browser.");
       return false;
     }
   }
@@ -1689,19 +1689,19 @@ export default function Page() {
   async function syncLocalHistoryToAccount() {
     if (!signedIn || !accountReady) {
       setHistorySyncState("error");
-      setHistorySyncMessage(signedIn ? "Saved projects are reconnecting. Local history still works." : "Sign in to sync local runs.");
+      setHistorySyncMessage(signedIn ? "Saved projects are reconnecting. Browser history still works." : "Sign in to sync browser runs.");
       return;
     }
 
     const syncableItems = syncableLocalHistoryItems(history, syncedHistoryIds);
     if (!syncableItems.length) {
       setHistorySyncState("synced");
-      setHistorySyncMessage("No restore-ready local runs need account sync.");
+      setHistorySyncMessage("No restore-ready browser runs need account sync.");
       return;
     }
 
     setHistorySyncState("saving");
-    setHistorySyncMessage(`Saving ${syncableItems.length} local run${syncableItems.length === 1 ? "" : "s"} to your account...`);
+    setHistorySyncMessage(`Saving ${syncableItems.length} browser run${syncableItems.length === 1 ? "" : "s"} to your account...`);
 
     let savedCount = 0;
     for (const item of syncableItems) {
@@ -1720,12 +1720,12 @@ export default function Page() {
     if (savedCount) {
       await refreshSavedRuns({ quiet: true });
       setHistorySyncState("synced");
-      setHistorySyncMessage(`${savedCount} local run${savedCount === 1 ? "" : "s"} saved to your account.`);
+      setHistorySyncMessage(`${savedCount} browser run${savedCount === 1 ? "" : "s"} saved to your account.`);
       return;
     }
 
     setHistorySyncState("error");
-    setHistorySyncMessage("Local runs could not sync. They are still saved in this browser.");
+    setHistorySyncMessage("Browser runs could not sync. They are still saved in this browser.");
   }
 
   function updateCurrentHistoryExport(url: string, format: ExportFormat) {
@@ -2597,11 +2597,11 @@ export default function Page() {
         ? "No browser projects"
         : signedIn
           ? "No saved projects yet"
-          : "No local runs yet";
+          : "No browser runs yet";
   const historyEmptyDetail =
     activeHistoryFilter === "account"
       ? localHistoryGroups.length
-        ? "Your completed local runs are still available under This browser. Complete a new signed-in run or refresh after sync to see account projects here."
+        ? "Your completed browser runs are still available under This browser. Complete a new signed-in run or load saved projects again to see account projects here."
         : "Complete a signed-in tailor run and it will save here with restore, target details, scores, and export links."
       : activeHistoryFilter === "local"
         ? accountHistoryGroups.length
@@ -3261,7 +3261,7 @@ export default function Page() {
               <section className="studio-card studio-history-panel" id="history" ref={historySectionRef}>
                 <div className="studio-card-head">
                   <div>
-                    <div className="eyebrow">{signedIn ? "Saved projects" : "Local history"}</div>
+                    <div className="eyebrow">{signedIn ? "Saved projects" : "Browser history"}</div>
                     <h2 className="panel-title">
                       {visibleHistoryGroups.length
                         ? `${visibleHistoryGroups.length} project${visibleHistoryGroups.length === 1 ? "" : "s"}`

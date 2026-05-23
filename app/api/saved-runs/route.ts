@@ -21,7 +21,7 @@ async function requireAccount() {
   if (error || !user) {
     return {
       error: withSupabaseCookies(
-        NextResponse.json({ error: "Sign in again to refresh saved projects." }, { status: 401 }),
+        NextResponse.json({ error: "Sign in again to load saved projects." }, { status: 401 }),
         routeClient.cookiesToSet,
       ),
     };
@@ -44,7 +44,7 @@ export async function GET() {
   } catch (error) {
     console.error("Saved projects refresh failed", error);
     return withSupabaseCookies(
-      NextResponse.json({ error: "Saved projects could not refresh." }, { status: 500 }),
+      NextResponse.json({ error: "Saved projects are taking a moment to load." }, { status: 500 }),
       account.routeClient.cookiesToSet,
     );
   }

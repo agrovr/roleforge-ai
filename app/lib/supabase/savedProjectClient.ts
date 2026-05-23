@@ -21,7 +21,7 @@ export async function loadSavedRuns(): Promise<SavedHistoryItem[]> {
   });
 
   if (!response.ok) {
-    throw new Error(await readSavedProjectError(response, "Saved projects could not refresh."));
+    throw new Error(await readSavedProjectError(response, "Saved projects are taking a moment to load."));
   }
 
   const payload = (await response.json()) as { runs?: SavedHistoryItem[] };
