@@ -2214,12 +2214,15 @@ export default function Page() {
   const targetUrlInfo = parseTargetUrl(firstTargetLine);
   const activeRole = targetUrlInfo?.label || firstTargetLine || (hasTarget ? "Role target loaded" : "Add a role target");
   const activeTitle = hasTarget && firstTargetLine ? firstTargetLine : activeResumeName;
+  const activeTargetName = targetUrlInfo?.label.replace(/\s+job target$/i, "");
   const activeDetail = result
     ? restoredHistoryId && !file
       ? "Saved run restored · upload the source file to re-tailor"
-      : targetUrlInfo?.host
-      ? `Tailored and exported for ${targetUrlInfo.host}`
-      : "Tailored and exported from the current workflow"
+      : activeTargetName
+      ? `Tailored and exported for ${activeTargetName}`
+      : hasTarget
+        ? "Tailored and exported for the current target"
+        : "Tailored and exported from the current workflow"
     : (file || uploadMeta) && hasTarget
       ? "Resume and target ready · run the workflow"
       : (file || uploadMeta)
