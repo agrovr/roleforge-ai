@@ -1591,9 +1591,10 @@ export default function Page() {
   async function exportResume(
     tailoredText: string,
     format: ExportFormat = "pdf",
-    options: { updateActiveDownload?: boolean } = {},
+    options: { templateSlug?: ResumeTemplateSlug; updateActiveDownload?: boolean } = {},
   ): Promise<string> {
     if (!baseUrl) throw new Error("Export is not available yet.");
+    const templateSlug = options.templateSlug ?? selectedTemplateSlug;
 
     const response = await fetch(`${baseUrl}/export`, {
       method: "POST",
@@ -1603,6 +1604,7 @@ export default function Page() {
         title: "TAILORED RESUME",
         content: tailoredText,
         format,
+        template: templateSlug,
       }),
     });
     if (!response.ok) throw await readApiError(response, "The export could not be created. Try again in a moment.");
@@ -1841,7 +1843,10 @@ export default function Page() {
 
     try {
       const updatesActiveStudioDownload = historyEntryIsOpenInStudio(entry);
-      const url = await exportResume(tailoredText, format, { updateActiveDownload: updatesActiveStudioDownload });
+      const url = await exportResume(tailoredText, format, {
+        templateSlug: isResumeTemplateSlug(entry.snapshot?.templateSlug) ? entry.snapshot.templateSlug : selectedTemplateSlug,
+        updateActiveDownload: updatesActiveStudioDownload,
+      });
       const updatedItem = updateHistoryEntryExport(entry, url, format);
       setSelectedHistoryId(entry.id);
       if (updatesActiveStudioDownload) {
