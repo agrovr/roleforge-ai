@@ -20,6 +20,7 @@ import { parseTargetUrl } from "../lib/targetLabel";
 import {
   formatHistoryTimestamp,
   groupHistoryItems,
+  historyGroupKey,
   hasRestorableSnapshot,
   historyDownloadEntries,
   historyDownloads,
@@ -992,6 +993,7 @@ export default function Page() {
   const historySectionRef = useRef<HTMLElement | null>(null);
   const historyDetailRef = useRef<HTMLElement | null>(null);
   const accountMenuRef = useRef<HTMLDivElement | null>(null);
+  const handledHistoryRunRef = useRef("");
 
   const accountUser = accountStatus?.user ?? null;
   const accountReady = Boolean(accountStatus?.configured && accountStatus.enabled);
@@ -1283,6 +1285,29 @@ export default function Page() {
 
     return () => window.removeEventListener("hashchange", openHashTarget);
   }, [openGeneratedAsset, openHistoryPanel, openPreviewMode]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const historyRunId = params.get("historyRun")?.trim();
+    if (!historyRunId || handledHistoryRunRef.current === historyRunId || !history.length) return;
+
+    const entry = history.find((item) =>
+      [item.id, item.accountRunId, item.projectId].filter(Boolean).includes(historyRunId),
+    );
+    if (!entry) return;
+
+    handledHistoryRunRef.current = historyRunId;
+    setHistoryFilter("all");
+    setExpandedHistoryGroupKey(historyGroupKey(entry, syncedHistoryIds));
+    setSelectedHistoryId(entry.id);
+    setProjectActionMessage(`${entry.filename} is selected in History.`);
+    openHistoryPanel();
+    window.setTimeout(() => scrollToHistoryDetails("auto"), 260);
+
+    params.delete("historyRun");
+    const nextUrl = `${window.location.pathname}${params.toString() ? `?${params}` : ""}#history`;
+    window.history.replaceState(null, "", nextUrl);
+  }, [history, openHistoryPanel, scrollToHistoryDetails, syncedHistoryIds]);
 
   function clearHistoryHash() {
     if (!["#history", "#cover-letter", "#interview-prep", "#preview-tailored", "#preview-original", "#preview-changes"].includes(window.location.hash)) return;

@@ -68,6 +68,17 @@ function formatSavedRunDate(value: string) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
+function savedRunHistoryHref(run: { id: string; accountRunId?: string }) {
+  return `/app?historyRun=${encodeURIComponent(run.accountRunId ?? run.id)}#history`;
+}
+
+function savedRunCanRestore(run: { snapshot?: Record<string, unknown> }) {
+  const result = run.snapshot?.result;
+  if (!result || typeof result !== "object") return false;
+  const tailoredText = (result as { tailored_text?: unknown }).tailored_text;
+  return typeof tailoredText === "string" && Boolean(tailoredText.trim());
+}
+
 async function countRows(
   supabase: NonNullable<Awaited<ReturnType<typeof createRoleForgeServerClient>>>,
   table: "resume_projects" | "tailor_runs",
@@ -240,14 +251,20 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 <div className="settings-project-list" aria-label="Recent saved projects">
                   {recentProjectRuns.map((run) => {
                     const downloadCount = Object.values(run.downloads ?? {}).filter(Boolean).length;
+                    const canRestore = savedRunCanRestore(run);
                     return (
-                      <article className="settings-project-item" key={run.accountRunId ?? run.id}>
+                      <Link
+                        className="settings-project-item"
+                        href={savedRunHistoryHref(run)}
+                        key={run.accountRunId ?? run.id}
+                        aria-label={`Open ${run.projectTitle || run.roleHint} in History`}
+                      >
                         <div>
                           <strong>{run.projectTitle || run.roleHint}</strong>
                           <span>{run.filename} · {formatSavedRunDate(run.createdAt)} · {run.score}/100</span>
                         </div>
-                        <small>{downloadCount ? `${downloadCount} export${downloadCount === 1 ? "" : "s"}` : "Restore-ready"}</small>
-                      </article>
+                        <small>{canRestore ? "Restore" : downloadCount ? `${downloadCount} export${downloadCount === 1 ? "" : "s"}` : "Open"}</small>
+                      </Link>
                     );
                   })}
                 </div>
