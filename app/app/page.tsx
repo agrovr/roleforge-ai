@@ -37,7 +37,7 @@ import {
   type HistoryItem as BaseHistoryItem,
 } from "../lib/history";
 import {
-  buildPlainResumeLines,
+  buildPlainResumePreview,
   buildResumeEntries,
   cleanBulletLine,
   isSourcePreviewSample,
@@ -242,9 +242,13 @@ function PlainResumeDocument({
   characterCount?: number;
   sourcePreviewTruncated?: boolean;
 }) {
-  const lines = buildPlainResumeLines(text);
+  const preview = buildPlainResumePreview(text);
+  const lines = preview.lines;
   const documentName = filename ? filename.replace(/\.(docx|pdf|txt)$/i, "") : mode === "original" ? "Original resume" : "Generated draft";
   const sourceSample = mode === "original" && isSourcePreviewSample(text, characterCount, sourcePreviewTruncated);
+  const cappedDetail = preview.capped
+    ? `Showing the first ${lines.length} preview lines from ${preview.renderedLineCount.toLocaleString()} readable lines.`
+    : "";
   const meta = [
     uploadFormat
       ? `${uploadFormat.toUpperCase()} ${sourceSample ? "source sample" : "source"}`
@@ -288,6 +292,7 @@ function PlainResumeDocument({
         ) : (
           <p>{mode === "original" ? "Upload a resume to preview extracted source text." : "Run the workflow to render the generated draft here."}</p>
         )}
+        {cappedDetail ? <p className="rf-preview-crop-note">{cappedDetail}</p> : null}
       </section>
     </div>
   );
@@ -297,31 +302,36 @@ function PreviewLineList({
   lines,
   keywords,
   empty,
+  cappedDetail,
 }: {
   lines: PlainResumeLine[];
   keywords: string[];
   empty: string;
+  cappedDetail?: string;
 }) {
   if (!lines.length) return <p className="rf-diff-empty">{empty}</p>;
 
   return (
-    <div className="rf-diff-lines">
-      {lines.map((line, index) => {
-        if (line.kind === "heading") return <h5 key={`diff-line-${index}`}>{line.text}</h5>;
-        if (line.kind === "bullet") {
+    <>
+      <div className="rf-diff-lines">
+        {lines.map((line, index) => {
+          if (line.kind === "heading") return <h5 key={`diff-line-${index}`}>{line.text}</h5>;
+          if (line.kind === "bullet") {
+            return (
+              <p className="plain-bullet" key={`diff-line-${index}`}>
+                <HighlightedText text={line.text} keywords={keywords} />
+              </p>
+            );
+          }
           return (
-            <p className="plain-bullet" key={`diff-line-${index}`}>
+            <p key={`diff-line-${index}`}>
               <HighlightedText text={line.text} keywords={keywords} />
             </p>
           );
-        }
-        return (
-          <p key={`diff-line-${index}`}>
-            <HighlightedText text={line.text} keywords={keywords} />
-          </p>
-        );
-      })}
-    </div>
+        })}
+      </div>
+      {cappedDetail ? <p className="rf-preview-crop-note">{cappedDetail}</p> : null}
+    </>
   );
 }
 
@@ -338,8 +348,10 @@ function DiffResumeDocument({
   changeLog?: string[];
   filename?: string;
 }) {
-  const beforeLines = buildPlainResumeLines(sourceText);
-  const afterLines = buildPlainResumeLines(tailoredText);
+  const beforePreview = buildPlainResumePreview(sourceText);
+  const afterPreview = buildPlainResumePreview(tailoredText);
+  const beforeLines = beforePreview.lines;
+  const afterLines = afterPreview.lines;
   const documentName = filename ? filename.replace(/\.(docx|pdf|txt)$/i, "") : "Resume";
   const hasBefore = Boolean(sourceText?.trim());
   const hasAfter = Boolean(tailoredText?.trim());
@@ -399,11 +411,25 @@ function DiffResumeDocument({
             lines={beforeLines}
             keywords={[]}
             empty={missingSavedSource ? "Original source text was not saved for this run." : "Upload a resume, or restore a run with saved source text, to show the before state."}
+            cappedDetail={
+              beforePreview.capped
+                ? `Showing the first ${beforeLines.length} preview lines from ${beforePreview.renderedLineCount.toLocaleString()} readable lines.`
+                : undefined
+            }
           />
         </article>
         <article className="rf-diff-column after">
           <div className="rf-diff-kicker">Tailored</div>
-          <PreviewLineList lines={afterLines} keywords={keywords} empty="Run Tailor, or restore a restorable saved run, to show the after state." />
+          <PreviewLineList
+            lines={afterLines}
+            keywords={keywords}
+            empty="Run Tailor, or restore a restorable saved run, to show the after state."
+            cappedDetail={
+              afterPreview.capped
+                ? `Showing the first ${afterLines.length} preview lines from ${afterPreview.renderedLineCount.toLocaleString()} readable lines.`
+                : undefined
+            }
+          />
         </article>
       </div>
     </div>

@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildPlainResumeLines, buildResumeEntries, isSourcePreviewSample, parseResumeText } from "./previewResume";
+import {
+  buildPlainResumeLines,
+  buildPlainResumePreview,
+  buildResumeEntries,
+  PLAIN_RESUME_PREVIEW_LINE_LIMIT,
+  isSourcePreviewSample,
+  parseResumeText,
+} from "./previewResume";
 
 const tailoredDraft = [
   "# Tailored Resume",
@@ -84,13 +91,30 @@ test("normalizes inline headings and bullet markers for plain preview", () => {
 test("caps plain preview lines so long restored runs cannot overgrow the card", () => {
   const lines = Array.from({ length: 120 }, (_, index) => `Line ${index + 1}`).join("\n");
 
-  assert.equal(buildPlainResumeLines(lines).length, 90);
+  assert.equal(buildPlainResumeLines(lines).length, PLAIN_RESUME_PREVIEW_LINE_LIMIT);
 });
 
 test("caps plain preview after inline headings expand into content lines", () => {
   const lines = Array.from({ length: 70 }, (_, index) => `Skills: Tool ${index + 1}`).join("\n");
 
-  assert.equal(buildPlainResumeLines(lines).length, 90);
+  assert.equal(buildPlainResumeLines(lines).length, PLAIN_RESUME_PREVIEW_LINE_LIMIT);
+});
+
+test("reports when plain preview is capped", () => {
+  const preview = buildPlainResumePreview(Array.from({ length: 95 }, (_, index) => `Line ${index + 1}`).join("\n"));
+
+  assert.equal(preview.capped, true);
+  assert.equal(preview.sourceLineCount, 95);
+  assert.equal(preview.renderedLineCount, 95);
+  assert.equal(preview.lines.length, PLAIN_RESUME_PREVIEW_LINE_LIMIT);
+});
+
+test("does not mark short plain previews as capped", () => {
+  const preview = buildPlainResumePreview(["Skills: React", "- Built workflow"].join("\n"));
+
+  assert.equal(preview.capped, false);
+  assert.equal(preview.sourceLineCount, 2);
+  assert.equal(preview.renderedLineCount, 3);
 });
 
 test("detects when original source preview is only a sample", () => {

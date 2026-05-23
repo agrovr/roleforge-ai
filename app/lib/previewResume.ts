@@ -2,6 +2,9 @@ export type ParsedResumeSection = { title: string; lines: string[] };
 export type ParsedResume = { name: string; role: string; contact: string; sections: ParsedResumeSection[] };
 export type ParsedResumeEntry = { title: string; meta?: string; date?: string; details: string[]; bullets: string[] };
 export type PlainResumeLine = { text: string; kind: "heading" | "bullet" | "body" };
+export type PlainResumePreview = { lines: PlainResumeLine[]; sourceLineCount: number; renderedLineCount: number; capped: boolean };
+
+export const PLAIN_RESUME_PREVIEW_LINE_LIMIT = 90;
 
 const RESUME_SECTION_TITLES: Record<string, string> = {
   "professional summary": "Professional summary",
@@ -248,23 +251,38 @@ export function buildResumeEntries(lines: string[]) {
   return entries;
 }
 
-export function buildPlainResumeLines(text?: string): PlainResumeLine[] {
+function normalizePlainResumeSourceLines(text?: string) {
   return (text ?? "")
     .replace(/\r/g, "")
     .split("\n")
     .map(normalizeResumeLine)
-    .filter(Boolean)
-    .slice(0, 90)
-    .flatMap((line): PlainResumeLine[] => {
-      const marker = getSectionMarker(line);
-      if (marker || (/^[A-Z][A-Z\s/&+-]{3,34}$/.test(line) && line.length <= 36)) {
-        const heading: PlainResumeLine = { text: marker?.title ?? line, kind: "heading" };
-        return marker?.rest ? [heading, { text: marker.rest, kind: "body" }] : [heading];
-      }
-      if (isBulletLine(line)) return [{ text: cleanBulletLine(line), kind: "bullet" }];
-      return [{ text: line, kind: "body" }];
-    })
-    .slice(0, 90);
+    .filter(Boolean);
+}
+
+function expandPlainResumeLine(line: string): PlainResumeLine[] {
+  const marker = getSectionMarker(line);
+  if (marker || (/^[A-Z][A-Z\s/&+-]{3,34}$/.test(line) && line.length <= 36)) {
+    const heading: PlainResumeLine = { text: marker?.title ?? line, kind: "heading" };
+    return marker?.rest ? [heading, { text: marker.rest, kind: "body" }] : [heading];
+  }
+  if (isBulletLine(line)) return [{ text: cleanBulletLine(line), kind: "bullet" }];
+  return [{ text: line, kind: "body" }];
+}
+
+export function buildPlainResumePreview(text?: string): PlainResumePreview {
+  const sourceLines = normalizePlainResumeSourceLines(text);
+  const renderedLines = sourceLines.flatMap(expandPlainResumeLine);
+
+  return {
+    lines: renderedLines.slice(0, PLAIN_RESUME_PREVIEW_LINE_LIMIT),
+    sourceLineCount: sourceLines.length,
+    renderedLineCount: renderedLines.length,
+    capped: renderedLines.length > PLAIN_RESUME_PREVIEW_LINE_LIMIT,
+  };
+}
+
+export function buildPlainResumeLines(text?: string): PlainResumeLine[] {
+  return buildPlainResumePreview(text).lines;
 }
 
 export function isSourcePreviewSample(text?: string, characterCount?: number, previewTruncated?: boolean) {

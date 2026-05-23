@@ -6662,6 +6662,19 @@ html[data-theme="dark"] input::file-selector-button {
   color: #222;
 }
 
+.rf-preview-crop-note {
+  margin: 16px 0 0;
+  padding: 10px 12px;
+  border: 1px solid #e4dbc9;
+  border-radius: 10px;
+  background: #f8f3ea;
+  color: #6f5f45;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
 .rf-resume-paper-empty {
   min-height: clamp(280px, 30vh, 360px);
 }
