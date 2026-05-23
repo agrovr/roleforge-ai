@@ -1483,7 +1483,7 @@ export default function Page() {
     form.append("file", file);
 
     const response = await fetch(`${baseUrl}/upload`, { method: "POST", body: form, headers: await workflowHeaders() });
-    if (!response.ok) throw await readApiError(response, "Upload failed");
+    if (!response.ok) throw await readApiError(response, "The resume could not be uploaded. Try another file or try again.");
 
     const data = (await response.json()) as UploadResponse;
     setResumeId(data.resume_id);
@@ -1516,7 +1516,7 @@ export default function Page() {
       headers: await workflowHeaders({ "Content-Type": "application/json" }),
       body: JSON.stringify(payload),
     });
-    if (!response.ok) throw await readApiError(response, "Tailor failed");
+    if (!response.ok) throw await readApiError(response, "The tailored draft could not be created. Try again in a moment.");
 
     const data = (await response.json()) as TailorResult;
     setResult(data);
@@ -1540,7 +1540,7 @@ export default function Page() {
         format,
       }),
     });
-    if (!response.ok) throw await readApiError(response, "Export failed");
+    if (!response.ok) throw await readApiError(response, "The export could not be created. Try again in a moment.");
 
     const data = (await response.json()) as ExportResponse;
     const url = workflowDownloadUrl(data.download_filename);
@@ -1791,7 +1791,7 @@ export default function Page() {
         void syncCompletedRun(updatedItem, entry.snapshot.result, url, { countUsage: false, preserveSuccessOnFailure: true });
       }
     } catch (caught) {
-      const nextError = workflowErrorFromCaught(caught, "Export failed");
+      const nextError = workflowErrorFromCaught(caught, "The export could not be created. Try again in a moment.");
       if (nextError.code === "premium_required") {
         setExportNotice({ format, label });
         setHistorySyncState("local");
@@ -2060,7 +2060,7 @@ export default function Page() {
       setPreviewMode("tailored");
       setRestoredHistoryId(null);
     } catch (caught) {
-      const nextError = workflowErrorFromCaught(caught, "Something went wrong");
+      const nextError = workflowErrorFromCaught(caught, "The workflow stopped before finishing. Try again in a moment.");
       setWorkflowError(nextError);
       setError(nextError.message);
       if (nextError.code === "plan_limit_reached") {
@@ -2115,7 +2115,7 @@ export default function Page() {
       }
       setStage("ready");
     } catch (caught) {
-      const nextError = workflowErrorFromCaught(caught, "Export failed");
+      const nextError = workflowErrorFromCaught(caught, "The export could not be created. Try again in a moment.");
       if (nextError.code === "premium_required") {
         setExportNotice({ format: selectedExportFormat, label: selectedFormatLabel });
         setError("");
