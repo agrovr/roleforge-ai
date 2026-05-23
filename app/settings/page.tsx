@@ -11,6 +11,7 @@ import { billingReadiness } from "../lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
+import { loadSavedRuns } from "../lib/supabase/savedProjects";
 import { loadAccountUsage } from "../lib/usage";
 import { SettingsSectionNav } from "./SettingsSectionNav";
 
@@ -61,6 +62,12 @@ function formatPlanDate(value: string | null) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
+function formatSavedRunDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
 async function countRows(
   supabase: NonNullable<Awaited<ReturnType<typeof createRoleForgeServerClient>>>,
   table: "resume_projects" | "tailor_runs",
@@ -90,9 +97,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     redirect("/login?next=/settings&account=signin-required");
   }
 
-  const [projectCount, runCount] = await Promise.all([
+  const [projectCount, runCount, recentSavedRuns] = await Promise.all([
     countRows(supabase, "resume_projects", user.id),
     countRows(supabase, "tailor_runs", user.id),
+    loadSavedRuns(supabase, user.id).catch(() => []),
     reconcileUserSubscriptionEntitlement(user.id).catch(() => false),
   ]);
   const entitlement = await loadAccountEntitlement(supabase, user.id);
@@ -136,6 +144,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
       : `${usage.remainingRuns} ${remainingRunWord} left`;
   const projectCountLabel = projectCount === 1 ? "Project" : "Projects";
   const runCountLabel = runCount === 1 ? "Run" : "Runs";
+  const recentProjectRuns = recentSavedRuns.slice(0, 3);
 
   return (
     <main className="settings-page-shell">
@@ -227,6 +236,27 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <span>{runCountLabel}</span>
                 </div>
               </div>
+              {recentProjectRuns.length ? (
+                <div className="settings-project-list" aria-label="Recent saved projects">
+                  {recentProjectRuns.map((run) => {
+                    const downloadCount = Object.values(run.downloads ?? {}).filter(Boolean).length;
+                    return (
+                      <article className="settings-project-item" key={run.accountRunId ?? run.id}>
+                        <div>
+                          <strong>{run.projectTitle || run.roleHint}</strong>
+                          <span>{run.filename} · {formatSavedRunDate(run.createdAt)} · {run.score}/100</span>
+                        </div>
+                        <small>{downloadCount ? `${downloadCount} export${downloadCount === 1 ? "" : "s"}` : "Restore-ready"}</small>
+                      </article>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="settings-project-empty">
+                  <strong>No saved runs yet</strong>
+                  <span>Completed exports will appear here and reopen from History.</span>
+                </div>
+              )}
               <Link className="btn btn-soft btn-sm settings-inline-link" href="/app#history">Open history</Link>
             </div>
           </section>
