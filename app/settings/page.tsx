@@ -332,7 +332,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 </div>
               ))}
               <div className="settings-export-actions">
-                <span>{selectedTemplate.name} is selected as your resume direction. Template-specific export files are being prepared.</span>
+                <span>{selectedTemplate.name} is selected as your resume direction and is sent with new exports.</span>
                 <Link className="btn btn-soft btn-sm settings-inline-link" href="/templates">Browse templates</Link>
               </div>
             </div>

@@ -304,7 +304,7 @@ function Templates() {
             <div className="eyebrow">Templates</div>
               <h2 className="display h2">Resume formats.<br /><span className="italic">Beautifully</span> simple.</h2>
           </div>
-          <p className="lede">Browse the visual directions planned for cleaner resume exports. Template switching stays gated until each design is ready for real files.</p>
+          <p className="lede">Browse the visual directions RoleForge can carry into cleaner resume exports. Pick a direction before opening the studio.</p>
         </div>
       </div>
       <div className="templates-row">
@@ -448,7 +448,7 @@ function FAQ() {
     ["Does RoleForge replace my judgment?", "No. The app surfaces generated guidance and exports a draft for your review."],
     ["Can I use a job posting URL?", "Yes, if the posting is public and RoleForge can access it. Pasted text is the most reliable target input."],
     ["What file formats can I export?", "The free workflow exports PDF. Premium enables DOCX and TXT exports when your plan is active."],
-    ["Can I use templates?", "Templates are visual examples for now. Template switching will unlock once those designs are wired into real exports."],
+    ["Can I use templates?", "Yes. Pick a template direction before opening the studio, and RoleForge sends that direction with new exports."],
     ["Is sign-in available?", "Yes. Google and email magic-link sign-in are available. Saved projects sync after sign-in."],
     ["How much is Premium?", "The launch price is $9/month or $72/year. Checkout and billing management are handled by Stripe."],
   ] as const;

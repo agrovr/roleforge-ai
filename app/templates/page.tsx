@@ -37,7 +37,7 @@ export default async function TemplatesPage() {
           <div className="eyebrow">Template library</div>
           <h1 id="templates-title">Resume formats for cleaner exports.</h1>
           <p>
-            Browse the visual directions planned for RoleForge exports. The current workflow keeps PDF export live while each template is prepared for real files.
+            Choose the visual direction RoleForge should carry into new PDF and premium DOCX exports. You can change it before each run.
           </p>
         </div>
         <div className="templates-page-actions">
