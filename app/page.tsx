@@ -432,7 +432,7 @@ function Pricing({ studioHref, premiumHref }: Pick<LandingLinks, "studioHref" | 
               <li><RoleForgeIcon name="check" size={14} />DOCX and TXT exports</li>
               <li><RoleForgeIcon name="check" size={14} />Saved project sync</li>
             </ul>
-            <Link className="btn btn-brand btn-lg" href={premiumHref}>View premium</Link>
+            <Link className="btn btn-brand btn-lg" href={premiumHref}>View plans</Link>
           </article>
         </div>
       </div>
