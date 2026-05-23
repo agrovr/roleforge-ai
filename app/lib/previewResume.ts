@@ -267,7 +267,8 @@ export function buildPlainResumeLines(text?: string): PlainResumeLine[] {
     .slice(0, 90);
 }
 
-export function isSourcePreviewSample(text?: string, characterCount?: number) {
+export function isSourcePreviewSample(text?: string, characterCount?: number, previewTruncated?: boolean) {
+  if (typeof previewTruncated === "boolean") return previewTruncated;
   const previewLength = text?.length ?? 0;
   return Boolean(previewLength && characterCount && characterCount > previewLength);
 }

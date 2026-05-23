@@ -115,6 +115,7 @@ type UploadResponse = {
   format?: UploadFormat;
   character_count?: number;
   text_preview?: string;
+  text_preview_truncated?: boolean;
 };
 type ExportResponse = { saved_to: string; download_filename: string };
 type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error";
@@ -231,6 +232,7 @@ function PlainResumeDocument({
   filename,
   uploadFormat,
   characterCount,
+  sourcePreviewTruncated,
 }: {
   text?: string;
   keywords: string[];
@@ -238,10 +240,11 @@ function PlainResumeDocument({
   filename?: string;
   uploadFormat?: UploadFormat;
   characterCount?: number;
+  sourcePreviewTruncated?: boolean;
 }) {
   const lines = buildPlainResumeLines(text);
   const documentName = filename ? filename.replace(/\.(docx|pdf|txt)$/i, "") : mode === "original" ? "Original resume" : "Generated draft";
-  const sourceSample = mode === "original" && isSourcePreviewSample(text, characterCount);
+  const sourceSample = mode === "original" && isSourcePreviewSample(text, characterCount, sourcePreviewTruncated);
   const meta = [
     uploadFormat
       ? `${uploadFormat.toUpperCase()} ${sourceSample ? "source sample" : "source"}`
@@ -602,6 +605,7 @@ function MiniResumeDocument({
   filename,
   uploadFormat,
   characterCount,
+  sourcePreviewTruncated,
   changeLog,
   hasTarget,
   sourcePreviewUnavailable,
@@ -615,6 +619,7 @@ function MiniResumeDocument({
   filename?: string;
   uploadFormat?: UploadFormat;
   characterCount?: number;
+  sourcePreviewTruncated?: boolean;
   changeLog?: string[];
   hasTarget: boolean;
   sourcePreviewUnavailable: boolean;
@@ -633,6 +638,7 @@ function MiniResumeDocument({
         filename={filename}
         uploadFormat={uploadFormat}
         characterCount={characterCount}
+        sourcePreviewTruncated={sourcePreviewTruncated}
       />
     );
   }
@@ -682,7 +688,7 @@ function MiniResumeDocument({
     );
   }
 
-  return <PlainResumeDocument text={text} keywords={keywords} mode={mode} filename={filename} uploadFormat={uploadFormat} characterCount={characterCount} />;
+  return <PlainResumeDocument text={text} keywords={keywords} mode={mode} filename={filename} uploadFormat={uploadFormat} characterCount={characterCount} sourcePreviewTruncated={sourcePreviewTruncated} />;
 }
 
 function loadHistory(): HistoryItem[] {
@@ -2295,7 +2301,11 @@ export default function Page() {
   const restoredRunOpen = Boolean(restoredHistoryId);
   const restoredSourceMissing = restoredRunOpen && hasTailoredPreview && !hasSourcePreview;
   const sourcePreviewUnavailable = Boolean((uploadMeta || file) && previewUploadState === "ready" && !hasSourcePreview);
-  const sourcePreviewSample = isSourcePreviewSample(sourcePreviewText, uploadMeta?.character_count);
+  const sourcePreviewSample = isSourcePreviewSample(
+    sourcePreviewText,
+    uploadMeta?.character_count,
+    uploadMeta?.text_preview_truncated,
+  );
   const previewTabState = {
     tailored: hasTailoredPreview ? "Ready" : stage === "tailoring" ? "Running" : "Waiting",
     original: hasSourcePreview
@@ -2895,6 +2905,7 @@ export default function Page() {
                     filename={uploadMeta?.filename ?? file?.name}
                     uploadFormat={uploadMeta?.format}
                     characterCount={uploadMeta?.character_count}
+                    sourcePreviewTruncated={uploadMeta?.text_preview_truncated}
                     changeLog={result?.change_log}
                     hasTarget={hasTarget}
                     sourcePreviewUnavailable={sourcePreviewUnavailable}

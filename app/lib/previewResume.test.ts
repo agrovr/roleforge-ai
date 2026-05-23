@@ -99,3 +99,8 @@ test("detects when original source preview is only a sample", () => {
   assert.equal(isSourcePreviewSample("", 40000), false);
   assert.equal(isSourcePreviewSample("Avery Stone"), false);
 });
+
+test("uses explicit source preview truncation when provided", () => {
+  assert.equal(isSourcePreviewSample("Avery Stone", "Avery Stone".length, true), true);
+  assert.equal(isSourcePreviewSample("Avery Stone", 40000, false), false);
+});
