@@ -1286,29 +1286,6 @@ export default function Page() {
     return () => window.removeEventListener("hashchange", openHashTarget);
   }, [openGeneratedAsset, openHistoryPanel, openPreviewMode]);
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const historyRunId = params.get("historyRun")?.trim();
-    if (!historyRunId || handledHistoryRunRef.current === historyRunId || !history.length) return;
-
-    const entry = history.find((item) =>
-      [item.id, item.accountRunId, item.projectId].filter(Boolean).includes(historyRunId),
-    );
-    if (!entry) return;
-
-    handledHistoryRunRef.current = historyRunId;
-    setHistoryFilter("all");
-    setExpandedHistoryGroupKey(historyGroupKey(entry, syncedHistoryIds));
-    setSelectedHistoryId(entry.id);
-    setProjectActionMessage(`${entry.filename} is selected in History.`);
-    openHistoryPanel();
-    window.setTimeout(() => scrollToHistoryDetails("auto"), 260);
-
-    params.delete("historyRun");
-    const nextUrl = `${window.location.pathname}${params.toString() ? `?${params}` : ""}#history`;
-    window.history.replaceState(null, "", nextUrl);
-  }, [history, openHistoryPanel, scrollToHistoryDetails, syncedHistoryIds]);
-
   function clearHistoryHash() {
     if (!["#history", "#cover-letter", "#interview-prep", "#preview-tailored", "#preview-original", "#preview-changes"].includes(window.location.hash)) return;
     window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
@@ -1878,7 +1855,7 @@ export default function Page() {
     };
   }
 
-  function restoreHistoryItem(entry: HistoryItem) {
+  const restoreHistoryItem = useCallback((entry: HistoryItem) => {
     const snapshot = entry.snapshot;
     if (!snapshot?.result?.tailored_text?.trim()) {
       setHistorySyncState("error");
@@ -1919,7 +1896,42 @@ export default function Page() {
     setHistorySyncMessage(`${entry.filename} is open in the studio`);
     setCopyState(`${entry.filename} restored`);
     openPreviewMode("tailored");
-  }
+  }, [accountStatus?.entitlement, openPreviewMode, syncedHistoryIds]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const historyRunId = params.get("historyRun")?.trim();
+    const historyAction = params.get("historyAction")?.trim();
+    const shouldRestore = historyAction === "restore";
+    const historyRequestKey = `${historyRunId ?? ""}:${historyAction ?? ""}`;
+    if (!historyRunId || handledHistoryRunRef.current === historyRequestKey || !history.length || accountStatus === null) return;
+
+    const entry = history.find((item) =>
+      [item.id, item.accountRunId, item.projectId].filter(Boolean).includes(historyRunId),
+    );
+    if (!entry) return;
+
+    handledHistoryRunRef.current = historyRequestKey;
+    setHistoryFilter("all");
+    setExpandedHistoryGroupKey(historyGroupKey(entry, syncedHistoryIds));
+    setSelectedHistoryId(entry.id);
+
+    params.delete("historyRun");
+    params.delete("historyAction");
+    if (shouldRestore && hasRestorableSnapshot(entry)) {
+      restoreHistoryItem(entry);
+      const nextUrl = `${window.location.pathname}${params.toString() ? `?${params}` : ""}#preview-tailored`;
+      window.history.replaceState(null, "", nextUrl);
+      return;
+    }
+
+    setProjectActionMessage(`${entry.filename} is selected in History.`);
+    openHistoryPanel();
+    window.setTimeout(() => scrollToHistoryDetails("auto"), 260);
+
+    const nextUrl = `${window.location.pathname}${params.toString() ? `?${params}` : ""}#history`;
+    window.history.replaceState(null, "", nextUrl);
+  }, [accountStatus, history, openHistoryPanel, restoreHistoryItem, scrollToHistoryDetails, syncedHistoryIds]);
 
   async function duplicateCurrentRun() {
     if (!result?.tailored_text?.trim() || !uploadMeta || !downloadUrl) return;

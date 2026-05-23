@@ -68,8 +68,10 @@ function formatSavedRunDate(value: string) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-function savedRunHistoryHref(run: { id: string; accountRunId?: string }) {
-  return `/app?historyRun=${encodeURIComponent(run.accountRunId ?? run.id)}#history`;
+function savedRunHistoryHref(run: { id: string; accountRunId?: string }, options: { restore?: boolean } = {}) {
+  const params = new URLSearchParams({ historyRun: run.accountRunId ?? run.id });
+  if (options.restore) params.set("historyAction", "restore");
+  return `/app?${params.toString()}#history`;
 }
 
 function savedRunCanRestore(run: { snapshot?: Record<string, unknown> }) {
@@ -255,7 +257,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     return (
                       <Link
                         className="settings-project-item"
-                        href={savedRunHistoryHref(run)}
+                        href={savedRunHistoryHref(run, { restore: canRestore })}
                         key={run.accountRunId ?? run.id}
                         aria-label={`Open ${run.projectTitle || run.roleHint} in History`}
                       >
