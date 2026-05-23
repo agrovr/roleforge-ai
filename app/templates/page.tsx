@@ -1,57 +1,10 @@
 import Link from "next/link";
 
 import { Brand } from "../components/Brand";
-import { ResumePreview } from "../components/ResumePreview";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
-
-const templates = [
-  {
-    name: "Classic",
-    tag: "General roles",
-    variant: "classic",
-    color: "#f5e6cb",
-    detail: "A clean single-column format for broad professional applications.",
-  },
-  {
-    name: "Modern",
-    tag: "Technical resumes",
-    variant: "modern",
-    color: "#d8e0ee",
-    detail: "A denser split layout for technical skills, projects, and tooling.",
-  },
-  {
-    name: "Editorial",
-    tag: "Creative roles",
-    variant: "accent",
-    color: "#d9e7df",
-    detail: "A lighter visual rhythm for roles where presentation matters.",
-  },
-  {
-    name: "Compact",
-    tag: "Concise drafts",
-    variant: "classic",
-    color: "#efd8d1",
-    detail: "A restrained direction for shorter resumes and quick review.",
-  },
-  {
-    name: "Executive",
-    tag: "Senior roles",
-    variant: "accent",
-    color: "#f0dfbd",
-    detail: "A more spacious format for leadership summaries and selected impact.",
-  },
-  {
-    name: "Engineer",
-    tag: "Technical roles",
-    variant: "modern",
-    color: "#d8e0ee",
-    detail: "A structured direction for skills-first engineering resumes.",
-  },
-] as const;
-
-const previewNames = ["Sarah Chen", "Marcus Reed", "Priya Patel", "Alex Kim", "Daniel Cole", "Jen Park"] as const;
+import { TemplateLibrary } from "./TemplateLibrary";
 
 async function getTemplateLinks() {
   const supabase = await createRoleForgeServerClient();
@@ -97,26 +50,7 @@ export default async function TemplatesPage() {
         </div>
       </section>
 
-      <section className="templates-page-grid" aria-label="Resume template directions">
-        {templates.map((template, index) => (
-          <article className="templates-page-card" key={template.name}>
-            <div className="template-thumb" style={{ borderTopColor: template.color }}>
-              <ResumePreview
-                variant={template.variant}
-                name={previewNames[index]}
-                role={template.tag.replace(/ resumes| drafts| roles/i, "")}
-              />
-            </div>
-            <div className="templates-page-card-copy">
-              <div>
-                <span className="template-name">{template.name}</span>
-                <span className="template-tag">{template.tag}</span>
-              </div>
-              <p>{template.detail}</p>
-            </div>
-          </article>
-        ))}
-      </section>
+      <TemplateLibrary studioHref={studioHref} />
     </main>
   );
 }

@@ -16,6 +16,13 @@ import {
   type ExportFormat,
 } from "../lib/exportFormats";
 import { formatInterviewPrepForClipboard } from "../lib/generatedAssets";
+import {
+  RESUME_TEMPLATE_COOKIE,
+  RESUME_TEMPLATE_STORAGE_KEY,
+  getResumeTemplate,
+  isResumeTemplateSlug,
+  type ResumeTemplateSlug,
+} from "../lib/resumeTemplates";
 import { parseTargetUrl } from "../lib/targetLabel";
 import {
   formatHistoryTimestamp,
@@ -216,6 +223,11 @@ function StudioMetric({
 
 function fileUploadKey(file: File | null) {
   return file ? `${file.name}:${file.size}:${file.lastModified}` : "";
+}
+
+function saveResumeTemplatePreference(slug: ResumeTemplateSlug) {
+  window.localStorage.setItem(RESUME_TEMPLATE_STORAGE_KEY, slug);
+  document.cookie = `${RESUME_TEMPLATE_COOKIE}=${encodeURIComponent(slug)}; Path=/; Max-Age=31536000; SameSite=Lax`;
 }
 
 function countReadableLines(text?: string) {
@@ -970,6 +982,7 @@ export default function Page() {
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [downloadFormat, setDownloadFormat] = useState<ExportFormat>("pdf");
   const [selectedExportFormat, setSelectedExportFormat] = useState<ExportFormat>("pdf");
+  const [selectedTemplateSlug, setSelectedTemplateSlug] = useState<ResumeTemplateSlug>("classic");
   const [downloadState, setDownloadState] = useState<DownloadState>("idle");
   const [downloadMessage, setDownloadMessage] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -1036,6 +1049,22 @@ export default function Page() {
   useEffect(() => {
     setHistory(loadHistory());
     setSyncedHistoryIds(loadSyncedHistoryIds());
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requestedTemplate = params.get("template");
+    const storedTemplate = window.localStorage.getItem(RESUME_TEMPLATE_STORAGE_KEY);
+    const nextTemplate = isResumeTemplateSlug(requestedTemplate)
+      ? requestedTemplate
+      : isResumeTemplateSlug(storedTemplate)
+        ? storedTemplate
+        : "classic";
+
+    if (isResumeTemplateSlug(requestedTemplate)) saveResumeTemplatePreference(requestedTemplate);
+
+    const frame = window.requestAnimationFrame(() => setSelectedTemplateSlug(nextTemplate));
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
@@ -2322,6 +2351,7 @@ export default function Page() {
   const selectedDownloadReady = Boolean(downloadReady && downloadUrl && downloadFormat === selectedExportFormat && currentDownloadAllowed);
   const topDownloadReady = Boolean(downloadReady && downloadUrl && currentDownloadAllowed);
   const selectedFormatLabel = selectedExportFormat.toUpperCase();
+  const selectedTemplate = getResumeTemplate(selectedTemplateSlug);
   const currentDownloadLabel = downloadFormat.toUpperCase();
   const premiumExportFormat = stringDetail(workflowError?.details, "format")?.toUpperCase() ?? selectedFormatLabel;
   const premiumExportRequested = exportNotice ?? (workflowError?.code === "premium_required" ? { format: selectedExportFormat, label: premiumExportFormat } : null);
@@ -2868,6 +2898,10 @@ export default function Page() {
                       </button>
                     );
                   })}
+                </div>
+                <div className="studio-template-preference" aria-label="Selected resume template direction">
+                  <span><RoleForgeIcon name="layers" size={13} /> {selectedTemplate.name} direction</span>
+                  <Link href="/templates">Change</Link>
                 </div>
                 {selectedDownloadMessage ? (
                   <span className={`export-status-note ${downloadState}`} role="status">

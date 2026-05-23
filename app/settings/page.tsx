@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { Brand } from "../components/Brand";
@@ -10,6 +11,7 @@ import { reconcileUserSubscriptionEntitlement } from "../lib/billing/entitlement
 import { billingReadiness } from "../lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
+import { RESUME_TEMPLATE_COOKIE, getResumeTemplate } from "../lib/resumeTemplates";
 import { savedRunHistoryHref } from "../lib/savedRunLinks";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 import { loadSavedRuns } from "../lib/supabase/savedProjects";
@@ -113,6 +115,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   ]);
   const entitlement = await loadAccountEntitlement(supabase, user.id);
   const usage = await loadAccountUsage(supabase, user.id, entitlement);
+  const templateCookie = (await cookies()).get(RESUME_TEMPLATE_COOKIE)?.value;
+  const selectedTemplate = getResumeTemplate(templateCookie);
   const billingConfig = getStripeBillingConfig();
   const premiumActive = entitlement.plan === "premium" && ["active", "trialing"].includes(entitlement.billingStatus);
   const planLabel = premiumActive ? "Premium" : "Free";
@@ -328,7 +332,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 </div>
               ))}
               <div className="settings-export-actions">
-                <span>Template previews show the resume directions being prepared for export.</span>
+                <span>{selectedTemplate.name} is selected as your resume direction. Template-specific export files are being prepared.</span>
                 <Link className="btn btn-soft btn-sm settings-inline-link" href="/templates">Browse templates</Link>
               </div>
             </div>

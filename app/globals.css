@@ -1467,6 +1467,30 @@ html[data-theme="dark"] textarea {
   justify-content: flex-end;
 }
 
+.templates-selection-status {
+  width: min(1200px, 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 auto 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 88%, rgba(137, 209, 190, 0.16));
+  box-shadow: var(--shadow-soft);
+}
+
+.templates-selection-status div {
+  display: grid;
+  gap: 2px;
+}
+
+.templates-selection-status strong {
+  color: var(--ink-0);
+  font-size: 1.2rem;
+}
+
 .templates-page-grid {
   width: min(1200px, 100%);
   display: grid;
@@ -1482,6 +1506,17 @@ html[data-theme="dark"] textarea {
   border-radius: 14px;
   background: rgba(255, 253, 248, 0.9);
   box-shadow: var(--shadow-soft);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.templates-page-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--brand) 44%, var(--line));
+}
+
+.templates-page-card.selected {
+  border-color: color-mix(in srgb, var(--brand) 68%, var(--line));
+  box-shadow: 0 22px 58px rgba(122, 85, 35, 0.18);
 }
 
 .templates-page-card .template-thumb {
@@ -1499,6 +1534,19 @@ html[data-theme="dark"] textarea {
   color: var(--ink-2);
   font-size: 0.92rem;
   line-height: 1.5;
+}
+
+.template-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.template-select-button.selected {
+  background: color-mix(in srgb, var(--success) 16%, var(--surface));
+  border-color: color-mix(in srgb, var(--success) 40%, var(--line));
+  color: var(--success-strong);
 }
 
 .template-card {
@@ -4433,6 +4481,41 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
 
 .export-format-chip.disabled small {
   color: var(--muted);
+}
+
+.studio-template-preference {
+  flex: 1 0 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  max-width: 440px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 76%, rgba(137, 209, 190, 0.14));
+  color: var(--ink-2);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.studio-template-preference span,
+.studio-template-preference a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.studio-template-preference a {
+  flex: 0 0 auto;
+  color: var(--brand-strong);
+  text-decoration: none;
+}
+
+.studio-template-preference a:hover,
+.studio-template-preference a:focus-visible {
+  text-decoration: underline;
 }
 
 .export-status-note {
@@ -8207,6 +8290,22 @@ html[data-theme="dark"] .templates-page-card-copy p {
   color: var(--ink-2);
 }
 
+html[data-theme="dark"] .templates-selection-status {
+  border-color: rgba(255, 247, 233, 0.16);
+  background:
+    linear-gradient(180deg, rgba(137, 209, 190, 0.09), rgba(255, 247, 233, 0.04)),
+    var(--surface);
+}
+
+html[data-theme="dark"] .templates-selection-status strong {
+  color: var(--ink-0);
+}
+
+html[data-theme="dark"] .templates-page-card.selected {
+  border-color: rgba(222, 162, 79, 0.54);
+  box-shadow: 0 22px 58px -32px rgba(222, 162, 79, 0.56);
+}
+
 html[data-theme="dark"] .feature-card:hover,
 html[data-theme="dark"] .template-card:hover,
 html[data-theme="dark"] .faq-item.open,
@@ -8376,6 +8475,16 @@ html[data-theme="dark"] .export-format-chip.disabled:focus-visible {
 
 html[data-theme="dark"] .export-format-chip.disabled small {
   color: rgba(224, 228, 241, 0.54);
+}
+
+html[data-theme="dark"] .studio-template-preference {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: rgba(137, 209, 190, 0.09);
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .studio-template-preference a {
+  color: #f4c979;
 }
 
 html[data-theme="dark"] .stage-chip {
@@ -9405,6 +9514,18 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
   .templates-page-card .template-thumb {
     height: 320px;
+  }
+
+  .templates-selection-status,
+  .template-card-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .templates-selection-status .btn,
+  .template-card-actions .btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .settings-hero-status {
