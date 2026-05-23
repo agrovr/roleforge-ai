@@ -2482,7 +2482,14 @@ export default function Page() {
                   : "Run Tailor to generate a draft",
             },
             { label: "Keywords", value: keywordTotal ? `${presentKeywords.length}/${keywordTotal} keywords matched` : "Run needed for keyword match" },
-            { label: "Export", value: restoredRunOpen ? "Saved run open" : downloadReady ? `${downloadFormat.toUpperCase()} export ready` : "Review before export" },
+            {
+              label: "Export",
+              value: restoredRunOpen
+                ? `${selectedTemplate.name} saved run open`
+                : downloadReady
+                  ? `${selectedTemplate.name} ${downloadFormat.toUpperCase()} ready`
+                  : `${selectedTemplate.name} direction selected`,
+            },
           ];
   const previewStatusTone = (value: string, index: number) => {
     const normalized = value.toLowerCase();

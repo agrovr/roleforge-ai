@@ -17,7 +17,7 @@ export function buildWorkflowExportPayload(
   const template = getResumeTemplate(templateSlug);
 
   return {
-    filename: `tailored_resume.${format}`,
+    filename: `tailored_resume_${template.slug}.${format}`,
     title: "TAILORED RESUME",
     content,
     format,
