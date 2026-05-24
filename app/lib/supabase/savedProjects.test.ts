@@ -43,6 +43,7 @@ test("loads saved runs with project titles without embedded relationship names",
                               fit_score: 84,
                               download_format: "pdf",
                               download_url: "/api/workflow/download/run-1.pdf",
+                              export_template: "engineer",
                               payload: { studioSnapshot: { downloads: {} } },
                             },
                             {
@@ -105,6 +106,8 @@ test("loads saved runs with project titles without embedded relationship names",
   assert.equal(runs.length, 1);
   assert.equal(runs[0].projectTitle, "Senior backend role");
   assert.equal(runs[0].source, "account");
+  assert.equal(runs[0].snapshot?.templateSlug, "engineer");
+  assert.equal(runs[0].snapshot?.templateName, "Engineer");
 });
 
 test("updates a server-recorded run instead of inserting a duplicate", async () => {
@@ -152,8 +155,9 @@ test("updates a server-recorded run instead of inserting a duplicate", async () 
             calls.push({ table, action: "update", payload });
             tailorRunUpdated = true;
             assert.equal(payload.download_url, "/api/workflow/download/history-1.pdf");
+            assert.equal(payload.export_template, "editorial");
             assert.deepEqual(payload.payload, {
-              studioSnapshot: { downloadUrl: "/api/workflow/download/history-1.pdf" },
+              studioSnapshot: { downloadUrl: "/api/workflow/download/history-1.pdf", templateSlug: "editorial" },
               runId: "history-1",
             });
             return {
@@ -223,7 +227,7 @@ test("updates a server-recorded run instead of inserting a duplicate", async () 
       sourceResumeName: "resume.pdf",
       jobTarget: "https://jobs.example.com/role",
       payload: {
-        studioSnapshot: { downloadUrl: "/api/workflow/download/history-1.pdf" },
+        studioSnapshot: { downloadUrl: "/api/workflow/download/history-1.pdf", templateSlug: "editorial" },
         runId: "history-1",
       },
     },

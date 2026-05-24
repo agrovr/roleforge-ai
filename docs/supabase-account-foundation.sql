@@ -78,9 +78,22 @@ create table if not exists public.tailor_runs (
   download_format text not null default 'pdf' check (download_format in ('pdf', 'docx', 'txt')),
   download_url text,
   download_filename text,
+  export_template text not null default 'classic' check (
+    export_template in ('classic', 'modern', 'editorial', 'compact', 'executive', 'engineer')
+  ),
   payload jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
+
+alter table public.tailor_runs
+  add column if not exists export_template text not null default 'classic';
+
+alter table public.tailor_runs
+  drop constraint if exists tailor_runs_export_template_check;
+
+alter table public.tailor_runs
+  add constraint tailor_runs_export_template_check
+  check (export_template in ('classic', 'modern', 'editorial', 'compact', 'executive', 'engineer'));
 
 alter table public.resume_projects
   drop constraint if exists resume_projects_latest_run_id_fkey;

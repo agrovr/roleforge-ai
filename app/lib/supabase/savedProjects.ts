@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { accountDisplayName } from "../accountUser";
+import { getResumeTemplate, isResumeTemplateSlug, type ResumeTemplateSlug } from "../resumeTemplates";
 
 type ExportFormat = "pdf" | "docx" | "txt";
 type SavedDownloadMap = Partial<Record<ExportFormat, string>>;
@@ -54,6 +55,7 @@ type TailorRunRow = {
   fit_score: number | null;
   download_format: ExportFormat | null;
   download_url: string | null;
+  export_template?: string | null;
   payload: Record<string, unknown> | null;
 };
 
@@ -79,6 +81,49 @@ function readSnapshotDownloads(snapshot: Record<string, unknown> | undefined) {
   }, {});
 }
 
+function missingExportTemplateColumn(error: unknown) {
+  if (!error || typeof error !== "object") return false;
+  const fields = error as { code?: unknown; message?: unknown; details?: unknown; hint?: unknown };
+  const text = [fields.code, fields.message, fields.details, fields.hint].filter(Boolean).join(" ").toLowerCase();
+  return text.includes("export_template") && /(column|schema|not found|could not find|unknown)/.test(text);
+}
+
+function withoutExportTemplate<T extends { export_template?: unknown }>(payload: T) {
+  const fallbackPayload = { ...payload } as Record<string, unknown>;
+  delete fallbackPayload.export_template;
+  return fallbackPayload;
+}
+
+function normalizedTemplateSlug(value: unknown): ResumeTemplateSlug | undefined {
+  return typeof value === "string" && isResumeTemplateSlug(value) ? value : undefined;
+}
+
+function templateSlugFromSnapshot(value: unknown) {
+  if (!value || typeof value !== "object") return undefined;
+  return normalizedTemplateSlug((value as Record<string, unknown>).templateSlug);
+}
+
+function snapshotWithTemplate(snapshot: Record<string, unknown> | undefined, exportTemplate: unknown) {
+  const templateSlug = templateSlugFromSnapshot(snapshot) ?? normalizedTemplateSlug(exportTemplate);
+  if (!templateSlug) return snapshot;
+
+  const template = getResumeTemplate(templateSlug);
+  return {
+    ...(snapshot ?? {}),
+    templateSlug,
+    templateName: typeof snapshot?.templateName === "string" ? snapshot.templateName : template.name,
+  };
+}
+
+function exportTemplateForInput(input: CompletedRunSaveInput) {
+  return (
+    templateSlugFromSnapshot(input.snapshot) ??
+    templateSlugFromSnapshot(input.payload?.studioSnapshot) ??
+    normalizedTemplateSlug(input.payload?.export_template) ??
+    "classic"
+  );
+}
+
 function hasSavedProjectSurface(run: TailorRunRow) {
   if (run.download_url && run.download_url !== "#") return true;
   const snapshot = run.payload?.studioSnapshot;
@@ -86,16 +131,27 @@ function hasSavedProjectSurface(run: TailorRunRow) {
 }
 
 export async function loadSavedRuns(client: SupabaseClient, userId: string): Promise<SavedHistoryItem[]> {
-  const { data, error } = await client
-    .from("tailor_runs")
-    .select("id, client_history_id, project_id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url, payload")
-    .eq("user_id", userId)
-    .order("created_at", { ascending: false })
-    .limit(12);
+  const selectSavedRuns = (select: string) =>
+    client
+      .from("tailor_runs")
+      .select(select)
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(12);
+
+  let { data, error } = await selectSavedRuns(
+    "id, client_history_id, project_id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url, export_template, payload",
+  );
+
+  if (error && missingExportTemplateColumn(error)) {
+    ({ data, error } = await selectSavedRuns(
+      "id, client_history_id, project_id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url, payload",
+    ));
+  }
 
   if (error) throw error;
 
-  const runs = (data ?? []) as TailorRunRow[];
+  const runs = (data ?? []) as unknown as TailorRunRow[];
   const visibleRuns = runs.filter(hasSavedProjectSurface);
   const projectIds = Array.from(new Set(visibleRuns.map((run) => run.project_id).filter(Boolean)));
   const projectTitles = new Map<string, string>();
@@ -115,7 +171,8 @@ export async function loadSavedRuns(client: SupabaseClient, userId: string): Pro
   }
 
   return visibleRuns.map((run) => {
-    const snapshot = (run.payload?.studioSnapshot as Record<string, unknown> | undefined) ?? undefined;
+    const rawSnapshot = (run.payload?.studioSnapshot as Record<string, unknown> | undefined) ?? undefined;
+    const snapshot = snapshotWithTemplate(rawSnapshot, run.export_template);
     const downloadFormat = run.download_format || "pdf";
     const downloads = readSnapshotDownloads(snapshot);
     if (run.download_url && run.download_url !== "#") downloads[downloadFormat] = run.download_url;
@@ -205,6 +262,7 @@ export async function saveCompletedRun(
     download_format: input.downloadFormat || "pdf",
     download_url: input.downloadUrl,
     download_filename: input.downloadFilename || null,
+    export_template: exportTemplateForInput(input),
     payload: input.payload ?? {},
     created_at: input.createdAt,
   };
@@ -220,11 +278,17 @@ export async function saveCompletedRun(
 
   if (existingRun) {
     const runRecord = existingRun as { id: string; project_id: string };
-    const { error: updateRunError } = await client
-      .from("tailor_runs")
-      .update(runPayload)
-      .eq("id", runRecord.id)
-      .eq("user_id", user.id);
+    const updateRun = (payload: Record<string, unknown>) =>
+      client
+        .from("tailor_runs")
+        .update(payload)
+        .eq("id", runRecord.id)
+        .eq("user_id", user.id);
+
+    let { error: updateRunError } = await updateRun(runPayload);
+    if (updateRunError && missingExportTemplateColumn(updateRunError)) {
+      ({ error: updateRunError } = await updateRun(withoutExportTemplate(runPayload)));
+    }
 
     if (updateRunError) throw updateRunError;
 
@@ -266,16 +330,22 @@ export async function saveCompletedRun(
   if (projectError) throw projectError;
   const projectId = (project as { id: string }).id;
 
-  const { data: run, error: runError } = await client
-    .from("tailor_runs")
-    .insert({
-      project_id: projectId,
-      user_id: user.id,
-      client_history_id: input.id,
-      ...runPayload,
-    })
-    .select("id")
-    .single();
+  const insertRun = (payload: Record<string, unknown>) =>
+    client
+      .from("tailor_runs")
+      .insert({
+        project_id: projectId,
+        user_id: user.id,
+        client_history_id: input.id,
+        ...payload,
+      })
+      .select("id")
+      .single();
+
+  let { data: run, error: runError } = await insertRun(runPayload);
+  if (runError && missingExportTemplateColumn(runError)) {
+    ({ data: run, error: runError } = await insertRun(withoutExportTemplate(runPayload)));
+  }
 
   if (runError) throw runError;
   const runId = (run as { id: string }).id;
