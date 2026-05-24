@@ -19,6 +19,34 @@ export function downloadStatusFromHead(format: ExportFormat, status: number) {
     };
   }
 
+  if (status === 401) {
+    return {
+      state: "expired" as CheckedDownloadState,
+      message: `Sign in again to download this ${label} export.`,
+    };
+  }
+
+  if (status === 403) {
+    return {
+      state: "expired" as CheckedDownloadState,
+      message: `This ${label} export is not available for this account.`,
+    };
+  }
+
+  if (status === 400) {
+    return {
+      state: "expired" as CheckedDownloadState,
+      message: `This ${label} download link is invalid. Create a fresh export.`,
+    };
+  }
+
+  if (status === 503) {
+    return {
+      state: "expired" as CheckedDownloadState,
+      message: `${label} downloads are temporarily unavailable. Try again in a moment.`,
+    };
+  }
+
   return {
     state: "expired" as CheckedDownloadState,
     message: `This ${label} link expired. Run the export again to create a fresh file.`,

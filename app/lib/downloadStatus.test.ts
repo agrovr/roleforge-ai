@@ -17,6 +17,25 @@ test("explains premium-gated restored downloads", () => {
   });
 });
 
+test("explains account and link problems without calling them expired", () => {
+  assert.deepEqual(downloadStatusFromHead("pdf", 401), {
+    state: "expired",
+    message: "Sign in again to download this PDF export.",
+  });
+  assert.deepEqual(downloadStatusFromHead("docx", 403), {
+    state: "expired",
+    message: "This DOCX export is not available for this account.",
+  });
+  assert.deepEqual(downloadStatusFromHead("txt", 400), {
+    state: "expired",
+    message: "This TXT download link is invalid. Create a fresh export.",
+  });
+  assert.deepEqual(downloadStatusFromHead("pdf", 503), {
+    state: "expired",
+    message: "PDF downloads are temporarily unavailable. Try again in a moment.",
+  });
+});
+
 test("keeps expired or missing downloads distinct from premium gates", () => {
   assert.deepEqual(downloadStatusFromHead("txt", 404), {
     state: "expired",
