@@ -7,11 +7,30 @@ export function isUrlTarget(value: string) {
   return /^(https?:\/\/|www\.)/i.test(value.trim());
 }
 
+const READABLE_SEGMENT_OVERRIDES: Record<string, string> = {
+  ai: "AI",
+  api: "API",
+  ats: "ATS",
+  hr: "HR",
+  it: "IT",
+  ml: "ML",
+  qa: "QA",
+  roleforge: "RoleForge",
+  ui: "UI",
+  ux: "UX",
+};
+
+function readableUrlPart(value: string) {
+  const lower = value.toLowerCase();
+  if (READABLE_SEGMENT_OVERRIDES[lower]) return READABLE_SEGMENT_OVERRIDES[lower];
+  return value.length <= 3 ? value.toUpperCase() : `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+}
+
 export function readableUrlSegment(value: string) {
   return value
     .split(/[-_]+/)
     .filter(Boolean)
-    .map((part) => (part.length <= 3 ? part.toUpperCase() : `${part.charAt(0).toUpperCase()}${part.slice(1)}`))
+    .map(readableUrlPart)
     .join(" ");
 }
 

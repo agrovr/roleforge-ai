@@ -16,7 +16,7 @@ test("uses company slugs from common job boards", () => {
 
   assert.deepEqual(parseTargetUrl("https://jobs.ashbyhq.com/roleforge-ai/example"), {
     host: "jobs.ashbyhq.com",
-    label: "Roleforge AI job target",
+    label: "RoleForge AI job target",
   });
 
   assert.deepEqual(parseTargetUrl("https://jobs.smartrecruiters.com/affirm/744000063770175"), {
@@ -26,7 +26,19 @@ test("uses company slugs from common job boards", () => {
 
   assert.deepEqual(parseTargetUrl("https://apply.workable.com/roleforge-ai/j/1234567890"), {
     host: "apply.workable.com",
-    label: "Roleforge AI job target",
+    label: "RoleForge AI job target",
+  });
+});
+
+test("preserves common acronym and brand casing in readable URL labels", () => {
+  assert.deepEqual(parseTargetUrl("https://www.roleforge-ai.com/careers"), {
+    host: "roleforge-ai.com",
+    label: "RoleForge AI job target",
+  });
+
+  assert.deepEqual(parseTargetUrl("https://api-first.dev/jobs"), {
+    host: "api-first.dev",
+    label: "API First job target",
   });
 });
 
