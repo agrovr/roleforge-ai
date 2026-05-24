@@ -128,16 +128,19 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     redirect("/login?next=/settings&account=signin-required");
   }
 
-  const syncBillingEntitlement = checkoutSessionId
-    ? syncCheckoutSessionEntitlement(user.id, checkoutSessionId)
-        .then((synced) => synced || reconcileUserSubscriptionEntitlement(user.id))
-    : reconcileUserSubscriptionEntitlement(user.id);
+  if (checkoutSessionId) {
+    const syncedCheckout = await syncCheckoutSessionEntitlement(user.id, checkoutSessionId).catch(() => false);
+
+    if (syncedCheckout) {
+      redirect("/settings?billing=checkout-success#billing");
+    }
+  }
 
   const [projectCount, runCount, recentSavedRuns] = await Promise.all([
     countRows(supabase, "resume_projects", user.id),
     countRows(supabase, "tailor_runs", user.id),
     loadSavedRuns(supabase, user.id).catch(() => []),
-    syncBillingEntitlement.catch(() => false),
+    reconcileUserSubscriptionEntitlement(user.id).catch(() => false),
   ]);
   const entitlement = await loadAccountEntitlement(supabase, user.id);
   const usage = await loadAccountUsage(supabase, user.id, entitlement);
