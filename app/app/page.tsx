@@ -8,7 +8,7 @@ import { ThemeToggle } from "../components/ThemeToggle";
 import { writeClipboardText } from "../lib/clipboard";
 import { downloadStatusFromHead } from "../lib/downloadStatus";
 import { normalizeWorkflowDownloadUrl, workflowDownloadUrl } from "../lib/downloadUrls";
-import type { AccountEntitlement } from "../lib/entitlements";
+import { FREE_ENTITLEMENT, type AccountEntitlement } from "../lib/entitlements";
 import {
   customerExportFormats,
   exportDownloadReadyForSelection,
@@ -64,6 +64,7 @@ import {
 import { createRoleForgeBrowserClient } from "../lib/supabase/client";
 import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun } from "../lib/supabase/savedProjectClient";
 import { tailorActionState } from "../lib/tailorAction";
+import { monthlyRunAllowanceSentence, runWord } from "../lib/usage";
 
 type AtsIssue = { severity: string; issue: string; fix: string };
 type AtsReport = { issues: AtsIssue[] };
@@ -1030,11 +1031,11 @@ export default function Page() {
   const usage = accountStatus?.usage ?? null;
   const errorLimit = numberDetail(workflowError?.details, "monthly_limit");
   const errorRuns = numberDetail(workflowError?.details, "monthly_runs");
-  const monthlyRunLimit = usage?.monthlyRunLimit ?? errorLimit ?? 5;
+  const monthlyRunLimit = usage ? usage.monthlyRunLimit : errorLimit ?? FREE_ENTITLEMENT.monthlyRunLimit;
   const monthlyRuns = usage?.monthlyRuns ?? errorRuns ?? monthlyRunLimit;
   const resetAt = usage?.currentPeriodEnd || stringDetail(workflowError?.details, "reset_at");
   const resetLabel = formatResetDate(resetAt);
-  const usageLabel = typeof monthlyRunLimit === "number" ? `${monthlyRuns}/${monthlyRunLimit} runs used` : "Premium runs are unlimited";
+  const usageLabel = typeof monthlyRunLimit === "number" ? `${monthlyRuns}/${monthlyRunLimit} ${runWord(monthlyRuns)} used` : "Premium runs are unlimited";
 
   const workflowHeaders = useCallback(async (extra: Record<string, string> = {}) => {
     if (!supabaseClient) return extra;
@@ -2599,8 +2600,8 @@ export default function Page() {
       label: "Usage",
       detail: accountStatus?.usage
         ? accountStatus.usage.monthlyRunLimit === null
-          ? `${accountStatus.usage.monthlyRuns} runs this month. Premium is unlimited.`
-          : `${accountStatus.usage.monthlyRuns}/${accountStatus.usage.monthlyRunLimit} free runs used this month.`
+          ? `${accountStatus.usage.monthlyRuns} ${runWord(accountStatus.usage.monthlyRuns)} this month. Premium is unlimited.`
+          : `${accountStatus.usage.monthlyRuns}/${accountStatus.usage.monthlyRunLimit} free ${runWord(accountStatus.usage.monthlyRuns)} used this month.`
         : "Sign in to see run usage.",
       href: "/settings#usage",
     },
@@ -3331,8 +3332,7 @@ export default function Page() {
                   <div className="rf-callout upgrade">
                     <strong>Free monthly limit reached</strong>
                     <p>
-                      Your free plan includes {typeof monthlyRunLimit === "number" ? monthlyRunLimit : 5} completed tailoring runs each month.
-                      Upgrade to keep tailoring today.
+                      {monthlyRunAllowanceSentence(typeof monthlyRunLimit === "number" ? monthlyRunLimit : FREE_ENTITLEMENT.monthlyRunLimit)}
                     </p>
                     <div className="rf-callout-meta">
                       <span>{usageLabel}</span>
