@@ -38,12 +38,14 @@ function getParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function billingNotice(value: string | undefined) {
+function billingNotice(value: string | undefined, options?: { premiumActive?: boolean }) {
   switch (value) {
     case "checkout-success":
       return {
         tone: "success",
-        text: "Checkout is complete. Premium access will appear here as soon as the subscription syncs.",
+        text: options?.premiumActive
+          ? "Checkout is complete. Premium access is active for this account."
+          : "Checkout is complete. Premium access will appear here as soon as the subscription syncs.",
       };
     case "checkout-canceled":
       return {
@@ -112,7 +114,7 @@ async function countRows(
 
 export default async function SettingsPage({ searchParams }: { searchParams: SettingsSearchParams }) {
   const params = await searchParams;
-  const notice = billingNotice(getParam(params.billing));
+  const billingParam = getParam(params.billing);
   const checkoutSessionId = getParam(params.session_id);
   const supabase = await createRoleForgeServerClient();
 
@@ -148,6 +150,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const selectedTemplate = getResumeTemplate(templateCookie);
   const billingConfig = getStripeBillingConfig();
   const premiumActive = entitlement.plan === "premium" && ["active", "trialing"].includes(entitlement.billingStatus);
+  const notice = billingNotice(billingParam, { premiumActive });
   const planLabel = premiumActive ? "Premium" : "Free";
   const premiumEnding = premiumActive && entitlement.cancelAtPeriodEnd;
   const premiumEndLabel = formatPlanDate(entitlement.cancelAt || entitlement.currentPeriodEnd);
