@@ -197,6 +197,94 @@ test("loads saved runs when the export template column is not in the schema cach
   assert.equal(runs[0].snapshot?.templateName, "Compact");
 });
 
+test("sanitizes loaded saved run download links before they reach history", async () => {
+  const client = {
+    from(table: string) {
+      if (table === "tailor_runs") {
+        return {
+          select() {
+            return {
+              eq() {
+                return {
+                  order() {
+                    return {
+                      async limit() {
+                        return {
+                          data: [
+                            {
+                              id: "run-unsafe",
+                              client_history_id: "history-unsafe",
+                              project_id: "project-unsafe",
+                              created_at: "2026-05-21T12:00:00.000Z",
+                              source_resume_name: "unsafe.pdf",
+                              job_target: "Unsafe target",
+                              mode: "balanced",
+                              fit_score: 63,
+                              download_format: "pdf",
+                              download_url: "https://downloads.example/unsafe.pdf",
+                              payload: {
+                                studioSnapshot: {
+                                  downloadUrl: "javascript:alert(1)",
+                                  downloadFormat: "txt",
+                                  downloads: {
+                                    pdf: "https://downloads.example/unsafe.pdf",
+                                    docx: "/api/workflow/download/history-safe.docx",
+                                    txt: "/api/workflow/download/.env",
+                                  },
+                                  templateSlug: "classic",
+                                },
+                              },
+                            },
+                          ],
+                          error: null,
+                        };
+                      },
+                    };
+                  },
+                };
+              },
+            };
+          },
+        };
+      }
+
+      if (table === "resume_projects") {
+        return {
+          select() {
+            return {
+              eq() {
+                return {
+                  async in() {
+                    return {
+                      data: [{ id: "project-unsafe", title: "Unsafe saved project" }],
+                      error: null,
+                    };
+                  },
+                };
+              },
+            };
+          },
+        };
+      }
+
+      throw new Error(`Unexpected table: ${table}`);
+    },
+  } as unknown as SupabaseClient;
+
+  const runs = await loadSavedRuns(client, "user-123");
+
+  assert.equal(runs.length, 1);
+  assert.equal(runs[0].downloadUrl, "#");
+  assert.deepEqual(runs[0].downloads, {
+    docx: "/api/workflow/download/history-safe.docx",
+  });
+  assert.deepEqual(runs[0].snapshot?.downloads, {
+    docx: "/api/workflow/download/history-safe.docx",
+  });
+  assert.equal(runs[0].snapshot?.downloadUrl, undefined);
+  assert.equal(runs[0].snapshot?.downloadFormat, undefined);
+});
+
 test("updates a server-recorded run instead of inserting a duplicate", async () => {
   const calls: Array<{ table: string; action: string; payload?: unknown }> = [];
   let tailorRunUpdated = false;

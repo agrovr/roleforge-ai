@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { accountDisplayName } from "../accountUser";
+import { parseWorkflowDownloadUrl } from "../downloadUrls";
 import { getResumeTemplate, isResumeTemplateSlug, type ResumeTemplateSlug } from "../resumeTemplates";
 
 type ExportFormat = "pdf" | "docx" | "txt";
@@ -76,9 +77,33 @@ function readSnapshotDownloads(snapshot: Record<string, unknown> | undefined) {
 
   return (["pdf", "docx", "txt"] as ExportFormat[]).reduce<SavedDownloadMap>((downloads, format) => {
     const value = (rawDownloads as Record<string, unknown>)[format];
-    if (typeof value === "string" && value && value !== "#") downloads[format] = value;
+    const parsedDownload = parseWorkflowDownloadUrl(value);
+    if (parsedDownload.ok && parsedDownload.format === format) downloads[format] = parsedDownload.url;
     return downloads;
   }, {});
+}
+
+function safeDownloadForFormat(url: unknown, format: ExportFormat) {
+  const parsedDownload = parseWorkflowDownloadUrl(url);
+  return parsedDownload.ok && parsedDownload.format === format ? parsedDownload.url : null;
+}
+
+function snapshotWithDownloads(snapshot: Record<string, unknown> | undefined, downloads: SavedDownloadMap) {
+  if (!snapshot) return snapshot;
+
+  const safeSnapshot: Record<string, unknown> = { ...snapshot, downloads };
+  const snapshotFormat = typeof safeSnapshot.downloadFormat === "string" ? safeSnapshot.downloadFormat : undefined;
+  const snapshotUrl = safeDownloadForFormat(safeSnapshot.downloadUrl, snapshotFormat as ExportFormat);
+
+  if (snapshotUrl && snapshotFormat) {
+    safeSnapshot.downloadUrl = snapshotUrl;
+    safeSnapshot.downloadFormat = snapshotFormat;
+    return safeSnapshot;
+  }
+
+  delete safeSnapshot.downloadUrl;
+  delete safeSnapshot.downloadFormat;
+  return safeSnapshot;
 }
 
 function missingExportTemplateColumn(error: unknown) {
@@ -172,10 +197,12 @@ export async function loadSavedRuns(client: SupabaseClient, userId: string): Pro
 
   return visibleRuns.map((run) => {
     const rawSnapshot = (run.payload?.studioSnapshot as Record<string, unknown> | undefined) ?? undefined;
-    const snapshot = snapshotWithTemplate(rawSnapshot, run.export_template);
+    const templateSnapshot = snapshotWithTemplate(rawSnapshot, run.export_template);
     const downloadFormat = run.download_format || "pdf";
-    const downloads = readSnapshotDownloads(snapshot);
-    if (run.download_url && run.download_url !== "#") downloads[downloadFormat] = run.download_url;
+    const downloads = readSnapshotDownloads(templateSnapshot);
+    const runDownloadUrl = safeDownloadForFormat(run.download_url, downloadFormat);
+    if (runDownloadUrl) downloads[downloadFormat] = runDownloadUrl;
+    const snapshot = snapshotWithDownloads(templateSnapshot, downloads);
 
     return {
       id: run.client_history_id || run.id,
@@ -186,7 +213,7 @@ export async function loadSavedRuns(client: SupabaseClient, userId: string): Pro
       filename: run.source_resume_name || "Saved resume",
       mode: run.mode || "balanced",
       score: run.fit_score ?? 0,
-      downloadUrl: run.download_url || "#",
+      downloadUrl: runDownloadUrl || "#",
       downloadFormat,
       downloads,
       roleHint: titleFromTarget(run.job_target ?? undefined),
