@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 
 import { withAccountDatabase } from "@/app/lib/supabase/accountDatabase";
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
-import { loadSavedRuns, saveCompletedRun, type CompletedRunSaveInput } from "@/app/lib/supabase/savedProjects";
+import { parseCompletedRunSaveInput } from "@/app/lib/supabase/savedProjectInput";
+import { loadSavedRuns, saveCompletedRun } from "@/app/lib/supabase/savedProjects";
 
 async function requireAccount() {
   const routeClient = await createRoleForgeRouteClient();
@@ -54,11 +55,28 @@ export async function POST(request: Request) {
   const account = await requireAccount();
   if ("error" in account) return account.error;
 
+  let payload: unknown;
   try {
-    const input = (await request.json()) as CompletedRunSaveInput;
+    payload = await request.json();
+  } catch {
+    return withSupabaseCookies(
+      NextResponse.json({ error: "Saved project data is incomplete." }, { status: 400 }),
+      account.routeClient.cookiesToSet,
+    );
+  }
+
+  const parsedInput = parseCompletedRunSaveInput(payload);
+  if (!parsedInput.ok) {
+    return withSupabaseCookies(
+      NextResponse.json({ error: parsedInput.error }, { status: 400 }),
+      account.routeClient.cookiesToSet,
+    );
+  }
+
+  try {
     const savedRun = await withAccountDatabase(
       account.routeClient.supabase,
-      (dbClient) => saveCompletedRun(dbClient, input, account.user),
+      (dbClient) => saveCompletedRun(dbClient, parsedInput.input, account.user),
       { label: "Saved project save database operation" },
     );
     return withSupabaseCookies(NextResponse.json(savedRun), account.routeClient.cookiesToSet);
