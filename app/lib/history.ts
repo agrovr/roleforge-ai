@@ -49,6 +49,13 @@ export type HistoryAvailabilityStatus = {
   tone: "restore" | "download" | "legacy";
 };
 
+export type HistoryRunActionCopy = {
+  downloadFallbackLabel: string;
+  downloadFallbackTitle: string;
+  exportHeading: string;
+  blockedExportTitle: string;
+};
+
 export const EXPORT_FORMAT_ORDER: ExportFormat[] = ["pdf", "docx", "txt"];
 
 export function hasRestorableSnapshot(item: HistoryItem) {
@@ -230,6 +237,40 @@ export function historyGroupStatus(group: HistoryGroup): HistoryAvailabilityStat
   }
 
   return { label: "Needs re-export", detail, tone: "legacy" };
+}
+
+export function historyRunActionCopy(
+  item: HistoryItem,
+  formatLabel: string,
+  entitlement?: ExportEntitlement | null,
+): HistoryRunActionCopy {
+  const restorable = hasRestorableSnapshot(item);
+  const hasAllowedDownload = historyDownloadEntries(item, entitlement).length > 0;
+
+  if (restorable) {
+    return {
+      downloadFallbackLabel: `Export ${formatLabel} first`,
+      downloadFallbackTitle: `Create a fresh ${formatLabel} from the saved tailored resume.`,
+      exportHeading: "Create a fresh file from the saved tailored resume",
+      blockedExportTitle: "",
+    };
+  }
+
+  if (hasAllowedDownload) {
+    return {
+      downloadFallbackLabel: `Download ${formatLabel}`,
+      downloadFallbackTitle: `Download the saved ${formatLabel} export.`,
+      exportHeading: "Only the saved download link is available",
+      blockedExportTitle: "This older saved run cannot be re-exported because the tailored draft was not saved.",
+    };
+  }
+
+  return {
+    downloadFallbackLabel: "Run Tailor again",
+    downloadFallbackTitle: "Run Tailor again to create a fresh export.",
+    exportHeading: "Run Tailor again to create a fresh export",
+    blockedExportTitle: "This older saved run cannot be re-exported because the tailored draft was not saved.",
+  };
 }
 
 export function historyVersionLabel(total: number, index: number) {

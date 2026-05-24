@@ -35,6 +35,7 @@ import {
   historyGroupSummary,
   historyGroupStatus,
   historyProjectTitle,
+  historyRunActionCopy,
   historyRunStatus,
   historyStatusLabel,
   historyStorageLabel,
@@ -2720,6 +2721,9 @@ export default function Page() {
     selectedHistoryPrimaryDownload?.format.toUpperCase() ?? visibleSelectedHistoryItem?.downloadFormat?.toUpperCase() ?? "PDF";
   const selectedHistoryTemplateName = visibleSelectedHistoryItem ? historyTemplateNameFor(visibleSelectedHistoryItem) : "";
   const selectedHistoryStatus = visibleSelectedHistoryItem ? historyRunStatus(visibleSelectedHistoryItem, accountStatus?.entitlement) : null;
+  const selectedHistoryActionCopy = visibleSelectedHistoryItem
+    ? historyRunActionCopy(visibleSelectedHistoryItem, selectedHistoryPrimaryDownloadLabel, accountStatus?.entitlement)
+    : null;
   const editorRailActive = activeTab === "score" || activeTab === "resume";
   const targetRailActive = activeTab === "gap";
   const suggestionsRailActive = activeTab === "changes";
@@ -3651,15 +3655,15 @@ export default function Page() {
                           Download {selectedHistoryPrimaryDownloadLabel} <RoleForgeIcon name="download" size={12} />
                         </a>
                       ) : (
-                        <button className="btn btn-soft btn-sm" type="button" disabled>
-                          Download {selectedHistoryPrimaryDownloadLabel} <RoleForgeIcon name="download" size={12} />
+                        <button className="btn btn-soft btn-sm" type="button" disabled title={selectedHistoryActionCopy?.downloadFallbackTitle}>
+                          {selectedHistoryActionCopy?.downloadFallbackLabel ?? `Download ${selectedHistoryPrimaryDownloadLabel}`} <RoleForgeIcon name="download" size={12} />
                         </button>
                       )}
                     </div>
                     <div className="history-export-panel">
                       <div>
                         <span className="eyebrow">Export this run</span>
-                        <strong>{hasRestorableSnapshot(visibleSelectedHistoryItem) ? "Create a fresh file from the saved tailored resume" : "Only the saved download link is available"}</strong>
+                        <strong>{selectedHistoryActionCopy?.exportHeading ?? "Create a fresh file from the saved tailored resume"}</strong>
                       </div>
                       <div className="history-export-actions" aria-label="Export selected saved run">
                         {exportFormats.map((format) => {
@@ -3677,7 +3681,7 @@ export default function Page() {
                               key={`history-export-${visibleSelectedHistoryItem.id}-${format.format}`}
                               onClick={() => void exportHistoryItem(visibleSelectedHistoryItem, format.format)}
                               disabled={blocked || Boolean(historyExportRequest)}
-                              title={locked ? `${label} exports unlock with Premium` : `Export ${label}`}
+                              title={blocked ? selectedHistoryActionCopy?.blockedExportTitle : locked ? `${label} exports unlock with Premium` : `Export ${label}`}
                               aria-label={locked ? `${label} export requires Premium` : `Export ${label}`}
                             >
                               {locked ? <RoleForgeIcon name="lock" size={12} /> : null}

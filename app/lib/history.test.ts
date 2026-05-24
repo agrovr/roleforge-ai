@@ -7,6 +7,7 @@ import {
   historyDownloads,
   historyGroupSummary,
   historyGroupStatus,
+  historyRunActionCopy,
   historyRunStatus,
   historyStorageLabel,
   historyVersionLabel,
@@ -253,6 +254,39 @@ test("summarizes saved project availability across grouped versions", () => {
     label: "Download ready",
     detail: "1 download-ready · 1 needs re-export",
     tone: "download",
+  });
+});
+
+test("guides saved-run download and export actions by availability", () => {
+  assert.deepEqual(historyRunActionCopy(historyItem({
+    downloadUrl: "#",
+    downloads: {},
+    snapshot: { result: { tailored_text: "Tailored draft" } },
+  }), "PDF"), {
+    downloadFallbackLabel: "Export PDF first",
+    downloadFallbackTitle: "Create a fresh PDF from the saved tailored resume.",
+    exportHeading: "Create a fresh file from the saved tailored resume",
+    blockedExportTitle: "",
+  });
+
+  assert.deepEqual(historyRunActionCopy(historyItem({
+    snapshot: undefined,
+  }), "PDF"), {
+    downloadFallbackLabel: "Download PDF",
+    downloadFallbackTitle: "Download the saved PDF export.",
+    exportHeading: "Only the saved download link is available",
+    blockedExportTitle: "This older saved run cannot be re-exported because the tailored draft was not saved.",
+  });
+
+  assert.deepEqual(historyRunActionCopy(historyItem({
+    downloadUrl: "#",
+    downloads: {},
+    snapshot: undefined,
+  }), "PDF"), {
+    downloadFallbackLabel: "Run Tailor again",
+    downloadFallbackTitle: "Run Tailor again to create a fresh export.",
+    exportHeading: "Run Tailor again to create a fresh export",
+    blockedExportTitle: "This older saved run cannot be re-exported because the tailored draft was not saved.",
   });
 });
 
