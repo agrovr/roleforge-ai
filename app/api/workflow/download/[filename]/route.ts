@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
 
 import { readDownloadProxyError } from "@/app/lib/downloadProxy";
+import { parseWorkflowDownloadFilename } from "@/app/lib/downloadUrls";
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
 
 type DownloadContext = {
   params: Promise<{ filename: string }>;
 };
-
-const SAFE_EXPORT_FILENAME = /^[A-Za-z0-9._-]+$/;
 
 function backendBaseUrl() {
   return process.env.NEXT_PUBLIC_BACKEND_URL?.trim().replace(/\/+$/, "") ?? "";
@@ -57,7 +56,7 @@ async function proxyDownload(request: Request, context: DownloadContext) {
   if ("error" in account) return account.error;
 
   const { filename } = await context.params;
-  const cleanFilename = filename.trim();
+  const parsedFilename = parseWorkflowDownloadFilename(filename);
   const baseUrl = backendBaseUrl();
 
   if (!baseUrl) {
@@ -67,14 +66,14 @@ async function proxyDownload(request: Request, context: DownloadContext) {
     );
   }
 
-  if (!SAFE_EXPORT_FILENAME.test(cleanFilename)) {
+  if (!parsedFilename.ok) {
     return withSupabaseCookies(
-      NextResponse.json({ error: "This download link is invalid." }, { status: 400 }),
+      NextResponse.json({ error: parsedFilename.error }, { status: 400 }),
       account.routeClient.cookiesToSet,
     );
   }
 
-  const upstream = await fetch(`${baseUrl}/download/${encodeURIComponent(cleanFilename)}`, {
+  const upstream = await fetch(`${baseUrl}/download/${encodeURIComponent(parsedFilename.filename)}`, {
     method: request.method,
     headers: {
       Authorization: `Bearer ${account.token}`,
