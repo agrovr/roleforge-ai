@@ -28,6 +28,27 @@ export function exportFormatAllowed(format: ExportFormat = "pdf", entitlement?: 
   return Boolean(entitlement?.exportFormats[format]);
 }
 
+export function exportDownloadReadyForSelection({
+  downloadFormat,
+  downloadState,
+  downloadUrl,
+  selectedFormat,
+  entitlement,
+}: {
+  downloadFormat: ExportFormat;
+  downloadState: "idle" | "checking" | "ready" | "expired";
+  downloadUrl?: string | null;
+  selectedFormat: ExportFormat;
+  entitlement?: ExportEntitlement | null;
+}) {
+  return Boolean(
+    downloadUrl &&
+      downloadState === "ready" &&
+      downloadFormat === selectedFormat &&
+      exportFormatAllowed(downloadFormat, entitlement),
+  );
+}
+
 export function customerExportFormats(formats?: ExportCapability[], entitlement?: ExportEntitlement | null) {
   const pdfCapability = formats?.find((format) => format.format === "pdf");
   const premiumFormats: ExportFormat[] = ["docx", "txt"];

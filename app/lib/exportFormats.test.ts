@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { customerExportFormats, exportFormatAllowed, type ExportEntitlement } from "./exportFormats";
+import { customerExportFormats, exportDownloadReadyForSelection, exportFormatAllowed, type ExportEntitlement } from "./exportFormats";
 
 const freeEntitlement: ExportEntitlement = {
   plan: "free",
@@ -55,4 +55,41 @@ test("checks individual download eligibility", () => {
   assert.equal(exportFormatAllowed("pdf", freeEntitlement), true);
   assert.equal(exportFormatAllowed("docx", freeEntitlement), false);
   assert.equal(exportFormatAllowed("txt", premiumEntitlement), true);
+});
+
+test("marks downloads ready only for the selected export format", () => {
+  assert.equal(
+    exportDownloadReadyForSelection({
+      downloadFormat: "pdf",
+      downloadState: "ready",
+      downloadUrl: "/api/workflow/download/run.pdf",
+      selectedFormat: "pdf",
+      entitlement: freeEntitlement,
+    }),
+    true,
+  );
+
+  assert.equal(
+    exportDownloadReadyForSelection({
+      downloadFormat: "pdf",
+      downloadState: "ready",
+      downloadUrl: "/api/workflow/download/run.pdf",
+      selectedFormat: "docx",
+      entitlement: premiumEntitlement,
+    }),
+    false,
+  );
+});
+
+test("keeps premium downloads gated even if a stale link exists", () => {
+  assert.equal(
+    exportDownloadReadyForSelection({
+      downloadFormat: "docx",
+      downloadState: "ready",
+      downloadUrl: "/api/workflow/download/run.docx",
+      selectedFormat: "docx",
+      entitlement: freeEntitlement,
+    }),
+    false,
+  );
 });

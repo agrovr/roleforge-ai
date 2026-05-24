@@ -11,6 +11,7 @@ import { normalizeWorkflowDownloadUrl, workflowDownloadUrl } from "../lib/downlo
 import type { AccountEntitlement } from "../lib/entitlements";
 import {
   customerExportFormats,
+  exportDownloadReadyForSelection,
   exportFormatAllowed,
   type ExportCapability,
   type ExportFormat,
@@ -2368,9 +2369,14 @@ export default function Page() {
   const exportFormats = customerExportFormats(capabilities?.export_formats, accountStatus?.entitlement);
   const selectedExportCapability = exportFormats.find((format) => format.format === selectedExportFormat) ?? exportFormats[0];
   const selectedExportAllowed = Boolean(selectedExportCapability?.enabled);
-  const currentDownloadAllowed = exportFormatAllowed(downloadFormat, accountStatus?.entitlement);
-  const selectedDownloadReady = Boolean(downloadReady && downloadUrl && downloadFormat === selectedExportFormat && currentDownloadAllowed);
-  const topDownloadReady = Boolean(downloadReady && downloadUrl && currentDownloadAllowed);
+  const selectedDownloadReady = exportDownloadReadyForSelection({
+    downloadFormat,
+    downloadState,
+    downloadUrl,
+    selectedFormat: selectedExportFormat,
+    entitlement: accountStatus?.entitlement,
+  });
+  const topDownloadReady = selectedDownloadReady;
   const selectedFormatLabel = selectedExportFormat.toUpperCase();
   const selectedTemplate = getResumeTemplate(selectedTemplateSlug);
   const backendExportTemplates = capabilities?.export_templates ?? [];
