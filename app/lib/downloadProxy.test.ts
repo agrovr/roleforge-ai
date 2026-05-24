@@ -24,10 +24,23 @@ test("keeps string download errors compatible", () => {
   });
 });
 
-test("falls back for empty or non-json upstream responses", async () => {
+test("uses status-aware fallbacks for empty or non-json upstream responses", async () => {
   const payload = await readDownloadProxyError(new Response("", { status: 402 }));
 
   assert.deepEqual(payload, {
-    error: "This export could not be downloaded.",
+    error: "This export requires an active Premium plan.",
+    code: "premium_required",
+  });
+
+  assert.deepEqual(await readDownloadProxyError(new Response("", { status: 404 })), {
+    error: "This export file is no longer available.",
+    code: "export_not_found",
+  });
+});
+
+test("keeps backend messages but fills missing codes from status", () => {
+  assert.deepEqual(downloadProxyErrorPayload({ error: { message: "Premium required." } }, 402), {
+    error: "Premium required.",
+    code: "premium_required",
   });
 });
