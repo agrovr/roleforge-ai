@@ -31,7 +31,7 @@ type EntitlementSubscriptionRow = {
   stripe_subscription_id: string | null;
 };
 
-const PREMIUM_FEATURES = {
+export const PREMIUM_FEATURES = {
   export_pdf: true,
   export_docx: true,
   export_txt: true,
@@ -39,13 +39,17 @@ const PREMIUM_FEATURES = {
   monthly_run_limit: null,
 };
 
-const FREE_FEATURES = {
+export const FREE_FEATURES = {
   export_pdf: true,
   export_docx: false,
   export_txt: false,
   project_storage: true,
   monthly_run_limit: 5,
 };
+
+export function billingFeaturesForPremiumAccess(premiumActive: boolean) {
+  return premiumActive ? PREMIUM_FEATURES : FREE_FEATURES;
+}
 
 export function normalizeBillingStatus(status?: Stripe.Subscription.Status | null): BillingStatus {
   if (
@@ -97,7 +101,7 @@ export async function upsertEntitlement(patch: EntitlementPatch) {
       cancel_at_period_end: patch.cancelAtPeriodEnd ?? false,
       cancel_at: patch.cancelAt ?? null,
       canceled_at: patch.canceledAt ?? null,
-      features: premiumActive ? PREMIUM_FEATURES : FREE_FEATURES,
+      features: billingFeaturesForPremiumAccess(premiumActive),
       updated_at: new Date().toISOString(),
     }, { onConflict: "user_id" });
 

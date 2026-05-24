@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { FREE_FEATURES } from "@/app/lib/billing/entitlements";
 import { absoluteUrl, getStripeBillingConfig, getStripeClient, priceIdForInterval, type BillingInterval } from "@/app/lib/billing/stripe";
 import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
 import { createRoleForgeServiceClient } from "@/app/lib/supabase/service";
@@ -66,12 +67,7 @@ export async function POST(request: Request) {
         plan: "free",
         billing_status: "none",
         stripe_customer_id: customerId,
-        features: {
-          export_pdf: true,
-          export_docx: false,
-          export_txt: false,
-          project_storage: true,
-        },
+        features: FREE_FEATURES,
         updated_at: new Date().toISOString(),
       }, { onConflict: "user_id" });
   }

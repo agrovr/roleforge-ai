@@ -3,7 +3,13 @@ import test from "node:test";
 
 import type Stripe from "stripe";
 
-import { entitlementPatchFromSubscription, normalizeBillingStatus } from "./entitlements";
+import {
+  FREE_FEATURES,
+  PREMIUM_FEATURES,
+  billingFeaturesForPremiumAccess,
+  entitlementPatchFromSubscription,
+  normalizeBillingStatus,
+} from "./entitlements";
 
 function subscriptionFixture(overrides: Partial<Stripe.Subscription> = {}) {
   const base = {
@@ -81,4 +87,15 @@ test("does not treat past_due as premium access", () => {
 
   assert.equal(patch.plan, "free");
   assert.equal(patch.billingStatus, "past_due");
+});
+
+test("exposes shared billing feature payloads for checkout and reconciliation", () => {
+  assert.deepEqual(billingFeaturesForPremiumAccess(false), FREE_FEATURES);
+  assert.deepEqual(billingFeaturesForPremiumAccess(true), PREMIUM_FEATURES);
+  assert.equal(FREE_FEATURES.monthly_run_limit, 5);
+  assert.equal(FREE_FEATURES.export_docx, false);
+  assert.equal(FREE_FEATURES.export_txt, false);
+  assert.equal(PREMIUM_FEATURES.monthly_run_limit, null);
+  assert.equal(PREMIUM_FEATURES.export_docx, true);
+  assert.equal(PREMIUM_FEATURES.export_txt, true);
 });
