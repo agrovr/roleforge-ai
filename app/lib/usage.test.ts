@@ -3,7 +3,13 @@ import test from "node:test";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { currentUsagePeriod, loadAccountUsage } from "./usage";
+import {
+  currentUsagePeriod,
+  loadAccountUsage,
+  monthlyRunAllowanceLabel,
+  monthlyRunAllowanceSentence,
+  usageProgressPercent,
+} from "./usage";
 
 const freeEntitlement = {
   plan: "free" as const,
@@ -99,4 +105,26 @@ test("treats premium usage as unlimited while still counting runs", async () => 
   assert.equal(usage.monthlyRunLimit, null);
   assert.equal(usage.remainingRuns, null);
   assert.equal(usage.runLimited, false);
+});
+
+test("formats monthly allowance copy from entitlement limits", () => {
+  assert.equal(monthlyRunAllowanceLabel(1), "1 run each month");
+  assert.equal(monthlyRunAllowanceLabel(5), "5 runs each month");
+  assert.equal(monthlyRunAllowanceLabel(null), "Unlimited runs");
+
+  assert.equal(
+    monthlyRunAllowanceSentence(1),
+    "Free includes 1 completed tailoring run each month. Upgrade when you need more room.",
+  );
+  assert.equal(
+    monthlyRunAllowanceSentence(null),
+    "Premium does not count completed runs against a monthly cap.",
+  );
+});
+
+test("calculates usage progress without invalid widths", () => {
+  assert.equal(usageProgressPercent({ monthlyRuns: 3, monthlyRunLimit: 5, runLimited: false }), 60);
+  assert.equal(usageProgressPercent({ monthlyRuns: 10, monthlyRunLimit: 5, runLimited: true }), 100);
+  assert.equal(usageProgressPercent({ monthlyRuns: 0, monthlyRunLimit: 0, runLimited: true }), 100);
+  assert.equal(usageProgressPercent({ monthlyRuns: 0, monthlyRunLimit: null, runLimited: false }), 100);
 });

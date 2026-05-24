@@ -16,7 +16,13 @@ import { RESUME_TEMPLATE_COOKIE, getResumeTemplate, isResumeTemplateSlug } from 
 import { savedRunHistoryHref } from "../lib/savedRunLinks";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 import { loadSavedRuns } from "../lib/supabase/savedProjects";
-import { loadAccountUsage } from "../lib/usage";
+import {
+  loadAccountUsage,
+  monthlyRunAllowanceLabel,
+  monthlyRunAllowanceSentence,
+  runWord,
+  usageProgressPercent,
+} from "../lib/usage";
 import { SettingsSectionNav } from "./SettingsSectionNav";
 
 type CountResult = { count: number | null; error: unknown };
@@ -148,14 +154,14 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const displayName = accountDisplayName(user);
   const planFeatures = premiumActive
     ? ["Unlimited runs", "DOCX and TXT exports", premiumEnding && premiumEndLabel ? `Access until ${premiumEndLabel}` : "Saved projects"]
-    : ["5 runs each month", "PDF export", "Saved projects"];
+    : [monthlyRunAllowanceLabel(usage.monthlyRunLimit), "PDF export", "Saved projects"];
   const exportRows: ExportRow[] = [
     { label: "PDF", enabled: entitlement.exportFormats.pdf, included: "Included", locked: "Unavailable" },
     { label: "DOCX", enabled: entitlement.exportFormats.docx, included: "Included with Premium", locked: "Premium" },
     { label: "TXT", enabled: entitlement.exportFormats.txt, included: "Included with Premium", locked: "Premium" },
   ];
-  const usedRunWord = usage.monthlyRuns === 1 ? "run" : "runs";
-  const remainingRunWord = usage.remainingRuns === 1 ? "run" : "runs";
+  const usedRunWord = runWord(usage.monthlyRuns);
+  const remainingRunWord = runWord(usage.remainingRuns);
   const usageUsedLabel =
     usage.monthlyRunLimit === null
       ? `${usage.monthlyRuns} ${usedRunWord} used`
@@ -168,6 +174,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     usage.monthlyRunLimit === null
       ? "No monthly cap"
       : `${usage.remainingRuns} ${remainingRunWord} left`;
+  const usageTrackWidth = usageProgressPercent(usage);
   const projectCountLabel = projectCount === 1 ? "Project" : "Projects";
   const runCountLabel = runCount === 1 ? "Run" : "Runs";
   const recentProjectRuns = recentSavedRuns.slice(0, 3);
@@ -313,7 +320,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <div className="settings-usage-track unlimited"><span style={{ width: "100%" }} /></div>
                 ) : (
                   <div className="settings-usage-track">
-                    <span style={{ width: `${Math.min(100, (usage.monthlyRuns / usage.monthlyRunLimit) * 100)}%` }} />
+                    <span style={{ width: `${usageTrackWidth}%` }} />
                   </div>
                 )}
                 <div className="settings-usage-meta">
@@ -326,7 +333,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   ? premiumEnding && premiumEndLabel
                     ? `Premium access remains available until ${premiumEndLabel}.`
                     : "Premium does not count completed runs against a monthly cap."
-                  : "Free includes 5 completed tailoring runs each month. Upgrade when you need more room."}
+                  : monthlyRunAllowanceSentence(usage.monthlyRunLimit)}
               </p>
             </div>
           </section>
