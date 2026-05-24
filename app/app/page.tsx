@@ -65,6 +65,12 @@ import { createRoleForgeBrowserClient } from "../lib/supabase/client";
 import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun } from "../lib/supabase/savedProjectClient";
 import { tailorActionState } from "../lib/tailorAction";
 import { monthlyRunAllowanceSentence, runWord } from "../lib/usage";
+import {
+  DEFAULT_UPLOAD_FORMATS,
+  normalizeWorkflowCapabilities,
+  type UploadFormat,
+  type WorkflowCapabilities,
+} from "../lib/workflowCapabilities";
 
 type AtsIssue = { severity: string; issue: string; fix: string };
 type AtsReport = { issues: AtsIssue[] };
@@ -121,14 +127,6 @@ type TailorResult = {
   request_id?: string;
 };
 
-type UploadFormat = "docx" | "pdf" | "txt";
-type UploadCapability = { format: UploadFormat; label: string; enabled: boolean };
-type ExportTemplateCapability = { template: string; label: string };
-type CapabilitiesResponse = {
-  upload_formats?: UploadCapability[];
-  export_formats?: ExportCapability[];
-  export_templates?: ExportTemplateCapability[];
-};
 type UploadResponse = {
   resume_id: string;
   filename: string;
@@ -196,11 +194,6 @@ type StudioSuggestion = { label: string; meta: string; before?: string; after: s
 
 const HISTORY_KEY = "resume-tailor-history-v1";
 const SYNCED_HISTORY_KEY = "roleforge-synced-history-v1";
-const DEFAULT_UPLOAD_FORMATS: UploadCapability[] = [
-  { format: "docx", label: "DOCX", enabled: true },
-  { format: "pdf", label: "PDF", enabled: true },
-  { format: "txt", label: "TXT", enabled: true },
-];
 function Pill({ text, kind }: { text: string; kind: "good" | "bad" }) {
   return <span className={`pill ${kind}`}>{text}</span>;
 }
@@ -1015,7 +1008,7 @@ export default function Page() {
   const [projectActionMessage, setProjectActionMessage] = useState("");
   const [confirmingClearHistory, setConfirmingClearHistory] = useState(false);
   const [confirmingDeleteProjectId, setConfirmingDeleteProjectId] = useState<string | null>(null);
-  const [capabilities, setCapabilities] = useState<CapabilitiesResponse | null>(null);
+  const [capabilities, setCapabilities] = useState<WorkflowCapabilities | null>(null);
   const editorSectionRef = useRef<HTMLElement | null>(null);
   const historySectionRef = useRef<HTMLElement | null>(null);
   const historyDetailRef = useRef<HTMLElement | null>(null);
@@ -1403,7 +1396,7 @@ export default function Page() {
     fetch(`${baseUrl}/capabilities`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error("Capability check failed");
-        return (await response.json()) as CapabilitiesResponse;
+        return normalizeWorkflowCapabilities(await response.json());
       })
       .then((data) => setCapabilities(data))
       .catch((caught) => {
