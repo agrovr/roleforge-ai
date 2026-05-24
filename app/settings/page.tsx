@@ -11,7 +11,7 @@ import { reconcileUserSubscriptionEntitlement } from "../lib/billing/entitlement
 import { billingReadiness } from "../lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
-import { RESUME_TEMPLATE_COOKIE, getResumeTemplate } from "../lib/resumeTemplates";
+import { RESUME_TEMPLATE_COOKIE, getResumeTemplate, isResumeTemplateSlug } from "../lib/resumeTemplates";
 import { savedRunHistoryHref } from "../lib/savedRunLinks";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 import { loadSavedRuns } from "../lib/supabase/savedProjects";
@@ -76,6 +76,19 @@ function savedRunCanRestore(run: { snapshot?: Record<string, unknown> }) {
   if (!result || typeof result !== "object") return false;
   const tailoredText = (result as { tailored_text?: unknown }).tailored_text;
   return typeof tailoredText === "string" && Boolean(tailoredText.trim());
+}
+
+function savedRunTemplateName(run: { snapshot?: Record<string, unknown> }) {
+  if (typeof run.snapshot?.templateName === "string" && run.snapshot.templateName.trim()) {
+    return run.snapshot.templateName;
+  }
+
+  const templateSlug = run.snapshot?.templateSlug;
+  if (typeof templateSlug === "string" && isResumeTemplateSlug(templateSlug)) {
+    return getResumeTemplate(templateSlug).name;
+  }
+
+  return "";
 }
 
 async function countRows(
@@ -253,6 +266,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   {recentProjectRuns.map((run) => {
                     const downloadCount = Object.values(run.downloads ?? {}).filter(Boolean).length;
                     const canRestore = savedRunCanRestore(run);
+                    const templateName = savedRunTemplateName(run);
                     return (
                       <Link
                         className="settings-project-item"
@@ -262,7 +276,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                       >
                         <div>
                           <strong>{run.projectTitle || run.roleHint}</strong>
-                          <span>{run.filename} · {formatSavedRunDate(run.createdAt)} · {run.score}/100</span>
+                          <span>
+                            {run.filename} · {formatSavedRunDate(run.createdAt)} · {run.score}/100
+                            {templateName ? ` · ${templateName}` : ""}
+                          </span>
                         </div>
                         <small>{canRestore ? "Restore" : downloadCount ? `${downloadCount} export${downloadCount === 1 ? "" : "s"}` : "Open"}</small>
                       </Link>
