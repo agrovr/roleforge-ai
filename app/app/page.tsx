@@ -117,7 +117,12 @@ type TailorResult = {
 
 type UploadFormat = "docx" | "pdf" | "txt";
 type UploadCapability = { format: UploadFormat; label: string; enabled: boolean };
-type CapabilitiesResponse = { upload_formats?: UploadCapability[]; export_formats?: ExportCapability[] };
+type ExportTemplateCapability = { template: string; label: string };
+type CapabilitiesResponse = {
+  upload_formats?: UploadCapability[];
+  export_formats?: ExportCapability[];
+  export_templates?: ExportTemplateCapability[];
+};
 type UploadResponse = {
   resume_id: string;
   filename: string;
@@ -1595,7 +1600,12 @@ export default function Page() {
     options: { templateSlug?: ResumeTemplateSlug; updateActiveDownload?: boolean } = {},
   ): Promise<string> {
     if (!baseUrl) throw new Error("Export is not available yet.");
-    const templateSlug = options.templateSlug ?? selectedTemplateSlug;
+    const requestedTemplateSlug = options.templateSlug ?? selectedTemplateSlug;
+    const advertisedTemplates = capabilities?.export_templates ?? [];
+    const templateSlug =
+      advertisedTemplates.length && !advertisedTemplates.some((template) => template.template === requestedTemplateSlug)
+        ? "classic"
+        : requestedTemplateSlug;
 
     const response = await fetch(`${baseUrl}/export`, {
       method: "POST",
@@ -2360,6 +2370,14 @@ export default function Page() {
   const topDownloadReady = Boolean(downloadReady && downloadUrl && currentDownloadAllowed);
   const selectedFormatLabel = selectedExportFormat.toUpperCase();
   const selectedTemplate = getResumeTemplate(selectedTemplateSlug);
+  const backendExportTemplates = capabilities?.export_templates ?? [];
+  const selectedTemplateSupported =
+    !backendExportTemplates.length || backendExportTemplates.some((template) => template.template === selectedTemplateSlug);
+  const selectedTemplateStatus = backendExportTemplates.length
+    ? selectedTemplateSupported
+      ? "Export ready"
+      : "Classic fallback"
+    : "Selected";
   const currentDownloadLabel = downloadFormat.toUpperCase();
   const premiumExportFormat = stringDetail(workflowError?.details, "format")?.toUpperCase() ?? selectedFormatLabel;
   const premiumExportRequested = exportNotice ?? (workflowError?.code === "premium_required" ? { format: selectedExportFormat, label: premiumExportFormat } : null);
@@ -2922,6 +2940,7 @@ export default function Page() {
                 </div>
                 <div className="studio-template-preference" aria-label="Selected resume template direction">
                   <span><RoleForgeIcon name="layers" size={13} /> {selectedTemplate.name} direction</span>
+                  <small>{selectedTemplateStatus}</small>
                   <Link href="/templates">Change</Link>
                 </div>
                 {selectedDownloadMessage ? (

@@ -4488,6 +4488,7 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 10px;
   max-width: 440px;
   padding: 8px 10px;
@@ -4500,11 +4501,21 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
 }
 
 .studio-template-preference span,
+.studio-template-preference small,
 .studio-template-preference a {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   min-width: 0;
+}
+
+.studio-template-preference small {
+  color: var(--good);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .studio-template-preference a {
