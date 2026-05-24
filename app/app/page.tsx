@@ -2913,7 +2913,7 @@ export default function Page() {
             <div className="rf-studio-hero">
               <div>
                 <div className="eyebrow">Active resume</div>
-                <h1 title={result ? activeResumeName : activeTitle}>{heroLabel}</h1>
+                <h1 title={heroTitle}>{heroLabel}</h1>
                 <p>{activeDetail}</p>
               </div>
               <div className="studio-hero-actions">

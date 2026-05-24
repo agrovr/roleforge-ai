@@ -5163,13 +5163,12 @@ html[data-theme="dark"] input::file-selector-button {
   line-height: 0.96;
   max-width: min(100%, 24ch);
   width: 100%;
-  display: -webkit-box;
+  display: block;
   overflow: hidden;
-  overflow-wrap: break-word;
-  text-wrap: balance;
-  word-break: keep-all;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: normal;
   hyphens: none;
 }
 
@@ -7623,6 +7622,15 @@ html[data-theme="dark"] .rf-rail-upgrade p {
 
   .rf-studio-hero > div:first-child {
     width: 100%;
+  }
+
+  .rf-studio-hero h1 {
+    display: -webkit-box;
+    white-space: normal;
+    overflow-wrap: normal;
+    word-break: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   .studio-hero-actions {
