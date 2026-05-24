@@ -48,6 +48,28 @@ test("rejects saved project input with invalid dates, modes, or scores", () => {
   });
 });
 
+test("rejects saved project input with unsafe download links", () => {
+  for (const downloadUrl of [
+    "https://downloads.example/resume.pdf",
+    "/download/history-1.pdf",
+    "/api/workflow/download/.env",
+    "/api/workflow/download/history 1.pdf",
+    "javascript:alert(1)",
+  ]) {
+    assert.deepEqual(parseCompletedRunSaveInput({ ...validSavedRun, downloadUrl }), {
+      ok: false,
+      error: "Saved project download link is invalid.",
+    }, downloadUrl);
+  }
+});
+
+test("rejects saved project input when the download format does not match the link", () => {
+  assert.deepEqual(parseCompletedRunSaveInput({ ...validSavedRun, downloadFormat: "docx" }), {
+    ok: false,
+    error: "Saved project download format is invalid.",
+  });
+});
+
 test("validates saved project ids for management routes", () => {
   assert.deepEqual(parseSavedProjectId("project-123"), { ok: true, projectId: "project-123" });
   assert.deepEqual(parseSavedProjectId(""), { ok: false, error: "Saved project link is invalid." });

@@ -1,4 +1,5 @@
 import type { CompletedRunSaveInput } from "./savedProjects";
+import { parseWorkflowDownloadUrl } from "../downloadUrls";
 
 const SAVE_MODES = new Set(["conservative", "balanced", "aggressive"]);
 
@@ -42,11 +43,28 @@ export function parseCompletedRunSaveInput(value: unknown):
     return { ok: false, error: "Saved project mode is invalid." };
   }
 
+  const parsedDownloadUrl = parseWorkflowDownloadUrl(downloadUrl);
+  if (!parsedDownloadUrl.ok) {
+    return { ok: false, error: parsedDownloadUrl.error };
+  }
+
+  const downloadFormat = stringValue(value.downloadFormat);
+  if (downloadFormat && downloadFormat !== parsedDownloadUrl.format) {
+    return { ok: false, error: "Saved project download format is invalid." };
+  }
+
   if (typeof score !== "number" || !Number.isFinite(score) || score < 0 || score > 100) {
     return { ok: false, error: "Saved project score is invalid." };
   }
 
-  return { ok: true, input: value as CompletedRunSaveInput };
+  return {
+    ok: true,
+    input: {
+      ...(value as CompletedRunSaveInput),
+      downloadUrl: parsedDownloadUrl.url,
+      downloadFormat: parsedDownloadUrl.format,
+    },
+  };
 }
 
 export function parseSavedProjectId(value: unknown) {

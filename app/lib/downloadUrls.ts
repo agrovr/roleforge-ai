@@ -14,6 +14,18 @@ type ParsedWorkflowDownloadFilename =
       error: string;
     };
 
+type ParsedWorkflowDownloadUrl =
+  | {
+      ok: true;
+      url: string;
+      filename: string;
+      format: ExportFormat;
+    }
+  | {
+      ok: false;
+      error: string;
+    };
+
 export function workflowDownloadUrl(filename: string) {
   return `/api/workflow/download/${encodeURIComponent(filename)}`;
 }
@@ -52,4 +64,38 @@ export function parseWorkflowDownloadFilename(value: unknown): ParsedWorkflowDow
   }
 
   return { ok: true, filename, format: match[1].toLowerCase() as ExportFormat };
+}
+
+export function parseWorkflowDownloadUrl(value: unknown): ParsedWorkflowDownloadUrl {
+  if (typeof value !== "string") {
+    return { ok: false, error: "Saved project download link is invalid." };
+  }
+
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(value.trim(), "https://roleforge.local");
+  } catch {
+    return { ok: false, error: "Saved project download link is invalid." };
+  }
+
+  if (parsedUrl.origin !== "https://roleforge.local" || parsedUrl.search || parsedUrl.hash) {
+    return { ok: false, error: "Saved project download link is invalid." };
+  }
+
+  const match = parsedUrl.pathname.match(/^\/api\/workflow\/download\/([^/]+)$/);
+  if (!match?.[1]) {
+    return { ok: false, error: "Saved project download link is invalid." };
+  }
+
+  const parsedFilename = parseWorkflowDownloadFilename(decodeURIComponent(match[1]));
+  if (!parsedFilename.ok) {
+    return { ok: false, error: "Saved project download link is invalid." };
+  }
+
+  return {
+    ok: true,
+    url: workflowDownloadUrl(parsedFilename.filename),
+    filename: parsedFilename.filename,
+    format: parsedFilename.format,
+  };
 }
