@@ -14,6 +14,7 @@ const READABLE_SEGMENT_OVERRIDES: Record<string, string> = {
   hr: "HR",
   it: "IT",
   ml: "ML",
+  openai: "OpenAI",
   qa: "QA",
   roleforge: "RoleForge",
   ui: "UI",

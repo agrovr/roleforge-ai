@@ -40,6 +40,11 @@ test("preserves common acronym and brand casing in readable URL labels", () => {
     host: "api-first.dev",
     label: "API First job target",
   });
+
+  assert.deepEqual(parseTargetUrl("https://openai.com/careers/search"), {
+    host: "openai.com",
+    label: "OpenAI job target",
+  });
 });
 
 test("falls back to readable domains for normal career sites", () => {
