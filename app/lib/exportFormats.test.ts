@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { customerExportFormats, exportDownloadReadyForSelection, exportFormatAllowed, type ExportEntitlement } from "./exportFormats";
+import {
+  customerExportFormats,
+  exportDownloadReadyForSelection,
+  exportFormatAllowed,
+  selectedExportStatusMessage,
+  type ExportEntitlement,
+} from "./exportFormats";
 
 const freeEntitlement: ExportEntitlement = {
   plan: "free",
@@ -91,5 +97,48 @@ test("keeps premium downloads gated even if a stale link exists", () => {
       entitlement: freeEntitlement,
     }),
     false,
+  );
+});
+
+test("keeps selected export status copy tied to the matching download", () => {
+  assert.equal(
+    selectedExportStatusMessage({
+      downloadFormat: "pdf",
+      downloadState: "ready",
+      downloadUrl: "/api/workflow/download/run.pdf",
+      selectedFormat: "pdf",
+      entitlement: freeEntitlement,
+      downloadMessage: "PDF download is ready.",
+      hasTailoredText: true,
+    }),
+    "PDF download is ready.",
+  );
+});
+
+test("explains when another export is ready but the selected format is not", () => {
+  assert.equal(
+    selectedExportStatusMessage({
+      downloadFormat: "pdf",
+      downloadState: "ready",
+      downloadUrl: "/api/workflow/download/run.pdf",
+      selectedFormat: "docx",
+      entitlement: premiumEntitlement,
+      hasTailoredText: true,
+    }),
+    "PDF is ready. Export DOCX to create that format.",
+  );
+});
+
+test("hides selected export status copy when no generated draft exists", () => {
+  assert.equal(
+    selectedExportStatusMessage({
+      downloadFormat: "pdf",
+      downloadState: "ready",
+      downloadUrl: "/api/workflow/download/run.pdf",
+      selectedFormat: "docx",
+      entitlement: premiumEntitlement,
+      hasTailoredText: false,
+    }),
+    "",
   );
 });

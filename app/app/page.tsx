@@ -13,6 +13,7 @@ import {
   customerExportFormats,
   exportDownloadReadyForSelection,
   exportFormatAllowed,
+  selectedExportStatusMessage,
   type ExportCapability,
   type ExportFormat,
 } from "../lib/exportFormats";
@@ -2411,7 +2412,15 @@ export default function Page() {
         : result?.tailored_text
           ? `Export ${selectedFormatLabel}`
           : `Export ${selectedFormatLabel}`;
-  const selectedDownloadMessage = downloadFormat === selectedExportFormat ? downloadMessage : "";
+  const selectedDownloadMessage = selectedExportStatusMessage({
+    downloadFormat,
+    downloadState,
+    downloadUrl,
+    selectedFormat: selectedExportFormat,
+    entitlement: accountStatus?.entitlement,
+    downloadMessage,
+    hasTailoredText: Boolean(result?.tailored_text?.trim()),
+  });
   const enabledUploadFormats = uploadFormats.filter((format) => format.enabled);
   const uploadAccept = enabledUploadFormats.length
     ? enabledUploadFormats.map((format) => `.${format.format}`).join(",")

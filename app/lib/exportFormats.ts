@@ -13,6 +13,8 @@ export type ExportEntitlement = {
   exportFormats: Record<ExportFormat, boolean>;
 };
 
+export type ExportDownloadState = "idle" | "checking" | "ready" | "expired";
+
 export const DEFAULT_EXPORT_FORMATS: ExportCapability[] = [
   { format: "pdf", label: "PDF", enabled: true, plan: "free" },
   { format: "docx", label: "DOCX", enabled: false, plan: "premium", reason: "Premium" },
@@ -36,7 +38,7 @@ export function exportDownloadReadyForSelection({
   entitlement,
 }: {
   downloadFormat: ExportFormat;
-  downloadState: "idle" | "checking" | "ready" | "expired";
+  downloadState: ExportDownloadState;
   downloadUrl?: string | null;
   selectedFormat: ExportFormat;
   entitlement?: ExportEntitlement | null;
@@ -47,6 +49,30 @@ export function exportDownloadReadyForSelection({
       downloadFormat === selectedFormat &&
       exportFormatAllowed(downloadFormat, entitlement),
   );
+}
+
+export function selectedExportStatusMessage({
+  downloadFormat,
+  downloadState,
+  downloadUrl,
+  selectedFormat,
+  entitlement,
+  downloadMessage,
+  hasTailoredText,
+}: {
+  downloadFormat: ExportFormat;
+  downloadState: ExportDownloadState;
+  downloadUrl?: string | null;
+  selectedFormat: ExportFormat;
+  entitlement?: ExportEntitlement | null;
+  downloadMessage?: string;
+  hasTailoredText: boolean;
+}) {
+  if (downloadFormat === selectedFormat) return downloadMessage ?? "";
+  if (!hasTailoredText) return "";
+  if (!downloadUrl || downloadState !== "ready" || !exportFormatAllowed(downloadFormat, entitlement)) return "";
+
+  return `${downloadFormat.toUpperCase()} is ready. Export ${selectedFormat.toUpperCase()} to create that format.`;
 }
 
 export function customerExportFormats(formats?: ExportCapability[], entitlement?: ExportEntitlement | null) {
