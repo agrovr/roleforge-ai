@@ -110,6 +110,93 @@ test("loads saved runs with project titles without embedded relationship names",
   assert.equal(runs[0].snapshot?.templateName, "Engineer");
 });
 
+test("loads saved runs when the export template column is not in the schema cache yet", async () => {
+  const selectQueries: string[] = [];
+
+  const client = {
+    from(table: string) {
+      if (table === "tailor_runs") {
+        return {
+          select(query: string) {
+            selectQueries.push(query);
+            return {
+              eq() {
+                return {
+                  order() {
+                    return {
+                      async limit() {
+                        if (query.includes("export_template")) {
+                          return {
+                            data: null,
+                            error: {
+                              code: "PGRST204",
+                              message: "Could not find the 'export_template' column of 'tailor_runs' in the schema cache",
+                            },
+                          };
+                        }
+
+                        return {
+                          data: [
+                            {
+                              id: "run-legacy",
+                              client_history_id: "history-legacy",
+                              project_id: "project-legacy",
+                              created_at: "2026-05-21T12:00:00.000Z",
+                              source_resume_name: "legacy.pdf",
+                              job_target: "Legacy target",
+                              mode: "balanced",
+                              fit_score: 61,
+                              download_format: "pdf",
+                              download_url: "/api/workflow/download/legacy.pdf",
+                              payload: { studioSnapshot: { templateSlug: "compact" } },
+                            },
+                          ],
+                          error: null,
+                        };
+                      },
+                    };
+                  },
+                };
+              },
+            };
+          },
+        };
+      }
+
+      if (table === "resume_projects") {
+        return {
+          select() {
+            return {
+              eq() {
+                return {
+                  async in() {
+                    return {
+                      data: [{ id: "project-legacy", title: "Legacy saved project" }],
+                      error: null,
+                    };
+                  },
+                };
+              },
+            };
+          },
+        };
+      }
+
+      throw new Error(`Unexpected table: ${table}`);
+    },
+  } as unknown as SupabaseClient;
+
+  const runs = await loadSavedRuns(client, "user-123");
+
+  assert.equal(selectQueries.length, 2);
+  assert.equal(selectQueries[0].includes("export_template"), true);
+  assert.equal(selectQueries[1].includes("export_template"), false);
+  assert.equal(runs.length, 1);
+  assert.equal(runs[0].projectTitle, "Legacy saved project");
+  assert.equal(runs[0].snapshot?.templateSlug, "compact");
+  assert.equal(runs[0].snapshot?.templateName, "Compact");
+});
+
 test("updates a server-recorded run instead of inserting a duplicate", async () => {
   const calls: Array<{ table: string; action: string; payload?: unknown }> = [];
   let tailorRunUpdated = false;
@@ -247,4 +334,98 @@ test("updates a server-recorded run instead of inserting a duplicate", async () 
   assert.equal(profilePayload?.payload.display_name, "Person From Google");
   assert.match(profilePayload?.payload.updated_at ?? "", /^\d{4}-\d{2}-\d{2}T/);
   assert.equal(calls.some((call) => call.action === "insert"), false);
+});
+
+test("saves existing runs without export_template when an older schema rejects the column", async () => {
+  const updatePayloads: Record<string, unknown>[] = [];
+
+  const client = {
+    from(table: string) {
+      if (table === "profiles") {
+        return {
+          async upsert() {
+            return { error: null };
+          },
+        };
+      }
+
+      if (table === "tailor_runs") {
+        return {
+          select() {
+            return {
+              eq() {
+                return {
+                  eq() {
+                    return {
+                      async maybeSingle() {
+                        return { data: { id: "run-existing", project_id: "project-existing" }, error: null };
+                      },
+                    };
+                  },
+                };
+              },
+            };
+          },
+          update(payload: Record<string, unknown>) {
+            updatePayloads.push(payload);
+            return {
+              eq() {
+                return {
+                  async eq() {
+                    return updatePayloads.length === 1
+                      ? {
+                          error: {
+                            code: "PGRST204",
+                            message: "Could not find the 'export_template' column of 'tailor_runs' in the schema cache",
+                          },
+                        }
+                      : { error: null };
+                  },
+                };
+              },
+            };
+          },
+        };
+      }
+
+      if (table === "resume_projects") {
+        return {
+          update() {
+            return {
+              eq() {
+                return {
+                  async eq() {
+                    return { error: null };
+                  },
+                };
+              },
+            };
+          },
+        };
+      }
+
+      throw new Error(`Unexpected table: ${table}`);
+    },
+  } as unknown as SupabaseClient;
+
+  const saved = await saveCompletedRun(
+    client,
+    {
+      id: "history-legacy",
+      createdAt: "2026-05-21T12:00:00.000Z",
+      filename: "resume.pdf",
+      mode: "balanced",
+      score: 74,
+      downloadUrl: "/api/workflow/download/history-legacy.pdf",
+      downloadFormat: "pdf",
+      roleHint: "Legacy target",
+      payload: { studioSnapshot: { templateSlug: "engineer" } },
+    },
+    { id: "user-123", email: "person@example.com", user_metadata: null },
+  );
+
+  assert.deepEqual(saved, { projectId: "project-existing", runId: "run-existing" });
+  assert.equal(updatePayloads.length, 2);
+  assert.equal(updatePayloads[0].export_template, "engineer");
+  assert.equal("export_template" in updatePayloads[1], false);
 });
