@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseCompletedRunSaveInput } from "./savedProjectInput";
+import { parseCompletedRunSaveInput, parseSavedProjectId, parseSavedProjectRenameInput } from "./savedProjectInput";
 
 const validSavedRun = {
   id: "history-1",
@@ -45,5 +45,26 @@ test("rejects saved project input with invalid dates, modes, or scores", () => {
   assert.deepEqual(parseCompletedRunSaveInput({ ...validSavedRun, score: 101 }), {
     ok: false,
     error: "Saved project score is invalid.",
+  });
+});
+
+test("validates saved project ids for management routes", () => {
+  assert.deepEqual(parseSavedProjectId("project-123"), { ok: true, projectId: "project-123" });
+  assert.deepEqual(parseSavedProjectId(""), { ok: false, error: "Saved project link is invalid." });
+  assert.deepEqual(parseSavedProjectId("x".repeat(121)), { ok: false, error: "Saved project link is invalid." });
+});
+
+test("normalizes and validates saved project rename input", () => {
+  assert.deepEqual(parseSavedProjectRenameInput({ title: "  Senior   backend role  " }), {
+    ok: true,
+    title: "Senior backend role",
+  });
+  assert.deepEqual(parseSavedProjectRenameInput({ title: " " }), {
+    ok: false,
+    error: "Project name is required.",
+  });
+  assert.deepEqual(parseSavedProjectRenameInput({ title: "x".repeat(121) }), {
+    ok: false,
+    error: "Project name must be 120 characters or fewer.",
   });
 });

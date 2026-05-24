@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { withAccountDatabase } from "@/app/lib/supabase/accountDatabase";
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
+import { parseSavedProjectId, parseSavedProjectRenameInput } from "@/app/lib/supabase/savedProjectInput";
 import { deleteSavedProject, renameSavedProject } from "@/app/lib/supabase/savedProjects";
 
 type RouteContext = {
@@ -38,13 +39,36 @@ export async function PATCH(request: Request, context: RouteContext) {
   const account = await requireAccount();
   if ("error" in account) return account.error;
 
-  const { projectId } = await context.params;
+  const projectIdParam = parseSavedProjectId((await context.params).projectId);
+  if (!projectIdParam.ok) {
+    return withSupabaseCookies(
+      NextResponse.json({ error: projectIdParam.error }, { status: 400 }),
+      account.routeClient.cookiesToSet,
+    );
+  }
+
+  let payload: unknown;
+  try {
+    payload = await request.json();
+  } catch {
+    return withSupabaseCookies(
+      NextResponse.json({ error: "Project name is required." }, { status: 400 }),
+      account.routeClient.cookiesToSet,
+    );
+  }
+
+  const parsedInput = parseSavedProjectRenameInput(payload);
+  if (!parsedInput.ok) {
+    return withSupabaseCookies(
+      NextResponse.json({ error: parsedInput.error }, { status: 400 }),
+      account.routeClient.cookiesToSet,
+    );
+  }
 
   try {
-    const payload = (await request.json()) as { title?: string };
     const title = await withAccountDatabase(
       account.routeClient.supabase,
-      (dbClient) => renameSavedProject(dbClient, projectId, payload.title ?? "", account.user.id),
+      (dbClient) => renameSavedProject(dbClient, projectIdParam.projectId, parsedInput.title, account.user.id),
       { label: "Saved project rename database operation" },
     );
     return withSupabaseCookies(NextResponse.json({ title }), account.routeClient.cookiesToSet);
@@ -61,12 +85,18 @@ export async function DELETE(_request: Request, context: RouteContext) {
   const account = await requireAccount();
   if ("error" in account) return account.error;
 
-  const { projectId } = await context.params;
+  const projectIdParam = parseSavedProjectId((await context.params).projectId);
+  if (!projectIdParam.ok) {
+    return withSupabaseCookies(
+      NextResponse.json({ error: projectIdParam.error }, { status: 400 }),
+      account.routeClient.cookiesToSet,
+    );
+  }
 
   try {
     await withAccountDatabase(
       account.routeClient.supabase,
-      (dbClient) => deleteSavedProject(dbClient, projectId, account.user.id),
+      (dbClient) => deleteSavedProject(dbClient, projectIdParam.projectId, account.user.id),
       { label: "Saved project delete database operation" },
     );
     return withSupabaseCookies(NextResponse.json({ ok: true }), account.routeClient.cookiesToSet);

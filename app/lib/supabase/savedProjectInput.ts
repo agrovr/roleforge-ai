@@ -48,3 +48,31 @@ export function parseCompletedRunSaveInput(value: unknown):
 
   return { ok: true, input: value as CompletedRunSaveInput };
 }
+
+export function parseSavedProjectId(value: unknown) {
+  const projectId = stringValue(value);
+  if (!projectId || projectId.length > 120) {
+    return { ok: false as const, error: "Saved project link is invalid." };
+  }
+
+  return { ok: true as const, projectId };
+}
+
+export function parseSavedProjectRenameInput(value: unknown):
+  | { ok: true; title: string }
+  | { ok: false; error: string } {
+  if (!isRecord(value)) {
+    return { ok: false, error: "Project name is required." };
+  }
+
+  const title = stringValue(value.title).replace(/\s+/g, " ");
+  if (!title) {
+    return { ok: false, error: "Project name is required." };
+  }
+
+  if (title.length > 120) {
+    return { ok: false, error: "Project name must be 120 characters or fewer." };
+  }
+
+  return { ok: true, title };
+}
