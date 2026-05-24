@@ -9946,11 +9946,11 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
   .history-actions,
   .history-content-grid.has-detail .history-actions {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .history-action-download {
-    grid-column: auto;
+    grid-column: 1 / -1;
   }
 
   .history-confirm-actions,
