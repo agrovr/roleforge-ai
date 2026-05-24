@@ -24,6 +24,7 @@ export function readableDomainName(hostname: string) {
 function companyNameFromJobBoardUrl(url: URL, host: string) {
   const pathSegments = url.pathname.split("/").map((segment) => segment.trim()).filter(Boolean);
   const firstPathSegment = pathSegments[0] ?? "";
+  const genericPathSegments = /^(apply|careers?|jobs?|job|positions?|openings?|en|us)$/i;
 
   if (/greenhouse\.io$/i.test(host) && firstPathSegment && !/^jobs?$/i.test(firstPathSegment)) {
     return readableUrlSegment(firstPathSegment);
@@ -34,6 +35,10 @@ function companyNameFromJobBoardUrl(url: URL, host: string) {
   }
 
   if (/ashbyhq\.com$/i.test(host) && firstPathSegment) {
+    return readableUrlSegment(firstPathSegment);
+  }
+
+  if (/(smartrecruiters\.com|workable\.com)$/i.test(host) && firstPathSegment && !genericPathSegments.test(firstPathSegment)) {
     return readableUrlSegment(firstPathSegment);
   }
 

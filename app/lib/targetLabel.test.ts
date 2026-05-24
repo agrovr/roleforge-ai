@@ -18,6 +18,16 @@ test("uses company slugs from common job boards", () => {
     host: "jobs.ashbyhq.com",
     label: "Roleforge AI job target",
   });
+
+  assert.deepEqual(parseTargetUrl("https://jobs.smartrecruiters.com/affirm/744000063770175"), {
+    host: "jobs.smartrecruiters.com",
+    label: "Affirm job target",
+  });
+
+  assert.deepEqual(parseTargetUrl("https://apply.workable.com/roleforge-ai/j/1234567890"), {
+    host: "apply.workable.com",
+    label: "Roleforge AI job target",
+  });
 });
 
 test("falls back to readable domains for normal career sites", () => {
