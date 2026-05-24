@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { FREE_FEATURES } from "@/app/lib/billing/entitlements";
-import { absoluteUrl, getStripeBillingConfig, getStripeClient, priceIdForInterval, type BillingInterval } from "@/app/lib/billing/stripe";
+import { absoluteUrl, checkoutSuccessUrl, getStripeBillingConfig, getStripeClient, priceIdForInterval, type BillingInterval } from "@/app/lib/billing/stripe";
 import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
 import { createRoleForgeServiceClient } from "@/app/lib/supabase/service";
 
@@ -81,7 +81,7 @@ export async function POST(request: Request) {
         quantity: 1,
       },
     ],
-    success_url: absoluteUrl(request, "/settings?billing=checkout-success"),
+    success_url: checkoutSuccessUrl(request),
     cancel_url: absoluteUrl(request, "/settings?billing=checkout-canceled#billing"),
     subscription_data: {
       metadata: {

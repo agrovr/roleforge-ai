@@ -7,7 +7,7 @@ import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { accountDisplayName } from "../lib/accountUser";
 import { billingStateDetail, billingStateLabel, billingStatusTone } from "../lib/billing/display";
-import { reconcileUserSubscriptionEntitlement } from "../lib/billing/entitlements";
+import { reconcileUserSubscriptionEntitlement, syncCheckoutSessionEntitlement } from "../lib/billing/entitlements";
 import { billingReadiness } from "../lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
@@ -113,6 +113,7 @@ async function countRows(
 export default async function SettingsPage({ searchParams }: { searchParams: SettingsSearchParams }) {
   const params = await searchParams;
   const notice = billingNotice(getParam(params.billing));
+  const checkoutSessionId = getParam(params.session_id);
   const supabase = await createRoleForgeServerClient();
 
   if (!supabase) {
@@ -127,11 +128,16 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     redirect("/login?next=/settings&account=signin-required");
   }
 
+  const syncBillingEntitlement = checkoutSessionId
+    ? syncCheckoutSessionEntitlement(user.id, checkoutSessionId)
+        .then((synced) => synced || reconcileUserSubscriptionEntitlement(user.id))
+    : reconcileUserSubscriptionEntitlement(user.id);
+
   const [projectCount, runCount, recentSavedRuns] = await Promise.all([
     countRows(supabase, "resume_projects", user.id),
     countRows(supabase, "tailor_runs", user.id),
     loadSavedRuns(supabase, user.id).catch(() => []),
-    reconcileUserSubscriptionEntitlement(user.id).catch(() => false),
+    syncBillingEntitlement.catch(() => false),
   ]);
   const entitlement = await loadAccountEntitlement(supabase, user.id);
   const usage = await loadAccountUsage(supabase, user.id, entitlement);

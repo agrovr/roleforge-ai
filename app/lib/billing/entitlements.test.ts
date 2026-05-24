@@ -7,6 +7,8 @@ import {
   FREE_FEATURES,
   PREMIUM_FEATURES,
   billingFeaturesForPremiumAccess,
+  checkoutSessionSubscriptionId,
+  checkoutSessionUserId,
   entitlementPatchFromSubscription,
   normalizeBillingStatus,
 } from "./entitlements";
@@ -98,4 +100,21 @@ test("exposes shared billing feature payloads for checkout and reconciliation", 
   assert.equal(PREMIUM_FEATURES.monthly_run_limit, null);
   assert.equal(PREMIUM_FEATURES.export_docx, true);
   assert.equal(PREMIUM_FEATURES.export_txt, true);
+});
+
+test("reads checkout session ownership and subscription identifiers", () => {
+  const session = {
+    metadata: {
+      supabase_user_id: "user_test",
+    },
+    subscription: {
+      id: "sub_test",
+    },
+  } as unknown as Stripe.Checkout.Session;
+
+  assert.equal(checkoutSessionUserId(session), "user_test");
+  assert.equal(checkoutSessionSubscriptionId(session), "sub_test");
+  assert.equal(checkoutSessionSubscriptionId({ subscription: "sub_string" } as Stripe.Checkout.Session), "sub_string");
+  assert.equal(checkoutSessionUserId({ metadata: null } as Stripe.Checkout.Session), "");
+  assert.equal(checkoutSessionSubscriptionId({ subscription: null } as Stripe.Checkout.Session), "");
 });

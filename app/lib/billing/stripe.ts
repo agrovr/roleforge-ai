@@ -8,6 +8,8 @@ export const PREMIUM_PRICE = {
   currency: "usd",
 };
 
+export const CHECKOUT_SESSION_ID_TEMPLATE = "{CHECKOUT_SESSION_ID}";
+
 export function getStripeBillingConfig() {
   const secretKey = process.env.STRIPE_SECRET_KEY?.trim() ?? "";
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim() ?? "";
@@ -50,4 +52,13 @@ export function absoluteUrl(request: Request, path: string) {
     (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "");
   const origin = configuredSiteUrl || new URL(request.url).origin;
   return new URL(path, origin).toString();
+}
+
+export function checkoutSuccessUrl(request: Request) {
+  const url = absoluteUrl(
+    request,
+    `/settings?billing=checkout-success&session_id=${CHECKOUT_SESSION_ID_TEMPLATE}`,
+  );
+
+  return url.replace(encodeURIComponent(CHECKOUT_SESSION_ID_TEMPLATE), CHECKOUT_SESSION_ID_TEMPLATE);
 }

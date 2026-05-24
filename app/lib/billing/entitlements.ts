@@ -137,6 +137,50 @@ export async function syncSubscriptionEntitlement(subscription: Stripe.Subscript
   await upsertEntitlement(entitlementPatchFromSubscription(subscription));
 }
 
+export function checkoutSessionUserId(session: Stripe.Checkout.Session) {
+  return typeof session.metadata?.supabase_user_id === "string" ? session.metadata.supabase_user_id : "";
+}
+
+export function checkoutSessionSubscriptionId(session: Stripe.Checkout.Session) {
+  const subscription = session.subscription;
+  if (!subscription) return "";
+  return typeof subscription === "string" ? subscription : subscription.id;
+}
+
+export async function syncCheckoutSessionEntitlement(userId: string, sessionId?: string | null) {
+  if (!sessionId?.startsWith("cs_")) {
+    return false;
+  }
+
+  const stripe = getStripeClient();
+
+  if (!stripe) {
+    return false;
+  }
+
+  const session = await stripe.checkout.sessions.retrieve(sessionId, {
+    expand: ["subscription"],
+  });
+
+  if (checkoutSessionUserId(session) !== userId) {
+    return false;
+  }
+
+  const subscription = session.subscription;
+
+  if (!subscription) {
+    return false;
+  }
+
+  if (typeof subscription === "string") {
+    await syncSubscriptionEntitlement(await stripe.subscriptions.retrieve(subscription));
+    return true;
+  }
+
+  await syncSubscriptionEntitlement(subscription);
+  return true;
+}
+
 export async function reconcileUserSubscriptionEntitlement(userId: string) {
   const supabase = createRoleForgeServiceClient();
   const stripe = getStripeClient();
