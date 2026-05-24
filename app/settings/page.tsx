@@ -11,6 +11,7 @@ import { reconcileUserSubscriptionEntitlement } from "../lib/billing/entitlement
 import { billingReadiness } from "../lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
+import { historyRunStatus } from "../lib/history";
 import { RESUME_TEMPLATE_COOKIE, getResumeTemplate, isResumeTemplateSlug } from "../lib/resumeTemplates";
 import { savedRunHistoryHref } from "../lib/savedRunLinks";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
@@ -264,8 +265,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               {recentProjectRuns.length ? (
                 <div className="settings-project-list" aria-label="Recent saved projects">
                   {recentProjectRuns.map((run) => {
-                    const downloadCount = Object.values(run.downloads ?? {}).filter(Boolean).length;
                     const canRestore = savedRunCanRestore(run);
+                    const status = historyRunStatus(run, entitlement);
                     const templateName = savedRunTemplateName(run);
                     return (
                       <Link
@@ -281,7 +282,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                             {templateName ? ` · ${templateName}` : ""}
                           </span>
                         </div>
-                        <small>{canRestore ? "Restore" : downloadCount ? `${downloadCount} export${downloadCount === 1 ? "" : "s"}` : "Open"}</small>
+                        <small title={status.detail}>{canRestore ? "Restore" : status.label}</small>
                       </Link>
                     );
                   })}

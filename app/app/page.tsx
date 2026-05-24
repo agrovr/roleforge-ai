@@ -33,7 +33,9 @@ import {
   historyDownloadEntries,
   historyDownloads,
   historyGroupSummary,
+  historyGroupStatus,
   historyProjectTitle,
+  historyRunStatus,
   historyStatusLabel,
   historyStorageLabel,
   historyVersionLabel,
@@ -2717,6 +2719,7 @@ export default function Page() {
   const selectedHistoryPrimaryDownloadLabel =
     selectedHistoryPrimaryDownload?.format.toUpperCase() ?? visibleSelectedHistoryItem?.downloadFormat?.toUpperCase() ?? "PDF";
   const selectedHistoryTemplateName = visibleSelectedHistoryItem ? historyTemplateNameFor(visibleSelectedHistoryItem) : "";
+  const selectedHistoryStatus = visibleSelectedHistoryItem ? historyRunStatus(visibleSelectedHistoryItem, accountStatus?.entitlement) : null;
   const editorRailActive = activeTab === "score" || activeTab === "resume";
   const targetRailActive = activeTab === "gap";
   const suggestionsRailActive = activeTab === "changes";
@@ -3447,6 +3450,8 @@ export default function Page() {
                       const restorable = hasRestorableSnapshot(entry);
                       const primaryDownload = primaryHistoryDownloadFor(entry);
                       const availableDownloadCount = historyDownloadEntriesFor(entry).length;
+                      const groupStatus = historyGroupStatus(group);
+                      const entryStatus = historyRunStatus(entry, accountStatus?.entitlement);
                       const canManageProject = Boolean(group.accountItem?.projectId && signedIn);
                       const isEditingProject = Boolean(canManageProject && editingProjectId === group.accountItem?.projectId);
                       const actionBusy = group.items.some((item) => projectActionId === item.id);
@@ -3478,8 +3483,8 @@ export default function Page() {
                                 <strong>{group.title}</strong>
                               )}
                               <small className={`history-sync-badge ${group.accountCount ? "account" : "local"}`}>{historyStorageLabel(group)}</small>
-                              <small className={`history-sync-badge ${group.restorableCount ? "restore" : "legacy"}`}>
-                                {group.restorableCount ? "Restore ready" : "Download only"}
+                              <small className={`history-sync-badge ${groupStatus.tone}`} title={groupStatus.detail}>
+                                {groupStatus.label}
                               </small>
                               {active ? <small className="history-sync-badge open">Open now</small> : null}
                             </div>
@@ -3500,6 +3505,7 @@ export default function Page() {
                             </div>
                             <div className="history-project-meta" aria-label="Project run summary">
                               <span>{historyGroupSummary(group)}</span>
+                              <span>{entryStatus.detail}</span>
                               <span>{entry.mode} mode</span>
                               {entryTemplateName ? <span>{entryTemplateName} direction</span> : null}
                             </div>
@@ -3603,7 +3609,7 @@ export default function Page() {
                         <div className="history-detail-badges" aria-label="Selected project state">
                           <span>{historyStorageLabel(selectedHistoryGroup)}</span>
                           <span>{selectedHistoryVersionLabel}</span>
-                          <span>{hasRestorableSnapshot(visibleSelectedHistoryItem) ? "Restores to studio" : "Download only"}</span>
+                          {selectedHistoryStatus ? <span>{selectedHistoryStatus.label}</span> : null}
                           {selectedHistoryTemplateName ? <span>{selectedHistoryTemplateName} direction</span> : null}
                         </div>
                       </div>
@@ -3622,7 +3628,7 @@ export default function Page() {
                       </div>
                       <div>
                         <dt>Export</dt>
-                        <dd>{selectedHistoryDownloadCount ? `${selectedHistoryDownloadCount} file${selectedHistoryDownloadCount === 1 ? "" : "s"} ready` : "No download link"}</dd>
+                        <dd>{selectedHistoryStatus?.detail ?? (selectedHistoryDownloadCount ? `${selectedHistoryDownloadCount} file${selectedHistoryDownloadCount === 1 ? "" : "s"} ready` : "Needs re-export")}</dd>
                       </div>
                     </dl>
                     <div className="history-selected-run">
@@ -3704,6 +3710,7 @@ export default function Page() {
                         const restorable = hasRestorableSnapshot(entry);
                         const versionLabel = historyVersionLabel(selectedHistoryGroup.items.length, index);
                         const entryDownloads = historyDownloadEntriesFor(entry);
+                        const entryStatus = historyRunStatus(entry, accountStatus?.entitlement);
                         return (
                           <article className={selectedHistoryId === entry.id ? "selected" : ""} key={`detail-${entry.id}`}>
                             <button type="button" onClick={() => setSelectedHistoryId(entry.id)} aria-pressed={selectedHistoryId === entry.id}>
@@ -3725,7 +3732,7 @@ export default function Page() {
                                   {entryDownloads.map((download) => download.format.toUpperCase()).join(" / ")} ready
                                 </span>
                               ) : (
-                                <span className="history-version-formats muted">No downloads</span>
+                                <span className="history-version-formats muted">{entryStatus.label}</span>
                               )}
                             </div>
                           </article>

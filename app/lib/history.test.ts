@@ -6,6 +6,8 @@ import {
   historyDownloadEntries,
   historyDownloads,
   historyGroupSummary,
+  historyGroupStatus,
+  historyRunStatus,
   historyStorageLabel,
   historyVersionLabel,
   mergeHistory,
@@ -190,6 +192,68 @@ test("groups local and account history into clear project summaries", () => {
   assert.equal(groups[1].items.length, 2);
   assert.equal(groups[1].bestScore, 82);
   assert.equal(historyGroupSummary(groups[1]), "2 runs · best 82/100 · 2 restore-ready");
+});
+
+test("labels saved run availability for restore, download, and re-export states", () => {
+  assert.deepEqual(historyRunStatus(historyItem({
+    snapshot: { result: { tailored_text: "Tailored draft" } },
+  })), {
+    label: "Restore + download",
+    detail: "Opens in studio with 1 download ready",
+    tone: "restore",
+  });
+
+  assert.deepEqual(historyRunStatus(historyItem({
+    downloadUrl: "#",
+    downloads: {},
+    snapshot: { result: { tailored_text: "Tailored draft" } },
+  })), {
+    label: "Restore ready",
+    detail: "Opens in studio; export again for a file",
+    tone: "restore",
+  });
+
+  assert.deepEqual(historyRunStatus(historyItem({
+    snapshot: undefined,
+  })), {
+    label: "Download only",
+    detail: "Older saved run with 1 download ready",
+    tone: "download",
+  });
+
+  assert.deepEqual(historyRunStatus(historyItem({
+    downloadUrl: "#",
+    downloads: {},
+    snapshot: undefined,
+  })), {
+    label: "Needs re-export",
+    detail: "Run Tailor again to create a fresh export",
+    tone: "legacy",
+  });
+});
+
+test("summarizes saved project availability across grouped versions", () => {
+  const groups = groupHistoryItems([
+    historyItem({
+      id: "download-only",
+      createdAt: "2026-05-15T20:00:00.000Z",
+      snapshot: undefined,
+    }),
+    historyItem({
+      id: "needs-export",
+      createdAt: "2026-05-15T19:00:00.000Z",
+      downloadUrl: "#",
+      downloads: {},
+      snapshot: undefined,
+    }),
+  ]);
+
+  assert.equal(historyGroupSummary(groups[0]), "2 runs · best 72/100 · 1 download-ready · 1 needs re-export");
+  assert.deepEqual(historyGroupStatus(groups[0]), {
+    label: "Download ready",
+    detail: "1 download-ready · 1 needs re-export",
+    tone: "download",
+  });
 });
 
 test("merges account metadata into matching local history", () => {

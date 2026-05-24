@@ -3837,6 +3837,12 @@ html[data-theme="dark"] .result-box {
   color: var(--brand-strong);
 }
 
+.history-sync-badge.download {
+  border-color: color-mix(in srgb, var(--info) 36%, var(--line));
+  background: color-mix(in srgb, var(--info) 10%, var(--surface));
+  color: var(--info);
+}
+
 .history-sync-badge.legacy {
   border-color: color-mix(in srgb, var(--warn) 34%, var(--line));
   background: var(--warn-soft);
@@ -9272,6 +9278,12 @@ html[data-theme="dark"] .history-sync-badge.restore {
   border-color: rgba(237, 127, 105, 0.38);
   background: rgba(237, 127, 105, 0.14);
   color: #ffbaaa;
+}
+
+html[data-theme="dark"] .history-sync-badge.download {
+  border-color: rgba(130, 191, 255, 0.32);
+  background: rgba(130, 191, 255, 0.12);
+  color: #b9d7ff;
 }
 
 html[data-theme="dark"] .history-sync-badge.legacy {

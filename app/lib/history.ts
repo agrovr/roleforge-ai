@@ -43,6 +43,12 @@ export type HistoryGroup<TSnapshot extends HistorySnapshot = HistorySnapshot> = 
   bestScore: number;
 };
 
+export type HistoryAvailabilityStatus = {
+  label: string;
+  detail: string;
+  tone: "restore" | "download" | "legacy";
+};
+
 export const EXPORT_FORMAT_ORDER: ExportFormat[] = ["pdf", "docx", "txt"];
 
 export function hasRestorableSnapshot(item: HistoryItem) {
@@ -142,14 +148,88 @@ export function historyStorageLabel(group: HistoryGroup) {
   return "This browser";
 }
 
+function historyGroupAvailabilityCounts(group: HistoryGroup) {
+  return group.items.reduce(
+    (counts, item) => {
+      if (hasRestorableSnapshot(item)) counts.restorable += 1;
+      else if (Object.keys(historyDownloads(item)).length) counts.downloadOnly += 1;
+      else counts.needsReExport += 1;
+      return counts;
+    },
+    { restorable: 0, downloadOnly: 0, needsReExport: 0 },
+  );
+}
+
 export function historyGroupSummary(group: HistoryGroup) {
   const runLabel = `${group.items.length} run${group.items.length === 1 ? "" : "s"}`;
-  const restoreLabel = group.restorableCount
-    ? `${group.restorableCount} restore-ready`
-    : group.downloadableCount
-      ? "Download only"
-      : "No export";
+  const counts = historyGroupAvailabilityCounts(group);
+  const restoreParts = [
+    counts.restorable ? `${counts.restorable} restore-ready` : "",
+    counts.downloadOnly ? `${counts.downloadOnly} download-ready` : "",
+    counts.needsReExport ? `${counts.needsReExport} needs re-export` : "",
+  ].filter(Boolean);
+  const restoreLabel = restoreParts.join(" · ");
   return `${runLabel} · best ${group.bestScore}/100 · ${restoreLabel}`;
+}
+
+export function historyRunStatus(item: HistoryItem, entitlement?: ExportEntitlement | null): HistoryAvailabilityStatus {
+  const restorable = hasRestorableSnapshot(item);
+  const downloadCount = historyDownloadEntries(item, entitlement).length;
+  const downloadLabel = `${downloadCount} download${downloadCount === 1 ? "" : "s"} ready`;
+
+  if (restorable && downloadCount) {
+    return {
+      label: "Restore + download",
+      detail: `Opens in studio with ${downloadLabel}`,
+      tone: "restore",
+    };
+  }
+
+  if (restorable) {
+    return {
+      label: "Restore ready",
+      detail: "Opens in studio; export again for a file",
+      tone: "restore",
+    };
+  }
+
+  if (downloadCount) {
+    return {
+      label: "Download only",
+      detail: `Older saved run with ${downloadLabel}`,
+      tone: "download",
+    };
+  }
+
+  return {
+    label: "Needs re-export",
+    detail: "Run Tailor again to create a fresh export",
+    tone: "legacy",
+  };
+}
+
+export function historyGroupStatus(group: HistoryGroup): HistoryAvailabilityStatus {
+  const counts = historyGroupAvailabilityCounts(group);
+  const parts = [
+    counts.restorable ? `${counts.restorable} restore-ready` : "",
+    counts.downloadOnly ? `${counts.downloadOnly} download-ready` : "",
+    counts.needsReExport ? `${counts.needsReExport} needs re-export` : "",
+  ].filter(Boolean);
+  const detail = parts.join(" · ");
+
+  if (counts.restorable && counts.downloadOnly) {
+    return { label: "Restore + download", detail, tone: "restore" };
+  }
+
+  if (counts.restorable) {
+    return { label: "Restore ready", detail, tone: "restore" };
+  }
+
+  if (counts.downloadOnly) {
+    return { label: "Download ready", detail, tone: "download" };
+  }
+
+  return { label: "Needs re-export", detail, tone: "legacy" };
 }
 
 export function historyVersionLabel(total: number, index: number) {
