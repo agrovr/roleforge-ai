@@ -6675,8 +6675,12 @@ html[data-theme="dark"] input::file-selector-button {
 .rf-resume-paper {
   position: relative;
   min-height: clamp(360px, 38vh, 460px);
+  max-height: min(820px, 74vh);
   width: 100%;
-  overflow: visible;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   overflow-wrap: anywhere;
   padding: 46px 54px 50px;
   border: 1px solid #e9e4da;
