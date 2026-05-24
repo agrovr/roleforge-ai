@@ -4,13 +4,20 @@ import { FaqAccordion } from "./components/FaqAccordion";
 import { ResumePreview } from "./components/ResumePreview";
 import { RoleForgeIcon } from "./components/RoleForgeIcons";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { PREMIUM_PRICE } from "./lib/billing/stripe";
+import { FREE_ENTITLEMENT } from "./lib/entitlements";
 import { createRoleForgeServerClient } from "./lib/supabase/server";
+import { monthlyRunAllowanceLabel } from "./lib/usage";
 
 type LandingLinks = {
   signedIn: boolean;
   studioHref: string;
   premiumHref: string;
 };
+
+const FREE_RUN_ALLOWANCE = monthlyRunAllowanceLabel(FREE_ENTITLEMENT.monthlyRunLimit);
+const PREMIUM_MONTHLY_PRICE = PREMIUM_PRICE.monthly / 100;
+const PREMIUM_YEARLY_PRICE = PREMIUM_PRICE.yearly / 100;
 
 async function getLandingLinks(): Promise<LandingLinks> {
   const supabase = await createRoleForgeServerClient();
@@ -417,9 +424,9 @@ function Pricing({ studioHref, premiumHref }: Pick<LandingLinks, "studioHref" | 
           <article className="price-card">
             <div className="price-name">Studio</div>
             <div className="price-amount"><span className="v">$0</span></div>
-            <div className="price-desc">Start with 5 tailoring runs each month for upload, targeting, review, and PDF export.</div>
+            <div className="price-desc">Start with {FREE_RUN_ALLOWANCE} for upload, targeting, review, and PDF export.</div>
             <ul className="price-list">
-              <li><RoleForgeIcon name="check" size={14} />5 tailoring runs each month</li>
+              <li><RoleForgeIcon name="check" size={14} />{FREE_RUN_ALLOWANCE}</li>
               <li><RoleForgeIcon name="check" size={14} />DOCX, PDF, and TXT upload</li>
               <li><RoleForgeIcon name="check" size={14} />PDF export</li>
               <li><RoleForgeIcon name="check" size={14} />Job description or public URL targeting</li>
@@ -428,8 +435,8 @@ function Pricing({ studioHref, premiumHref }: Pick<LandingLinks, "studioHref" | 
           </article>
           <article className="price-card featured">
             <div className="price-name">Premium</div>
-            <div className="price-amount"><span className="v">$9</span><span className="m">/mo</span></div>
-            <div className="price-desc">$72/year for early users. Premium unlocks unlimited runs plus DOCX and TXT exports.</div>
+            <div className="price-amount"><span className="v">${PREMIUM_MONTHLY_PRICE}</span><span className="m">/mo</span></div>
+            <div className="price-desc">${PREMIUM_YEARLY_PRICE}/year for early users. Premium unlocks unlimited runs plus DOCX and TXT exports.</div>
             <ul className="price-list">
               <li><RoleForgeIcon name="check" size={14} />Unlimited tailoring runs</li>
               <li><RoleForgeIcon name="check" size={14} />DOCX and TXT exports</li>
@@ -450,7 +457,7 @@ function FAQ() {
     ["What file formats can I export?", "The free workflow exports PDF. Premium enables DOCX and TXT exports when your plan is active."],
     ["Can I use templates?", "Yes. Pick a template direction before opening the studio, and RoleForge sends that direction with new exports."],
     ["Is sign-in available?", "Yes. Google and email magic-link sign-in are available. Saved projects sync after sign-in."],
-    ["How much is Premium?", "The launch price is $9/month or $72/year. Checkout and billing management are handled by Stripe."],
+    ["How much is Premium?", `The launch price is $${PREMIUM_MONTHLY_PRICE}/month or $${PREMIUM_YEARLY_PRICE}/year. Checkout and billing management are handled by Stripe.`],
   ] as const;
 
   return (
