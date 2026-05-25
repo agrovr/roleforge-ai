@@ -1086,7 +1086,11 @@ html[data-theme="dark"] textarea {
 
 .dash-mock-url {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
   text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-family: var(--font-mono);
   color: var(--ink-3);
   font-size: 0.75rem;
@@ -10009,6 +10013,11 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px 20px;
+  }
+
+  .dash-mock-url {
+    padding-inline: 10px;
+    font-size: 0.66rem;
   }
 }
 

@@ -102,6 +102,7 @@ async function checkPublicShell(baseUrl) {
   requireCondition(stylesheetText.includes(".dash-stat-value"), "landing dashboard stat styles were missing");
   requireCondition(stylesheetText.includes("2.1cqi"), "landing dashboard stats were not using container-aware type");
   requireCondition(/min-block-size:\s*144px/.test(stylesheetText), "landing dashboard stats were missing stable card height");
+  requireCondition(/\.dash-mock-url\s*\{[^}]*overflow:\s*hidden[^}]*text-overflow:\s*ellipsis/s.test(stylesheetText), "landing dashboard URL bar can still overflow on narrow screens");
   pass("landing dashboard stat cards include overflow-safe styles");
 
   requireCondition(stylesheetText.includes(".nav-cta-short"), "landing mobile nav compact CTA styles were missing");
