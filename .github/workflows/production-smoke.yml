@@ -1,0 +1,26 @@
+name: Production Smoke
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 11 * * *"
+
+jobs:
+  smoke:
+    name: Live frontend smoke
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Smoke live frontend
+        run: node scripts/smoke_frontend.mjs
+        env:
+          ROLEFORGE_SITE_URL: https://roleforgeai.vercel.app
+          ROLEFORGE_SMOKE_COOKIE: ${{ secrets.ROLEFORGE_SMOKE_COOKIE }}
