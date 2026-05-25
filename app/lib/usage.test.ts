@@ -3,6 +3,7 @@ import test from "node:test";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { FREE_ENTITLEMENT, type AccountEntitlement } from "./entitlements";
 import {
   currentUsagePeriod,
   loadAccountUsage,
@@ -11,17 +12,12 @@ import {
   usageProgressPercent,
 } from "./usage";
 
-const freeEntitlement = {
-  plan: "free" as const,
-  billingStatus: "none" as const,
-  exportFormats: { pdf: true, docx: false, txt: false },
-  monthlyRunLimit: 5,
-};
+const freeEntitlement: AccountEntitlement = FREE_ENTITLEMENT;
 
-const premiumEntitlement = {
-  ...freeEntitlement,
-  plan: "premium" as const,
-  billingStatus: "active" as const,
+const premiumEntitlement: AccountEntitlement = {
+  ...FREE_ENTITLEMENT,
+  plan: "premium",
+  billingStatus: "active",
   exportFormats: { pdf: true, docx: true, txt: true },
   monthlyRunLimit: null,
 };

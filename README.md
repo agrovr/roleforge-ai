@@ -141,7 +141,7 @@ Do not expose these values through `NEXT_PUBLIC_*` variables.
 
 ```bash
 npm run lint
-npx tsc --noEmit
+npm run typecheck
 npm run build
 npm run smoke:frontend
 ```
