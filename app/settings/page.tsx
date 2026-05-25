@@ -170,8 +170,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName = accountDisplayName(user);
   const planFeatures = premiumActive
-    ? ["Unlimited runs", "DOCX and TXT exports", premiumEnding && premiumEndLabel ? `Access until ${premiumEndLabel}` : "Saved projects"]
-    : [monthlyRunAllowanceLabel(usage.monthlyRunLimit), "PDF export", "Saved projects"];
+    ? ["Unlimited runs", "DOCX and TXT exports", premiumEnding && premiumEndLabel ? `Access until ${premiumEndLabel}` : "PDF export included"]
+    : [monthlyRunAllowanceLabel(usage.monthlyRunLimit), "PDF export", "Saved project sync"];
   const exportRows: ExportRow[] = [
     { label: "PDF", enabled: entitlement.exportFormats.pdf, included: "Included", locked: "Unavailable" },
     { label: "DOCX", enabled: entitlement.exportFormats.docx, included: "Included with Premium", locked: "Premium" },
