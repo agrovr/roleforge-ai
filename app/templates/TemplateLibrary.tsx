@@ -11,6 +11,7 @@ import {
   RESUME_TEMPLATES,
   getResumeTemplate,
   isResumeTemplateSlug,
+  resumeTemplateEntryHref,
   resumeTemplateStudioHref,
   type ResumeTemplateSlug,
 } from "../lib/resumeTemplates";
@@ -20,7 +21,7 @@ function rememberTemplate(slug: ResumeTemplateSlug) {
   document.cookie = `${RESUME_TEMPLATE_COOKIE}=${encodeURIComponent(slug)}; Path=/; Max-Age=31536000; SameSite=Lax`;
 }
 
-export function TemplateLibrary({ studioHref }: { studioHref: string }) {
+export function TemplateLibrary({ signedIn }: { signedIn: boolean }) {
   const [selectedSlug, setSelectedSlug] = useState<ResumeTemplateSlug>("classic");
 
   useEffect(() => {
@@ -40,7 +41,7 @@ export function TemplateLibrary({ studioHref }: { studioHref: string }) {
           <span className="eyebrow">Selected direction</span>
           <strong>{selectedTemplate.name}</strong>
         </div>
-        <Link className="btn btn-soft btn-sm" href={resumeTemplateStudioHref(selectedSlug)}>
+        <Link className="btn btn-soft btn-sm" href={resumeTemplateEntryHref(selectedSlug, signedIn)}>
           Use in studio <RoleForgeIcon name="arrow" size={12} />
         </Link>
       </div>
@@ -76,7 +77,7 @@ export function TemplateLibrary({ studioHref }: { studioHref: string }) {
                   >
                     {selected ? "Selected" : "Select"} <RoleForgeIcon name={selected ? "check" : "layers"} size={12} />
                   </button>
-                  <Link className="btn btn-ghost btn-sm" href={studioHref.includes("?") ? studioHref : resumeTemplateStudioHref(template.slug)}>
+                  <Link className="btn btn-ghost btn-sm" href={signedIn ? resumeTemplateStudioHref(template.slug) : resumeTemplateEntryHref(template.slug, signedIn)}>
                     Studio
                   </Link>
                 </div>

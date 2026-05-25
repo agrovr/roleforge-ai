@@ -14,13 +14,14 @@ async function getTemplateLinks() {
   const signedIn = Boolean(user);
 
   return {
+    signedIn,
     studioHref: signedIn ? "/app" : "/login?next=/app",
     settingsHref: signedIn ? "/settings#exports" : `/login?next=${encodeURIComponent("/settings#exports")}`,
   };
 }
 
 export default async function TemplatesPage() {
-  const { studioHref, settingsHref } = await getTemplateLinks();
+  const { signedIn, studioHref, settingsHref } = await getTemplateLinks();
 
   return (
     <main className="templates-page-shell">
@@ -50,7 +51,7 @@ export default async function TemplatesPage() {
         </div>
       </section>
 
-      <TemplateLibrary studioHref={studioHref} />
+      <TemplateLibrary signedIn={signedIn} />
     </main>
   );
 }

@@ -84,3 +84,8 @@ export function resumeTemplateStudioHref(value?: string | null) {
   const template = getResumeTemplate(value);
   return `/app?template=${encodeURIComponent(template.slug)}`;
 }
+
+export function resumeTemplateEntryHref(value: string | null | undefined, signedIn: boolean) {
+  const studioHref = resumeTemplateStudioHref(value);
+  return signedIn ? studioHref : `/login?next=${encodeURIComponent(studioHref)}`;
+}
