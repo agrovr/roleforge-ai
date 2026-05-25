@@ -66,7 +66,7 @@ function Hero({ studioHref }: Pick<LandingLinks, "studioHref">) {
           <span>AI-assisted resume tailoring for focused applications</span>
         </div>
         <h1 className="display h1">
-          The&nbsp;resume&nbsp;that{" "}<br />
+          The resume that{" "}<br />
           <span className="italic underline-brand">actually fits</span>{" "}<br />
           the role.
         </h1>

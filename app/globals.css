@@ -8048,6 +8048,10 @@ html[data-theme="dark"] .rf-rail-upgrade p {
     display: inline;
   }
 
+  .brand {
+    min-width: 0;
+  }
+
   .h1 {
     font-size: clamp(3rem, 16vw, 4.1rem);
   }
@@ -9944,6 +9948,67 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     min-width: 0;
     padding-inline: 6px;
     font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 355px) {
+  .nav-inner {
+    gap: 8px;
+  }
+
+  .nav-links {
+    gap: 6px;
+  }
+
+  .brand {
+    gap: 8px;
+  }
+
+  .brand-mark {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+    border-radius: 11px;
+  }
+
+  .brand-name {
+    max-width: 108px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.02rem;
+  }
+
+  .nav .theme-toggle {
+    width: 40px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .nav .btn-brand {
+    min-height: 42px;
+    padding: 0 12px;
+  }
+
+  .hero-copy,
+  .hero-stage {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .hero-trust {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .hero-trust span:not(.badge) {
+    min-width: 0;
+  }
+
+  .hero-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 20px;
   }
 }
 

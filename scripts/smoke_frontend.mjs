@@ -107,6 +107,8 @@ async function checkPublicShell(baseUrl) {
   requireCondition(stylesheetText.includes(".nav-cta-short"), "landing mobile nav compact CTA styles were missing");
   requireCondition(/\.nav-link-secondary,\s*\.nav-link-account,\s*\.nav-divider\s*\{\s*display:\s*none/.test(stylesheetText), "landing mobile nav still exposes full navigation links");
   requireCondition(/\.nav\s+\.btn-brand\s*\{[^}]*min-width:\s*0/.test(stylesheetText), "landing mobile nav CTA can still force header overflow");
+  requireCondition(/@media\s*\(max-width:\s*355px\)/.test(stylesheetText), "landing nav was missing narrow-phone overflow protection");
+  requireCondition(!home.text.includes("The&nbsp;resume&nbsp;that"), "landing hero headline still prevents narrow-phone wrapping");
   pass("landing mobile nav includes compact one-row styles");
 }
 
