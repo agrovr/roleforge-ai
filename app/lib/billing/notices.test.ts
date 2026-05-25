@@ -20,6 +20,7 @@ test("formats billing fallback notices without raw provider language", () => {
     tone: "neutral",
     text: "Billing is taking a moment to connect. Try again shortly.",
   });
+  assert.equal(billingNotice("temporarily-unavailable", { premiumActive: true }), null);
   assert.deepEqual(billingNotice("already-premium"), {
     tone: "neutral",
     text: "Premium is already active for this account. Use Manage billing for plan changes.",

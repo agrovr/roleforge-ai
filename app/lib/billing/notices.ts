@@ -33,6 +33,7 @@ export function billingNotice(value: string | undefined, options?: { premiumActi
         text: "Premium is already active for this account. Use Manage billing for plan changes.",
       };
     case "temporarily-unavailable":
+      if (options?.premiumActive) return null;
       return {
         tone: "neutral",
         text: "Billing is taking a moment to connect. Try again shortly.",
