@@ -8,6 +8,7 @@ import { ThemeToggle } from "../components/ThemeToggle";
 import { accountDisplayName } from "../lib/accountUser";
 import { billingStateDetail, billingStateLabel, billingStatusTone } from "../lib/billing/display";
 import { reconcileUserSubscriptionEntitlement, syncCheckoutSessionEntitlement } from "../lib/billing/entitlements";
+import { billingNotice } from "../lib/billing/notices";
 import { billingReadiness } from "../lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
@@ -36,40 +37,6 @@ type SettingsSearchParams = Promise<Record<string, string | string[] | undefined
 
 function getParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
-}
-
-function billingNotice(value: string | undefined, options?: { premiumActive?: boolean }) {
-  switch (value) {
-    case "checkout-success":
-      return {
-        tone: "success",
-        text: options?.premiumActive
-          ? "Checkout is complete. Premium access is active for this account."
-          : "Checkout is complete. Premium access will appear here as soon as the subscription syncs.",
-      };
-    case "checkout-canceled":
-      return {
-        tone: "neutral",
-        text: "Checkout was canceled. Your current plan is unchanged.",
-      };
-    case "portal-return":
-      return {
-        tone: "success",
-        text: "Billing details refreshed. Plan changes can take a moment to sync.",
-      };
-    case "no-customer":
-      return {
-        tone: "neutral",
-        text: "Start Premium first, then billing management will open here.",
-      };
-    case "already-premium":
-      return {
-        tone: "neutral",
-        text: "Premium is already active for this account. Use Manage billing for plan changes.",
-      };
-    default:
-      return null;
-  }
 }
 
 function formatPlanDate(value: string | null) {

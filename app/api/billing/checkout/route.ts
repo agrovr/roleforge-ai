@@ -44,11 +44,16 @@ export async function POST(request: Request) {
   const interval = normalizeInterval(formData.get("interval"));
   const priceId = priceIdForInterval(interval);
 
-  const { data: entitlement } = await serviceSupabase
+  const { data: entitlement, error: entitlementError } = await serviceSupabase
     .from("account_entitlements")
     .select("stripe_customer_id, plan, billing_status")
     .eq("user_id", user.id)
     .maybeSingle();
+
+  if (entitlementError) {
+    console.error("Checkout entitlement lookup failed", entitlementError);
+    return NextResponse.redirect(absoluteUrl(request, "/settings?billing=temporarily-unavailable#billing"), 303);
+  }
 
   const entitlementRow = entitlement as EntitlementBillingRow | null;
   if (hasActivePremiumAccess(entitlementRow?.plan, entitlementRow?.billing_status)) {
@@ -68,7 +73,7 @@ export async function POST(request: Request) {
 
     customerId = customer.id;
 
-    await serviceSupabase
+    const { error: customerRecordError } = await serviceSupabase
       .from("account_entitlements")
       .upsert({
         user_id: user.id,
@@ -78,6 +83,11 @@ export async function POST(request: Request) {
         features: FREE_FEATURES,
         updated_at: new Date().toISOString(),
       }, { onConflict: "user_id" });
+
+    if (customerRecordError) {
+      console.error("Checkout customer record save failed", customerRecordError);
+      return NextResponse.redirect(absoluteUrl(request, "/settings?billing=temporarily-unavailable#billing"), 303);
+    }
   }
 
   const session = await stripe.checkout.sessions.create({

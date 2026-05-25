@@ -32,11 +32,16 @@ export async function POST(request: Request) {
     return NextResponse.redirect(absoluteUrl(request, "/login?next=/settings&account=signin-required"), 303);
   }
 
-  const { data: entitlement } = await serviceSupabase
+  const { data: entitlement, error: entitlementError } = await serviceSupabase
     .from("account_entitlements")
     .select("stripe_customer_id")
     .eq("user_id", user.id)
     .maybeSingle();
+
+  if (entitlementError) {
+    console.error("Billing portal entitlement lookup failed", entitlementError);
+    return NextResponse.redirect(absoluteUrl(request, "/settings?billing=temporarily-unavailable#billing"), 303);
+  }
 
   const customerId = (entitlement as EntitlementBillingRow | null)?.stripe_customer_id ?? "";
 
