@@ -233,6 +233,12 @@ async function checkSignedInStatus(baseUrl, cookie, expectPremiumAccess) {
   requireCondition(app.text.includes("Resume studio"), "signed-in studio did not render the workspace");
   pass("signed-in studio renders the workspace shell");
 
+  const savedRuns = await request(baseUrl, "/api/saved-runs", { cookie, redirect: "follow" });
+  requireCondition(savedRuns.response.ok, `signed-in saved projects returned ${savedRuns.response.status}`);
+  const savedRunsPayload = JSON.parse(savedRuns.text);
+  requireCondition(Array.isArray(savedRunsPayload.runs), "signed-in saved projects did not return a runs array");
+  pass("signed-in saved projects API returns account runs");
+
   const settings = await request(baseUrl, "/settings", { cookie, redirect: "follow" });
   requireCondition(settings.response.ok, `signed-in settings returned ${settings.response.status}`);
   requireCondition(settings.text.includes("Settings"), "signed-in settings did not render the settings page");
