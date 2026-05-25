@@ -1210,9 +1210,13 @@ html[data-theme="dark"] textarea {
 }
 
 .dash-stat {
+  display: flex;
+  min-block-size: 144px;
   min-width: 0;
+  flex-direction: column;
+  justify-content: space-between;
   overflow: hidden;
-  padding: 16px;
+  padding: 18px 16px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
@@ -1228,14 +1232,15 @@ html[data-theme="dark"] textarea {
 
 .dash-stat-value {
   max-width: 100%;
-  margin: 6px 0 4px;
+  margin: 10px 0 8px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(1.45rem, 1.75vw, 1.9rem);
+  font-size: clamp(1.35rem, 2.1cqi, 1.9rem);
   font-weight: 500;
   letter-spacing: 0;
-  line-height: 1.02;
-  overflow-wrap: anywhere;
+  line-height: 1;
+  overflow-wrap: normal;
+  text-wrap: balance;
 }
 
 .dash-stat-delta {
@@ -1250,6 +1255,10 @@ html[data-theme="dark"] textarea {
 @container (max-width: 680px) {
   .dash-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dash-stat {
+    min-block-size: 132px;
   }
 }
 

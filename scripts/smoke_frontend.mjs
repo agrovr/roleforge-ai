@@ -33,6 +33,19 @@ async function request(baseUrl, path, options = {}) {
   return { response, text };
 }
 
+async function requestAbsolute(url, options = {}) {
+  const response = await fetch(url, {
+    method: options.method || "GET",
+    redirect: options.redirect || "manual",
+    headers: {
+      "User-Agent": "RoleForge frontend smoke",
+      ...(options.headers || {}),
+    },
+  });
+  const text = await response.text();
+  return { response, text };
+}
+
 function requireCondition(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -72,6 +85,24 @@ async function checkPublicShell(baseUrl) {
     "login did not include the protected-studio sign-in copy",
   );
   pass("login page explains protected studio access");
+
+  const stylesheetPaths = Array.from(home.text.matchAll(/href="([^"]+\.css[^"]*)"/g))
+    .map((match) => match[1])
+    .filter((path) => path.startsWith("/_next/static/"));
+  requireCondition(stylesheetPaths.length > 0, "home did not include Next.js stylesheets");
+
+  const stylesheetText = (
+    await Promise.all(stylesheetPaths.map(async (path) => {
+      const stylesheet = await requestAbsolute(new URL(path, baseUrl).toString(), { redirect: "follow" });
+      requireCondition(stylesheet.response.ok, `stylesheet ${path} returned ${stylesheet.response.status}`);
+      return stylesheet.text;
+    }))
+  ).join("\n");
+
+  requireCondition(stylesheetText.includes(".dash-stat-value"), "landing dashboard stat styles were missing");
+  requireCondition(stylesheetText.includes("2.1cqi"), "landing dashboard stats were not using container-aware type");
+  requireCondition(/min-block-size:\s*144px/.test(stylesheetText), "landing dashboard stats were missing stable card height");
+  pass("landing dashboard stat cards include overflow-safe styles");
 }
 
 async function checkAnonymousGate(baseUrl) {
