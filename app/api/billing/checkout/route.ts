@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { FREE_FEATURES } from "@/app/lib/billing/entitlements";
+import { hasActivePremiumAccess } from "@/app/lib/billing/readiness";
 import { absoluteUrl, checkoutSuccessUrl, getStripeBillingConfig, getStripeClient, priceIdForInterval, type BillingInterval } from "@/app/lib/billing/stripe";
 import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
 import { createRoleForgeServiceClient } from "@/app/lib/supabase/service";
@@ -9,6 +10,8 @@ export const runtime = "nodejs";
 
 type EntitlementBillingRow = {
   stripe_customer_id: string | null;
+  plan: string | null;
+  billing_status: string | null;
 };
 
 function normalizeInterval(value: FormDataEntryValue | null): BillingInterval {
@@ -43,11 +46,16 @@ export async function POST(request: Request) {
 
   const { data: entitlement } = await serviceSupabase
     .from("account_entitlements")
-    .select("stripe_customer_id")
+    .select("stripe_customer_id, plan, billing_status")
     .eq("user_id", user.id)
     .maybeSingle();
 
-  let customerId = (entitlement as EntitlementBillingRow | null)?.stripe_customer_id ?? "";
+  const entitlementRow = entitlement as EntitlementBillingRow | null;
+  if (hasActivePremiumAccess(entitlementRow?.plan, entitlementRow?.billing_status)) {
+    return NextResponse.redirect(absoluteUrl(request, "/settings?billing=already-premium#billing"), 303);
+  }
+
+  let customerId = entitlementRow?.stripe_customer_id ?? "";
 
   if (!customerId) {
     const customer = await stripe.customers.create({

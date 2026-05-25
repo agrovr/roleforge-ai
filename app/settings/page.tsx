@@ -62,6 +62,11 @@ function billingNotice(value: string | undefined, options?: { premiumActive?: bo
         tone: "neutral",
         text: "Start Premium first, then billing management will open here.",
       };
+    case "already-premium":
+      return {
+        tone: "neutral",
+        text: "Premium is already active for this account. Use Manage billing for plan changes.",
+      };
     default:
       return null;
   }

@@ -16,3 +16,7 @@ export function billingReadiness(
     portalReady: Boolean(billingServiceReady && options.billingStatus !== "none"),
   };
 }
+
+export function hasActivePremiumAccess(plan: unknown, billingStatus: unknown) {
+  return plan === "premium" && (billingStatus === "active" || billingStatus === "trialing");
+}

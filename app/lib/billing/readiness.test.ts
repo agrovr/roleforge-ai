@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { billingReadiness } from "./readiness";
+import { billingReadiness, hasActivePremiumAccess } from "./readiness";
 
 test("enables checkout only when Stripe prices and service role are configured", () => {
   assert.deepEqual(
@@ -47,4 +47,12 @@ test("disables billing portal when there is no subscription state to manage", ()
     ).portalReady,
     false,
   );
+});
+
+test("detects active premium access for checkout guards", () => {
+  assert.equal(hasActivePremiumAccess("premium", "active"), true);
+  assert.equal(hasActivePremiumAccess("premium", "trialing"), true);
+  assert.equal(hasActivePremiumAccess("premium", "past_due"), false);
+  assert.equal(hasActivePremiumAccess("free", "active"), false);
+  assert.equal(hasActivePremiumAccess(null, "active"), false);
 });
