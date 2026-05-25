@@ -71,6 +71,7 @@ import {
   type UploadFormat,
   type WorkflowCapabilities,
 } from "../lib/workflowCapabilities";
+import { readApiError, workflowErrorFromCaught, type WorkflowErrorState } from "../lib/workflowErrors";
 
 type AtsIssue = { severity: string; issue: string; fix: string };
 type AtsReport = { issues: AtsIssue[] };
@@ -176,18 +177,6 @@ type AccountStatus = {
   entitlement?: AccountEntitlement;
   usage?: AccountUsage | null;
   next: string;
-};
-type ApiErrorPayload = { error?: { code?: string; message?: string; request_id?: string; details?: unknown } };
-type ApiWorkflowError = Error & {
-  code?: string;
-  requestId?: string;
-  details?: Record<string, unknown> | null;
-};
-type WorkflowErrorState = {
-  message: string;
-  code?: string;
-  requestId?: string;
-  details?: Record<string, unknown> | null;
 };
 type ExportNotice = { format: ExportFormat; label: string };
 type StudioSuggestion = { label: string; meta: string; before?: string; after: string; tone?: "good" | "warn" | "neutral" };
@@ -765,45 +754,6 @@ function loadSyncedHistoryIds(): string[] {
 function saveSyncedHistoryIds(ids: string[]) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(SYNCED_HISTORY_KEY, JSON.stringify([...new Set(ids)].slice(0, 40)));
-}
-
-function asRecord(value: unknown): Record<string, unknown> | null {
-  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null;
-}
-
-function createWorkflowError(message: string, code?: string, requestId?: string, details?: unknown): ApiWorkflowError {
-  const error = new Error(message) as ApiWorkflowError;
-  error.code = code;
-  error.requestId = requestId;
-  error.details = asRecord(details);
-  return error;
-}
-
-async function readApiError(response: Response, fallback: string): Promise<ApiWorkflowError> {
-  try {
-    const data = (await response.json()) as ApiErrorPayload;
-    const message = data.error?.message;
-    const code = data.error?.code;
-    const requestId = data.error?.request_id;
-    if (message) return createWorkflowError(message, code, requestId, data.error?.details);
-  } catch {
-    // Keep the interaction moving with the fallback below.
-  }
-  return createWorkflowError(fallback);
-}
-
-function workflowErrorFromCaught(caught: unknown, fallback: string): WorkflowErrorState {
-  if (caught instanceof Error) {
-    const apiError = caught as ApiWorkflowError;
-    return {
-      message: apiError.message || fallback,
-      code: apiError.code,
-      requestId: apiError.requestId,
-      details: apiError.details ?? null,
-    };
-  }
-
-  return { message: fallback, details: null };
 }
 
 function numberDetail(details: Record<string, unknown> | null | undefined, key: string): number | null {
