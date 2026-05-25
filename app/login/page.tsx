@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { loginNoticeCopy, loginNoticeTone } from "../lib/loginNotice";
 import { safeRedirectPath } from "../lib/safeRedirect";
 import { getSupabaseConfig } from "../lib/supabase/config";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
@@ -14,35 +15,13 @@ function getParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function noticeCopy(account: string | undefined) {
-  switch (account) {
-    case "signin-required":
-      return "Sign in to start tailoring resumes and keep saved projects tied to your account.";
-    case "check-email":
-      return "Check your email for the secure sign-in link.";
-    case "signed-out":
-      return "You are signed out.";
-    case "signin-error":
-      return "Sign-in could not finish. Try Google or send a new email link.";
-    default:
-      return "Choose Google or a secure email link to continue to the studio.";
-  }
-}
-
-function noticeTone(account: string | undefined) {
-  if (account === "check-email") return "success";
-  if (account === "signin-error") return "error";
-  if (account === "signed-out") return "neutral";
-  return "info";
-}
-
 export default async function LoginPage({ searchParams }: { searchParams: LoginSearchParams }) {
   const params = await searchParams;
   const next = safeRedirectPath(getParam(params.next) ?? null, "/app");
   const statusNext = `/login?next=${encodeURIComponent(next)}`;
   const account = getParam(params.account);
-  const notice = noticeCopy(account);
-  const tone = noticeTone(account);
+  const notice = loginNoticeCopy(account);
+  const tone = loginNoticeTone(account);
   const config = getSupabaseConfig();
   const supabase = await createRoleForgeServerClient();
 
