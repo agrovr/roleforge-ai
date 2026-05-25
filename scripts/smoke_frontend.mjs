@@ -34,12 +34,29 @@ function requireCondition(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+function requireHeader(response, name, expected) {
+  const value = response.headers.get(name) || "";
+  if (expected instanceof RegExp) {
+    requireCondition(expected.test(value), `${name} header was unexpected: ${value || "(missing)"}`);
+    return;
+  }
+
+  requireCondition(value.toLowerCase() === expected.toLowerCase(), `${name} header was unexpected: ${value || "(missing)"}`);
+}
+
 async function checkPublicShell(baseUrl) {
   const home = await request(baseUrl, "/", { redirect: "follow" });
   requireCondition(home.response.ok, `home returned ${home.response.status}`);
   requireCondition(home.text.includes("RoleForge AI"), "home did not include RoleForge AI brand copy");
   requireCondition(home.text.includes("/app"), "home did not include a studio route");
   pass("home page renders the RoleForge shell");
+
+  requireHeader(home.response, "strict-transport-security", /^max-age=63072000; includeSubDomains; preload$/i);
+  requireHeader(home.response, "x-content-type-options", "nosniff");
+  requireHeader(home.response, "x-frame-options", "DENY");
+  requireHeader(home.response, "referrer-policy", "strict-origin-when-cross-origin");
+  requireHeader(home.response, "permissions-policy", /camera=\(\), microphone=\(\), geolocation=\(\)/i);
+  pass("home page includes production security headers");
 
   const login = await request(baseUrl, "/login?next=%2Fapp&account=signin-required", { redirect: "follow" });
   requireCondition(login.response.ok, `login returned ${login.response.status}`);
