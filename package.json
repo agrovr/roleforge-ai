@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "smoke:frontend": "node scripts/smoke_frontend.mjs",
     "test": "tsx --test app/lib/*.test.ts app/lib/billing/*.test.ts app/lib/supabase/*.test.ts",
     "test:billing": "tsx --test app/lib/billing/entitlements.test.ts",
     "test:billing-display": "tsx --test app/lib/billing/display.test.ts",

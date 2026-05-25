@@ -143,6 +143,9 @@ Do not expose these values through `NEXT_PUBLIC_*` variables.
 npm run lint
 npx tsc --noEmit
 npm run build
+npm run smoke:frontend
 ```
+
+`npm run smoke:frontend` checks the live RoleForge shell, login copy, and anonymous `/app` auth gate against `https://roleforgeai.vercel.app` by default. Set `ROLEFORGE_SITE_URL` to target another deployment. Set `ROLEFORGE_SMOKE_COOKIE` only for a dedicated smoke account when you want it to also verify signed-in account status; do not use a personal browser cookie in CI.
 
 Before changing billing behavior, confirm the Stripe products, price IDs, webhook events, redirect URLs, backend endpoints, and entitlement rules match the current production setup.
