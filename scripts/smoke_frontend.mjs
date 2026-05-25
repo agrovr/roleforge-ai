@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const DEFAULT_BASE_URL = "https://roleforgeai.vercel.app";
+const DEFAULT_BACKEND_URL = "https://roleforge-api-224015900616.us-central1.run.app";
 
 function normalizeBaseUrl(value) {
   const raw = (value || DEFAULT_BASE_URL).trim().replace(/\/+$/, "");
@@ -110,6 +111,32 @@ async function checkCrawlerMetadata(baseUrl) {
   pass("crawler metadata exposes public pages and excludes protected routes");
 }
 
+async function checkBackendCapabilities(backendUrl) {
+  const capabilities = await request(backendUrl, "/capabilities", { redirect: "follow" });
+  requireCondition(capabilities.response.ok, `backend capabilities returned ${capabilities.response.status}`);
+  const payload = JSON.parse(capabilities.text);
+  const uploadFormats = Object.fromEntries((payload.upload_formats || []).map((item) => [item.format, item]));
+  const exportFormats = Object.fromEntries((payload.export_formats || []).map((item) => [item.format, item]));
+  const exportTemplates = Object.fromEntries((payload.export_templates || []).map((item) => [item.template, item]));
+
+  for (const format of ["docx", "pdf", "txt"]) {
+    requireCondition(uploadFormats[format]?.enabled === true, `backend upload format ${format} is not enabled`);
+  }
+
+  requireCondition(exportFormats.pdf?.enabled === true, "backend PDF export is not enabled");
+  requireCondition(exportFormats.pdf?.plan === "free", "backend PDF export is not marked free");
+
+  for (const format of ["docx", "txt"]) {
+    requireCondition(exportFormats[format]?.plan === "premium", `backend ${format.toUpperCase()} export is not marked premium`);
+  }
+
+  for (const template of ["classic", "modern", "editorial", "compact", "executive", "engineer"]) {
+    requireCondition(exportTemplates[template]?.label, `backend export template ${template} is not advertised`);
+  }
+
+  pass("backend capabilities match the frontend workflow contract");
+}
+
 async function checkSignedInStatus(baseUrl, cookie) {
   if (!cookie) {
     pass("signed-in smoke skipped because ROLEFORGE_SMOKE_COOKIE is not configured");
@@ -139,6 +166,7 @@ async function checkSignedInStatus(baseUrl, cookie) {
 
 async function main() {
   const baseUrl = normalizeBaseUrl(process.env.ROLEFORGE_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL);
+  const backendUrl = normalizeBaseUrl(process.env.ROLEFORGE_BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || DEFAULT_BACKEND_URL);
   const cookie = process.env.ROLEFORGE_SMOKE_COOKIE?.trim();
 
   try {
@@ -146,6 +174,7 @@ async function main() {
     await checkAnonymousAuthStatus(baseUrl);
     await checkAnonymousGate(baseUrl);
     await checkCrawlerMetadata(baseUrl);
+    await checkBackendCapabilities(backendUrl);
     await checkSignedInStatus(baseUrl, cookie);
   } catch (error) {
     fail(error instanceof Error ? error.message : String(error));

@@ -37,8 +37,8 @@ Backend health with exact deployed revision:
 
 Frontend:
 
-- `Frontend CI` runs tests, lint, typecheck, build, waits for Vercel, then smokes production.
-- `Production Smoke` runs daily and can be manually dispatched for the live frontend.
+- `Frontend CI` runs tests, lint, typecheck, build, waits for Vercel, then smokes production, including the backend `/capabilities` contract.
+- `Production Smoke` runs daily and can be manually dispatched for the live frontend and backend workflow contract.
 - Optional secret: `ROLEFORGE_SMOKE_COOKIE` for a dedicated smoke account. Do not use a personal browser cookie in CI.
 
 Backend:
@@ -63,7 +63,7 @@ Before assuming a frontend bug is fixed in production:
 
 - Confirm GitHub `Frontend CI` passed.
 - Confirm the commit has a successful `Vercel` status.
-- Run `node scripts\smoke_frontend.mjs`.
+- Run `node scripts\smoke_frontend.mjs`; it verifies the frontend shell and the backend `/capabilities` contract the studio depends on.
 
 Backend deploys through GitHub Actions to Cloud Run from `agrovr/roleforge-ai-backend` `main`.
 

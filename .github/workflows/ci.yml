@@ -51,4 +51,5 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: npm run smoke:frontend
         env:
+          ROLEFORGE_BACKEND_URL: https://roleforge-api-224015900616.us-central1.run.app
           ROLEFORGE_SMOKE_COOKIE: ${{ secrets.ROLEFORGE_SMOKE_COOKIE }}

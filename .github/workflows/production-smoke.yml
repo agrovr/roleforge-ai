@@ -23,4 +23,5 @@ jobs:
         run: node scripts/smoke_frontend.mjs
         env:
           ROLEFORGE_SITE_URL: https://roleforgeai.vercel.app
+          ROLEFORGE_BACKEND_URL: https://roleforge-api-224015900616.us-central1.run.app
           ROLEFORGE_SMOKE_COOKIE: ${{ secrets.ROLEFORGE_SMOKE_COOKIE }}
