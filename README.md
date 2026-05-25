@@ -88,6 +88,8 @@ The studio is protected behind Supabase Auth. Email magic-link sign-in and Googl
 
 Plan rules live in `docs/plan-rules.md`, and Stripe billing behavior lives in `docs/stripe-billing-foundation.md`. The app uses `account_entitlements` as the account-level source of truth so signed-in users can read their current plan while client-side writes remain blocked.
 
+Billing routes fail closed when account entitlement reads or customer writes are unavailable, returning users to Settings instead of continuing with paid state that cannot be reconciled to their Supabase account.
+
 The Supabase-ready frontend foundation is in place:
 
 - `GET /api/auth/status` reports whether public Supabase environment variables are configured and whether a user session exists.

@@ -41,7 +41,9 @@ After creating the endpoint, add its signing secret to Vercel as `STRIPE_WEBHOOK
 ## Entitlement behavior
 
 - Checkout is only available to signed-in users.
-- Checkout creates or reuses a Stripe customer and records the customer ID in `account_entitlements`.
+- Checkout creates or reuses a Stripe customer and records the customer ID in `account_entitlements` before sending the user to Stripe.
+- Checkout stops and returns to `/settings?billing=temporarily-unavailable#billing` if the entitlement lookup fails or the Stripe customer ID cannot be saved.
+- Billing portal access stops and returns to `/settings?billing=temporarily-unavailable#billing` if the entitlement lookup fails.
 - Premium is only granted by Stripe webhook events.
 - Active or trialing subscriptions set `plan = 'premium'`, unlock premium export entitlements, and set `monthly_run_limit = null`.
 - Canceled, incomplete, past-due, or missing subscriptions fall back to free entitlements.
@@ -51,4 +53,5 @@ After creating the endpoint, add its signing secret to Vercel as `STRIPE_WEBHOOK
 
 - Keep all Stripe and Supabase service credentials server-only.
 - After changing Price IDs or webhook events, redeploy and confirm checkout, portal return, webhook delivery, and `/settings` plan state.
+- Do not let checkout or portal continue when service-role reads or writes fail; the app should fail closed instead of creating paid state that cannot be reconciled to the signed-in account.
 - Use Stripe test subscriptions to verify active, canceled, and renewed states before switching any live-mode values.

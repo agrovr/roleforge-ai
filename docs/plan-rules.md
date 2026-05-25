@@ -29,6 +29,8 @@ These rules keep the app honest now that Supabase auth, Stripe checkout, custome
 - Users cannot insert or update entitlement rows from the client.
 - Stripe webhook handlers update this table with server-side credentials only.
 - Entitlement `features.monthly_run_limit` is `5` for free accounts and `null` for active/trialing premium accounts.
+- Checkout and billing portal routes must fail closed if service-role entitlement reads fail.
+- Checkout must also fail closed if a newly-created Stripe customer cannot be saved back to `account_entitlements`.
 
 ## Billing Environment
 
