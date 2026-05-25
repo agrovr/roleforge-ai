@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import type { Provider } from "@supabase/supabase-js";
 
+import { loginStatusRedirectPath } from "@/app/lib/authRedirect";
 import { safeRedirectPath } from "@/app/lib/safeRedirect";
 import { getRequestOrigin } from "@/app/lib/siteUrl";
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
@@ -13,17 +14,14 @@ export async function GET(request: NextRequest) {
   const url = request.nextUrl;
   const provider = url.searchParams.get("provider") as Provider | null;
   const next = safeRedirectPath(url.searchParams.get("next"));
-  const fallback = new URL(next, url.origin);
 
   if (!provider || !supportedOAuthProviders.has(provider)) {
-    fallback.searchParams.set("account", "signin-error");
-    return NextResponse.redirect(fallback);
+    return NextResponse.redirect(new URL(loginStatusRedirectPath(next, "signin-error"), url.origin));
   }
 
   const routeClient = await createRoleForgeRouteClient();
   if (!routeClient) {
-    fallback.searchParams.set("account", "account-not-configured");
-    return NextResponse.redirect(fallback);
+    return NextResponse.redirect(new URL(loginStatusRedirectPath(next, "account-not-configured"), url.origin));
   }
 
   const origin = getRequestOrigin(request.url);
@@ -36,8 +34,9 @@ export async function GET(request: NextRequest) {
   });
 
   if (error || !data.url) {
-    fallback.searchParams.set("account", "signin-error");
-    return NextResponse.redirect(fallback);
+    return NextResponse.redirect(
+      new URL(loginStatusRedirectPath(next, "signin-error", error?.message), url.origin),
+    );
   }
 
   return withSupabaseCookies(NextResponse.redirect(data.url), routeClient.cookiesToSet);

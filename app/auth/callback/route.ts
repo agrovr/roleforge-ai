@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { loginStatusRedirectPath } from "@/app/lib/authRedirect";
 import { safeRedirectPath } from "@/app/lib/safeRedirect";
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
 
@@ -14,26 +15,28 @@ export async function GET(request: NextRequest) {
   const redirectTo = new URL(next, url.origin);
 
   if (authError) {
-    redirectTo.searchParams.set("account", "signin-error");
-    redirectTo.searchParams.set("auth_error", authErrorDescription || authError);
-    return NextResponse.redirect(redirectTo);
+    return NextResponse.redirect(
+      new URL(loginStatusRedirectPath(next, "signin-error", authErrorDescription || authError), url.origin),
+    );
   }
 
   if (!code) {
-    redirectTo.searchParams.set("account", "signin-error");
-    return NextResponse.redirect(redirectTo);
+    return NextResponse.redirect(new URL(loginStatusRedirectPath(next, "signin-error"), url.origin));
   }
 
   const routeClient = await createRoleForgeRouteClient();
   if (!routeClient) {
-    redirectTo.searchParams.set("account", "account-not-configured");
-    return NextResponse.redirect(redirectTo);
+    return NextResponse.redirect(new URL(loginStatusRedirectPath(next, "account-not-configured"), url.origin));
   }
 
   const { error } = await routeClient.supabase.auth.exchangeCodeForSession(code);
   if (error) {
-    redirectTo.searchParams.set("account", "signin-error");
-    redirectTo.searchParams.set("auth_error", error.message);
+    return withSupabaseCookies(
+      NextResponse.redirect(
+        new URL(loginStatusRedirectPath(next, "signin-error", error.message), url.origin),
+      ),
+      routeClient.cookiesToSet,
+    );
   } else {
     redirectTo.searchParams.set("account", "connected");
   }
