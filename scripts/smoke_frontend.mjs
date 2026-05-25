@@ -85,6 +85,41 @@ async function checkAnonymousGate(baseUrl) {
   pass("anonymous studio access redirects to sign-in");
 }
 
+async function checkAnonymousAccountDataGate(baseUrl) {
+  const settings = await request(baseUrl, "/settings");
+  requireCondition([301, 302, 303, 307, 308].includes(settings.response.status), `anonymous /settings returned ${settings.response.status}`);
+  const settingsLocation = settings.response.headers.get("location") || "";
+  requireCondition(
+    settingsLocation.includes("/login") && settingsLocation.includes("next=/settings") && settingsLocation.includes("account=signin-required"),
+    `anonymous /settings redirected to unexpected location: ${settingsLocation}`,
+  );
+
+  const protectedRoutes = [
+    ["saved runs list", "GET", "/api/saved-runs", {}],
+    ["saved runs save", "POST", "/api/saved-runs", {
+      body: JSON.stringify({}),
+      headers: { "Content-Type": "application/json" },
+    }],
+    ["saved runs rename", "PATCH", "/api/saved-runs/smoke-project", {
+      body: JSON.stringify({}),
+      headers: { "Content-Type": "application/json" },
+    }],
+    ["saved runs delete", "DELETE", "/api/saved-runs/smoke-project", {}],
+    ["workflow download", "GET", "/api/workflow/download/smoke.pdf", {}],
+    ["workflow download head", "HEAD", "/api/workflow/download/smoke.pdf", {}],
+  ];
+
+  for (const [name, method, path, options] of protectedRoutes) {
+    const result = await request(baseUrl, path, { method, ...options });
+    requireCondition(result.response.status === 401, `anonymous ${name} returned ${result.response.status}`);
+    if (method !== "HEAD") {
+      requireCondition(result.text.includes("Sign in again"), `anonymous ${name} returned unexpected body: ${result.text.slice(0, 120)}`);
+    }
+  }
+
+  pass("anonymous settings, saved projects, and downloads require sign-in");
+}
+
 async function checkAnonymousBillingGate(baseUrl) {
   const protectedRoutes = [
     ["checkout", {
@@ -215,6 +250,7 @@ async function main() {
     await checkPublicShell(baseUrl);
     await checkAnonymousAuthStatus(baseUrl);
     await checkAnonymousGate(baseUrl);
+    await checkAnonymousAccountDataGate(baseUrl);
     await checkAnonymousBillingGate(baseUrl);
     await checkCrawlerMetadata(baseUrl);
     await checkBackendCapabilities(backendUrl);

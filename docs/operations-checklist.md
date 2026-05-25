@@ -81,6 +81,7 @@ Before assuming a backend bug is fixed in production:
 Expected production state:
 
 - The studio at `/app` requires sign-in.
+- Settings, saved-project APIs, and workflow downloads require sign-in.
 - Landing page should show account-aware navigation when a session exists.
 - Supabase email and Google OAuth callbacks return through `/auth/callback`.
 
