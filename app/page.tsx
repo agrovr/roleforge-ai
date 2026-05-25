@@ -429,6 +429,7 @@ function Pricing({ studioHref, premiumHref }: Pick<LandingLinks, "studioHref" | 
               <li><RoleForgeIcon name="check" size={14} />{FREE_RUN_ALLOWANCE}</li>
               <li><RoleForgeIcon name="check" size={14} />DOCX, PDF, and TXT upload</li>
               <li><RoleForgeIcon name="check" size={14} />PDF export</li>
+              <li><RoleForgeIcon name="check" size={14} />Saved project sync and restore</li>
               <li><RoleForgeIcon name="check" size={14} />Job description or public URL targeting</li>
             </ul>
             <Link className="btn btn-soft btn-lg" href={studioHref}>Open studio</Link>
@@ -440,7 +441,7 @@ function Pricing({ studioHref, premiumHref }: Pick<LandingLinks, "studioHref" | 
             <ul className="price-list">
               <li><RoleForgeIcon name="check" size={14} />Unlimited tailoring runs</li>
               <li><RoleForgeIcon name="check" size={14} />DOCX and TXT exports</li>
-              <li><RoleForgeIcon name="check" size={14} />Saved project sync</li>
+              <li><RoleForgeIcon name="check" size={14} />No monthly run cap</li>
             </ul>
             <Link className="btn btn-brand btn-lg" href={premiumHref}>View plans</Link>
           </article>
