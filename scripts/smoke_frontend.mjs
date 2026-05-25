@@ -63,7 +63,7 @@ async function checkAnonymousGate(baseUrl) {
 
 async function checkSignedInStatus(baseUrl, cookie) {
   if (!cookie) {
-    pass("signed-in status skipped because ROLEFORGE_SMOKE_COOKIE is not configured");
+    pass("signed-in smoke skipped because ROLEFORGE_SMOKE_COOKIE is not configured");
     return;
   }
 
@@ -74,6 +74,18 @@ async function checkSignedInStatus(baseUrl, cookie) {
   requireCondition(payload.user?.id, "auth status did not include a signed-in user");
   requireCondition(payload.entitlement?.plan, "auth status did not include an account plan");
   pass("signed-in auth status returns account and plan state");
+
+  const app = await request(baseUrl, "/app", { cookie, redirect: "follow" });
+  requireCondition(app.response.ok, `signed-in studio returned ${app.response.status}`);
+  requireCondition(app.text.includes("RoleForge AI"), "signed-in studio did not render the RoleForge shell");
+  requireCondition(app.text.includes("Resume studio"), "signed-in studio did not render the workspace");
+  pass("signed-in studio renders the workspace shell");
+
+  const settings = await request(baseUrl, "/settings", { cookie, redirect: "follow" });
+  requireCondition(settings.response.ok, `signed-in settings returned ${settings.response.status}`);
+  requireCondition(settings.text.includes("Settings"), "signed-in settings did not render the settings page");
+  requireCondition(settings.text.includes("Current plan"), "signed-in settings did not render account plan details");
+  pass("signed-in settings renders account plan details");
 }
 
 async function main() {

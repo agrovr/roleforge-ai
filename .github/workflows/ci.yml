@@ -50,3 +50,5 @@ jobs:
       - name: Smoke production shell
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: npm run smoke:frontend
+        env:
+          ROLEFORGE_SMOKE_COOKIE: ${{ secrets.ROLEFORGE_SMOKE_COOKIE }}
