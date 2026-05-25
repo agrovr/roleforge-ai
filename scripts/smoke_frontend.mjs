@@ -103,6 +103,11 @@ async function checkPublicShell(baseUrl) {
   requireCondition(stylesheetText.includes("2.1cqi"), "landing dashboard stats were not using container-aware type");
   requireCondition(/min-block-size:\s*144px/.test(stylesheetText), "landing dashboard stats were missing stable card height");
   pass("landing dashboard stat cards include overflow-safe styles");
+
+  requireCondition(stylesheetText.includes(".nav-cta-short"), "landing mobile nav compact CTA styles were missing");
+  requireCondition(/\.nav-link-secondary,\s*\.nav-link-account,\s*\.nav-divider\s*\{\s*display:\s*none/.test(stylesheetText), "landing mobile nav still exposes full navigation links");
+  requireCondition(/\.nav\s+\.btn-brand\s*\{[^}]*min-width:\s*0/.test(stylesheetText), "landing mobile nav CTA can still force header overflow");
+  pass("landing mobile nav includes compact one-row styles");
 }
 
 async function checkAnonymousGate(baseUrl) {
