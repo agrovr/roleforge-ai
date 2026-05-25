@@ -20,7 +20,7 @@ cd C:\Users\ashmi\Downloads\Project_v1\resume-tailor-ui-github
 node scripts\smoke_frontend.mjs
 ```
 
-Backend health, readiness, capabilities, and anonymous auth gates:
+Backend health, readiness, capabilities, production frontend CORS preflight, and anonymous auth gates:
 
 ```bash
 cd C:\Users\ashmi\Downloads\Project_v1\resume-tailor-backend
@@ -72,6 +72,7 @@ Before assuming a backend bug is fixed in production:
 - Confirm `Deploy Cloud Run` passed.
 - Confirm the deploy step and smoke step passed.
 - Confirm `/health` reports the expected `revision`.
+- Confirm the smoke output includes `CORS preflight allows the production frontend origin`.
 - Run the backend smoke command with `--expect-revision`.
 
 ## Auth and Login
@@ -145,6 +146,7 @@ Expected production state:
 Check these when downloads fail:
 
 - Backend `/capabilities` advertises upload formats, export formats, and templates.
+- Backend smoke confirms the production frontend CORS preflight.
 - Backend `GCS_BUCKET` and `GCS_PREFIX` are set in Cloud Run.
 - Backend smoke passes.
 - The user still has access to the export format they are trying to download.
