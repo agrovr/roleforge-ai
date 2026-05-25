@@ -114,6 +114,9 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/@media\s*\(max-width:\s*355px\)/.test(stylesheetText), "landing nav was missing narrow-phone overflow protection");
   requireCondition(!home.text.includes("The&nbsp;resume&nbsp;that"), "landing hero headline still prevents narrow-phone wrapping");
   pass("landing mobile nav includes compact one-row styles");
+
+  requireCondition(/@media\s*\(max-width:\s*1040px\)[\s\S]*?\.login-panel\s*\{[^}]*grid-template-columns:\s*1fr/.test(stylesheetText), "login page can still stay cramped at tablet widths");
+  pass("login page includes tablet-width stack protection");
 }
 
 async function checkAnonymousGate(baseUrl) {
