@@ -5394,6 +5394,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-project-item {
+  align-items: flex-start;
   color: inherit;
   text-decoration: none;
   transition:
@@ -5416,6 +5417,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-item div,
 .settings-project-empty {
+  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -5430,6 +5432,14 @@ html[data-theme="dark"] input::file-selector-button {
   white-space: nowrap;
 }
 
+.settings-project-item strong {
+  display: -webkit-box;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+}
+
 .settings-project-item span,
 .settings-project-empty span {
   display: block;
@@ -5441,8 +5451,21 @@ html[data-theme="dark"] input::file-selector-button {
   white-space: nowrap;
 }
 
+.settings-project-item span {
+  display: -webkit-box;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: normal;
+}
+
 .settings-project-item small {
   flex: 0 0 auto;
+  margin-top: 2px;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand) 10%, var(--surface));
   color: var(--ink-3);
   font-size: 0.72rem;
   font-weight: 950;
@@ -9035,6 +9058,11 @@ html[data-theme="dark"] .settings-export-item.disabled small {
   color: var(--ink-3);
 }
 
+html[data-theme="dark"] .settings-project-item small {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: rgba(255, 247, 233, 0.055);
+}
+
 html[data-theme="dark"] .settings-export-item small {
   color: #b7e5c4;
 }
@@ -9544,6 +9572,15 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   .settings-page-hero,
   .settings-section {
     padding: 18px;
+  }
+
+  .settings-project-item {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .settings-project-item small {
+    align-self: flex-start;
   }
 
   .settings-page-hero h1 {
