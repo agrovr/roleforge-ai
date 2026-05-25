@@ -17,6 +17,13 @@ test("adds notice params without breaking existing query strings", () => {
   );
 });
 
+test("adds email sign-in status without swallowing the next path", () => {
+  assert.equal(
+    redirectPathWithParam("/login?next=%2Fapp%3Ftemplate%3Dmodern", "account", "check-email"),
+    "/login?next=%2Fapp%3Ftemplate%3Dmodern&account=check-email",
+  );
+});
+
 test("adds notice params before a hash fragment", () => {
   assert.equal(
     redirectPathWithParam("/settings#billing", "account", "signed-out"),
