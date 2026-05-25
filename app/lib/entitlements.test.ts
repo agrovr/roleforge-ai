@@ -21,6 +21,7 @@ test("does not expose stale premium features when billing is inactive", () => {
   });
 
   assert.deepEqual(entitlement.exportFormats, { pdf: true, docx: false, txt: false });
+  assert.equal(entitlement.plan, "free");
   assert.equal(entitlement.monthlyRunLimit, 5);
 });
 
@@ -42,5 +43,6 @@ test("keeps active premium feature overrides explicit", () => {
   });
 
   assert.deepEqual(entitlement.exportFormats, { pdf: true, docx: true, txt: false });
+  assert.equal(entitlement.plan, "premium");
   assert.equal(entitlement.monthlyRunLimit, null);
 });

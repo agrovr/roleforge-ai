@@ -71,12 +71,12 @@ function premiumBooleanFeature(features: Record<string, unknown> | null, key: st
 export function entitlementFromRow(row?: EntitlementRow | null): AccountEntitlement {
   if (!row) return FREE_ENTITLEMENT;
 
-  const plan = row.plan === "premium" ? "premium" : "free";
-  const premiumActive = plan === "premium" && ["active", "trialing"].includes(row.billing_status ?? "");
+  const rowPlan = row.plan === "premium" ? "premium" : "free";
+  const premiumActive = rowPlan === "premium" && ["active", "trialing"].includes(row.billing_status ?? "");
   const features = row.features ?? {};
 
   return {
-    plan,
+    plan: premiumActive ? "premium" : "free",
     billingStatus: row.billing_status ?? "none",
     exportFormats: {
       pdf: booleanFeature(features, "export_pdf", true),
