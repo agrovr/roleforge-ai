@@ -26,10 +26,24 @@ function asRecord(value: unknown): Record<string, unknown> | null {
 
 function customerWorkflowMessage(code: string | undefined, apiMessage: string | undefined, fallback: string) {
   switch (code) {
+    case "auth_not_configured":
+      return "Account sign-in is temporarily unavailable. Try again shortly.";
     case "authentication_required":
       return "Sign in again to continue your resume workflow.";
     case "auth_verification_failed":
       return "We could not verify your session. Refresh the page or sign in again, then retry.";
+    case "export_forbidden":
+      return "This export belongs to another signed-in account.";
+    case "file_not_found":
+      return "This export link is no longer available. Create a fresh PDF from the saved run.";
+    case "invalid_filename":
+      return "This export link is invalid. Create a fresh export from the saved run.";
+    case "job_url_fetch_failed":
+      return "We could not read that job post. Paste the job description or try the link again.";
+    case "missing_filename":
+      return "Choose a resume file before uploading.";
+    case "resume_not_found":
+      return "Upload the source resume again before re-running Tailor.";
     case "usage_verification_failed":
       return "We could not check your plan usage. Wait a moment, then try again.";
     case "usage_recording_failed":

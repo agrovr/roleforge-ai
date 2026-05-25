@@ -35,6 +35,58 @@ test("maps account verification failures without exposing backend phrasing", asy
   assert.equal(state.message, "We could not check your plan usage. Wait a moment, then try again.");
 });
 
+test("maps auth and stale workflow failures without setup-shaped copy", async () => {
+  const auth = await readApiError(new Response(JSON.stringify({
+    error: {
+      code: "auth_not_configured",
+      message: "Account verification is not ready yet.",
+    },
+  }), { status: 503 }), "Fallback copy.");
+
+  assert.equal(
+    workflowErrorFromCaught(auth, "Fallback copy.").message,
+    "Account sign-in is temporarily unavailable. Try again shortly.",
+  );
+
+  const missingResume = await readApiError(new Response(JSON.stringify({
+    error: {
+      code: "resume_not_found",
+      message: "resume_id not found or expired",
+    },
+  }), { status: 404 }), "Fallback copy.");
+
+  assert.equal(
+    workflowErrorFromCaught(missingResume, "Fallback copy.").message,
+    "Upload the source resume again before re-running Tailor.",
+  );
+});
+
+test("maps job URL and export ownership failures to recovery copy", async () => {
+  const jobUrl = await readApiError(new Response(JSON.stringify({
+    error: {
+      code: "job_url_fetch_failed",
+      message: "ConnectTimeout: private upstream detail",
+    },
+  }), { status: 502 }), "Fallback copy.");
+
+  assert.equal(
+    workflowErrorFromCaught(jobUrl, "Fallback copy.").message,
+    "We could not read that job post. Paste the job description or try the link again.",
+  );
+
+  const exportForbidden = await readApiError(new Response(JSON.stringify({
+    error: {
+      code: "export_forbidden",
+      message: "This export belongs to a different account.",
+    },
+  }), { status: 403 }), "Fallback copy.");
+
+  assert.equal(
+    workflowErrorFromCaught(exportForbidden, "Fallback copy.").message,
+    "This export belongs to another signed-in account.",
+  );
+});
+
 test("keeps unknown API messages and falls back when the response is not JSON", async () => {
   const known = await readApiError(new Response(JSON.stringify({
     error: { code: "invalid_resume", message: "Upload a readable PDF, DOCX, or TXT file." },
