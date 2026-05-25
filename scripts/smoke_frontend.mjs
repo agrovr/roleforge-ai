@@ -145,6 +145,21 @@ async function checkAnonymousBillingGate(baseUrl) {
   pass("anonymous billing routes redirect to sign-in");
 }
 
+async function checkBillingWebhookGate(baseUrl) {
+  const result = await request(baseUrl, "/api/billing/webhook", {
+    method: "POST",
+    body: JSON.stringify({}),
+    headers: { "Content-Type": "application/json" },
+  });
+
+  requireCondition(result.response.status === 400, `unsigned Stripe webhook returned ${result.response.status}`);
+  requireCondition(
+    result.text.includes("Missing Stripe signature"),
+    `unsigned Stripe webhook returned unexpected body: ${result.text.slice(0, 120)}`,
+  );
+  pass("unsigned Stripe webhook requests fail closed");
+}
+
 async function checkAnonymousAuthStatus(baseUrl) {
   const status = await request(baseUrl, "/api/auth/status", { redirect: "follow" });
   requireCondition(status.response.ok, `anonymous auth status returned ${status.response.status}`);
@@ -262,6 +277,7 @@ async function main() {
     await checkAnonymousGate(baseUrl);
     await checkAnonymousAccountDataGate(baseUrl);
     await checkAnonymousBillingGate(baseUrl);
+    await checkBillingWebhookGate(baseUrl);
     await checkCrawlerMetadata(baseUrl);
     await checkBackendCapabilities(backendUrl);
     await checkSignedInStatus(baseUrl, cookie, { expectPremiumAccess, requireSignedInSmoke });

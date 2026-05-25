@@ -65,7 +65,7 @@ Before assuming a frontend bug is fixed in production:
 
 - Confirm GitHub `Frontend CI` passed.
 - Confirm the commit has a successful `Vercel` status.
-- Run `node scripts\smoke_frontend.mjs`; it verifies the frontend shell, anonymous studio, settings, saved-project, download, and billing auth gates, plus the backend `/capabilities` contract the studio depends on.
+- Run `node scripts\smoke_frontend.mjs`; it verifies the frontend shell, anonymous studio, settings, saved-project, download, billing auth gates, unsigned Stripe webhook rejection, plus the backend `/capabilities` contract the studio depends on.
 
 Backend deploys through GitHub Actions to Cloud Run from `agrovr/roleforge-ai-backend` `main`.
 
