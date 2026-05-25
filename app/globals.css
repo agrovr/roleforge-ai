@@ -347,6 +347,7 @@ html[data-theme="dark"] textarea {
   display: block;
   font-size: 1.13rem;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .brand-ai {
@@ -399,6 +400,10 @@ html[data-theme="dark"] textarea {
 .link-button:focus-visible {
   background: var(--surface);
   color: var(--ink-0);
+}
+
+.nav-cta-short {
+  display: none;
 }
 
 .nav-divider {
@@ -8007,6 +8012,42 @@ html[data-theme="dark"] .rf-rail-upgrade p {
 }
 
 @media (max-width: 620px) {
+  .nav-inner {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+  }
+
+  .nav-links {
+    width: auto;
+    margin-left: auto;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .nav-link-secondary,
+  .nav-link-account,
+  .nav-divider {
+    display: none;
+  }
+
+  .nav .btn-brand {
+    min-width: 0;
+    min-height: 46px;
+    padding: 0 15px;
+    border-radius: 13px;
+  }
+
+  .nav-cta-full {
+    display: none;
+  }
+
+  .nav-cta-short {
+    display: inline;
+  }
+
   .h1 {
     font-size: clamp(3rem, 16vw, 4.1rem);
   }

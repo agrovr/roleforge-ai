@@ -39,15 +39,17 @@ function Nav({ signedIn, studioHref }: Pick<LandingLinks, "signedIn" | "studioHr
       <div className="nav-inner">
         <Brand />
         <nav className="nav-links" aria-label="Primary navigation">
-          <Link className="nav-link" href="/templates">Templates</Link>
-          <a className="nav-link" href="#how">How it works</a>
-          <a className="nav-link" href="#features">Features</a>
-          <a className="nav-link" href="#pricing">Pricing</a>
+          <Link className="nav-link nav-link-secondary" href="/templates">Templates</Link>
+          <a className="nav-link nav-link-secondary" href="#how">How it works</a>
+          <a className="nav-link nav-link-secondary" href="#features">Features</a>
+          <a className="nav-link nav-link-secondary" href="#pricing">Pricing</a>
           <span className="nav-divider" aria-hidden="true" />
           <ThemeToggle />
-          <Link className="nav-link" href={studioHref}>{signedIn ? "Studio" : "Sign in"}</Link>
+          <Link className="nav-link nav-link-account" href={studioHref}>{signedIn ? "Studio" : "Sign in"}</Link>
           <Link className="btn btn-brand" href={studioHref}>
-            Build my resume <RoleForgeIcon name="arrow" size={14} />
+            <span className="nav-cta-full">Build my resume</span>
+            <span className="nav-cta-short">Build</span>
+            <RoleForgeIcon name="arrow" size={14} />
           </Link>
         </nav>
       </div>
