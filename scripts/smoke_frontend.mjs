@@ -20,6 +20,8 @@ function fail(message) {
 
 async function request(baseUrl, path, options = {}) {
   const response = await fetch(`${baseUrl}${path}`, {
+    method: options.method || "GET",
+    body: options.body,
     redirect: options.redirect || "manual",
     headers: {
       "User-Agent": "RoleForge frontend smoke",
@@ -81,6 +83,31 @@ async function checkAnonymousGate(baseUrl) {
     `anonymous /app redirected to unexpected location: ${location}`,
   );
   pass("anonymous studio access redirects to sign-in");
+}
+
+async function checkAnonymousBillingGate(baseUrl) {
+  const protectedRoutes = [
+    ["checkout", {
+      body: new URLSearchParams({ interval: "month" }),
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    }],
+    ["portal", {}],
+  ];
+
+  for (const [path, options] of protectedRoutes) {
+    const result = await request(baseUrl, `/api/billing/${path}`, {
+      method: "POST",
+      ...options,
+    });
+    requireCondition([301, 302, 303, 307, 308].includes(result.response.status), `anonymous billing ${path} returned ${result.response.status}`);
+    const location = result.response.headers.get("location") || "";
+    requireCondition(
+      location.includes("/login") && location.includes("next=/settings") && location.includes("account=signin-required"),
+      `anonymous billing ${path} redirected to unexpected location: ${location}`,
+    );
+  }
+
+  pass("anonymous billing routes redirect to sign-in");
 }
 
 async function checkAnonymousAuthStatus(baseUrl) {
@@ -188,6 +215,7 @@ async function main() {
     await checkPublicShell(baseUrl);
     await checkAnonymousAuthStatus(baseUrl);
     await checkAnonymousGate(baseUrl);
+    await checkAnonymousBillingGate(baseUrl);
     await checkCrawlerMetadata(baseUrl);
     await checkBackendCapabilities(backendUrl);
     await checkSignedInStatus(baseUrl, cookie, expectPremiumAccess);
