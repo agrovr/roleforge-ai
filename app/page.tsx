@@ -64,8 +64,8 @@ function Hero({ studioHref }: Pick<LandingLinks, "studioHref">) {
           <span>AI-assisted resume tailoring for focused applications</span>
         </div>
         <h1 className="display h1">
-          The&nbsp;resume&nbsp;that<br />
-          <span className="italic underline-brand">actually fits</span><br />
+          The&nbsp;resume&nbsp;that{" "}<br />
+          <span className="italic underline-brand">actually fits</span>{" "}<br />
           the role.
         </h1>
         <p className="hero-sub">
@@ -206,7 +206,7 @@ function StudioPreview({ studioHref }: Pick<LandingLinks, "studioHref">) {
         <div className="section-head">
           <div>
             <div className="eyebrow">The studio</div>
-            <h2 className="display h2">Everything you need.<br /><span className="italic">Nothing</span> you don&apos;t.</h2>
+            <h2 className="display h2">Everything you need.{" "}<br /><span className="italic">Nothing</span> you don&apos;t.</h2>
           </div>
           <p className="lede">A focused workspace that shows your resume, the job, and generated suggestions side-by-side. Fit signals, gaps, and export controls stay in one calm panel.</p>
         </div>
@@ -309,7 +309,7 @@ function Templates() {
         <div className="section-head">
           <div>
             <div className="eyebrow">Templates</div>
-              <h2 className="display h2">Resume formats.<br /><span className="italic">Beautifully</span> simple.</h2>
+              <h2 className="display h2">Resume formats.{" "}<br /><span className="italic">Beautifully</span> simple.</h2>
           </div>
           <p className="lede">Browse the visual directions RoleForge can carry into cleaner resume exports. Pick a direction before opening the studio.</p>
         </div>
@@ -386,7 +386,7 @@ function Features() {
         <div className="section-head">
           <div>
             <div className="eyebrow">Features</div>
-            <h2 className="display h2">More than a builder.<br /><span className="italic">A guided workspace.</span></h2>
+            <h2 className="display h2">More than a builder.{" "}<br /><span className="italic">A guided workspace.</span></h2>
           </div>
           <p className="lede">RoleForge compares the target role with your resume and shows practical next steps without rewriting your career.</p>
         </div>
