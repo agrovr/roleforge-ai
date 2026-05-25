@@ -78,6 +78,21 @@ async function checkAnonymousGate(baseUrl) {
   pass("anonymous studio access redirects to sign-in");
 }
 
+async function checkCrawlerMetadata(baseUrl) {
+  const robots = await request(baseUrl, "/robots.txt", { redirect: "follow" });
+  requireCondition(robots.response.ok, `robots.txt returned ${robots.response.status}`);
+  requireCondition(robots.text.includes("Sitemap:") && robots.text.includes("/sitemap.xml"), "robots.txt did not reference sitemap.xml");
+  requireCondition(robots.text.includes("Disallow: /app"), "robots.txt did not block the protected studio route");
+  requireCondition(robots.text.includes("Disallow: /api/"), "robots.txt did not block API routes");
+
+  const sitemap = await request(baseUrl, "/sitemap.xml", { redirect: "follow" });
+  requireCondition(sitemap.response.ok, `sitemap.xml returned ${sitemap.response.status}`);
+  requireCondition(sitemap.text.includes(`${baseUrl}/`) || sitemap.text.includes(`${baseUrl}</loc>`), "sitemap.xml did not include the home page");
+  requireCondition(sitemap.text.includes(`${baseUrl}/templates`), "sitemap.xml did not include templates");
+  requireCondition(!sitemap.text.includes(`${baseUrl}/app`), "sitemap.xml included the protected studio route");
+  pass("crawler metadata exposes public pages and excludes protected routes");
+}
+
 async function checkSignedInStatus(baseUrl, cookie) {
   if (!cookie) {
     pass("signed-in smoke skipped because ROLEFORGE_SMOKE_COOKIE is not configured");
@@ -112,6 +127,7 @@ async function main() {
   try {
     await checkPublicShell(baseUrl);
     await checkAnonymousGate(baseUrl);
+    await checkCrawlerMetadata(baseUrl);
     await checkSignedInStatus(baseUrl, cookie);
   } catch (error) {
     fail(error instanceof Error ? error.message : String(error));
