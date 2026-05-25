@@ -64,6 +64,10 @@ function numberFeature(features: Record<string, unknown> | null, key: string, fa
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }
 
+function premiumBooleanFeature(features: Record<string, unknown> | null, key: string, premiumActive: boolean) {
+  return premiumActive ? booleanFeature(features, key, true) : false;
+}
+
 export function entitlementFromRow(row?: EntitlementRow | null): AccountEntitlement {
   if (!row) return FREE_ENTITLEMENT;
 
@@ -76,11 +80,11 @@ export function entitlementFromRow(row?: EntitlementRow | null): AccountEntitlem
     billingStatus: row.billing_status ?? "none",
     exportFormats: {
       pdf: booleanFeature(features, "export_pdf", true),
-      docx: booleanFeature(features, "export_docx", premiumActive),
-      txt: booleanFeature(features, "export_txt", premiumActive),
+      docx: premiumBooleanFeature(features, "export_docx", premiumActive),
+      txt: premiumBooleanFeature(features, "export_txt", premiumActive),
     },
     projectStorage: booleanFeature(features, "project_storage", true),
-    monthlyRunLimit: numberFeature(features, "monthly_run_limit", premiumActive ? null : FREE_ENTITLEMENT.monthlyRunLimit),
+    monthlyRunLimit: premiumActive ? numberFeature(features, "monthly_run_limit", null) : FREE_ENTITLEMENT.monthlyRunLimit,
     currentPeriodEnd: row.current_period_end,
     cancelAtPeriodEnd: Boolean(row.cancel_at_period_end),
     cancelAt: row.cancel_at ?? null,
