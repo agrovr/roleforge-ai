@@ -78,6 +78,23 @@ async function checkAnonymousGate(baseUrl) {
   pass("anonymous studio access redirects to sign-in");
 }
 
+async function checkAnonymousAuthStatus(baseUrl) {
+  const status = await request(baseUrl, "/api/auth/status", { redirect: "follow" });
+  requireCondition(status.response.ok, `anonymous auth status returned ${status.response.status}`);
+
+  const payload = JSON.parse(status.text);
+  requireCondition(payload.configured === true, "anonymous auth status did not report configured auth");
+  requireCondition(payload.enabled === true, "anonymous auth status did not report enabled auth");
+  requireCondition(payload.provider === "supabase", `anonymous auth status reported unexpected provider: ${payload.provider}`);
+  requireCondition(payload.user === null, "anonymous auth status unexpectedly included a signed-in user");
+  requireCondition(payload.entitlement?.plan === "free", "anonymous auth status did not include the free fallback plan");
+  requireCondition(
+    typeof payload.next === "string" && /sign-in|sign in/i.test(payload.next),
+    "anonymous auth status did not include user-facing sign-in guidance",
+  );
+  pass("anonymous auth status reports configured Supabase auth");
+}
+
 async function checkCrawlerMetadata(baseUrl) {
   const robots = await request(baseUrl, "/robots.txt", { redirect: "follow" });
   requireCondition(robots.response.ok, `robots.txt returned ${robots.response.status}`);
@@ -126,6 +143,7 @@ async function main() {
 
   try {
     await checkPublicShell(baseUrl);
+    await checkAnonymousAuthStatus(baseUrl);
     await checkAnonymousGate(baseUrl);
     await checkCrawlerMetadata(baseUrl);
     await checkSignedInStatus(baseUrl, cookie);
