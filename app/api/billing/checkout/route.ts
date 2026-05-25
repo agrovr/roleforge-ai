@@ -1,18 +1,11 @@
 import { NextResponse } from "next/server";
 
-import { FREE_FEATURES } from "@/app/lib/billing/entitlements";
-import { hasActivePremiumAccess } from "@/app/lib/billing/readiness";
+import { prepareCheckoutCustomer } from "@/app/lib/billing/customer";
 import { absoluteUrl, checkoutSuccessUrl, getStripeBillingConfig, getStripeClient, priceIdForInterval, type BillingInterval } from "@/app/lib/billing/stripe";
 import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
 import { createRoleForgeServiceClient } from "@/app/lib/supabase/service";
 
 export const runtime = "nodejs";
-
-type EntitlementBillingRow = {
-  stripe_customer_id: string | null;
-  plan: string | null;
-  billing_status: string | null;
-};
 
 function normalizeInterval(value: FormDataEntryValue | null): BillingInterval {
   return value === "year" ? "year" : "month";
@@ -44,55 +37,20 @@ export async function POST(request: Request) {
   const interval = normalizeInterval(formData.get("interval"));
   const priceId = priceIdForInterval(interval);
 
-  const { data: entitlement, error: entitlementError } = await serviceSupabase
-    .from("account_entitlements")
-    .select("stripe_customer_id, plan, billing_status")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const checkoutCustomer = await prepareCheckoutCustomer(serviceSupabase, stripe, user);
 
-  if (entitlementError) {
-    console.error("Checkout entitlement lookup failed", entitlementError);
+  if (checkoutCustomer.status === "temporarily-unavailable") {
+    console.error(`Checkout ${checkoutCustomer.reason}`, checkoutCustomer.error);
     return NextResponse.redirect(absoluteUrl(request, "/settings?billing=temporarily-unavailable#billing"), 303);
   }
 
-  const entitlementRow = entitlement as EntitlementBillingRow | null;
-  if (hasActivePremiumAccess(entitlementRow?.plan, entitlementRow?.billing_status)) {
+  if (checkoutCustomer.status === "already-premium") {
     return NextResponse.redirect(absoluteUrl(request, "/settings?billing=already-premium#billing"), 303);
-  }
-
-  let customerId = entitlementRow?.stripe_customer_id ?? "";
-
-  if (!customerId) {
-    const customer = await stripe.customers.create({
-      email: user.email ?? undefined,
-      name: typeof user.user_metadata?.name === "string" ? user.user_metadata.name : undefined,
-      metadata: {
-        supabase_user_id: user.id,
-      },
-    });
-
-    customerId = customer.id;
-
-    const { error: customerRecordError } = await serviceSupabase
-      .from("account_entitlements")
-      .upsert({
-        user_id: user.id,
-        plan: "free",
-        billing_status: "none",
-        stripe_customer_id: customerId,
-        features: FREE_FEATURES,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: "user_id" });
-
-    if (customerRecordError) {
-      console.error("Checkout customer record save failed", customerRecordError);
-      return NextResponse.redirect(absoluteUrl(request, "/settings?billing=temporarily-unavailable#billing"), 303);
-    }
   }
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
-    customer: customerId,
+    customer: checkoutCustomer.customerId,
     line_items: [
       {
         price: priceId,
