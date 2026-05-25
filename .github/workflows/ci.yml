@@ -53,3 +53,4 @@ jobs:
         env:
           ROLEFORGE_BACKEND_URL: https://roleforge-api-224015900616.us-central1.run.app
           ROLEFORGE_SMOKE_COOKIE: ${{ secrets.ROLEFORGE_SMOKE_COOKIE }}
+          ROLEFORGE_EXPECT_PREMIUM_ACCESS: ${{ vars.ROLEFORGE_EXPECT_PREMIUM_ACCESS }}

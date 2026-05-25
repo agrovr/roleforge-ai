@@ -147,7 +147,7 @@ npm run build
 npm run smoke:frontend
 ```
 
-`npm run smoke:frontend` checks the live RoleForge shell, login copy, anonymous `/app` auth gate, crawler metadata, auth status, and backend `/capabilities` contract against `https://roleforgeai.vercel.app` and the production Cloud Run backend by default. Set `ROLEFORGE_SITE_URL` or `ROLEFORGE_BACKEND_URL` to target another deployment. Set `ROLEFORGE_SMOKE_COOKIE` only for a dedicated smoke account when you want it to also verify signed-in account status, the studio shell, and settings plan details; do not use a personal browser cookie in CI.
+`npm run smoke:frontend` checks the live RoleForge shell, login copy, anonymous `/app` auth gate, crawler metadata, auth status, and backend `/capabilities` contract against `https://roleforgeai.vercel.app` and the production Cloud Run backend by default. Set `ROLEFORGE_SITE_URL` or `ROLEFORGE_BACKEND_URL` to target another deployment. Set `ROLEFORGE_SMOKE_COOKIE` only for a dedicated smoke account when you want it to also verify signed-in account status, the studio shell, and settings plan details; do not use a personal browser cookie in CI. If the smoke cookie belongs to a premium account, set `ROLEFORGE_EXPECT_PREMIUM_ACCESS=true` so the smoke fails when Premium or DOCX/TXT export access is missing.
 
 On GitHub Actions, the frontend CI waits for the Vercel status on the pushed commit before running the production smoke check.
 

@@ -40,6 +40,7 @@ Frontend:
 - `Frontend CI` runs tests, lint, typecheck, build, waits for Vercel, then smokes production, including the backend `/capabilities` contract.
 - `Production Smoke` runs daily and can be manually dispatched for the live frontend and backend workflow contract.
 - Optional secret: `ROLEFORGE_SMOKE_COOKIE` for a dedicated smoke account. Do not use a personal browser cookie in CI.
+- Optional repository variable: `ROLEFORGE_EXPECT_PREMIUM_ACCESS=true` when the smoke cookie belongs to a premium account and should fail if DOCX/TXT access disappears.
 
 Backend:
 

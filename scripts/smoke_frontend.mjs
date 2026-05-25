@@ -45,6 +45,10 @@ function requireHeader(response, name, expected) {
   requireCondition(value.toLowerCase() === expected.toLowerCase(), `${name} header was unexpected: ${value || "(missing)"}`);
 }
 
+function readBooleanEnv(name) {
+  return ["1", "true", "yes"].includes((process.env[name] || "").trim().toLowerCase());
+}
+
 async function checkPublicShell(baseUrl) {
   const home = await request(baseUrl, "/", { redirect: "follow" });
   requireCondition(home.response.ok, `home returned ${home.response.status}`);
@@ -137,8 +141,9 @@ async function checkBackendCapabilities(backendUrl) {
   pass("backend capabilities match the frontend workflow contract");
 }
 
-async function checkSignedInStatus(baseUrl, cookie) {
+async function checkSignedInStatus(baseUrl, cookie, expectPremiumAccess) {
   if (!cookie) {
+    requireCondition(!expectPremiumAccess, "ROLEFORGE_EXPECT_PREMIUM_ACCESS requires ROLEFORGE_SMOKE_COOKIE");
     pass("signed-in smoke skipped because ROLEFORGE_SMOKE_COOKIE is not configured");
     return;
   }
@@ -149,6 +154,15 @@ async function checkSignedInStatus(baseUrl, cookie) {
   requireCondition(payload.configured === true && payload.enabled === true, "auth status did not report enabled Supabase auth");
   requireCondition(payload.user?.id, "auth status did not include a signed-in user");
   requireCondition(payload.entitlement?.plan, "auth status did not include an account plan");
+
+  if (expectPremiumAccess) {
+    requireCondition(payload.entitlement.plan === "premium", `signed-in smoke expected premium plan, got ${payload.entitlement.plan}`);
+    requireCondition(payload.entitlement.billingStatus === "active" || payload.entitlement.billingStatus === "trialing", `signed-in smoke expected active premium billing, got ${payload.entitlement.billingStatus}`);
+    requireCondition(payload.entitlement.exportFormats?.docx === true, "signed-in premium smoke did not include DOCX export access");
+    requireCondition(payload.entitlement.exportFormats?.txt === true, "signed-in premium smoke did not include TXT export access");
+    pass("signed-in auth status confirms premium export access");
+  }
+
   pass("signed-in auth status returns account and plan state");
 
   const app = await request(baseUrl, "/app", { cookie, redirect: "follow" });
@@ -168,6 +182,7 @@ async function main() {
   const baseUrl = normalizeBaseUrl(process.env.ROLEFORGE_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL);
   const backendUrl = normalizeBaseUrl(process.env.ROLEFORGE_BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || DEFAULT_BACKEND_URL);
   const cookie = process.env.ROLEFORGE_SMOKE_COOKIE?.trim();
+  const expectPremiumAccess = readBooleanEnv("ROLEFORGE_EXPECT_PREMIUM_ACCESS");
 
   try {
     await checkPublicShell(baseUrl);
@@ -175,7 +190,7 @@ async function main() {
     await checkAnonymousGate(baseUrl);
     await checkCrawlerMetadata(baseUrl);
     await checkBackendCapabilities(backendUrl);
-    await checkSignedInStatus(baseUrl, cookie);
+    await checkSignedInStatus(baseUrl, cookie, expectPremiumAccess);
   } catch (error) {
     fail(error instanceof Error ? error.message : String(error));
   }
