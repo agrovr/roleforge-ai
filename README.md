@@ -148,4 +148,6 @@ npm run smoke:frontend
 
 `npm run smoke:frontend` checks the live RoleForge shell, login copy, and anonymous `/app` auth gate against `https://roleforgeai.vercel.app` by default. Set `ROLEFORGE_SITE_URL` to target another deployment. Set `ROLEFORGE_SMOKE_COOKIE` only for a dedicated smoke account when you want it to also verify signed-in account status; do not use a personal browser cookie in CI.
 
+On GitHub Actions, the frontend CI waits for the Vercel status on the pushed commit before running the production smoke check.
+
 Before changing billing behavior, confirm the Stripe products, price IDs, webhook events, redirect URLs, backend endpoints, and entitlement rules match the current production setup.

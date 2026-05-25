@@ -38,6 +38,12 @@ jobs:
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-placeholder
           NEXT_TELEMETRY_DISABLED: "1"
 
+      - name: Wait for Vercel deployment
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: npm run wait:vercel
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
       - name: Smoke production shell
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: npm run smoke:frontend
