@@ -43,6 +43,7 @@ app/
   globals.css                     # Global styles and responsive layout
   layout.tsx                      # Root layout and metadata
 docs/
+  operations-checklist.md        # Production checks and break/fix runbook
   supabase-account-foundation.sql # Draft RLS schema for saved projects
   plan-rules.md                   # Current free and premium entitlement rules
   stripe-billing-foundation.md    # Stripe checkout, portal, webhook, and entitlement behavior
@@ -151,3 +152,5 @@ npm run smoke:frontend
 On GitHub Actions, the frontend CI waits for the Vercel status on the pushed commit before running the production smoke check.
 
 Before changing billing behavior, confirm the Stripe products, price IDs, webhook events, redirect URLs, backend endpoints, and entitlement rules match the current production setup.
+
+Use `docs/operations-checklist.md` for the cross-system production runbook covering frontend smoke, backend smoke, auth, billing, saved projects, exports, and AI tailoring failure checks.
