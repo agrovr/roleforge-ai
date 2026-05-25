@@ -203,8 +203,11 @@ async function checkBackendCapabilities(backendUrl) {
   pass("backend capabilities match the frontend workflow contract");
 }
 
-async function checkSignedInStatus(baseUrl, cookie, expectPremiumAccess) {
+async function checkSignedInStatus(baseUrl, cookie, options) {
+  const { expectPremiumAccess, requireSignedInSmoke } = options;
+
   if (!cookie) {
+    requireCondition(!requireSignedInSmoke, "ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE requires ROLEFORGE_SMOKE_COOKIE");
     requireCondition(!expectPremiumAccess, "ROLEFORGE_EXPECT_PREMIUM_ACCESS requires ROLEFORGE_SMOKE_COOKIE");
     pass("signed-in smoke skipped because ROLEFORGE_SMOKE_COOKIE is not configured");
     return;
@@ -250,6 +253,7 @@ async function main() {
   const baseUrl = normalizeBaseUrl(process.env.ROLEFORGE_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL);
   const backendUrl = normalizeBaseUrl(process.env.ROLEFORGE_BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || DEFAULT_BACKEND_URL);
   const cookie = process.env.ROLEFORGE_SMOKE_COOKIE?.trim();
+  const requireSignedInSmoke = readBooleanEnv("ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE");
   const expectPremiumAccess = readBooleanEnv("ROLEFORGE_EXPECT_PREMIUM_ACCESS");
 
   try {
@@ -260,7 +264,7 @@ async function main() {
     await checkAnonymousBillingGate(baseUrl);
     await checkCrawlerMetadata(baseUrl);
     await checkBackendCapabilities(backendUrl);
-    await checkSignedInStatus(baseUrl, cookie, expectPremiumAccess);
+    await checkSignedInStatus(baseUrl, cookie, { expectPremiumAccess, requireSignedInSmoke });
   } catch (error) {
     fail(error instanceof Error ? error.message : String(error));
   }
