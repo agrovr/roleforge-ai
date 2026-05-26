@@ -240,6 +240,7 @@ html[data-theme="dark"] textarea {
 }
 
 .nav-inner {
+  width: min(var(--container), 100%);
   max-width: var(--container);
   min-height: 0;
   margin: 0 auto;
@@ -1218,19 +1219,20 @@ html[data-theme="dark"] textarea {
 
 .dash-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 
 .dash-stat {
+  container-type: inline-size;
   display: flex;
-  min-block-size: 150px;
+  min-block-size: clamp(138px, 13cqi, 154px);
   min-width: 0;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
   gap: 12px;
-  padding: 18px;
+  padding: clamp(16px, 6cqi, 20px);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
@@ -1249,11 +1251,12 @@ html[data-theme="dark"] textarea {
   margin: 4px 0 2px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(1.95rem, 2.4cqi, 2.55rem);
+  font-size: clamp(2rem, 13cqi, 2.65rem);
   font-weight: 500;
   letter-spacing: 0;
   line-height: 1.02;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
   text-wrap: balance;
 }
 
@@ -8053,7 +8056,7 @@ html[data-theme="dark"] .rf-rail-upgrade p {
     flex-direction: row;
     align-items: center;
     gap: 12px;
-    padding: 12px 0;
+    padding: 12px;
   }
 
   .nav-links {
@@ -8073,8 +8076,12 @@ html[data-theme="dark"] .rf-rail-upgrade p {
   .nav .btn-brand {
     min-width: 0;
     min-height: 46px;
-    padding: 0 15px;
+    padding: 0 13px;
     border-radius: 13px;
+  }
+
+  .nav .btn-brand svg {
+    display: none;
   }
 
   .nav-cta-full {
@@ -8087,10 +8094,44 @@ html[data-theme="dark"] .rf-rail-upgrade p {
 
   .brand {
     min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .brand-name {
+    max-width: clamp(118px, 36vw, 170px);
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .h1 {
     font-size: clamp(3rem, 16vw, 4.1rem);
+  }
+
+  .hero {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    gap: 28px;
+    padding-inline: 20px;
+  }
+
+  .hero-copy,
+  .hero-sub {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .hero-ctas,
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .hero-ctas .btn,
+  .hero-actions .btn {
+    width: 100%;
   }
 
   .section,
