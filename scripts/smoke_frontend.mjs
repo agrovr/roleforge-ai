@@ -2,6 +2,7 @@
 
 const DEFAULT_BASE_URL = "https://roleforgeai.vercel.app";
 const DEFAULT_BACKEND_URL = "https://roleforge-api-224015900616.us-central1.run.app";
+const SUPABASE_COOKIE_CHUNK_SIZE = 3180;
 
 function normalizeBaseUrl(value) {
   const raw = (value || DEFAULT_BASE_URL).trim().replace(/\/+$/, "");
@@ -35,6 +36,143 @@ async function request(baseUrl, path, options = {}) {
   });
   const text = await response.text();
   return { response, text };
+}
+
+function firstNonEmptyEnv(...names) {
+  for (const name of names) {
+    const value = process.env[name]?.trim();
+    if (value) return value;
+  }
+  return "";
+}
+
+function base64UrlEncode(value) {
+  return Buffer.from(value, "utf8").toString("base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+}
+
+function supabaseStorageKey(supabaseUrl) {
+  const host = new URL(supabaseUrl).hostname;
+  const projectRef = host.split(".")[0];
+  if (!projectRef) throw new Error(`Could not derive Supabase project ref from ${supabaseUrl}`);
+  return `sb-${projectRef}-auth-token`;
+}
+
+function createCookieChunks(key, value) {
+  const encodedValue = encodeURIComponent(value);
+  if (encodedValue.length <= SUPABASE_COOKIE_CHUNK_SIZE) return [{ name: key, value }];
+
+  const chunks = [];
+  let remaining = encodedValue;
+  while (remaining.length > 0) {
+    let encodedChunkHead = remaining.slice(0, SUPABASE_COOKIE_CHUNK_SIZE);
+    const lastEscapePos = encodedChunkHead.lastIndexOf("%");
+    if (lastEscapePos > SUPABASE_COOKIE_CHUNK_SIZE - 3) {
+      encodedChunkHead = encodedChunkHead.slice(0, lastEscapePos);
+    }
+
+    let valueHead = "";
+    while (encodedChunkHead.length > 0) {
+      try {
+        valueHead = decodeURIComponent(encodedChunkHead);
+        break;
+      } catch (error) {
+        if (error instanceof URIError && encodedChunkHead.at(-3) === "%" && encodedChunkHead.length > 3) {
+          encodedChunkHead = encodedChunkHead.slice(0, encodedChunkHead.length - 3);
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    chunks.push(valueHead);
+    remaining = remaining.slice(encodedChunkHead.length);
+  }
+
+  return chunks.map((chunk, index) => ({ name: `${key}.${index}`, value: chunk }));
+}
+
+function cookieHeaderFromSession(supabaseUrl, session) {
+  requireCondition(session?.access_token, "Supabase smoke sign-in did not return an access token");
+  requireCondition(session?.refresh_token, "Supabase smoke sign-in did not return a refresh token");
+  requireCondition(session?.user?.id, "Supabase smoke sign-in did not return a user");
+
+  const key = supabaseStorageKey(supabaseUrl);
+  const encoded = `base64-${base64UrlEncode(JSON.stringify(session))}`;
+  return createCookieChunks(key, encoded).map(({ name, value }) => `${name}=${value}`).join("; ");
+}
+
+async function signInSmokeAccount() {
+  const supabaseUrl = firstNonEmptyEnv("ROLEFORGE_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL");
+  const supabaseKey = firstNonEmptyEnv(
+    "ROLEFORGE_SUPABASE_PUBLISHABLE_KEY",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+  );
+  const email = firstNonEmptyEnv("ROLEFORGE_SMOKE_EMAIL");
+  const password = firstNonEmptyEnv("ROLEFORGE_SMOKE_PASSWORD");
+
+  if (!email && !password) return "";
+  requireCondition(email && password, "ROLEFORGE_SMOKE_EMAIL and ROLEFORGE_SMOKE_PASSWORD must be configured together");
+  requireCondition(supabaseUrl, "ROLEFORGE_SUPABASE_URL is required for smoke account sign-in");
+  requireCondition(supabaseKey, "ROLEFORGE_SUPABASE_PUBLISHABLE_KEY is required for smoke account sign-in");
+
+  const authUrl = new URL("/auth/v1/token", supabaseUrl);
+  authUrl.searchParams.set("grant_type", "password");
+  const result = await fetch(authUrl, {
+    method: "POST",
+    headers: {
+      "User-Agent": "RoleForge frontend smoke",
+      "Content-Type": "application/json",
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+    },
+    body: JSON.stringify({ email, password }),
+  });
+  const text = await result.text();
+  requireCondition(result.ok, `Supabase smoke sign-in failed with ${result.status}: ${text.slice(0, 160)}`);
+
+  const payload = JSON.parse(text);
+  return cookieHeaderFromSession(supabaseUrl, payload);
+}
+
+function parseCookieHeader(cookie) {
+  const jar = new Map();
+  for (const part of (cookie || "").split(";")) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const separatorIndex = trimmed.indexOf("=");
+    if (separatorIndex <= 0) continue;
+    jar.set(trimmed.slice(0, separatorIndex), trimmed.slice(separatorIndex + 1));
+  }
+  return jar;
+}
+
+function cookieHeaderFromJar(jar) {
+  return Array.from(jar.entries()).map(([name, value]) => `${name}=${value}`).join("; ");
+}
+
+function mergeSetCookieHeaders(cookie, response) {
+  const getSetCookie = response.headers.getSetCookie;
+  const headers = typeof getSetCookie === "function" ? getSetCookie.call(response.headers) : [];
+  const fallback = response.headers.get("set-cookie");
+  if (!headers.length && !fallback) return cookie;
+
+  const jar = parseCookieHeader(cookie);
+  for (const header of headers.length ? headers : [fallback]) {
+    const firstPart = header.split(";")[0]?.trim();
+    if (!firstPart) continue;
+    const separatorIndex = firstPart.indexOf("=");
+    if (separatorIndex <= 0) continue;
+    const name = firstPart.slice(0, separatorIndex);
+    const value = firstPart.slice(separatorIndex + 1);
+    if (!value || /max-age=0/i.test(header)) {
+      jar.delete(name);
+    } else {
+      jar.set(name, value);
+    }
+  }
+
+  return cookieHeaderFromJar(jar);
 }
 
 async function requestAbsolute(url, options = {}) {
@@ -277,13 +415,15 @@ async function checkSignedInStatus(baseUrl, cookie, options) {
   const { expectPremiumAccess, requireSignedInSmoke } = options;
 
   if (!cookie) {
-    requireCondition(!requireSignedInSmoke, "ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE requires ROLEFORGE_SMOKE_COOKIE");
-    requireCondition(!expectPremiumAccess, "ROLEFORGE_EXPECT_PREMIUM_ACCESS requires ROLEFORGE_SMOKE_COOKIE");
-    skip("signed-in smoke skipped because ROLEFORGE_SMOKE_COOKIE is not configured");
+    requireCondition(!requireSignedInSmoke, "ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE requires ROLEFORGE_SMOKE_COOKIE or a dedicated ROLEFORGE_SMOKE_EMAIL/ROLEFORGE_SMOKE_PASSWORD account");
+    requireCondition(!expectPremiumAccess, "ROLEFORGE_EXPECT_PREMIUM_ACCESS requires ROLEFORGE_SMOKE_COOKIE or a dedicated ROLEFORGE_SMOKE_EMAIL/ROLEFORGE_SMOKE_PASSWORD account");
+    skip("signed-in smoke skipped because ROLEFORGE_SMOKE_COOKIE or ROLEFORGE_SMOKE_EMAIL/ROLEFORGE_SMOKE_PASSWORD is not configured");
     return;
   }
 
-  const status = await request(baseUrl, "/api/auth/status", { cookie, redirect: "follow" });
+  let signedInCookie = cookie;
+  const status = await request(baseUrl, "/api/auth/status", { cookie: signedInCookie, redirect: "follow" });
+  signedInCookie = mergeSetCookieHeaders(signedInCookie, status.response);
   requireCondition(status.response.ok, `auth status returned ${status.response.status}`);
   const payload = JSON.parse(status.text);
   requireCondition(payload.configured === true && payload.enabled === true, "auth status did not report enabled Supabase auth");
@@ -300,19 +440,21 @@ async function checkSignedInStatus(baseUrl, cookie, options) {
 
   pass("signed-in auth status returns account and plan state");
 
-  const app = await request(baseUrl, "/app", { cookie, redirect: "follow" });
+  const app = await request(baseUrl, "/app", { cookie: signedInCookie, redirect: "follow" });
+  signedInCookie = mergeSetCookieHeaders(signedInCookie, app.response);
   requireCondition(app.response.ok, `signed-in studio returned ${app.response.status}`);
   requireCondition(app.text.includes("RoleForge AI"), "signed-in studio did not render the RoleForge shell");
   requireCondition(app.text.includes("Resume studio"), "signed-in studio did not render the workspace");
   pass("signed-in studio renders the workspace shell");
 
-  const savedRuns = await request(baseUrl, "/api/saved-runs", { cookie, redirect: "follow" });
+  const savedRuns = await request(baseUrl, "/api/saved-runs", { cookie: signedInCookie, redirect: "follow" });
+  signedInCookie = mergeSetCookieHeaders(signedInCookie, savedRuns.response);
   requireCondition(savedRuns.response.ok, `signed-in saved projects returned ${savedRuns.response.status}`);
   const savedRunsPayload = JSON.parse(savedRuns.text);
   requireCondition(Array.isArray(savedRunsPayload.runs), "signed-in saved projects did not return a runs array");
   pass("signed-in saved projects API returns account runs");
 
-  const settings = await request(baseUrl, "/settings", { cookie, redirect: "follow" });
+  const settings = await request(baseUrl, "/settings", { cookie: signedInCookie, redirect: "follow" });
   requireCondition(settings.response.ok, `signed-in settings returned ${settings.response.status}`);
   requireCondition(settings.text.includes("Settings"), "signed-in settings did not render the settings page");
   requireCondition(settings.text.includes("Current plan"), "signed-in settings did not render account plan details");
@@ -322,7 +464,7 @@ async function checkSignedInStatus(baseUrl, cookie, options) {
 async function main() {
   const baseUrl = normalizeBaseUrl(process.env.ROLEFORGE_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL);
   const backendUrl = normalizeBaseUrl(process.env.ROLEFORGE_BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || DEFAULT_BACKEND_URL);
-  const cookie = process.env.ROLEFORGE_SMOKE_COOKIE?.trim();
+  const cookie = process.env.ROLEFORGE_SMOKE_COOKIE?.trim() || await signInSmokeAccount();
   const requireSignedInSmoke = readBooleanEnv("ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE");
   const expectPremiumAccess = readBooleanEnv("ROLEFORGE_EXPECT_PREMIUM_ACCESS");
 
