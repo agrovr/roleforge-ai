@@ -208,6 +208,58 @@ function readBooleanEnv(name) {
   return ["1", "true", "yes"].includes((process.env[name] || "").trim().toLowerCase());
 }
 
+export function buildSmokeSavedRunPayload(overrides = {}) {
+  const now = overrides.createdAt || new Date().toISOString();
+  const uniqueSuffix = overrides.id || `roleforge-smoke-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+  return {
+    id: uniqueSuffix,
+    createdAt: now,
+    filename: "roleforge-smoke-resume.pdf",
+    sourceResumeName: "roleforge-smoke-resume.pdf",
+    jobTarget: "RoleForge smoke saved-project target",
+    roleHint: "RoleForge smoke saved-project target",
+    mode: "balanced",
+    score: 88,
+    atsScore: 91,
+    keywordMatchCount: 5,
+    readTimeSeconds: 42,
+    downloadUrl: "/api/workflow/download/roleforge-smoke-tailored-resume.pdf",
+    downloadFormat: "pdf",
+    downloadFilename: "roleforge-smoke-tailored-resume.pdf",
+    payload: {
+      studioSnapshot: {
+        sourcePreviewText: "Smoke source resume text",
+        jdText: "RoleForge smoke saved-project target",
+        inputMode: "text",
+        tailoringMode: "balanced",
+        downloadUrl: "/api/workflow/download/roleforge-smoke-tailored-resume.pdf",
+        downloadFormat: "pdf",
+        downloads: {
+          pdf: "/api/workflow/download/roleforge-smoke-tailored-resume.pdf",
+        },
+        templateSlug: "classic",
+        templateName: "Classic",
+        uploadMeta: {
+          resume_id: "roleforge-smoke-resume",
+          filename: "roleforge-smoke-resume.pdf",
+          format: "pdf",
+          character_count: 24,
+          text_preview: "Smoke source resume text",
+        },
+        result: {
+          tailored_text: "Smoke tailored draft",
+          change_log: ["Smoke saved-project roundtrip"],
+          suggestions: [],
+          ats_before: { issues: [] },
+          ats_after: { issues: [] },
+        },
+      },
+    },
+    ...overrides,
+  };
+}
+
 async function checkPublicShell(baseUrl) {
   const home = await request(baseUrl, "/", { redirect: "follow" });
   requireCondition(home.response.ok, `home returned ${home.response.status}`);
@@ -449,6 +501,83 @@ async function checkBackendCapabilities(backendUrl) {
   pass("backend capabilities match the frontend workflow contract");
 }
 
+async function checkSignedInSavedProjectRoundTrip(baseUrl, cookie) {
+  let signedInCookie = cookie;
+  let createdProjectId = "";
+  let pendingError = null;
+  const smokeRun = buildSmokeSavedRunPayload();
+  const smokeTitle = `RoleForge smoke saved project ${smokeRun.id.slice(-8)}`;
+
+  try {
+    const created = await request(baseUrl, "/api/saved-runs", {
+      cookie: signedInCookie,
+      method: "POST",
+      redirect: "follow",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(smokeRun),
+    });
+    signedInCookie = mergeSetCookieHeaders(signedInCookie, created.response);
+    requireCondition(created.response.ok, `signed-in saved project create returned ${created.response.status}: ${created.text.slice(0, 160)}`);
+
+    const createdPayload = JSON.parse(created.text);
+    requireCondition(createdPayload.projectId, "signed-in saved project create did not return a project id");
+    requireCondition(createdPayload.runId, "signed-in saved project create did not return a run id");
+    createdProjectId = createdPayload.projectId;
+
+    const renamed = await request(baseUrl, `/api/saved-runs/${encodeURIComponent(createdProjectId)}`, {
+      cookie: signedInCookie,
+      method: "PATCH",
+      redirect: "follow",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: smokeTitle }),
+    });
+    signedInCookie = mergeSetCookieHeaders(signedInCookie, renamed.response);
+    requireCondition(renamed.response.ok, `signed-in saved project rename returned ${renamed.response.status}: ${renamed.text.slice(0, 160)}`);
+    requireCondition(JSON.parse(renamed.text).title === smokeTitle, "signed-in saved project rename did not return the saved title");
+
+    const listed = await request(baseUrl, "/api/saved-runs", { cookie: signedInCookie, redirect: "follow" });
+    signedInCookie = mergeSetCookieHeaders(signedInCookie, listed.response);
+    requireCondition(listed.response.ok, `signed-in saved project list after create returned ${listed.response.status}`);
+    const listedPayload = JSON.parse(listed.text);
+    const createdRun = listedPayload.runs?.find((run) => run.id === smokeRun.id || run.projectId === createdProjectId);
+    requireCondition(createdRun, "signed-in saved project list did not include the smoke run after create");
+    requireCondition(createdRun.projectTitle === smokeTitle, "signed-in saved project list did not include the renamed title");
+    requireCondition(createdRun.snapshot?.result?.tailored_text === "Smoke tailored draft", "signed-in saved project list did not preserve the restorable snapshot");
+  } catch (error) {
+    pendingError = error;
+  } finally {
+    if (createdProjectId) {
+      try {
+        const deleted = await request(baseUrl, `/api/saved-runs/${encodeURIComponent(createdProjectId)}`, {
+          cookie: signedInCookie,
+          method: "DELETE",
+          redirect: "follow",
+        });
+        signedInCookie = mergeSetCookieHeaders(signedInCookie, deleted.response);
+        requireCondition(deleted.response.ok, `signed-in saved project delete returned ${deleted.response.status}: ${deleted.text.slice(0, 160)}`);
+
+        const listedAfterDelete = await request(baseUrl, "/api/saved-runs", { cookie: signedInCookie, redirect: "follow" });
+        signedInCookie = mergeSetCookieHeaders(signedInCookie, listedAfterDelete.response);
+        requireCondition(listedAfterDelete.response.ok, `signed-in saved project list after delete returned ${listedAfterDelete.response.status}`);
+        const listedAfterDeletePayload = JSON.parse(listedAfterDelete.text);
+        const leftoverRun = listedAfterDeletePayload.runs?.find((run) => run.id === smokeRun.id || run.projectId === createdProjectId);
+        requireCondition(!leftoverRun, "signed-in saved project delete left the smoke run visible");
+      } catch (cleanupError) {
+        if (!pendingError) {
+          pendingError = cleanupError;
+        } else {
+          console.error(`Signed-in saved project cleanup failed: ${cleanupError instanceof Error ? cleanupError.message : String(cleanupError)}`);
+        }
+      }
+    }
+  }
+
+  if (pendingError) throw pendingError;
+
+  pass("signed-in saved projects support create, rename, delete, and cleanup");
+  return signedInCookie;
+}
+
 async function checkSignedInStatus(baseUrl, cookie, options) {
   const { cookieSource, expectPremiumAccess, requireSignedInSmoke } = options;
 
@@ -493,6 +622,8 @@ async function checkSignedInStatus(baseUrl, cookie, options) {
   const savedRunsPayload = JSON.parse(savedRuns.text);
   requireCondition(Array.isArray(savedRunsPayload.runs), "signed-in saved projects did not return a runs array");
   pass("signed-in saved projects API returns account runs");
+
+  signedInCookie = await checkSignedInSavedProjectRoundTrip(baseUrl, signedInCookie);
 
   const settings = await request(baseUrl, "/settings", { cookie: signedInCookie, redirect: "follow" });
   requireCondition(settings.response.ok, `signed-in settings returned ${settings.response.status}`);

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import {
+  buildSmokeSavedRunPayload,
   cookieHeaderFromSession,
   createCookieChunks,
   mergeSetCookieHeaders,
@@ -84,4 +85,19 @@ test("removes expired Set-Cookie values from the smoke cookie jar", () => {
 
   assert.equal(jar.has("sb-project-auth-token"), false);
   assert.equal(jar.get("theme"), "dark");
+});
+
+test("builds a cleanup-safe saved-project smoke payload", () => {
+  const payload = buildSmokeSavedRunPayload({
+    id: "roleforge-smoke-fixed",
+    createdAt: "2026-05-26T18:00:00.000Z",
+  });
+
+  assert.equal(payload.id, "roleforge-smoke-fixed");
+  assert.equal(payload.mode, "balanced");
+  assert.equal(payload.downloadUrl, "/api/workflow/download/roleforge-smoke-tailored-resume.pdf");
+  assert.equal(payload.downloadFormat, "pdf");
+  assert.equal(payload.payload.studioSnapshot.result.tailored_text, "Smoke tailored draft");
+  assert.equal(payload.payload.studioSnapshot.downloads.pdf, payload.downloadUrl);
+  assert.equal(payload.payload.studioSnapshot.templateSlug, "classic");
 });
