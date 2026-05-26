@@ -1261,6 +1261,18 @@ export default function Page() {
     }, 40);
   }, [openPreviewMode]);
 
+  const openAccountSummaryLink = useCallback((event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    setAccountPanelOpen(false);
+
+    if (href !== "/app#history") return;
+
+    event.preventDefault();
+    if (window.location.hash !== "#history") {
+      window.history.pushState(null, "", `${window.location.pathname}${window.location.search}#history`);
+    }
+    openHistoryPanel();
+  }, [openHistoryPanel]);
+
   function onPreviewTabKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
     const modes: PreviewMode[] = ["tailored", "original", "diff"];
     const currentIndex = modes.indexOf(previewMode);
@@ -2895,7 +2907,7 @@ export default function Page() {
                         className="studio-account-summary"
                         href={item.href}
                         key={item.label}
-                        onClick={() => setAccountPanelOpen(false)}
+                        onClick={(event) => openAccountSummaryLink(event, item.href)}
                       >
                         <span>{item.label}</span>
                         <small>{item.detail}</small>
