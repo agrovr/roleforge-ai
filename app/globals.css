@@ -3886,7 +3886,9 @@ html[data-theme="dark"] .result-box {
 .history-filter-bar {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 4px;
+  max-width: 100%;
   min-height: 40px;
   padding: 4px;
   border: 1px solid var(--line);
@@ -3909,8 +3911,9 @@ html[data-theme="dark"] .result-box {
   font: inherit;
   font-size: 0.8rem;
   font-weight: 950;
-  line-height: 1;
-  white-space: nowrap;
+  line-height: 1.08;
+  text-align: center;
+  white-space: normal;
 }
 
 .history-filter-bar button:hover {
@@ -3938,6 +3941,8 @@ html[data-theme="dark"] .result-box {
 .history-sync-badge {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  max-width: 100%;
   padding: 3px 8px;
   border: 1px solid color-mix(in srgb, var(--good) 42%, var(--line));
   border-radius: 999px;
@@ -3946,7 +3951,11 @@ html[data-theme="dark"] .result-box {
   font-size: 0.72rem;
   font-weight: 950;
   letter-spacing: 0.05em;
+  line-height: 1.12;
+  text-align: center;
   text-transform: uppercase;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .history-sync-badge.local {
@@ -4031,20 +4040,23 @@ html[data-theme="dark"] .result-box {
 
 .history-actions .ghost-button {
   flex: 0 1 auto;
-  min-height: 38px;
+  max-width: 100%;
+  min-height: 40px;
   min-width: 0;
   justify-content: center;
+  padding: 8px 12px;
+  line-height: 1.12;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .history-action-details,
 .history-action-restore {
-  min-width: 104px;
+  min-width: min(100%, 104px);
 }
 
 .history-action-download {
-  min-width: 132px;
+  min-width: min(100%, 132px);
 }
 
 .history-confirm-actions {

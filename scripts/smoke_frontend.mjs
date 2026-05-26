@@ -445,6 +445,14 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/@container\s+rf-studio-stat\s*\(max-width:\s*220px\)\s*\{[^}]*\.rf-studio-stat-row\s*\{[^}]*font-size:\s*clamp\(1\.42rem,\s*16cqi,\s*1\.72rem\)/s.test(stylesheetText), "studio metric values are missing fitted type for compact cards");
   pass("studio metric cards include fitted overflow-safe typography");
 
+  requireCondition(/\.history-filter-bar\s*\{(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText), "history filters can still force panel overflow");
+  requireCondition(/\.history-filter-bar\s+button\s*\{(?=[^}]*line-height:\s*1\.08)(?=[^}]*text-align:\s*center)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "history filter labels can still render cramped");
+  requireCondition(/\.history-sync-badge\s*\{(?=[^}]*justify-content:\s*center)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText), "history badges can still force narrow row overflow");
+  requireCondition(/\.history-sync-badge\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-align:\s*center)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "history badge labels can still render cramped");
+  requireCondition(/\.history-actions\s+\.ghost-button\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*min-height:\s*40px)(?=[^}]*padding:\s*8px\s+12px)(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "history action buttons can still render cramped labels");
+  requireCondition(/\.history-action-download\s*\{(?=[^}]*min-width:\s*min\(100%,\s*132px\))[^}]*\}/s.test(stylesheetText), "history download action can still force row overflow");
+  pass("history controls include label wrapping safeguards");
+
   requireCondition(/\.faq-q\s*\{[^}]*min-height:\s*44px/.test(stylesheetText), "FAQ rows are missing comfortable touch targets");
   requireCondition(/\.login-nav-actions\s+\.btn-sm\s*\{[^}]*min-height:\s*44px/.test(stylesheetText), "login nav actions are missing comfortable touch targets");
   pass("public interactive elements include touch-target polish");
