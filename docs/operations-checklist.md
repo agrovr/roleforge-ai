@@ -50,7 +50,17 @@ Backend:
 - `Deploy Cloud Run` runs tests, deploys to Cloud Run, and smokes the deployed revision.
 - `Production Smoke` runs daily and can be manually dispatched for the live backend.
 - Optional repository variable: `BACKEND_URL` if the Cloud Run URL changes.
-- Optional secret: `SMOKE_AUTH_TOKEN` for a dedicated signed-in smoke user.
+- Repository variables for signed-in smoke account auth: `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`.
+- Optional secrets for signed-in smoke: `ROLEFORGE_SMOKE_EMAIL` and `ROLEFORGE_SMOKE_PASSWORD` for the same dedicated non-personal smoke account. Backend-only aliases `SMOKE_EMAIL` and `SMOKE_PASSWORD` also work.
+- Fallback secret: `SMOKE_AUTH_TOKEN` for a one-off dedicated smoke account token.
+- Optional repository variable: `SMOKE_REQUIRE_SIGNED_IN_SMOKE=true` after the smoke account credentials or token are configured, so CI fails if signed-in backend checks are skipped.
+
+Smoke readiness across both GitHub repos:
+
+```bash
+cd C:\Users\ashmi\Downloads\Project_v1\resume-tailor-ui-github
+npm run smoke:readiness
+```
 
 Useful checks:
 

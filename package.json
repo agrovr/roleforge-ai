@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "smoke:frontend": "node scripts/smoke_frontend.mjs",
+    "smoke:readiness": "node scripts/check_smoke_readiness.mjs",
     "typecheck": "tsc --noEmit",
     "wait:vercel": "node scripts/wait_for_vercel_status.mjs",
     "test": "tsx --test app/lib/*.test.ts app/lib/billing/*.test.ts app/lib/supabase/*.test.ts scripts/*.test.mjs",
