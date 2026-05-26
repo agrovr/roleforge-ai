@@ -100,8 +100,10 @@ async function checkPublicShell(baseUrl) {
   ).join("\n");
 
   requireCondition(stylesheetText.includes(".dash-stat-value"), "landing dashboard stat styles were missing");
-  requireCondition(stylesheetText.includes("2.1cqi"), "landing dashboard stats were not using container-aware type");
-  requireCondition(/min-block-size:\s*144px/.test(stylesheetText), "landing dashboard stats were missing stable card height");
+  requireCondition(stylesheetText.includes("2.4cqi"), "landing dashboard stats were not using container-aware type");
+  requireCondition(/overflow-wrap:\s*anywhere/.test(stylesheetText), "landing dashboard stats can still clip long words");
+  requireCondition(/min-block-size:\s*150px/.test(stylesheetText), "landing dashboard stats were missing stable card height");
+  requireCondition(/@container\s*\(max-width:\s*940px\)[\s\S]*?\.dash-stats\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/.test(stylesheetText), "landing dashboard stats do not collapse before cramped widths");
   requireCondition(
     /\.dash-mock-url\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)(?=[^}]*text-overflow:\s*ellipsis)[^}]*\}/s.test(stylesheetText),
     "landing dashboard URL bar can still overflow on narrow screens",
@@ -117,6 +119,10 @@ async function checkPublicShell(baseUrl) {
 
   requireCondition(/@media\s*\(max-width:\s*1040px\)[\s\S]*?\.login-panel\s*\{[^}]*grid-template-columns:\s*1fr/.test(stylesheetText), "login page can still stay cramped at tablet widths");
   pass("login page includes tablet-width stack protection");
+
+  requireCondition(/\.faq-q\s*\{[^}]*min-height:\s*44px/.test(stylesheetText), "FAQ rows are missing comfortable touch targets");
+  requireCondition(/\.login-nav-actions\s+\.btn-sm\s*\{[^}]*min-height:\s*44px/.test(stylesheetText), "login nav actions are missing comfortable touch targets");
+  pass("public interactive elements include touch-target polish");
 }
 
 async function checkAnonymousGate(baseUrl) {
