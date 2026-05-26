@@ -39,9 +39,11 @@ Frontend:
 
 - `Frontend CI` runs tests, lint, typecheck, build, waits for Vercel, then smokes production, including the backend `/capabilities` contract.
 - `Production Smoke` runs daily and can be manually dispatched for the live frontend and backend workflow contract.
-- Optional secret: `ROLEFORGE_SMOKE_COOKIE` for a dedicated smoke account. Do not use a personal browser cookie in CI.
-- Optional repository variable: `ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE=true` after the smoke cookie is configured, so CI fails if signed-in account checks are skipped.
-- Optional repository variable: `ROLEFORGE_EXPECT_PREMIUM_ACCESS=true` when the smoke cookie belongs to a premium account and should fail if DOCX/TXT access disappears.
+- Repository variables for signed-in smoke account auth: `ROLEFORGE_SUPABASE_URL` and `ROLEFORGE_SUPABASE_PUBLISHABLE_KEY`.
+- Optional secrets for signed-in smoke: `ROLEFORGE_SMOKE_EMAIL` and `ROLEFORGE_SMOKE_PASSWORD` for a dedicated non-personal smoke account. The smoke script signs in through Supabase Auth and builds the app's SSR cookie shape.
+- Fallback secret: `ROLEFORGE_SMOKE_COOKIE` for a one-off dedicated smoke account cookie. Do not use a personal browser cookie in CI.
+- Optional repository variable: `ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE=true` after the smoke account credentials or cookie are configured, so CI fails if signed-in account checks are skipped.
+- Optional repository variable: `ROLEFORGE_EXPECT_PREMIUM_ACCESS=true` when the smoke account should have premium access and should fail if DOCX/TXT access disappears.
 
 Backend:
 
@@ -66,6 +68,7 @@ Before assuming a frontend bug is fixed in production:
 - Confirm GitHub `Frontend CI` passed.
 - Confirm the commit has a successful `Vercel` status.
 - Run `node scripts\smoke_frontend.mjs`; it verifies the frontend shell, anonymous studio, settings, saved-project, download, billing auth gates, unsigned Stripe webhook rejection, plus the backend `/capabilities` contract the studio depends on.
+- When signed-in smoke is configured, the frontend smoke output should include `PASS signed-in smoke configured with ...` before checking account status, `/app`, `/api/saved-runs`, and `/settings`.
 
 Backend deploys through GitHub Actions to Cloud Run from `agrovr/roleforge-ai-backend` `main`.
 

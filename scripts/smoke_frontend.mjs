@@ -414,7 +414,7 @@ async function checkBackendCapabilities(backendUrl) {
 }
 
 async function checkSignedInStatus(baseUrl, cookie, options) {
-  const { expectPremiumAccess, requireSignedInSmoke } = options;
+  const { cookieSource, expectPremiumAccess, requireSignedInSmoke } = options;
 
   if (!cookie) {
     requireCondition(!requireSignedInSmoke, "ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE requires ROLEFORGE_SMOKE_COOKIE or a dedicated ROLEFORGE_SMOKE_EMAIL/ROLEFORGE_SMOKE_PASSWORD account");
@@ -422,6 +422,8 @@ async function checkSignedInStatus(baseUrl, cookie, options) {
     skip("signed-in smoke skipped because ROLEFORGE_SMOKE_COOKIE or ROLEFORGE_SMOKE_EMAIL/ROLEFORGE_SMOKE_PASSWORD is not configured");
     return;
   }
+
+  pass(`signed-in smoke configured with ${cookieSource}`);
 
   let signedInCookie = cookie;
   const status = await request(baseUrl, "/api/auth/status", { cookie: signedInCookie, redirect: "follow" });
@@ -466,7 +468,10 @@ async function checkSignedInStatus(baseUrl, cookie, options) {
 async function main() {
   const baseUrl = normalizeBaseUrl(process.env.ROLEFORGE_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL);
   const backendUrl = normalizeBaseUrl(process.env.ROLEFORGE_BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || DEFAULT_BACKEND_URL);
-  const cookie = process.env.ROLEFORGE_SMOKE_COOKIE?.trim() || await signInSmokeAccount();
+  const cookieFromEnv = process.env.ROLEFORGE_SMOKE_COOKIE?.trim();
+  const cookieFromSmokeAccount = cookieFromEnv ? "" : await signInSmokeAccount();
+  const cookie = cookieFromEnv || cookieFromSmokeAccount;
+  const cookieSource = cookieFromEnv ? "ROLEFORGE_SMOKE_COOKIE" : cookieFromSmokeAccount ? "ROLEFORGE_SMOKE_EMAIL/ROLEFORGE_SMOKE_PASSWORD" : "";
   const requireSignedInSmoke = readBooleanEnv("ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE");
   const expectPremiumAccess = readBooleanEnv("ROLEFORGE_EXPECT_PREMIUM_ACCESS");
 
@@ -479,7 +484,7 @@ async function main() {
     await checkBillingWebhookGate(baseUrl);
     await checkCrawlerMetadata(baseUrl);
     await checkBackendCapabilities(backendUrl);
-    await checkSignedInStatus(baseUrl, cookie, { expectPremiumAccess, requireSignedInSmoke });
+    await checkSignedInStatus(baseUrl, cookie, { cookieSource, expectPremiumAccess, requireSignedInSmoke });
   } catch (error) {
     fail(error instanceof Error ? error.message : String(error));
   }
