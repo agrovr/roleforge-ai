@@ -265,6 +265,13 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/@media\s*\(max-width:\s*1040px\)[\s\S]*?\.login-panel\s*\{[^}]*grid-template-columns:\s*1fr/.test(stylesheetText), "login page can still stay cramped at tablet widths");
   pass("login page includes tablet-width stack protection");
 
+  requireCondition(/\.settings-section-panel\s*\{(?=[^}]*container-type:\s*inline-size)[^}]*\}/s.test(stylesheetText), "settings panels were missing container sizing");
+  requireCondition(/\.settings-metric\s*\{(?=[^}]*container-type:\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "settings metric cards can still overflow their panel");
+  requireCondition(/\.settings-metric\s+strong\s*\{(?=[^}]*font-size:\s*clamp\(1\.32rem,\s*13cqi,\s*1\.7rem\))(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings metric display text is not using balanced container-aware type");
+  requireCondition(/\.settings-status-pill\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings status pills can still force narrow layout overflow");
+  requireCondition(/\.settings-plan-includes\s+span\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings plan chips can still force narrow layout overflow");
+  pass("settings cards include overflow-safe plan and metric styles");
+
   requireCondition(/\.faq-q\s*\{[^}]*min-height:\s*44px/.test(stylesheetText), "FAQ rows are missing comfortable touch targets");
   requireCondition(/\.login-nav-actions\s+\.btn-sm\s*\{[^}]*min-height:\s*44px/.test(stylesheetText), "login nav actions are missing comfortable touch targets");
   pass("public interactive elements include touch-target polish");

@@ -5274,6 +5274,7 @@ html[data-theme="dark"] input::file-selector-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  max-width: 100%;
   min-height: 34px;
   padding: 7px 12px;
   border: 1px solid var(--line);
@@ -5284,7 +5285,10 @@ html[data-theme="dark"] input::file-selector-button {
   font-weight: 950;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  white-space: nowrap;
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .settings-status-pill.good {
@@ -5387,12 +5391,14 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-metric-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(10.75rem, 100%), 1fr));
   gap: 8px;
 }
 
 .settings-metric {
+  container-type: inline-size;
   min-width: 0;
+  overflow: hidden;
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -5403,8 +5409,11 @@ html[data-theme="dark"] input::file-selector-button {
   display: block;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: 1.7rem;
-  line-height: 1;
+  font-size: clamp(1.32rem, 13cqi, 1.7rem);
+  line-height: 0.98;
+  overflow-wrap: normal;
+  text-wrap: balance;
+  word-break: normal;
 }
 
 .settings-metric span {
@@ -6083,6 +6092,8 @@ html[data-theme="dark"] input::file-selector-button {
 .settings-plan-includes span {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  max-width: 100%;
   min-height: 30px;
   padding: 6px 10px;
   border: 1px solid color-mix(in srgb, var(--brand) 22%, var(--line));
@@ -6091,7 +6102,10 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--ink-1);
   font-size: 0.74rem;
   font-weight: 900;
-  white-space: nowrap;
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .settings-page-hero h1 {
@@ -6118,6 +6132,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-section-panel {
+  container-type: inline-size;
   display: grid;
   gap: 14px;
   min-width: 0;
