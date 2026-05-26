@@ -256,8 +256,11 @@ async function checkPublicShell(baseUrl) {
 
   requireCondition(stylesheetText.includes(".dash-stat-value"), "landing dashboard stat styles were missing");
   requireCondition(/\.dash-mock\s*\{(?=[^}]*container-type:\s*inline-size)[^}]*\}/s.test(stylesheetText), "landing dashboard mock was missing container sizing");
-  requireCondition(/grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(10\.5rem,\s*100%\),\s*1fr\)\)/.test(stylesheetText), "landing dashboard stats do not wrap before cramped widths");
-  requireCondition(/\.dash-stat-value\s*\{(?=[^}]*font-size:\s*clamp\(1\.65rem,\s*4\.3cqi,\s*2\.45rem\))(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "landing dashboard stat values are not using overflow-safe fitted type");
+  requireCondition(/\.dash-main\s*\{(?=[^}]*container:\s*dash-main\s*\/\s*inline-size)[^}]*\}/s.test(stylesheetText), "landing dashboard main column was missing named container sizing");
+  requireCondition(/\.dash-stats\s*\{(?=[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "landing dashboard stats are missing stable desktop columns");
+  requireCondition(/@container\s+dash-main\s*\(max-width:\s*880px\)\s*\{[^}]*\.dash-stats\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s.test(stylesheetText), "landing dashboard stats do not collapse to two columns before cramped widths");
+  requireCondition(/@container\s+dash-main\s*\(max-width:\s*460px\)\s*\{[^}]*\.dash-stats\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText), "landing dashboard stats do not collapse to one column on narrow widths");
+  requireCondition(/\.dash-stat-value\s*\{(?=[^}]*font-size:\s*clamp\(1\.9rem,\s*9cqi,\s*2\.9rem\))(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "landing dashboard stat values are not using overflow-safe fitted type");
   requireCondition(/\.dash-stat-delta\s*\{(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "landing dashboard stat captions can still force card overflow");
   requireCondition(/min-block-size:\s*clamp\(126px,\s*16cqi,\s*146px\)/.test(stylesheetText), "landing dashboard stats were missing stable card height");
   requireCondition(

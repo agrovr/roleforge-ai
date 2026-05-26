@@ -1185,7 +1185,7 @@ html[data-theme="dark"] textarea {
 }
 
 .dash-main {
-  container-type: inline-size;
+  container: dash-main / inline-size;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -1197,8 +1197,8 @@ html[data-theme="dark"] textarea {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: flex-end;
-  gap: 24px;
+  align-items: center;
+  gap: 16px 24px;
 }
 
 .dash-main-head > div {
@@ -1227,12 +1227,12 @@ html[data-theme="dark"] textarea {
 
 .dash-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(10.5rem, 100%), 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 
 .dash-stat {
-  container-type: inline-size;
+  container: dash-stat / inline-size;
   display: flex;
   min-block-size: clamp(126px, 16cqi, 146px);
   min-width: 0;
@@ -1259,11 +1259,11 @@ html[data-theme="dark"] textarea {
   margin: 4px 0 2px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(1.65rem, 4.3cqi, 2.45rem);
+  font-size: clamp(1.9rem, 9cqi, 2.9rem);
   font-weight: 500;
   letter-spacing: 0;
   line-height: 0.98;
-  overflow-wrap: normal;
+  overflow-wrap: anywhere;
   text-wrap: balance;
   word-break: normal;
   white-space: normal;
@@ -1282,15 +1282,28 @@ html[data-theme="dark"] textarea {
   text-wrap: balance;
 }
 
-@container (max-width: 940px) {
-  .dash-stat {
-    min-block-size: 132px;
+@container dash-main (max-width: 880px) {
+  .dash-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@container (max-width: 480px) {
+@container dash-main (max-width: 460px) {
   .dash-stats {
     grid-template-columns: 1fr;
+  }
+}
+
+@container dash-stat (max-width: 180px) {
+  .dash-stat-value {
+    font-size: clamp(1.55rem, 18cqi, 2rem);
+    line-height: 1.02;
+  }
+}
+
+@container dash-main (max-width: 940px) {
+  .dash-stat {
+    min-block-size: 132px;
   }
 }
 
