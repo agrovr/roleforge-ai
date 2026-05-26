@@ -8829,6 +8829,10 @@ html[data-theme="dark"] .rf-resume-generated {
 }
 
 .rf-intake-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   margin: 0;
   padding: 20px 22px;
   background:
@@ -8840,6 +8844,21 @@ html[data-theme="dark"] .rf-resume-generated {
   line-height: 1;
   font-weight: 900;
   letter-spacing: -0.01em;
+}
+
+.rf-intake-next {
+  flex: 0 0 auto;
+  min-height: 24px;
+  padding: 5px 9px;
+  border: 1px solid rgba(255, 250, 240, 0.32);
+  border-radius: 999px;
+  background: rgba(255, 250, 240, 0.13);
+  color: #f6d393;
+  font-size: 0.64rem;
+  font-weight: 950;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .rf-intake-card-body {

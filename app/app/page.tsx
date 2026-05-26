@@ -2419,6 +2419,25 @@ export default function Page() {
   const uploadFormatHint = enabledUploadFormats.length
     ? `${enabledUploadFormats.map((format) => format.label).join(", ")}. Drop your file here or browse from your computer.`
     : "DOCX, PDF, or TXT. Drop your file here or browse from your computer.";
+  const fileSelected = Boolean(file || uploadMeta);
+  const uploadStatusCopy = file
+    ? previewUploadState === "reading"
+      ? "Reading resume..."
+      : previewUploadState === "error"
+        ? "Resume selected. Replace it if the preview looks incomplete."
+        : uploadMeta
+          ? hasTarget
+            ? "Resume ready. Run Tailor when the target looks right."
+            : "Resume ready. Add the job target next."
+          : "Resume selected. Add the job target next."
+    : uploadFormatHint;
+  const showTargetNext = Boolean(fileSelected && !hasTarget && !result);
+  const targetTextPlaceholder = fileSelected
+    ? "Paste the full job description here to unlock Run Tailor..."
+    : "Paste the full job description here...";
+  const targetUrlPlaceholder = fileSelected
+    ? "https://company.com/careers/job - add the role link next"
+    : "https://company.com/careers/job";
   const sourceLineCount = countReadableLines(sourcePreviewText);
   const tailoredLineCount = countReadableLines(result?.tailored_text);
   const coverLetterWordCount = countReadableWords(coverLetterText);
@@ -3248,7 +3267,7 @@ export default function Page() {
                       <span className="rf-file-icon"><RoleForgeIcon name="file" size={24} /></span>
                       <span className="rf-file-copy">
                         <strong>{file ? file.name : "Choose a resume file"}</strong>
-                        <small>{file ? "Ready for tailoring" : uploadFormatHint}</small>
+                        <small aria-live="polite">{uploadStatusCopy}</small>
                       </span>
                       <span className="rf-file-action">{file ? "Replace file" : "Choose File"}</span>
                     </label>
@@ -3256,7 +3275,10 @@ export default function Page() {
                 </article>
 
                 <article className="rf-intake-card rf-intake-target-card">
-                  <h3 className="rf-intake-card-header">Job Target</h3>
+                  <h3 className="rf-intake-card-header">
+                    Job Target
+                    {showTargetNext ? <span className="rf-intake-next">Next</span> : null}
+                  </h3>
                   <div className="rf-intake-card-body">
                     <div className="rf-target-editor" id="target">
                       <div className="segment rf-target-segment" role="tablist" aria-label="Job description input mode">
@@ -3264,9 +3286,9 @@ export default function Page() {
                         <button className={inputMode === "url" ? "active" : ""} type="button" onClick={() => setInputMode("url")}>Job URL</button>
                       </div>
                       {inputMode === "text" ? (
-                        <textarea id="jdText" value={jdText} onChange={(event) => setJdText(event.target.value)} placeholder="Paste the full job description here..." aria-label="Job description" />
+                        <textarea id="jdText" value={jdText} onChange={(event) => setJdText(event.target.value)} placeholder={targetTextPlaceholder} aria-label="Job description" />
                       ) : (
-                        <input id="jdUrl" value={jdUrl} onChange={(event) => setJdUrl(event.target.value)} placeholder="https://company.com/careers/job" aria-label="Job posting URL" />
+                        <input id="jdUrl" value={jdUrl} onChange={(event) => setJdUrl(event.target.value)} placeholder={targetUrlPlaceholder} aria-label="Job posting URL" />
                       )}
                     </div>
                   </div>
