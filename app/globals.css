@@ -6152,6 +6152,22 @@ html[data-theme="dark"] input::file-selector-button {
   width: fit-content;
 }
 
+.settings-profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.settings-profile-actions form {
+  margin: 0;
+}
+
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button {
+  min-height: 44px;
+}
+
 .settings-billing-panel {
   align-content: start;
 }
@@ -9979,6 +9995,7 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   }
 
   .settings-action-row,
+  .settings-profile-actions,
   .settings-export-item,
   .settings-export-actions,
   .settings-billing-head,
@@ -9993,6 +10010,9 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
   .settings-download-button,
   .settings-coming-soon,
+  .settings-profile-actions .primary-button,
+  .settings-profile-actions .ghost-button,
+  .settings-profile-actions form,
   .settings-billing-head .ghost-button,
   .settings-action-row .btn,
   .settings-action-row .ghost-button,

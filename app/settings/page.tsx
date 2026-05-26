@@ -230,10 +230,15 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 </div>
               </div>
               <p className="settings-billing-note">{billingDetail}</p>
-              <form action="/auth/signout" method="post">
-                <input type="hidden" name="next" value="/login?account=signed-out" />
-                <button className="ghost-button" type="submit">Sign out</button>
-              </form>
+              <div className="settings-profile-actions">
+                <Link className="primary-button" href="/app">
+                  <RoleForgeIcon name="file" size={14} /> Open studio
+                </Link>
+                <form action="/auth/signout" method="post">
+                  <input type="hidden" name="next" value="/login?account=signed-out" />
+                  <button className="ghost-button" type="submit">Sign out</button>
+                </form>
+              </div>
             </div>
           </section>
 
