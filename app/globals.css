@@ -1260,13 +1260,12 @@ html[data-theme="dark"] textarea {
   margin: 4px 0 2px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(1.72rem, 7cqi, 2.42rem);
+  font-size: clamp(1.58rem, 5.35cqi, 2.16rem);
   font-weight: 500;
   letter-spacing: 0;
   line-height: 1.03;
-  overflow-wrap: normal;
+  overflow-wrap: anywhere;
   text-wrap: balance;
-  word-break: keep-all;
   word-break: normal;
   white-space: normal;
 }
@@ -1298,15 +1297,31 @@ html[data-theme="dark"] textarea {
 
 @container dash-stat (max-width: 250px) {
   .dash-stat-value {
-    font-size: clamp(1.55rem, 12cqi, 2rem);
+    font-size: clamp(1.45rem, 10.5cqi, 1.82rem);
     line-height: 1.05;
   }
 }
 
 @container dash-stat (max-width: 210px) {
   .dash-stat-value {
-    font-size: clamp(1.38rem, 12cqi, 1.72rem);
-    line-height: 1.02;
+    font-size: clamp(1.28rem, 10cqi, 1.56rem);
+    line-height: 1.04;
+  }
+}
+
+@media (max-width: 1320px) {
+  .dash-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .dash-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-stat {
+    min-block-size: 118px;
   }
 }
 
