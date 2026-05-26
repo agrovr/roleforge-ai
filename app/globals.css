@@ -5635,8 +5635,10 @@ html[data-theme="dark"] input::file-selector-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
   min-height: 44px;
+  min-width: 0;
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -5647,14 +5649,20 @@ html[data-theme="dark"] input::file-selector-button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   color: var(--ink-0);
   font-weight: 950;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
 }
 
 .settings-export-item small {
+  max-width: 100%;
   color: var(--good);
   font-size: 0.76rem;
   font-weight: 900;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
   text-align: right;
 }
 
@@ -6313,7 +6321,10 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-price-card {
+  container: settings-price-card / inline-size;
   display: grid;
+  min-width: 0;
+  overflow: hidden;
   gap: 16px;
   padding: 16px;
   border: 1px solid var(--line);
@@ -6338,16 +6349,28 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-price-card strong {
   display: inline-block;
+  max-width: 100%;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: 2.7rem;
-  line-height: 0.9;
+  font-size: clamp(2.05rem, 19cqi, 2.58rem);
+  line-height: 1;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .settings-price-card small {
-  margin-left: 6px;
+  display: inline-block;
+  margin: 4px 0 0 6px;
   color: var(--ink-2);
   font-weight: 850;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+}
+
+@container settings-price-card (max-width: 220px) {
+  .settings-price-card strong {
+    font-size: clamp(1.78rem, 18cqi, 2.08rem);
+  }
 }
 
 .settings-usage-card {

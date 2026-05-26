@@ -419,6 +419,14 @@ async function checkPublicShell(baseUrl) {
   );
   pass("settings action buttons include spacing and wrap safeguards");
 
+  requireCondition(/\.settings-export-item\s*\{(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "settings export rows can still force panel overflow");
+  requireCondition(/\.settings-export-item\s+span\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*line-height:\s*1\.18)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "settings export labels can still render cramped");
+  requireCondition(/\.settings-export-item\s+small\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*line-height:\s*1\.18)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "settings export descriptions can still squeeze rows");
+  requireCondition(/\.settings-price-card\s*\{(?=[^}]*container:\s*settings-price-card\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "settings price cards were missing container sizing");
+  requireCondition(/\.settings-price-card\s+strong\s*\{(?=[^}]*font-size:\s*clamp\(2\.05rem,\s*19cqi,\s*2\.58rem\))(?=[^}]*line-height:\s*1)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings price values can still clip or overflow");
+  requireCondition(/@container\s+settings-price-card\s*\(max-width:\s*220px\)\s*\{[^}]*\.settings-price-card\s+strong\s*\{[^}]*font-size:\s*clamp\(1\.78rem,\s*18cqi,\s*2\.08rem\)/s.test(stylesheetText), "settings price values are missing fitted type for compact cards");
+  pass("settings export and billing cards include overflow-safe typography");
+
   requireCondition(
     /\.studio-top-button\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*justify-content:\s*center)[^}]*\}/s.test(stylesheetText),
     "studio top action buttons can still force header overflow",
