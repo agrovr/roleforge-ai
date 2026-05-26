@@ -60,7 +60,7 @@ export function TemplateLibrary({ signedIn }: { signedIn: boolean }) {
                 />
               </div>
               <div className="templates-page-card-copy">
-                <div>
+                <div className="template-title-row">
                   <span className="template-name">{template.name}</span>
                   <span className="template-tag">{template.tag}</span>
                 </div>

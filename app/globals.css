@@ -1655,6 +1655,13 @@ html[data-theme="dark"] textarea {
   font-weight: 800;
 }
 
+.template-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
 .template-tag {
   color: var(--ink-3);
   font-size: 0.82rem;
