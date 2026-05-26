@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
+import { RESUME_TEMPLATE_COOKIE, getResumeTemplate } from "../lib/resumeTemplates";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 import { TemplateLibrary } from "./TemplateLibrary";
@@ -12,16 +14,19 @@ async function getTemplateLinks() {
     data: { user },
   } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
   const signedIn = Boolean(user);
+  const templateCookie = (await cookies()).get(RESUME_TEMPLATE_COOKIE)?.value;
+  const initialTemplateSlug = getResumeTemplate(templateCookie).slug;
 
   return {
     signedIn,
+    initialTemplateSlug,
     studioHref: signedIn ? "/app" : "/login?next=/app",
     settingsHref: signedIn ? "/settings#exports" : `/login?next=${encodeURIComponent("/settings#exports")}`,
   };
 }
 
 export default async function TemplatesPage() {
-  const { signedIn, studioHref, settingsHref } = await getTemplateLinks();
+  const { signedIn, initialTemplateSlug, studioHref, settingsHref } = await getTemplateLinks();
 
   return (
     <main className="templates-page-shell">
@@ -51,7 +56,7 @@ export default async function TemplatesPage() {
         </div>
       </section>
 
-      <TemplateLibrary signedIn={signedIn} />
+      <TemplateLibrary signedIn={signedIn} initialTemplateSlug={initialTemplateSlug} />
     </main>
   );
 }

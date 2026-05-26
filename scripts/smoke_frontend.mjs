@@ -230,6 +230,17 @@ async function checkPublicShell(baseUrl) {
   );
   pass("login page explains protected studio access");
 
+  const templates = await request(baseUrl, "/templates", {
+    redirect: "follow",
+    cookie: "roleforge-template=engineer",
+  });
+  requireCondition(templates.response.ok, `templates returned ${templates.response.status}`);
+  requireCondition(
+    /Selected direction[\s\S]*?<strong>Engineer<\/strong>/.test(templates.text),
+    "templates page did not render the cookie-selected resume direction",
+  );
+  pass("templates page respects the saved template direction");
+
   const stylesheetPaths = Array.from(home.text.matchAll(/href="([^"]+\.css[^"]*)"/g))
     .map((match) => match[1])
     .filter((path) => path.startsWith("/_next/static/"));

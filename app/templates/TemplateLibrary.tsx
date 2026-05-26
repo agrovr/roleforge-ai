@@ -21,8 +21,14 @@ function rememberTemplate(slug: ResumeTemplateSlug) {
   document.cookie = `${RESUME_TEMPLATE_COOKIE}=${encodeURIComponent(slug)}; Path=/; Max-Age=31536000; SameSite=Lax`;
 }
 
-export function TemplateLibrary({ signedIn }: { signedIn: boolean }) {
-  const [selectedSlug, setSelectedSlug] = useState<ResumeTemplateSlug>("classic");
+export function TemplateLibrary({
+  signedIn,
+  initialTemplateSlug = "classic",
+}: {
+  signedIn: boolean;
+  initialTemplateSlug?: ResumeTemplateSlug;
+}) {
+  const [selectedSlug, setSelectedSlug] = useState<ResumeTemplateSlug>(initialTemplateSlug);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(RESUME_TEMPLATE_STORAGE_KEY);
