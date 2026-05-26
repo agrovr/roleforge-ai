@@ -12,14 +12,7 @@ function normalizeInterval(value: FormDataEntryValue | null): BillingInterval {
 }
 
 export async function POST(request: Request) {
-  const stripe = getStripeClient();
-  const billingConfig = getStripeBillingConfig();
   const supabase = await createRoleForgeServerClient();
-  const serviceSupabase = createRoleForgeServiceClient();
-
-  if (!stripe || !billingConfig.checkoutConfigured || !serviceSupabase) {
-    return NextResponse.json({ error: "Billing is not configured yet." }, { status: 503 });
-  }
 
   if (!supabase) {
     return NextResponse.redirect(absoluteUrl(request, "/login?next=/settings&account=signin-required"), 303);
@@ -31,6 +24,14 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.redirect(absoluteUrl(request, "/login?next=/settings&account=signin-required"), 303);
+  }
+
+  const stripe = getStripeClient();
+  const billingConfig = getStripeBillingConfig();
+  const serviceSupabase = createRoleForgeServiceClient();
+
+  if (!stripe || !billingConfig.checkoutConfigured || !serviceSupabase) {
+    return NextResponse.json({ error: "Billing is not configured yet." }, { status: 503 });
   }
 
   const formData = await request.formData();

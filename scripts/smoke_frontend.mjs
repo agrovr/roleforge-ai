@@ -256,10 +256,10 @@ async function checkPublicShell(baseUrl) {
 
   requireCondition(stylesheetText.includes(".dash-stat-value"), "landing dashboard stat styles were missing");
   requireCondition(/\.dash-mock\s*\{(?=[^}]*container-type:\s*inline-size)[^}]*\}/s.test(stylesheetText), "landing dashboard mock was missing container sizing");
-  requireCondition(/grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(12\.5rem,\s*100%\),\s*1fr\)\)/.test(stylesheetText), "landing dashboard stats do not wrap before cramped widths");
-  requireCondition(/font-size:\s*clamp\(1\.95rem,\s*6\.2cqi,\s*3\.1rem\)/.test(stylesheetText), "landing dashboard stats were not using fitted container-aware type");
-  requireCondition(/white-space:\s*nowrap/.test(stylesheetText), "landing dashboard stat values can still wrap awkwardly");
-  requireCondition(/min-block-size:\s*clamp\(132px,\s*18cqi,\s*150px\)/.test(stylesheetText), "landing dashboard stats were missing stable card height");
+  requireCondition(/grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(10\.5rem,\s*100%\),\s*1fr\)\)/.test(stylesheetText), "landing dashboard stats do not wrap before cramped widths");
+  requireCondition(/\.dash-stat-value\s*\{(?=[^}]*font-size:\s*clamp\(1\.65rem,\s*4\.3cqi,\s*2\.45rem\))(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "landing dashboard stat values are not using overflow-safe fitted type");
+  requireCondition(/\.dash-stat-delta\s*\{(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "landing dashboard stat captions can still force card overflow");
+  requireCondition(/min-block-size:\s*clamp\(126px,\s*16cqi,\s*146px\)/.test(stylesheetText), "landing dashboard stats were missing stable card height");
   requireCondition(
     /\.dash-mock-url\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)(?=[^}]*text-overflow:\s*ellipsis)[^}]*\}/s.test(stylesheetText),
     "landing dashboard URL bar can still overflow on narrow screens",

@@ -8,14 +8,7 @@ import { createRoleForgeServiceClient } from "@/app/lib/supabase/service";
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  const stripe = getStripeClient();
-  const billingConfig = getStripeBillingConfig();
   const supabase = await createRoleForgeServerClient();
-  const serviceSupabase = createRoleForgeServiceClient();
-
-  if (!stripe || !billingConfig.secretKey || !serviceSupabase) {
-    return NextResponse.json({ error: "Billing is not configured yet." }, { status: 503 });
-  }
 
   if (!supabase) {
     return NextResponse.redirect(absoluteUrl(request, "/login?next=/settings&account=signin-required"), 303);
@@ -27,6 +20,14 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.redirect(absoluteUrl(request, "/login?next=/settings&account=signin-required"), 303);
+  }
+
+  const stripe = getStripeClient();
+  const billingConfig = getStripeBillingConfig();
+  const serviceSupabase = createRoleForgeServiceClient();
+
+  if (!stripe || !billingConfig.secretKey || !serviceSupabase) {
+    return NextResponse.json({ error: "Billing is not configured yet." }, { status: 503 });
   }
 
   const portalCustomer = await loadBillingPortalCustomer(serviceSupabase, user.id);

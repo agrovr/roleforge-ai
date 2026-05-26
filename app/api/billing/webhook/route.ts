@@ -17,17 +17,17 @@ async function retrieveSubscription(subscriptionId: string) {
 }
 
 export async function POST(request: Request) {
+  const signature = request.headers.get("stripe-signature");
+
+  if (!signature) {
+    return NextResponse.json({ error: "Missing Stripe signature." }, { status: 400 });
+  }
+
   const stripe = getStripeClient();
   const { webhookSecret } = getStripeBillingConfig();
 
   if (!stripe || !webhookSecret) {
     return NextResponse.json({ error: "Webhook is not configured." }, { status: 503 });
-  }
-
-  const signature = request.headers.get("stripe-signature");
-
-  if (!signature) {
-    return NextResponse.json({ error: "Missing Stripe signature." }, { status: 400 });
   }
 
   const payload = await request.text();
