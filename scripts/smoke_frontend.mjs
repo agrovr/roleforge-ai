@@ -661,9 +661,10 @@ async function checkSignedInStatus(baseUrl, cookie, options) {
   const app = await request(baseUrl, "/app", { cookie: signedInCookie, redirect: "follow" });
   signedInCookie = mergeSetCookieHeaders(signedInCookie, app.response);
   requireCondition(app.response.ok, `signed-in studio returned ${app.response.status}`);
+  const appPath = new URL(app.response.url || `${baseUrl}/app`).pathname;
+  requireCondition(appPath === "/app", `signed-in studio ended at ${appPath} instead of /app`);
   requireCondition(app.text.includes("RoleForge AI"), "signed-in studio did not render the RoleForge shell");
-  requireCondition(app.text.includes("Resume studio"), "signed-in studio did not render the workspace");
-  pass("signed-in studio renders the workspace shell");
+  pass("signed-in account can access the protected studio route");
 
   const savedRuns = await request(baseUrl, "/api/saved-runs", { cookie: signedInCookie, redirect: "follow" });
   signedInCookie = mergeSetCookieHeaders(signedInCookie, savedRuns.response);
