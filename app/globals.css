@@ -4554,6 +4554,9 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
   appearance: none;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-width: min(100%, 92px);
+  max-width: 100%;
   gap: 6px;
   min-height: 28px;
   padding: 5px 9px;
@@ -4564,8 +4567,14 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
   font-size: 0.76rem;
   font-weight: 900;
   letter-spacing: 0.01em;
-  white-space: nowrap;
+  line-height: 1.12;
+  text-align: center;
+  white-space: normal;
   cursor: pointer;
+}
+
+.export-format-chip svg {
+  flex: 0 0 auto;
 }
 
 .export-format-chip:hover,
@@ -4578,6 +4587,8 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
   color: var(--muted);
   font-size: 0.68rem;
   font-weight: 850;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
 }
 
 .export-format-chip.active {
@@ -4637,6 +4648,7 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
   align-items: center;
   gap: 6px;
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .studio-template-preference small {
@@ -4645,7 +4657,9 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
   font-weight: 950;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  white-space: nowrap;
+  line-height: 1.12;
+  white-space: normal;
+  text-wrap: balance;
 }
 
 .studio-template-preference a {

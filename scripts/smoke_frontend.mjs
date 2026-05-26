@@ -433,6 +433,12 @@ async function checkPublicShell(baseUrl) {
   );
   pass("studio action buttons include narrow-width wrapping safeguards");
 
+  requireCondition(/\.export-format-chip\s*\{(?=[^}]*justify-content:\s*center)(?=[^}]*min-width:\s*min\(100%,\s*92px\))(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText), "studio export format chips can still collapse too narrow");
+  requireCondition(/\.export-format-chip\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-align:\s*center)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "studio export format chip labels can still render cramped");
+  requireCondition(/\.export-format-chip\s+small\s*\{(?=[^}]*line-height:\s*1\.1)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "studio export format chip subtitles can still squeeze chips");
+  requireCondition(/\.studio-template-preference\s+small\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "studio template preference status can still force cramped pills");
+  pass("studio export chips and template preference include wrapping safeguards");
+
   requireCondition(/\.rf-studio-stat\s*\{(?=[^}]*container:\s*rf-studio-stat\s*\/\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "studio metric cards were missing container sizing");
   requireCondition(/\.rf-studio-stat-row\s*\{(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*font-size:\s*clamp\(1\.62rem,\s*17cqi,\s*2\.18rem\))(?=[^}]*line-height:\s*1\.02)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "studio metric values can still overflow or clip");
   requireCondition(/\.rf-studio-stat-row\s+small\s*\{(?=[^}]*line-height:\s*1\.15)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "studio metric units can still squeeze value rows");
