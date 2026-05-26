@@ -1046,6 +1046,7 @@ html[data-theme="dark"] textarea {
 }
 
 .dash-mock {
+  container-type: inline-size;
   max-width: var(--container);
   margin: 0 auto;
   border: 1px solid var(--line);
@@ -1194,9 +1195,14 @@ html[data-theme="dark"] textarea {
 
 .dash-main-head {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-end;
   gap: 24px;
+}
+
+.dash-main-head > div {
+  min-width: 0;
 }
 
 .dash-main-head h3 {
@@ -1219,20 +1225,20 @@ html[data-theme="dark"] textarea {
 
 .dash-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(12.5rem, 100%), 1fr));
   gap: 12px;
 }
 
 .dash-stat {
   container-type: inline-size;
   display: flex;
-  min-block-size: 150px;
+  min-block-size: clamp(132px, 18cqi, 150px);
   min-width: 0;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
   gap: 12px;
-  padding: clamp(16px, 5cqi, 20px);
+  padding: clamp(16px, 4.6cqi, 20px);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
@@ -1251,13 +1257,13 @@ html[data-theme="dark"] textarea {
   margin: 4px 0 2px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(1.85rem, 9.5cqi, 2.35rem);
+  font-size: clamp(1.95rem, 6.2cqi, 3.1rem);
   font-weight: 500;
   letter-spacing: 0;
   line-height: 1.02;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
   word-break: normal;
-  text-wrap: balance;
+  white-space: nowrap;
 }
 
 .dash-stat-delta {
@@ -1270,10 +1276,6 @@ html[data-theme="dark"] textarea {
 }
 
 @container (max-width: 940px) {
-  .dash-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .dash-stat {
     min-block-size: 136px;
   }
@@ -1345,6 +1347,7 @@ html[data-theme="dark"] textarea {
 
 .dash-resume-meta {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   color: var(--ink-3);
   font-size: 12.5px;
