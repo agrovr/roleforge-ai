@@ -244,7 +244,7 @@ async function checkPublicShell(baseUrl) {
   ).join("\n");
 
   requireCondition(stylesheetText.includes(".dash-stat-value"), "landing dashboard stat styles were missing");
-  requireCondition(stylesheetText.includes("2.4cqi"), "landing dashboard stats were not using container-aware type");
+  requireCondition(/font-size:\s*clamp\(1\.85rem,\s*9\.5cqi,\s*2\.35rem\)/.test(stylesheetText), "landing dashboard stats were not using fitted container-aware type");
   requireCondition(/overflow-wrap:\s*anywhere/.test(stylesheetText), "landing dashboard stats can still clip long words");
   requireCondition(/min-block-size:\s*150px/.test(stylesheetText), "landing dashboard stats were missing stable card height");
   requireCondition(/@container\s*\(max-width:\s*940px\)[\s\S]*?\.dash-stats\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/.test(stylesheetText), "landing dashboard stats do not collapse before cramped widths");
