@@ -5314,6 +5314,9 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .rf-studio-stat {
+  container: rf-studio-stat / inline-size;
+  min-width: 0;
+  overflow: hidden;
   padding: 18px;
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -6429,14 +6432,24 @@ html[data-theme="dark"] input::file-selector-button {
 
 .rf-studio-stat-row {
   display: flex;
+  min-width: 0;
   align-items: baseline;
+  flex-wrap: wrap;
   gap: 5px;
   margin: 9px 0 8px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: 2.25rem;
+  font-size: clamp(1.62rem, 17cqi, 2.18rem);
   font-weight: 700;
-  line-height: 0.9;
+  line-height: 1.02;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.rf-studio-stat-row > span {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .rf-studio-stat-row small {
@@ -6444,6 +6457,14 @@ html[data-theme="dark"] input::file-selector-button {
   font-family: var(--font-sans);
   font-size: 0.76rem;
   font-weight: 850;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+@container rf-studio-stat (max-width: 220px) {
+  .rf-studio-stat-row {
+    font-size: clamp(1.42rem, 16cqi, 1.72rem);
+  }
 }
 
 .rf-studio-stat-track {
