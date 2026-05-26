@@ -13,6 +13,10 @@ function pass(message) {
   console.log(`PASS ${message}`);
 }
 
+function skip(message) {
+  console.log(`SKIP ${message}`);
+}
+
 function fail(message) {
   console.error(`FAIL ${message}`);
   process.exitCode = 1;
@@ -275,7 +279,7 @@ async function checkSignedInStatus(baseUrl, cookie, options) {
   if (!cookie) {
     requireCondition(!requireSignedInSmoke, "ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE requires ROLEFORGE_SMOKE_COOKIE");
     requireCondition(!expectPremiumAccess, "ROLEFORGE_EXPECT_PREMIUM_ACCESS requires ROLEFORGE_SMOKE_COOKIE");
-    pass("signed-in smoke skipped because ROLEFORGE_SMOKE_COOKIE is not configured");
+    skip("signed-in smoke skipped because ROLEFORGE_SMOKE_COOKIE is not configured");
     return;
   }
 
