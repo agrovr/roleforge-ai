@@ -1753,14 +1753,17 @@ html[data-theme="dark"] textarea {
 }
 
 .pricing-grid.two {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(min(100%, 360px), 1fr));
 }
 
 .price-card {
+  container: price-card / inline-size;
   min-height: 390px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 18px;
+  overflow: hidden;
   padding: 28px;
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
@@ -1784,9 +1787,27 @@ html[data-theme="dark"] textarea {
 }
 
 .price-amount .v {
+  display: inline-block;
+  max-width: 100%;
   font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-size: clamp(2.35rem, 15cqi, 3.25rem);
   font-weight: 500;
+  line-height: 1;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.price-amount .m {
+  display: inline-block;
+  margin-left: 4px;
+  color: var(--ink-2);
+  font-weight: 850;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.price-card.featured .price-amount .m {
+  color: #d6d1c7;
 }
 
 .price-desc,
@@ -1816,12 +1837,32 @@ html[data-theme="dark"] textarea {
 
 .price-list li {
   display: flex;
+  min-width: 0;
   gap: 10px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.price-list li svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
 }
 
 .price-card .btn,
 .price-card button {
+  width: 100%;
   margin-top: auto;
+  justify-content: center;
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+@container price-card (max-width: 340px) {
+  .price-amount .v {
+    font-size: clamp(2rem, 14cqi, 2.45rem);
+  }
 }
 
 .faq-grid {
