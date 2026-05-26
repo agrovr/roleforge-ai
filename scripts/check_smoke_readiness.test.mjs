@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { REPOS, evaluateRepoReadiness } from "./check_smoke_readiness.mjs";
+import { REPOS, buildSetupCommands, evaluateRepoReadiness } from "./check_smoke_readiness.mjs";
 
 const frontendConfig = REPOS.find((repo) => repo.label === "Frontend");
 const backendConfig = REPOS.find((repo) => repo.label === "Backend");
@@ -42,4 +42,30 @@ test("reports missing signed-in smoke credentials and gate variables", () => {
       "Frontend variable ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE must be true after credentials are configured",
     ],
   );
+});
+
+test("prints safe setup commands without secret values", () => {
+  const commands = buildSetupCommands(frontendConfig, {
+    variables: ["ROLEFORGE_SUPABASE_URL", "ROLEFORGE_SUPABASE_PUBLISHABLE_KEY"],
+    variableValues: {},
+    secrets: [],
+  });
+
+  assert.deepEqual(commands, [
+    'gh secret set ROLEFORGE_SMOKE_EMAIL --repo agrovr/roleforge-ai --body "<smoke-account-email>"',
+    'gh secret set ROLEFORGE_SMOKE_PASSWORD --repo agrovr/roleforge-ai --body "<smoke-account-password>"',
+    'gh variable set ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE --repo agrovr/roleforge-ai --body "true"',
+  ]);
+});
+
+test("only prints missing public variables when credentials and gate are ready", () => {
+  const commands = buildSetupCommands(backendConfig, {
+    variables: ["SUPABASE_URL", "SMOKE_REQUIRE_SIGNED_IN_SMOKE"],
+    variableValues: { SMOKE_REQUIRE_SIGNED_IN_SMOKE: "true" },
+    secrets: ["ROLEFORGE_SMOKE_EMAIL", "ROLEFORGE_SMOKE_PASSWORD"],
+  });
+
+  assert.deepEqual(commands, [
+    'gh variable set SUPABASE_PUBLISHABLE_KEY --repo agrovr/roleforge-ai-backend --body "<supabase-publishable-key>"',
+  ]);
 });

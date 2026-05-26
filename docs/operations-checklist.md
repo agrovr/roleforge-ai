@@ -62,6 +62,8 @@ cd C:\Users\ashmi\Downloads\Project_v1\resume-tailor-ui-github
 npm run smoke:readiness
 ```
 
+If readiness is incomplete, the command prints safe `gh secret set` and `gh variable set` commands with placeholders for the missing values.
+
 Useful checks:
 
 ```bash

@@ -33,6 +33,16 @@ function includesAll(names, required) {
   return required.every((name) => names.has(name));
 }
 
+function placeholderForName(name) {
+  if (/EMAIL/i.test(name)) return "<smoke-account-email>";
+  if (/PASSWORD/i.test(name)) return "<smoke-account-password>";
+  if (/COOKIE/i.test(name)) return "<smoke-account-cookie>";
+  if (/TOKEN/i.test(name)) return "<smoke-auth-token>";
+  if (/URL/i.test(name)) return "<supabase-url>";
+  if (/PUBLISHABLE_KEY/i.test(name)) return "<supabase-publishable-key>";
+  return "<value>";
+}
+
 export function evaluateRepoReadiness(config, state) {
   const variables = new Set(state.variables || []);
   const secrets = new Set(state.secrets || []);
@@ -77,6 +87,32 @@ export function evaluateRepoReadiness(config, state) {
   return findings;
 }
 
+export function buildSetupCommands(config, state) {
+  const variables = new Set(state.variables || []);
+  const secrets = new Set(state.secrets || []);
+  const variableValues = state.variableValues || {};
+  const commands = [];
+
+  for (const name of config.requiredVariables) {
+    if (!variables.has(name)) {
+      commands.push(`gh variable set ${name} --repo ${config.repo} --body "${placeholderForName(name)}"`);
+    }
+  }
+
+  const configuredSecretGroup = config.requiredSecretGroups.find((group) => includesAll(secrets, group));
+  if (!configuredSecretGroup) {
+    for (const name of config.preferredSecretGroup) {
+      commands.push(`gh secret set ${name} --repo ${config.repo} --body "${placeholderForName(name)}"`);
+    }
+  }
+
+  if ((variableValues[config.requiredGateVariable] || "").toLowerCase() !== "true") {
+    commands.push(`gh variable set ${config.requiredGateVariable} --repo ${config.repo} --body "true"`);
+  }
+
+  return commands;
+}
+
 function ghJson(args) {
   const output = execFileSync("gh", args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
   return JSON.parse(output);
@@ -107,6 +143,12 @@ async function main() {
     for (const finding of evaluateRepoReadiness(config, state)) {
       printFinding(finding);
       if (!finding.ok) hasFailure = true;
+    }
+
+    const commands = buildSetupCommands(config, state);
+    if (commands.length) {
+      console.log(`\n${config.label} setup commands:`);
+      for (const command of commands) console.log(`  ${command}`);
     }
   }
 
