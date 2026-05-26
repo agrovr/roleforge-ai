@@ -12,6 +12,53 @@ function normalizeBaseUrl(value) {
   return raw;
 }
 
+export function parseSmokeArgs(argv) {
+  const options = {};
+  const aliases = {
+    "--base-url": "baseUrl",
+    "--site-url": "baseUrl",
+    "--backend-url": "backendUrl",
+    "--canonical-url": "canonicalUrl",
+  };
+
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    const equalsIndex = arg.indexOf("=");
+    const name = equalsIndex >= 0 ? arg.slice(0, equalsIndex) : arg;
+    const inlineValue = equalsIndex >= 0 ? arg.slice(equalsIndex + 1) : undefined;
+
+    if (name === "--require-signed-in-smoke") {
+      options.requireSignedInSmoke = true;
+      continue;
+    }
+
+    if (name === "--expect-premium-access") {
+      options.expectPremiumAccess = true;
+      continue;
+    }
+
+    const key = aliases[name];
+    if (!key) {
+      throw new Error(`Unknown argument: ${arg}`);
+    }
+
+    const value = inlineValue ?? argv[index + 1];
+    if (!value || value.startsWith("--")) {
+      throw new Error(`${name} requires a value`);
+    }
+
+    options[key] = value;
+    if (inlineValue === undefined) index += 1;
+  }
+
+  return options;
+}
+
+function isLocalBaseUrl(baseUrl) {
+  const hostname = new URL(baseUrl).hostname;
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+}
+
 function pass(message) {
   console.log(`PASS ${message}`);
 }
@@ -462,7 +509,7 @@ async function checkAnonymousAuthStatus(baseUrl) {
   pass("anonymous auth status reports configured Supabase auth");
 }
 
-async function checkCrawlerMetadata(baseUrl) {
+async function checkCrawlerMetadata(baseUrl, canonicalUrl = baseUrl) {
   const robots = await request(baseUrl, "/robots.txt", { redirect: "follow" });
   requireCondition(robots.response.ok, `robots.txt returned ${robots.response.status}`);
   requireCondition(robots.text.includes("Sitemap:") && robots.text.includes("/sitemap.xml"), "robots.txt did not reference sitemap.xml");
@@ -471,9 +518,9 @@ async function checkCrawlerMetadata(baseUrl) {
 
   const sitemap = await request(baseUrl, "/sitemap.xml", { redirect: "follow" });
   requireCondition(sitemap.response.ok, `sitemap.xml returned ${sitemap.response.status}`);
-  requireCondition(sitemap.text.includes(`${baseUrl}/`) || sitemap.text.includes(`${baseUrl}</loc>`), "sitemap.xml did not include the home page");
-  requireCondition(sitemap.text.includes(`${baseUrl}/templates`), "sitemap.xml did not include templates");
-  requireCondition(!sitemap.text.includes(`${baseUrl}/app`), "sitemap.xml included the protected studio route");
+  requireCondition(sitemap.text.includes(`${canonicalUrl}/`) || sitemap.text.includes(`${canonicalUrl}</loc>`), "sitemap.xml did not include the home page");
+  requireCondition(sitemap.text.includes(`${canonicalUrl}/templates`), "sitemap.xml did not include templates");
+  requireCondition(!sitemap.text.includes(`${canonicalUrl}/app`), "sitemap.xml included the protected studio route");
   pass("crawler metadata exposes public pages and excludes protected routes");
 }
 
@@ -634,15 +681,21 @@ async function checkSignedInStatus(baseUrl, cookie, options) {
   pass("signed-in settings renders account plan details");
 }
 
-async function main() {
-  const baseUrl = normalizeBaseUrl(process.env.ROLEFORGE_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL);
-  const backendUrl = normalizeBaseUrl(process.env.ROLEFORGE_BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || DEFAULT_BACKEND_URL);
+async function main(argv = process.argv.slice(2)) {
+  const args = parseSmokeArgs(argv);
+  const baseUrl = normalizeBaseUrl(args.baseUrl || process.env.ROLEFORGE_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL);
+  const backendUrl = normalizeBaseUrl(args.backendUrl || process.env.ROLEFORGE_BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || DEFAULT_BACKEND_URL);
+  const canonicalUrl = normalizeBaseUrl(
+    args.canonicalUrl
+    || process.env.ROLEFORGE_CANONICAL_URL
+    || (isLocalBaseUrl(baseUrl) ? process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_BASE_URL : baseUrl),
+  );
   const cookieFromEnv = process.env.ROLEFORGE_SMOKE_COOKIE?.trim();
   const cookieFromSmokeAccount = cookieFromEnv ? "" : await signInSmokeAccount();
   const cookie = cookieFromEnv || cookieFromSmokeAccount;
   const cookieSource = cookieFromEnv ? "ROLEFORGE_SMOKE_COOKIE" : cookieFromSmokeAccount ? "ROLEFORGE_SMOKE_EMAIL/ROLEFORGE_SMOKE_PASSWORD" : "";
-  const requireSignedInSmoke = readBooleanEnv("ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE");
-  const expectPremiumAccess = readBooleanEnv("ROLEFORGE_EXPECT_PREMIUM_ACCESS");
+  const requireSignedInSmoke = args.requireSignedInSmoke ?? readBooleanEnv("ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE");
+  const expectPremiumAccess = args.expectPremiumAccess ?? readBooleanEnv("ROLEFORGE_EXPECT_PREMIUM_ACCESS");
 
   try {
     await checkPublicShell(baseUrl);
@@ -651,7 +704,7 @@ async function main() {
     await checkAnonymousAccountDataGate(baseUrl);
     await checkAnonymousBillingGate(baseUrl);
     await checkBillingWebhookGate(baseUrl);
-    await checkCrawlerMetadata(baseUrl);
+    await checkCrawlerMetadata(baseUrl, canonicalUrl);
     await checkBackendCapabilities(backendUrl);
     await checkSignedInStatus(baseUrl, cookie, { cookieSource, expectPremiumAccess, requireSignedInSmoke });
   } catch (error) {

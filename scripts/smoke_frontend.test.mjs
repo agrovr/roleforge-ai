@@ -6,6 +6,7 @@ import {
   cookieHeaderFromSession,
   createCookieChunks,
   mergeSetCookieHeaders,
+  parseSmokeArgs,
   parseCookieHeader,
   supabaseStorageKey,
 } from "./smoke_frontend.mjs";
@@ -100,4 +101,30 @@ test("builds a cleanup-safe saved-project smoke payload", () => {
   assert.equal(payload.payload.studioSnapshot.result.tailored_text, "Smoke tailored draft");
   assert.equal(payload.payload.studioSnapshot.downloads.pdf, payload.downloadUrl);
   assert.equal(payload.payload.studioSnapshot.templateSlug, "classic");
+});
+
+test("parses frontend smoke CLI target options", () => {
+  assert.deepEqual(
+    parseSmokeArgs([
+      "--base-url",
+      "http://127.0.0.1:3036",
+      "--backend-url=https://roleforge-api.example.run.app",
+      "--canonical-url",
+      "https://roleforgeai.vercel.app",
+      "--require-signed-in-smoke",
+      "--expect-premium-access",
+    ]),
+    {
+      baseUrl: "http://127.0.0.1:3036",
+      backendUrl: "https://roleforge-api.example.run.app",
+      canonicalUrl: "https://roleforgeai.vercel.app",
+      requireSignedInSmoke: true,
+      expectPremiumAccess: true,
+    },
+  );
+});
+
+test("rejects unknown frontend smoke CLI options", () => {
+  assert.throws(() => parseSmokeArgs(["--not-real"]), /Unknown argument/);
+  assert.throws(() => parseSmokeArgs(["--base-url"]), /requires a value/);
 });

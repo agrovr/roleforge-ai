@@ -148,7 +148,11 @@ npm run smoke:frontend
 npm run smoke:readiness
 ```
 
-`npm run smoke:frontend` checks the live RoleForge shell, login copy, anonymous `/app`, settings, saved-project, download, billing auth gates, unsigned Stripe webhook rejection, crawler metadata, auth status, and backend `/capabilities` contract against `https://roleforgeai.vercel.app` and the production Cloud Run backend by default. Set `ROLEFORGE_SITE_URL` or `ROLEFORGE_BACKEND_URL` to target another deployment.
+`npm run smoke:frontend` checks the live RoleForge shell, login copy, anonymous `/app`, settings, saved-project, download, billing auth gates, unsigned Stripe webhook rejection, crawler metadata, auth status, and backend `/capabilities` contract against `https://roleforgeai.vercel.app` and the production Cloud Run backend by default. Set `ROLEFORGE_SITE_URL` / `ROLEFORGE_BACKEND_URL`, or pass `--base-url` / `--backend-url`, to target another deployment. For local builds that still emit the production canonical sitemap, pass `--canonical-url`.
+
+```bash
+npm run smoke:frontend -- --base-url http://127.0.0.1:3036 --canonical-url https://roleforgeai.vercel.app --backend-url https://roleforge-api-224015900616.us-central1.run.app
+```
 
 For signed-in smoke coverage, prefer a dedicated smoke account instead of a personal browser cookie. Add GitHub repository variables `ROLEFORGE_SUPABASE_URL` and `ROLEFORGE_SUPABASE_PUBLISHABLE_KEY`, then add GitHub repository secrets `ROLEFORGE_SMOKE_EMAIL` and `ROLEFORGE_SMOKE_PASSWORD` for a non-personal test user. The smoke script signs in through Supabase Auth, builds the same SSR cookie shape used by the app, and verifies signed-in account status, the studio shell, saved-project API access, a saved-project create/rename/delete cleanup round trip, and settings plan details. `ROLEFORGE_SMOKE_COOKIE` remains supported as a fallback for one-off local checks only. Set `ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE=true` after the dedicated smoke account is configured so CI fails instead of silently skipping signed-in checks. If the smoke account should have Premium access, set `ROLEFORGE_EXPECT_PREMIUM_ACCESS=true` so the smoke fails when Premium or DOCX/TXT export access is missing.
 
