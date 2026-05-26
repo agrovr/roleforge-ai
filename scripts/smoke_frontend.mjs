@@ -389,6 +389,36 @@ async function checkPublicShell(baseUrl) {
   pass("settings cards include overflow-safe plan and metric styles");
 
   requireCondition(
+    /\.primary-button,\s*\.ghost-button\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*padding:\s*12px\s+20px)(?=[^}]*text-align:\s*center)[^}]*\}/s.test(stylesheetText),
+    "primary and ghost buttons can still render cramped labels",
+  );
+  requireCondition(
+    /\.primary-button\s+svg,\s*\.ghost-button\s+svg\s*\{(?=[^}]*(?:flex:\s*0\s+0\s+auto|flex:\s*none))[^}]*\}/s.test(stylesheetText),
+    "button icons can still squeeze action labels",
+  );
+  requireCondition(
+    /\.settings-profile-actions\s*\{(?=[^}]*gap:\s*12px)(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s.test(stylesheetText),
+    "settings profile actions can still crowd adjacent buttons",
+  );
+  requireCondition(
+    /\.settings-profile-actions\s+\.primary-button,\s*\.settings-profile-actions\s+\.ghost-button\s*\{(?=[^}]*min-height:\s*48px)(?=[^}]*padding-inline:\s*18px)(?=[^}]*font-size:\s*1rem)[^}]*\}/s.test(stylesheetText),
+    "settings account action buttons can still render cramped labels",
+  );
+  requireCondition(
+    /\.settings-billing-head\s*\{(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s.test(stylesheetText),
+    "settings billing header can still squeeze billing actions",
+  );
+  requireCondition(
+    /\.settings-billing-head\s+\.ghost-button\s*\{(?=[^}]*min-height:\s*48px)(?=[^}]*padding-inline:\s*18px)(?=[^}]*font-size:\s*1rem)[^}]*\}/s.test(stylesheetText),
+    "settings billing action button can still render cramped labels",
+  );
+  requireCondition(
+    /\.settings-plan-active-card\s+\.settings-inline-link\s*\{(?=[^}]*(?:flex:\s*0\s+0\s+auto|flex:\s*none))(?=[^}]*padding-inline:\s*18px)[^}]*\}/s.test(stylesheetText),
+    "settings active plan studio link can still collapse into cramped text",
+  );
+  pass("settings action buttons include spacing and wrap safeguards");
+
+  requireCondition(
     /\.studio-top-button\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*justify-content:\s*center)[^}]*\}/s.test(stylesheetText),
     "studio top action buttons can still force header overflow",
   );
