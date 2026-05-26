@@ -910,6 +910,7 @@ export default function Page() {
   const supabaseClient = useMemo(() => createRoleForgeBrowserClient(), []);
 
   const [file, setFile] = useState<File | null>(null);
+  const [fileInputVersion, setFileInputVersion] = useState(0);
   const [inputMode, setInputMode] = useState<InputMode>("text");
   const [tailoringMode, setTailoringMode] = useState<TailoringMode>("balanced");
   const [jdUrl, setJdUrl] = useState("");
@@ -1160,6 +1161,44 @@ export default function Page() {
     setProjectActionMessage("");
   }
 
+  function startNewResume() {
+    setFile(null);
+    setFileInputVersion((version) => version + 1);
+    setResumeId(null);
+    setUploadMeta(null);
+    setUploadFileKey("");
+    setPreviewUploadState("idle");
+    setPreviewUploadError("");
+    setSourcePreviewText("");
+    setResult(null);
+    setDownloadUrl(null);
+    setDownloadFormat("pdf");
+    setSelectedExportFormat("pdf");
+    setDownloadState("idle");
+    setDownloadMessage("");
+    setJdUrl("");
+    setJdText("");
+    setCompanyUrl("");
+    setInputMode("text");
+    setTailoringMode("balanced");
+    setStage("idle");
+    setError("");
+    setWorkflowError(null);
+    setExportNotice(null);
+    setCopyState("New resume ready");
+    setAssetCopyState("");
+    setRestoredHistoryId(null);
+    setSelectedHistoryId(null);
+    setHistoryExportRequest(null);
+    setAccountPanelOpen(false);
+    setPreviewMode("original");
+    setActiveTab("score");
+
+    window.setTimeout(() => {
+      document.getElementById("input")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 30);
+  }
+
   const openGeneratedAsset = useCallback((asset: "cover" | "interview", options: { behavior?: ScrollBehavior; updateHash?: boolean } = {}) => {
     const targetId = asset === "cover" ? "cover-letter" : "interview-prep";
     const nextHash = `#${targetId}`;
@@ -1366,6 +1405,13 @@ export default function Page() {
       setUploadFileKey("");
       setPreviewUploadState("idle");
       setPreviewUploadError("");
+      setSourcePreviewText("");
+      setResult(null);
+      setDownloadUrl(null);
+      setDownloadFormat("pdf");
+      setSelectedExportFormat("pdf");
+      setDownloadState("idle");
+      setDownloadMessage("");
       return;
     }
 
@@ -2310,6 +2356,7 @@ export default function Page() {
   const downloadReady = Boolean(downloadUrl && downloadState === "ready");
   const coverLetterText = result?.cover_letter?.trim() ?? "";
   const canDuplicateCurrentRun = Boolean(result?.tailored_text?.trim() && uploadMeta && downloadUrl);
+  const hasActiveWorkspace = Boolean(file || uploadMeta || result || downloadUrl || hasTarget || sourcePreviewText.trim() || restoredHistoryId);
   const uploadFormats = capabilities?.upload_formats?.length ? capabilities.upload_formats : DEFAULT_UPLOAD_FORMATS;
   const exportFormats = customerExportFormats(capabilities?.export_formats, accountStatus?.entitlement);
   const selectedExportCapability = exportFormats.find((format) => format.format === selectedExportFormat) ?? exportFormats[0];
@@ -2883,6 +2930,11 @@ export default function Page() {
                     {exportLabel} <RoleForgeIcon name="download" size={14} />
                   </button>
                 )}
+                {hasActiveWorkspace ? (
+                  <button className="ghost-button" type="button" onClick={startNewResume} title="Clear the current resume, target, preview, and export state">
+                    <RoleForgeIcon name="plus" size={14} /> New resume
+                  </button>
+                ) : null}
                 <div className="export-format-strip" aria-label="Export format availability">
                   {exportFormats.map((format) => {
                     const selected = selectedExportFormat === format.format;
@@ -3192,7 +3244,7 @@ export default function Page() {
                       onDragLeave={() => setDragActive(false)}
                       onDrop={onDrop}
                     >
-                      <input className="rf-file-input" type="file" accept={uploadAccept} onChange={(event) => setFile(event.target.files?.[0] ?? null)} aria-label="Upload resume file" />
+                      <input key={fileInputVersion} className="rf-file-input" type="file" accept={uploadAccept} onChange={(event) => setFile(event.target.files?.[0] ?? null)} aria-label="Upload resume file" />
                       <span className="rf-file-icon"><RoleForgeIcon name="file" size={24} /></span>
                       <span className="rf-file-copy">
                         <strong>{file ? file.name : "Choose a resume file"}</strong>
