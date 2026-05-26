@@ -427,9 +427,21 @@ html[data-theme="dark"] textarea {
   border: 1px solid transparent;
   border-radius: var(--radius);
   font-weight: 600;
-  line-height: 1;
+  line-height: 1.12;
   white-space: nowrap;
   transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.primary-button,
+.ghost-button {
+  max-width: 100%;
+  padding: 12px 20px;
+  text-align: center;
+}
+
+.primary-button svg,
+.ghost-button svg {
+  flex: 0 0 auto;
 }
 
 .btn:hover,
@@ -1539,7 +1551,7 @@ html[data-theme="dark"] textarea {
   font-size: clamp(2.75rem, 5vw, 5rem);
   font-weight: 650;
   letter-spacing: 0;
-  line-height: 0.94;
+  line-height: 1.02;
   text-wrap: balance;
 }
 
@@ -5695,7 +5707,7 @@ html[data-theme="dark"] input::file-selector-button {
   margin: 0;
   color: var(--ink-0);
   font-size: clamp(3rem, 6.4vw, 5.85rem);
-  line-height: 0.94;
+  line-height: 1;
   text-wrap: balance;
 }
 
@@ -5812,7 +5824,7 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--ink-0);
   font-family: var(--font-display);
   font-size: 1.4rem;
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .login-card {
@@ -5835,7 +5847,7 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--ink-0);
   font-family: var(--font-display);
   font-size: clamp(1.85rem, 4vw, 2.35rem);
-  line-height: 1;
+  line-height: 1.08;
 }
 
 .login-card-head p {
@@ -6160,7 +6172,7 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--ink-0);
   font-family: var(--font-display);
   font-size: 4.2rem;
-  line-height: 0.92;
+  line-height: 1;
 }
 
 .settings-page-hero p,
@@ -6220,7 +6232,7 @@ html[data-theme="dark"] input::file-selector-button {
 .settings-profile-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
@@ -6230,7 +6242,9 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-profile-actions .primary-button,
 .settings-profile-actions .ghost-button {
-  min-height: 44px;
+  min-height: 48px;
+  padding-inline: 18px;
+  font-size: 1rem;
 }
 
 .settings-billing-panel {
@@ -6242,6 +6256,17 @@ html[data-theme="dark"] input::file-selector-button {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
+}
+
+.settings-billing-head form {
+  margin: 0;
+}
+
+.settings-billing-head .ghost-button {
+  min-height: 48px;
+  padding-inline: 18px;
+  font-size: 1rem;
 }
 
 .settings-price-grid {
@@ -6358,6 +6383,11 @@ html[data-theme="dark"] input::file-selector-button {
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--good) 14%, transparent), transparent 54%),
     color-mix(in srgb, var(--surface) 82%, var(--bg-alt));
+}
+
+.settings-plan-active-card .settings-inline-link {
+  flex: 0 0 auto;
+  padding-inline: 18px;
 }
 
 .settings-plan-active-card strong {
