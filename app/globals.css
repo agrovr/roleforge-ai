@@ -1199,6 +1199,7 @@ html[data-theme="dark"] textarea {
 .dash-main {
   container: dash-main / inline-size;
   display: flex;
+  min-width: 0;
   flex-direction: column;
   gap: 24px;
   padding: 32px;
@@ -1272,10 +1273,11 @@ html[data-theme="dark"] textarea {
   margin: 4px 0 2px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(1.58rem, 5.35cqi, 2.16rem);
+  font-size: clamp(1.45rem, 4.7cqi, 1.95rem);
   font-weight: 500;
   letter-spacing: 0;
-  line-height: 1.03;
+  line-height: 1.08;
+  hyphens: auto;
   overflow-wrap: anywhere;
   text-wrap: balance;
   word-break: normal;
@@ -1295,7 +1297,7 @@ html[data-theme="dark"] textarea {
   text-wrap: balance;
 }
 
-@container dash-main (max-width: 1080px) {
+@container dash-main (max-width: 1260px) {
   .dash-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1307,21 +1309,27 @@ html[data-theme="dark"] textarea {
   }
 }
 
+@container dash-stat (max-width: 310px) {
+  .dash-stat-value {
+    font-size: clamp(1.34rem, 8.2cqi, 1.72rem);
+  }
+}
+
 @container dash-stat (max-width: 250px) {
   .dash-stat-value {
-    font-size: clamp(1.45rem, 10.5cqi, 1.82rem);
+    font-size: clamp(1.28rem, 10.5cqi, 1.58rem);
     line-height: 1.05;
   }
 }
 
 @container dash-stat (max-width: 210px) {
   .dash-stat-value {
-    font-size: clamp(1.28rem, 10cqi, 1.56rem);
+    font-size: clamp(1.18rem, 10cqi, 1.42rem);
     line-height: 1.04;
   }
 }
 
-@media (max-width: 1320px) {
+@media (max-width: 1500px) {
   .dash-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
