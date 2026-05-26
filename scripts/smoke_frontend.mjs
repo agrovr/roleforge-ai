@@ -283,6 +283,20 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.settings-plan-includes\s+span\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings plan chips can still force narrow layout overflow");
   pass("settings cards include overflow-safe plan and metric styles");
 
+  requireCondition(
+    /\.studio-top-button\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*justify-content:\s*center)[^}]*\}/s.test(stylesheetText),
+    "studio top action buttons can still force header overflow",
+  );
+  requireCondition(
+    /@media\s*\(max-width:\s*720px\)[\s\S]*?\.studio-top-button\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*text-align:\s*center)[^}]*\}/.test(stylesheetText),
+    "studio top action buttons can still overflow on mobile",
+  );
+  requireCondition(
+    /@media\s*\(max-width:\s*720px\)[\s\S]*?\.studio-hero-actions\s+\.ghost-button,\s*\.studio-hero-actions\s+\.primary-button\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*line-height:\s*1\.12)[^}]*\}/.test(stylesheetText),
+    "studio hero action buttons can still overflow on mobile",
+  );
+  pass("studio action buttons include narrow-width wrapping safeguards");
+
   requireCondition(/\.faq-q\s*\{[^}]*min-height:\s*44px/.test(stylesheetText), "FAQ rows are missing comfortable touch targets");
   requireCondition(/\.login-nav-actions\s+\.btn-sm\s*\{[^}]*min-height:\s*44px/.test(stylesheetText), "login nav actions are missing comfortable touch targets");
   pass("public interactive elements include touch-target polish");

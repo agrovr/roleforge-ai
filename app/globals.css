@@ -4772,11 +4772,14 @@ html[data-theme="dark"] input::file-selector-button {
 
 .studio-top-button {
   min-height: 46px;
+  min-width: 0;
+  max-width: 100%;
   padding-inline: 18px;
   gap: 9px;
   border-radius: 10px;
   font-size: 0.95rem;
   font-weight: 900;
+  justify-content: center;
   white-space: nowrap;
 }
 
@@ -7723,6 +7726,9 @@ html[data-theme="dark"] .rf-rail-upgrade p {
     width: 100%;
     min-height: 42px;
     padding-inline: 10px;
+    line-height: 1.12;
+    text-align: center;
+    white-space: normal;
   }
 
   .studio-account-menu {
@@ -7774,6 +7780,8 @@ html[data-theme="dark"] .rf-rail-upgrade p {
     min-width: 0;
     min-height: 46px;
     padding-inline: 12px;
+    line-height: 1.12;
+    white-space: normal;
   }
 
   .studio-hero-actions .export-format-strip,
