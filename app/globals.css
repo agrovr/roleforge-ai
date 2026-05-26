@@ -1235,7 +1235,18 @@ html[data-theme="dark"] textarea {
 .dash-main-head .btn-sm {
   max-width: 100%;
   flex: 0 1 auto;
+  min-width: min(100%, 150px);
   min-height: 42px;
+  justify-content: center;
+  padding-inline: 14px;
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.dash-main-head .btn-sm svg {
+  flex: 0 0 auto;
 }
 
 .dash-stats {
@@ -5685,6 +5696,7 @@ html[data-theme="dark"] input::file-selector-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: 4px;
   padding-top: 10px;
@@ -6276,20 +6288,27 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-profile-actions {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 12px;
   flex-wrap: wrap;
 }
 
 .settings-profile-actions form {
+  display: flex;
   margin: 0;
 }
 
 .settings-profile-actions .primary-button,
 .settings-profile-actions .ghost-button {
+  flex: 1 1 170px;
+  min-width: min(100%, 150px);
   min-height: 48px;
+  justify-content: center;
   padding-inline: 18px;
   font-size: 1rem;
+  line-height: 1.12;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .settings-billing-panel {
@@ -6305,13 +6324,19 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-billing-head form {
+  display: flex;
   margin: 0;
 }
 
 .settings-billing-head .ghost-button {
+  min-width: min(100%, 170px);
   min-height: 48px;
+  justify-content: center;
   padding-inline: 18px;
   font-size: 1rem;
+  line-height: 1.12;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .settings-price-grid {
@@ -6374,7 +6399,10 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-usage-card {
+  container: settings-usage-card / inline-size;
   display: grid;
+  min-width: 0;
+  overflow: hidden;
   gap: 14px;
   padding: 16px;
   border: 1px solid var(--line);
@@ -6386,16 +6414,28 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-usage-card strong {
   display: inline-block;
+  max-width: 100%;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: 2.8rem;
-  line-height: 0.95;
+  font-size: clamp(2rem, 14cqi, 2.55rem);
+  line-height: 1;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .settings-usage-card small {
-  margin-left: 8px;
+  display: inline-block;
+  margin: 5px 0 0 8px;
   color: var(--ink-2);
   font-weight: 900;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+}
+
+@container settings-usage-card (max-width: 300px) {
+  .settings-usage-card strong {
+    font-size: clamp(1.62rem, 13cqi, 2rem);
+  }
 }
 
 .settings-usage-track {
@@ -6436,7 +6476,10 @@ html[data-theme="dark"] input::file-selector-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 16px;
+  min-width: 0;
+  overflow: hidden;
   padding: 18px;
   border: 1px solid color-mix(in srgb, var(--good) 30%, var(--line));
   border-radius: 14px;
@@ -6446,16 +6489,30 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-plan-active-card .settings-inline-link {
-  flex: 0 0 auto;
+  flex: 0 1 170px;
+  min-width: min(100%, 150px);
+  justify-content: center;
   padding-inline: 18px;
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.settings-plan-active-card > div {
+  min-width: 0;
+  flex: 1 1 320px;
 }
 
 .settings-plan-active-card strong {
   display: block;
+  max-width: 100%;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: 2.3rem;
-  line-height: 0.96;
+  font-size: clamp(1.82rem, 8cqi, 2.3rem);
+  line-height: 1;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .settings-plan-active-card p {
