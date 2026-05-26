@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import { pathToFileURL } from "node:url";
+
 const DEFAULT_BASE_URL = "https://roleforgeai.vercel.app";
 const DEFAULT_BACKEND_URL = "https://roleforge-api-224015900616.us-central1.run.app";
 const SUPABASE_COOKIE_CHUNK_SIZE = 3180;
@@ -50,14 +52,14 @@ function base64UrlEncode(value) {
   return Buffer.from(value, "utf8").toString("base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
 }
 
-function supabaseStorageKey(supabaseUrl) {
+export function supabaseStorageKey(supabaseUrl) {
   const host = new URL(supabaseUrl).hostname;
   const projectRef = host.split(".")[0];
   if (!projectRef) throw new Error(`Could not derive Supabase project ref from ${supabaseUrl}`);
   return `sb-${projectRef}-auth-token`;
 }
 
-function createCookieChunks(key, value) {
+export function createCookieChunks(key, value) {
   const encodedValue = encodeURIComponent(value);
   if (encodedValue.length <= SUPABASE_COOKIE_CHUNK_SIZE) return [{ name: key, value }];
 
@@ -91,7 +93,7 @@ function createCookieChunks(key, value) {
   return chunks.map((chunk, index) => ({ name: `${key}.${index}`, value: chunk }));
 }
 
-function cookieHeaderFromSession(supabaseUrl, session) {
+export function cookieHeaderFromSession(supabaseUrl, session) {
   requireCondition(session?.access_token, "Supabase smoke sign-in did not return an access token");
   requireCondition(session?.refresh_token, "Supabase smoke sign-in did not return a refresh token");
   requireCondition(session?.user?.id, "Supabase smoke sign-in did not return a user");
@@ -135,7 +137,7 @@ async function signInSmokeAccount() {
   return cookieHeaderFromSession(supabaseUrl, payload);
 }
 
-function parseCookieHeader(cookie) {
+export function parseCookieHeader(cookie) {
   const jar = new Map();
   for (const part of (cookie || "").split(";")) {
     const trimmed = part.trim();
@@ -147,11 +149,11 @@ function parseCookieHeader(cookie) {
   return jar;
 }
 
-function cookieHeaderFromJar(jar) {
+export function cookieHeaderFromJar(jar) {
   return Array.from(jar.entries()).map(([name, value]) => `${name}=${value}`).join("; ");
 }
 
-function mergeSetCookieHeaders(cookie, response) {
+export function mergeSetCookieHeaders(cookie, response) {
   const getSetCookie = response.headers.getSetCookie;
   const headers = typeof getSetCookie === "function" ? getSetCookie.call(response.headers) : [];
   const fallback = response.headers.get("set-cookie");
@@ -483,4 +485,6 @@ async function main() {
   }
 }
 
-await main();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  await main();
+}

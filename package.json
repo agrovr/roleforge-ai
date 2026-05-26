@@ -10,7 +10,7 @@
     "smoke:frontend": "node scripts/smoke_frontend.mjs",
     "typecheck": "tsc --noEmit",
     "wait:vercel": "node scripts/wait_for_vercel_status.mjs",
-    "test": "tsx --test app/lib/*.test.ts app/lib/billing/*.test.ts app/lib/supabase/*.test.ts",
+    "test": "tsx --test app/lib/*.test.ts app/lib/billing/*.test.ts app/lib/supabase/*.test.ts scripts/*.test.mjs",
     "test:billing": "tsx --test app/lib/billing/entitlements.test.ts",
     "test:billing-display": "tsx --test app/lib/billing/display.test.ts",
     "test:exports": "tsx --test app/lib/exportFormats.test.ts",
