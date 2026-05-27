@@ -1266,7 +1266,7 @@ html[data-theme="dark"] textarea {
 
 .dash-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
   align-items: stretch;
   gap: 12px;
 }
@@ -1274,13 +1274,13 @@ html[data-theme="dark"] textarea {
 .dash-stat {
   container: dash-stat / inline-size;
   display: flex;
-  min-block-size: clamp(126px, 16cqi, 146px);
+  min-block-size: clamp(118px, 14cqi, 138px);
   min-width: 0;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
   gap: 10px;
-  padding: clamp(16px, 4.6cqi, 20px);
+  padding: clamp(15px, 4cqi, 19px);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
@@ -1299,7 +1299,7 @@ html[data-theme="dark"] textarea {
   margin: 4px 0 2px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(1.45rem, 4.7cqi, 1.95rem);
+  font-size: clamp(1.36rem, 4.2cqi, 1.72rem);
   font-weight: 500;
   letter-spacing: 0;
   line-height: 1.08;
@@ -1337,20 +1337,20 @@ html[data-theme="dark"] textarea {
 
 @container dash-stat (max-width: 310px) {
   .dash-stat-value {
-    font-size: clamp(1.34rem, 8.2cqi, 1.72rem);
+    font-size: clamp(1.26rem, 7.6cqi, 1.56rem);
   }
 }
 
 @container dash-stat (max-width: 250px) {
   .dash-stat-value {
-    font-size: clamp(1.28rem, 10.5cqi, 1.58rem);
+    font-size: clamp(1.18rem, 9.5cqi, 1.4rem);
     line-height: 1.05;
   }
 }
 
 @container dash-stat (max-width: 210px) {
   .dash-stat-value {
-    font-size: clamp(1.18rem, 10cqi, 1.42rem);
+    font-size: clamp(1.08rem, 9cqi, 1.25rem);
     line-height: 1.04;
   }
 }
@@ -6424,10 +6424,13 @@ html[data-theme="dark"] input::file-selector-button {
   align-items: stretch;
   gap: 12px;
   flex-wrap: wrap;
+  width: min(100%, 430px);
 }
 
 .settings-profile-actions form {
   display: flex;
+  flex: 1 1 170px;
+  min-width: min(100%, 150px);
   margin: 0;
 }
 
@@ -6444,6 +6447,10 @@ html[data-theme="dark"] input::file-selector-button {
   white-space: normal;
 }
 
+.settings-profile-actions form .ghost-button {
+  width: 100%;
+}
+
 .settings-billing-panel {
   align-content: start;
 }
@@ -6458,6 +6465,8 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-billing-head form {
   display: flex;
+  flex: 0 1 210px;
+  max-width: 100%;
   margin: 0;
 }
 
@@ -6470,6 +6479,7 @@ html[data-theme="dark"] input::file-selector-button {
   line-height: 1.12;
   text-wrap: balance;
   white-space: normal;
+  width: 100%;
 }
 
 .settings-price-grid {

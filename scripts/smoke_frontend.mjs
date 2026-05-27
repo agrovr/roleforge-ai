@@ -376,16 +376,16 @@ async function checkPublicShell(baseUrl) {
   requireCondition(stylesheetText.includes(".dash-stat-value"), "landing dashboard stat styles were missing");
   requireCondition(/\.dash-mock\s*\{(?=[^}]*container-type:\s*inline-size)[^}]*\}/s.test(stylesheetText), "landing dashboard mock was missing container sizing");
   requireCondition(/\.dash-main\s*\{(?=[^}]*container:\s*dash-main\s*\/\s*inline-size)[^}]*\}/s.test(stylesheetText), "landing dashboard main column was missing named container sizing");
-  requireCondition(/\.dash-stats\s*\{(?=[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "landing dashboard stats are missing stable desktop columns");
+  requireCondition(/\.dash-stats\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*210px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "landing dashboard stats can still squeeze cards at desktop widths");
   requireCondition(/@container\s+dash-main\s*\(max-width:\s*1260px\)\s*\{[^}]*\.dash-stats\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s.test(stylesheetText), "landing dashboard stats do not collapse to two columns before cramped widths");
   requireCondition(/@container\s+dash-main\s*\(max-width:\s*460px\)\s*\{[^}]*\.dash-stats\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText), "landing dashboard stats do not collapse to one column on narrow widths");
-  requireCondition(/\.dash-stat-value\s*\{(?=[^}]*font-size:\s*clamp\(1\.45rem,\s*4\.7cqi,\s*1\.95rem\))(?=[^}]*hyphens:\s*auto)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "landing dashboard stat values are not using overflow-safe fitted type");
-  requireCondition(/@container\s+dash-stat\s*\(max-width:\s*310px\)\s*\{[^}]*\.dash-stat-value\s*\{[^}]*font-size:\s*clamp\(1\.34rem,\s*8\.2cqi,\s*1\.72rem\)/s.test(stylesheetText), "landing dashboard stat values are missing fitted type for medium cards");
-  requireCondition(/@container\s+dash-stat\s*\(max-width:\s*250px\)\s*\{[^}]*\.dash-stat-value\s*\{[^}]*font-size:\s*clamp\(1\.28rem,\s*10\.5cqi,\s*1\.58rem\)/s.test(stylesheetText), "landing dashboard stat values are missing fitted type for compact cards");
-  requireCondition(/@container\s+dash-stat\s*\(max-width:\s*210px\)\s*\{[^}]*\.dash-stat-value\s*\{[^}]*font-size:\s*clamp\(1\.18rem,\s*10cqi,\s*1\.42rem\)/s.test(stylesheetText), "landing dashboard stat values are missing fitted type for cramped cards");
+  requireCondition(/\.dash-stat-value\s*\{(?=[^}]*font-size:\s*clamp\(1\.36rem,\s*4\.2cqi,\s*1\.72rem\))(?=[^}]*hyphens:\s*auto)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "landing dashboard stat values are not using overflow-safe fitted type");
+  requireCondition(/@container\s+dash-stat\s*\(max-width:\s*310px\)\s*\{[^}]*\.dash-stat-value\s*\{[^}]*font-size:\s*clamp\(1\.26rem,\s*7\.6cqi,\s*1\.56rem\)/s.test(stylesheetText), "landing dashboard stat values are missing fitted type for medium cards");
+  requireCondition(/@container\s+dash-stat\s*\(max-width:\s*250px\)\s*\{[^}]*\.dash-stat-value\s*\{[^}]*font-size:\s*clamp\(1\.18rem,\s*9\.5cqi,\s*1\.4rem\)/s.test(stylesheetText), "landing dashboard stat values are missing fitted type for compact cards");
+  requireCondition(/@container\s+dash-stat\s*\(max-width:\s*210px\)\s*\{[^}]*\.dash-stat-value\s*\{[^}]*font-size:\s*clamp\(1\.08rem,\s*9cqi,\s*1\.25rem\)/s.test(stylesheetText), "landing dashboard stat values are missing fitted type for cramped cards");
   requireCondition(/@media\s*\(max-width:\s*1500px\)\s*\{[^}]*\.dash-stats\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s.test(stylesheetText), "landing dashboard stats are missing viewport fallback columns");
   requireCondition(/\.dash-stat-delta\s*\{(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "landing dashboard stat captions can still force card overflow");
-  requireCondition(/min-block-size:\s*clamp\(126px,\s*16cqi,\s*146px\)/.test(stylesheetText), "landing dashboard stats were missing stable card height");
+  requireCondition(/min-block-size:\s*clamp\(118px,\s*14cqi,\s*138px\)/.test(stylesheetText), "landing dashboard stats were missing stable card height");
   requireCondition(
     /\.dash-mock-url\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)(?=[^}]*text-overflow:\s*ellipsis)[^}]*\}/s.test(stylesheetText),
     "landing dashboard URL bar can still overflow on narrow screens",
@@ -430,8 +430,12 @@ async function checkPublicShell(baseUrl) {
     "button icons can still squeeze action labels",
   );
   requireCondition(
-    /\.settings-profile-actions\s*\{(?=[^}]*gap:\s*12px)(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s.test(stylesheetText),
-    "settings profile actions can still crowd adjacent buttons",
+    /\.settings-profile-actions\s*\{(?=[^}]*gap:\s*12px)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*width:\s*min\(100%,\s*430px\))[^}]*\}/s.test(stylesheetText),
+    "settings profile actions can still crowd or over-expand adjacent buttons",
+  );
+  requireCondition(
+    /\.settings-profile-actions\s+form\s*\{(?=[^}]*flex:\s*(?:1\s+1\s+)?170px)(?=[^}]*min-width:\s*min\(100%,\s*150px\))[^}]*\}/s.test(stylesheetText),
+    "settings sign-out form can still stay narrower than its paired action",
   );
   requireCondition(
     /\.settings-profile-actions\s+\.primary-button,\s*\.settings-profile-actions\s+\.ghost-button\s*\{(?=[^}]*flex:\s*(?:1\s+1\s+)?170px)(?=[^}]*min-width:\s*min\(100%,\s*150px\))(?=[^}]*min-height:\s*48px)(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText),
@@ -442,7 +446,11 @@ async function checkPublicShell(baseUrl) {
     "settings billing header can still squeeze billing actions",
   );
   requireCondition(
-    /\.settings-billing-head\s+\.ghost-button\s*\{(?=[^}]*min-width:\s*min\(100%,\s*170px\))(?=[^}]*min-height:\s*48px)(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText),
+    /\.settings-billing-head\s+form\s*\{(?=[^}]*flex:\s*0\s+(?:1\s+)?210px)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText),
+    "settings billing form can still collapse the manage billing button",
+  );
+  requireCondition(
+    /\.settings-billing-head\s+\.ghost-button\s*\{(?=[^}]*min-width:\s*min\(100%,\s*170px\))(?=[^}]*min-height:\s*48px)(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)(?=[^}]*width:\s*100%)[^}]*\}/s.test(stylesheetText),
     "settings billing action button can still render cramped labels",
   );
   requireCondition(
