@@ -408,6 +408,15 @@ async function checkPublicShell(baseUrl) {
   requireCondition(!home.text.includes("The&nbsp;resume&nbsp;that"), "landing hero headline still prevents narrow-phone wrapping");
   pass("landing mobile nav includes compact one-row styles");
 
+  requireCondition(/\.hero\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*overflow-x:\s*clip)[^}]*\}/s.test(stylesheetText), "landing hero can still create horizontal overflow");
+  requireCondition(/\.hero\s*>\s*\*\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "landing hero children can still force page overflow");
+  requireCondition(/\.hero-copy\s*\{(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText), "landing hero copy can still exceed its grid column");
+  requireCondition(/\.hero-stage\s*\{(?=[^}]*justify-self:\s*end)(?=[^}]*width:\s*min\(100%,\s*640px\))(?=[^}]*max-width:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)(?=[^}]*isolation:\s*isolate)[^}]*\}/s.test(stylesheetText), "landing hero visual stack can still spill out of the viewport");
+  requireCondition(/\.b-score\s*\{(?=[^}]*right:\s*0)[^}]*\}/s.test(stylesheetText) && /\.b-keyword\s*\{(?=[^}]*right:\s*0)[^}]*\}/s.test(stylesheetText), "landing hero floating badges can still extend beyond the visual stage");
+  requireCondition(/@media\s*\(max-width:\s*1180px\)[\s\S]*?\.hero-stage\s*\{(?=[^}]*justify-self:\s*center)(?=[^}]*width:\s*min\(100%,\s*680px\))(?=[^}]*height:\s*clamp\(500px,\s*56vw,\s*560px\))(?=[^}]*overflow:\s*hidden)[^}]*\}/.test(stylesheetText), "landing hero tablet visual stage is missing containment");
+  requireCondition(/@media\s*\(max-width:\s*900px\)[\s\S]*?\.hero-stage\s*\{(?=[^}]*width:\s*min\(100%,\s*560px\))(?=[^}]*height:\s*clamp\(460px,\s*92vw,\s*520px\))[^}]*\}/.test(stylesheetText), "landing hero mobile visual stage is missing fitted sizing");
+  pass("landing hero includes overflow-safe visual stage guards");
+
   requireCondition(/\.cta-band\s*\{(?=[^}]*container:\s*cta-band\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*isolation:\s*isolate)[^}]*\}/s.test(stylesheetText), "landing final CTA can still overflow its full-bleed container");
   requireCondition(/\.cta-band\s*>\s*\*\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "landing final CTA children can still force overflow");
   requireCondition(/\.cta-band\s+\.btn\s*\{(?=[^}]*flex:\s*(?:1\s+1\s+)?184px)(?=[^}]*min-width:\s*min\(100%,\s*164px\))(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "landing final CTA buttons can still render cramped labels");
@@ -521,6 +530,23 @@ async function checkPublicShell(baseUrl) {
     "studio hero action buttons can still overflow on mobile",
   );
   pass("studio action buttons include narrow-width wrapping safeguards");
+
+  requireCondition(/\.studio-account-popover\s*\{(?=[^}]*container:\s*studio-account-popover\s*\/\s*inline-size)(?=[^}]*max-height:\s*calc\(100dvh\s*-\s*96px\))(?=[^}]*overflow-y:\s*auto)[^}]*\}/s.test(stylesheetText), "studio account popover can still overflow the viewport");
+  requireCondition(/\.studio-account-popover\s*>\s*strong\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "studio account heading can still overflow");
+  requireCondition(/\.studio-account-popover\s*>\s*\.studio-account-email\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*text-overflow:\s*initial)[^}]*\}/s.test(stylesheetText), "studio account email can still clip awkwardly");
+  requireCondition(/\.studio-account-shortcuts\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "studio account shortcuts can still squeeze together");
+  requireCondition(
+    /\.studio-account-shortcuts\s+a,\s*\.studio-account-shortcuts\s+button\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText) &&
+      /\.studio-account-shortcuts\s+a,\s*\.studio-account-shortcuts\s+button\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText),
+    "studio account shortcut labels can still render cramped",
+  );
+  requireCondition(/\.studio-account-summary\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "studio account summary cards can still overflow");
+  requireCondition(/\.studio-account-summary\s+span\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "studio account summary titles can still overflow");
+  requireCondition(
+    /@media\s*\((?:max-width:\s*720px|width<=720px)\)[\s\S]*?\.studio-account-popover\s*\{(?=[^}]*right:\s*auto)(?=[^}]*left:\s*0)(?=[^}]*width:\s*min\(340px,\s*(?:calc\()?100vw\s*-\s*44px\)?\))[^}]*\}/.test(stylesheetText),
+    "studio account popover can still anchor off-screen on mobile",
+  );
+  pass("studio account popover includes compact overflow safeguards");
 
   requireCondition(/\.export-format-chip\s*\{(?=[^}]*justify-content:\s*center)(?=[^}]*min-width:\s*min\(100%,\s*92px\))(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText), "studio export format chips can still collapse too narrow");
   requireCondition(/\.export-format-chip\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-align:\s*center)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "studio export format chip labels can still render cramped");
