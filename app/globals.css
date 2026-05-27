@@ -3444,6 +3444,8 @@ html[data-theme="dark"] .result-box {
   display: flex;
   align-items: center;
   gap: 14px;
+  min-width: 0;
+  flex-wrap: wrap;
   margin-top: 14px;
 }
 
@@ -3464,8 +3466,12 @@ html[data-theme="dark"] .result-box {
 .summary-strip strong,
 .empty-state strong {
   display: block;
+  max-width: 100%;
   color: var(--ink-0);
   font-weight: 850;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .drop-hint,
@@ -3476,9 +3482,12 @@ html[data-theme="dark"] .result-box {
 .summary-strip p,
 .empty-state p {
   display: block;
+  max-width: 100%;
   margin-top: 6px;
   color: var(--ink-2);
   line-height: 1.55;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
 .empty-state-action {
@@ -3489,13 +3498,17 @@ html[data-theme="dark"] .result-box {
 .metric-grid,
 .studio-stats {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(min(100%, 220px), 1fr));
   gap: 12px;
+  min-width: 0;
 }
 
 .quick-card,
 .metric,
 .studio-stat {
+  container: compact-card / inline-size;
+  min-width: 0;
+  overflow: hidden;
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -3642,18 +3655,25 @@ html[data-theme="dark"] .result-box {
 
 .stage-row {
   display: flex;
+  min-width: 0;
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 16px;
 }
 
 .stage-chip {
+  max-width: 100%;
   padding: 7px 10px;
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--ink-3);
   font-size: 0.78rem;
   font-weight: 850;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .stage-chip.active {
@@ -3667,22 +3687,31 @@ html[data-theme="dark"] .result-box {
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+  min-width: 0;
   margin-top: 16px;
 }
 
 .copy-state {
+  max-width: 100%;
   color: var(--ink-3);
   font-weight: 800;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .generated-copy-state {
+  max-width: 100%;
   border: 1px solid color-mix(in srgb, var(--good) 34%, var(--line));
   border-radius: 999px;
   padding: 7px 12px;
   background: color-mix(in srgb, var(--good) 12%, transparent);
   color: var(--good);
   font-size: 0.82rem;
-  white-space: nowrap;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .analysis-grid {
@@ -3727,7 +3756,10 @@ html[data-theme="dark"] .result-box {
   margin-top: 7px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: 1.55rem;
+  font-size: clamp(1.25rem, 12cqi, 1.55rem);
+  line-height: 1;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .keyword-cloud,
@@ -3778,6 +3810,8 @@ html[data-theme="dark"] .result-box {
 .issue-card,
 .empty-state,
 .history-item {
+  min-width: 0;
+  overflow: hidden;
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -3796,11 +3830,15 @@ html[data-theme="dark"] .result-box {
 }
 
 .warning-list span {
+  max-width: 100%;
   padding: 10px 12px;
   border-radius: var(--radius);
   background: var(--warn-soft);
   color: var(--warn);
   font-weight: 750;
+  line-height: 1.24;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
 .insight-grid,

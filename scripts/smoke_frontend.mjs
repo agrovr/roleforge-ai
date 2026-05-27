@@ -549,6 +549,21 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/@container\s+rf-studio-stat\s*\(max-width:\s*220px\)\s*\{[^}]*\.rf-studio-stat-row\s*\{[^}]*font-size:\s*clamp\(1\.42rem,\s*16cqi,\s*1\.72rem\)/s.test(stylesheetText), "studio metric values are missing fitted type for compact cards");
   pass("studio metric cards include fitted overflow-safe typography");
 
+  requireCondition(/\.quick-grid,\s*\.metric-grid,\s*\.studio-stats\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(min\(100%,\s*220px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "legacy quick and metric grids can still squeeze card tracks");
+  requireCondition(/\.quick-card,\s*\.metric,\s*\.studio-stat\s*\{(?=[^}]*container:\s*compact-card\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "legacy quick and metric cards can still overflow");
+  requireCondition(/\.drop-title,\s*\.quick-card\s+strong,\s*\.change-item\s+strong,\s*\.issue-card\s+strong,\s*\.summary-strip\s+strong,\s*\.empty-state\s+strong\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "legacy card headings can still overflow or clip");
+  requireCondition(/\.drop-hint,\s*\.field-hint,\s*\.quick-card\s+span,\s*\.issue-card\s+p,\s*\.change-item\s+p,\s*\.summary-strip\s+p,\s*\.empty-state\s+p\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*pretty)[^}]*\}/s.test(stylesheetText), "legacy card copy can still overflow narrow cards");
+  requireCondition(/\.metric-value\s*\{(?=[^}]*font-size:\s*clamp\(1\.25rem,\s*12cqi,\s*1\.55rem\))(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "legacy metric values are missing fitted type");
+  requireCondition(/\.stage-chip\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "legacy stage chips can still render cramped labels");
+  requireCondition(
+    /\.generated-copy-state\s*\{[^}]*max-width:\s*100%[^}]*\}/s.test(stylesheetText) &&
+      /\.generated-copy-state\s*\{[^}]*white-space:\s*normal[^}]*\}/s.test(stylesheetText) &&
+      /\.generated-copy-state\s*\{[^}]*text-wrap:\s*balance[^}]*\}/s.test(stylesheetText),
+    "legacy generated status chip can still force row overflow",
+  );
+  requireCondition(/\.warning-list\s+span\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*pretty)[^}]*\}/s.test(stylesheetText), "legacy warning rows can still overflow cards");
+  pass("legacy studio cards and status chips include overflow-safe safeguards");
+
   requireCondition(/\.rf-intake-card-header\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "workflow intake card headers can still clip narrow labels");
   requireCondition(/\.rf-intake-next\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "workflow intake next badge can still overflow its header");
   requireCondition(/\.rf-intake-grid\s+\.rf-file-copy\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*245px)[^}]*\}/s.test(stylesheetText), "workflow file copy can still force upload card overflow");
