@@ -485,6 +485,17 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.studio-template-preference\s+small\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "studio template preference status can still force cramped pills");
   pass("studio export chips and template preference include wrapping safeguards");
 
+  requireCondition(/\.studio-tabs-mini\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText), "studio preview tabs can still force card overflow");
+  requireCondition(/\.rf-live-card\s+\.studio-tabs-mini\s*\{(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(68px,\s*1fr\)\))(?=[^}]*width:\s*min\(100%,\s*330px\))[^}]*\}/s.test(stylesheetText), "live preview tab rail can still render too wide");
+  requireCondition(/\.rf-live-card\s+\.studio-tabs-mini\s+button\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*line-height:\s*1)(?=[^}]*text-align:\s*center)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "live preview tab labels can still render cramped");
+  requireCondition(/\.rf-live-card\s+\.studio-tabs-mini\s+button\s+span,\s*\.rf-live-card\s+\.studio-tabs-mini\s+button\s+small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "live preview tab text can still overflow");
+  requireCondition(/\.rf-preview-wrap\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*calc\(100%\s*-\s*44px\))[^}]*\}/s.test(stylesheetText), "live preview wrapper can still overflow its card");
+  requireCondition(/\.rf-preview-status\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*160px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "live preview status chips can still stay cramped");
+  requireCondition(/\.rf-preview-status\s+span,\s*\.rf-preview-alert\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "live preview status text can still overflow");
+  requireCondition(/\.rf-preview-empty-steps\s*\{(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(min\(100%,\s*150px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "live preview empty steps can still squeeze narrow cards");
+  requireCondition(/\.rf-diff-readiness\s*\{(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(min\(100%,\s*150px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "live preview diff readiness chips can still squeeze narrow cards");
+  pass("live preview tabs and status chips include wrapping safeguards");
+
   requireCondition(/\.rf-studio-stat\s*\{(?=[^}]*container:\s*rf-studio-stat\s*\/\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "studio metric cards were missing container sizing");
   requireCondition(/\.rf-studio-stat-row\s*\{(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*font-size:\s*clamp\(1\.62rem,\s*17cqi,\s*2\.18rem\))(?=[^}]*line-height:\s*1\.02)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "studio metric values can still overflow or clip");
   requireCondition(/\.rf-studio-stat-row\s+small\s*\{(?=[^}]*line-height:\s*1\.15)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "studio metric units can still squeeze value rows");

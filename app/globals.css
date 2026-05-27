@@ -3503,6 +3503,8 @@ html[data-theme="dark"] .result-box {
 
 .studio-tabs-mini {
   flex: 0 0 auto;
+  min-width: 0;
+  max-width: 100%;
   flex-wrap: nowrap;
 }
 
@@ -3526,7 +3528,7 @@ html[data-theme="dark"] .result-box {
 .rf-live-card .studio-tabs-mini {
   display: grid;
   grid-template-columns: repeat(3, minmax(68px, 1fr));
-  width: min(330px, 34vw);
+  width: min(100%, 330px);
   min-height: 62px;
   padding: 7px;
   border-radius: 18px;
@@ -3538,19 +3540,22 @@ html[data-theme="dark"] .result-box {
   align-items: center;
   justify-content: center;
   gap: 2px;
+  min-width: 0;
   min-height: 48px;
   border-radius: 12px;
   font-size: clamp(0.98rem, 1.15vw, 1.2rem);
   font-weight: 850;
   line-height: 1;
+  text-align: center;
+  white-space: normal;
 }
 
 .rf-live-card .studio-tabs-mini button span,
 .rf-live-card .studio-tabs-mini button small {
   display: block;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .rf-live-card .studio-tabs-mini button .preview-tab-state {
@@ -7060,6 +7065,8 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .rf-preview-wrap {
+  min-width: 0;
+  max-width: calc(100% - 44px);
   margin: 20px 22px 22px;
   padding: 22px;
   border: 1px solid var(--line);
@@ -7071,7 +7078,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .rf-preview-status {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
   align-items: stretch;
   gap: 8px;
   margin: 0 0 14px;
@@ -7093,6 +7100,7 @@ html[data-theme="dark"] input::file-selector-button {
   font-weight: 850;
   line-height: 1.25;
   overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .rf-preview-status strong {
@@ -7101,6 +7109,8 @@ html[data-theme="dark"] input::file-selector-button {
   font-weight: 950;
   letter-spacing: 0.1em;
   line-height: 1;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
   text-transform: uppercase;
 }
 
@@ -7113,6 +7123,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .rf-preview-alert {
   display: flex;
+  flex-wrap: wrap;
   width: fit-content;
   max-width: 100%;
   margin: 0 0 14px;
@@ -7121,6 +7132,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .rf-live-card .studio-card-head {
   align-items: center;
+  flex-wrap: wrap;
   padding: 28px 28px 0;
 }
 
@@ -7280,7 +7292,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .rf-preview-empty-steps {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(min(100%, 150px), 1fr));
   gap: 10px;
   margin-top: 24px;
 }
@@ -7297,6 +7309,9 @@ html[data-theme="dark"] input::file-selector-button {
   font-family: var(--font-sans);
   font-size: 0.86rem;
   font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .rf-preview-empty-steps span.waiting {
@@ -7309,6 +7324,9 @@ html[data-theme="dark"] input::file-selector-button {
   font-size: 0.68rem;
   font-weight: 950;
   letter-spacing: 0.12em;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
   text-transform: uppercase;
 }
 
@@ -7318,7 +7336,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .rf-diff-readiness {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(min(100%, 150px), 1fr));
   gap: 10px;
   margin: 22px 0 24px;
 }
@@ -7335,6 +7353,9 @@ html[data-theme="dark"] input::file-selector-button {
   font-family: var(--font-sans);
   font-size: 0.86rem;
   font-weight: 850;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .rf-diff-readiness span.waiting {
@@ -7347,6 +7368,9 @@ html[data-theme="dark"] input::file-selector-button {
   font-size: 0.68rem;
   font-weight: 950;
   letter-spacing: 0.12em;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
   text-transform: uppercase;
 }
 
@@ -7989,7 +8013,7 @@ html[data-theme="dark"] .rf-rail-upgrade p {
   }
 
   .rf-live-card .studio-tabs-mini {
-    width: min(330px, 48vw);
+    width: min(100%, 330px);
   }
 }
 
