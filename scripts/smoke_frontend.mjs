@@ -404,7 +404,22 @@ async function checkPublicShell(baseUrl) {
   pass("landing mobile nav includes compact one-row styles");
 
   requireCondition(/@media\s*\(max-width:\s*1040px\)[\s\S]*?\.login-panel\s*\{[^}]*grid-template-columns:\s*1fr/.test(stylesheetText), "login page can still stay cramped at tablet widths");
-  pass("login page includes tablet-width stack protection");
+  requireCondition(/\.login-shell\s*\{(?=[^}]*overflow-x:\s*clip)[^}]*\}/s.test(stylesheetText), "login page can still create horizontal overflow");
+  requireCondition(/\.login-nav\s+\.brand\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "login nav brand can still force the home action off-screen");
+  requireCondition(/@media\s*\(max-width:\s*760px\)[\s\S]*?\.login-nav-actions\s+\.btn-sm\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*padding-inline:\s*12px)[^}]*\}/.test(stylesheetText), "login mobile nav actions can still overflow");
+  requireCondition(/@media\s*\(max-width:\s*520px\)\s*\{[^}]*\.login-nav-actions\s+\.btn-sm\s*\{[^}]*display:\s*none/s.test(stylesheetText), "login narrow-phone nav still keeps too many actions visible");
+  requireCondition(/\.login-panel\s*>\s*\*\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "login panel children can still force horizontal overflow");
+  requireCondition(/@media\s*\(max-width:\s*760px\)[\s\S]*?\.login-panel\s*\{(?=[^}]*width:\s*100%)(?=[^}]*max-width:\s*100%)(?=[^}]*overflow:\s*hidden)[^}]*\}/.test(stylesheetText), "login mobile panel can still exceed the viewport");
+  requireCondition(/\.login-copy\s+p\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*pretty)[^}]*\}/s.test(stylesheetText), "login intro copy can still overflow narrow screens");
+  requireCondition(/\.login-benefits\s+span\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*align-items:\s*flex-start)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "login benefit rows can still clip on mobile");
+  requireCondition(/\.login-studio-preview\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*min\(650px,\s*100%\))[^}]*\}/s.test(stylesheetText), "login studio preview can still exceed the viewport");
+  requireCondition(/\.login-preview-top\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s.test(stylesheetText), "login preview header can still squeeze labels");
+  requireCondition(/@media\s*\(max-width:\s*760px\)[\s\S]*?\.login-preview-top\s*\{(?=[^}]*flex-direction:\s*column)[^}]*\}/.test(stylesheetText), "login mobile preview header can still crowd its title");
+  requireCondition(/\.login-preview-sheet\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(min\(100%,\s*130px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "login preview sheet can still shrink into cramped columns");
+  requireCondition(/\.login-status\s*\{(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText) && /\.login-status\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "login status pill can still force card overflow");
+  requireCondition(/\.login-session-strip\s+span\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-align:\s*center)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "login session chips can still render cramped labels");
+  requireCondition(/\.studio-oauth-button\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText) && /\.studio-oauth-button\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "login OAuth button can still render cramped labels");
+  pass("login page includes mobile overflow and auth control safeguards");
 
   requireCondition(/\.pricing-grid\.two\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(min\(100%,\s*360px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "pricing cards can still shrink below comfortable desktop widths");
   requireCondition(/\.price-card\s*\{(?=[^}]*container:\s*price-card\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "pricing cards were missing container overflow safeguards");

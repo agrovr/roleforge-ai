@@ -5165,18 +5165,25 @@ html[data-theme="dark"] input::file-selector-button {
 
 .studio-oauth-button {
   display: flex;
+  max-width: 100%;
+  min-width: 0;
   min-height: 46px;
   align-items: center;
   justify-content: center;
   gap: 10px;
   margin: 12px 0 10px;
+  padding-inline: 14px;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: color-mix(in srgb, var(--surface) 90%, white);
   color: var(--ink-0);
   font-size: 0.95rem;
   font-weight: 950;
+  line-height: 1.12;
+  text-align: center;
   text-decoration: none;
+  text-wrap: balance;
+  white-space: normal;
   transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 
@@ -5190,6 +5197,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .studio-oauth-mark {
   display: grid;
+  flex: 0 0 24px;
   width: 24px;
   height: 24px;
   place-items: center;
@@ -5249,6 +5257,8 @@ html[data-theme="dark"] input::file-selector-button {
 .studio-account-submit {
   width: 100%;
   justify-content: center;
+  line-height: 1.12;
+  white-space: normal;
 }
 
 .studio-account-shortcuts {
@@ -5851,6 +5861,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .login-shell {
   min-height: 100dvh;
+  overflow-x: clip;
   padding: 28px clamp(18px, 4vw, 54px) 48px;
   background:
     radial-gradient(circle at 86% 8%, rgba(137, 209, 190, 0.18), transparent 20rem),
@@ -5860,14 +5871,22 @@ html[data-theme="dark"] input::file-selector-button {
 
 .login-nav {
   display: flex;
+  min-width: 0;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
 
+.login-nav .brand {
+  min-width: 0;
+}
+
 .login-nav-actions {
   display: flex;
+  flex: 0 0 auto;
+  min-width: 0;
   align-items: center;
+  justify-content: flex-end;
   gap: 10px;
 }
 
@@ -5878,6 +5897,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .login-panel {
   width: min(1180px, 100%);
+  max-width: 100%;
   min-height: calc(100vh - 150px);
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(360px, 440px);
@@ -5887,8 +5907,14 @@ html[data-theme="dark"] input::file-selector-button {
   padding: clamp(42px, 6vw, 72px) 0 28px;
 }
 
+.login-panel > * {
+  min-width: 0;
+}
+
 .login-copy {
   display: grid;
+  min-width: 0;
+  max-width: 100%;
   gap: 18px;
 }
 
@@ -5907,6 +5933,8 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--ink-2);
   font-size: 1.08rem;
   line-height: 1.65;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
 .login-benefits {
@@ -5918,13 +5946,18 @@ html[data-theme="dark"] input::file-selector-button {
 
 .login-benefits span {
   display: flex;
-  align-items: center;
+  min-width: 0;
+  align-items: flex-start;
   gap: 10px;
   color: var(--ink-1);
   font-weight: 850;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .login-benefits svg {
+  flex: 0 0 auto;
+  margin-top: 0.18em;
   color: var(--good);
 }
 
@@ -5932,7 +5965,8 @@ html[data-theme="dark"] input::file-selector-button {
   position: relative;
   display: grid;
   gap: 14px;
-  max-width: 650px;
+  min-width: 0;
+  max-width: min(650px, 100%);
   margin-top: 14px;
   padding: 18px;
   border: 1px solid var(--line);
@@ -5964,8 +5998,10 @@ html[data-theme="dark"] input::file-selector-button {
 
 .login-preview-top {
   display: flex;
+  min-width: 0;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
   min-height: 54px;
   padding: 12px 14px;
@@ -5976,6 +6012,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .login-preview-top span,
 .login-preview-sheet span {
+  min-width: 0;
   color: var(--ink-3);
   font-size: 0.7rem;
   font-weight: 950;
@@ -5984,14 +6021,20 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .login-preview-top strong {
+  min-width: 0;
   color: var(--ink-0);
   font-size: 0.98rem;
   font-weight: 950;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-align: right;
+  text-wrap: balance;
 }
 
 .login-preview-sheet {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: 0;
+  grid-template-columns: repeat(3, minmax(min(100%, 130px), 1fr));
   border: 1px solid var(--line);
   border-radius: 14px;
   overflow: hidden;
@@ -6001,6 +6044,7 @@ html[data-theme="dark"] input::file-selector-button {
 .login-preview-sheet div {
   display: grid;
   gap: 6px;
+  min-width: 0;
   min-height: 92px;
   padding: 16px;
   border-right: 1px solid var(--line);
@@ -6011,15 +6055,21 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .login-preview-sheet strong {
+  max-width: 100%;
   color: var(--ink-0);
   font-family: var(--font-display);
   font-size: 1.4rem;
   line-height: 1.1;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .login-card {
   display: grid;
   gap: 18px;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
   padding: 24px;
   border: 1px solid var(--line);
   border-radius: 18px;
@@ -6050,6 +6100,7 @@ html[data-theme="dark"] input::file-selector-button {
   display: inline-flex;
   align-items: center;
   width: fit-content;
+  max-width: 100%;
   min-height: 30px;
   padding: 6px 10px;
   border: 1px solid var(--line);
@@ -6058,6 +6109,10 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--ink-2);
   font-size: 0.75rem;
   font-weight: 900;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .login-status.success {
@@ -6100,7 +6155,10 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--ink-1);
   font-size: 0.78rem;
   font-weight: 900;
-  white-space: nowrap;
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .login-session-strip svg {
@@ -10055,13 +10113,60 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     padding: 18px 16px 34px;
   }
 
+  .login-nav {
+    gap: 10px;
+  }
+
+  .login-nav .brand {
+    flex: 1 1 auto;
+    gap: 8px;
+  }
+
+  .login-nav .brand-name {
+    max-width: clamp(126px, 42vw, 170px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .login-nav-actions {
+    gap: 8px;
+  }
+
+  .login-nav-actions .btn-sm {
+    min-width: 0;
+    padding-inline: 12px;
+  }
+
   .login-panel {
+    width: 100%;
+    max-width: 100%;
     gap: 24px;
+    overflow: hidden;
     padding-top: 42px;
+  }
+
+  .login-copy,
+  .login-copy h1,
+  .login-copy p,
+  .login-benefits,
+  .login-studio-preview,
+  .login-card {
+    width: 100%;
+    max-width: 100%;
   }
 
   .login-copy h1 {
     font-size: 3rem;
+  }
+
+  .login-preview-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .login-preview-top strong {
+    width: 100%;
+    text-align: left;
   }
 
   .login-preview-sheet {
@@ -10453,6 +10558,12 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
   .rf-intake-grid .mode-segment {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .login-nav-actions .btn-sm {
+    display: none;
   }
 }
 
