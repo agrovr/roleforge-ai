@@ -440,8 +440,9 @@ async function checkPublicShell(baseUrl) {
   pass("pricing cards include overflow-safe typography and actions");
 
   requireCondition(/\.settings-section-panel\s*\{(?=[^}]*container-type:\s*inline-size)[^}]*\}/s.test(stylesheetText), "settings panels were missing container sizing");
+  requireCondition(/\.settings-page-hero,\s*\.settings-section\s*\{(?=[^}]*container:\s*settings-section\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "settings sections can still overflow their page grid");
   requireCondition(/\.settings-metric\s*\{(?=[^}]*container-type:\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "settings metric cards can still overflow their panel");
-  requireCondition(/\.settings-metric\s+strong\s*\{(?=[^}]*font-size:\s*clamp\(1\.32rem,\s*13cqi,\s*1\.7rem\))(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings metric display text is not using balanced container-aware type");
+  requireCondition(/\.settings-metric\s+strong\s*\{(?=[^}]*font-size:\s*clamp\(1\.32rem,\s*13cqi,\s*1\.7rem\))(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings metric display text is not using fitted container-aware type");
   requireCondition(/\.settings-status-pill\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings status pills can still force narrow layout overflow");
   requireCondition(/\.settings-plan-includes\s+span\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings plan chips can still force narrow layout overflow");
   pass("settings cards include overflow-safe plan and metric styles");
@@ -455,23 +456,23 @@ async function checkPublicShell(baseUrl) {
     "button icons can still squeeze action labels",
   );
   requireCondition(
-    /\.settings-profile-actions\s*\{(?=[^}]*gap:\s*12px)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*width:\s*min\(100%,\s*430px\))[^}]*\}/s.test(stylesheetText),
+    /\.settings-profile-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*158px\),\s*1fr\)\))(?=[^}]*width:\s*min\(100%,\s*460px\))[^}]*\}/s.test(stylesheetText),
     "settings profile actions can still crowd or over-expand adjacent buttons",
   );
   requireCondition(
-    /\.settings-profile-actions\s+form\s*\{(?=[^}]*flex:\s*(?:1\s+1\s+)?170px)(?=[^}]*min-width:\s*min\(100%,\s*150px\))[^}]*\}/s.test(stylesheetText),
+    /\.settings-profile-actions\s+form\s*\{(?=[^}]*display:\s*flex)(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText),
     "settings sign-out form can still stay narrower than its paired action",
   );
   requireCondition(
-    /\.settings-profile-actions\s+\.primary-button,\s*\.settings-profile-actions\s+\.ghost-button\s*\{(?=[^}]*flex:\s*(?:1\s+1\s+)?170px)(?=[^}]*min-width:\s*min\(100%,\s*150px\))(?=[^}]*min-height:\s*48px)(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText),
+    /\.settings-profile-actions\s+\.primary-button,\s*\.settings-profile-actions\s+\.ghost-button\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*min-height:\s*48px)(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText),
     "settings account action buttons can still render cramped labels",
   );
   requireCondition(
-    /\.settings-billing-head\s*\{(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s.test(stylesheetText),
+    /\.settings-billing-head\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*170px\),\s*auto\))(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText),
     "settings billing header can still squeeze billing actions",
   );
   requireCondition(
-    /\.settings-billing-head\s+form\s*\{(?=[^}]*flex:\s*0\s+(?:1\s+)?210px)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText),
+    /\.settings-billing-head\s+form\s*\{(?=[^}]*display:\s*flex)(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText),
     "settings billing form can still collapse the manage billing button",
   );
   requireCondition(
@@ -482,6 +483,10 @@ async function checkPublicShell(baseUrl) {
     /\.settings-plan-active-card\s+\.settings-inline-link\s*\{(?=[^}]*flex:\s*0\s+(?:1\s+)?170px)(?=[^}]*min-width:\s*min\(100%,\s*150px\))(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText),
     "settings active plan studio link can still collapse into cramped text",
   );
+  requireCondition(
+    /@container\s*\(max-width:\s*430px\)\s*\{[\s\S]*?\.settings-profile-actions,\s*\.settings-billing-head,\s*\.settings-export-actions\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText),
+    "settings controls are missing compact container stacking",
+  );
   pass("settings action buttons include spacing and wrap safeguards");
 
   requireCondition(/\.settings-export-item\s*\{(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "settings export rows can still force panel overflow");
@@ -490,7 +495,7 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.settings-price-card\s*\{(?=[^}]*container:\s*settings-price-card\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "settings price cards were missing container sizing");
   requireCondition(/\.settings-price-card\s+strong\s*\{(?=[^}]*font-size:\s*clamp\(2\.05rem,\s*19cqi,\s*2\.58rem\))(?=[^}]*line-height:\s*1)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings price values can still clip or overflow");
   requireCondition(/@container\s+settings-price-card\s*\(max-width:\s*220px\)\s*\{[^}]*\.settings-price-card\s+strong\s*\{[^}]*font-size:\s*clamp\(1\.78rem,\s*18cqi,\s*2\.08rem\)/s.test(stylesheetText), "settings price values are missing fitted type for compact cards");
-  requireCondition(/\.settings-export-actions\s*\{(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s.test(stylesheetText), "settings export template action can still squeeze its link");
+  requireCondition(/\.settings-export-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*150px\),\s*auto\))[^}]*\}/s.test(stylesheetText), "settings export template action can still squeeze its link");
   requireCondition(/\.settings-usage-card\s*\{(?=[^}]*container:\s*settings-usage-card\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "settings usage card was missing container sizing");
   requireCondition(/\.settings-usage-card\s+strong\s*\{(?=[^}]*font-size:\s*clamp\(2rem,\s*14cqi,\s*2\.55rem\))(?=[^}]*line-height:\s*1)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings usage headline can still clip or overflow");
   requireCondition(/@container\s+settings-usage-card\s*\(max-width:\s*300px\)\s*\{[^}]*\.settings-usage-card\s+strong\s*\{[^}]*font-size:\s*clamp\(1\.62rem,\s*13cqi,\s*2rem\)/s.test(stylesheetText), "settings usage headline is missing fitted type for compact cards");

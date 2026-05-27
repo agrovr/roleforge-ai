@@ -5755,7 +5755,7 @@ html[data-theme="dark"] input::file-selector-button {
   font-family: var(--font-display);
   font-size: clamp(1.32rem, 13cqi, 1.7rem);
   line-height: 0.98;
-  overflow-wrap: normal;
+  overflow-wrap: anywhere;
   text-wrap: balance;
   word-break: normal;
 }
@@ -5854,6 +5854,13 @@ html[data-theme="dark"] input::file-selector-button {
   white-space: normal;
 }
 
+.settings-project-empty span {
+  overflow-wrap: anywhere;
+  text-overflow: initial;
+  text-wrap: pretty;
+  white-space: normal;
+}
+
 .settings-project-item small {
   flex: 0 0 auto;
   margin-top: 2px;
@@ -5930,10 +5937,10 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-export-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 150px), auto);
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
   gap: 12px;
   margin-top: 4px;
   padding-top: 10px;
@@ -5945,6 +5952,8 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--ink-2);
   font-size: 0.88rem;
   line-height: 1.4;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
 .settings-download-button,
@@ -6430,10 +6439,13 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-page-hero,
 .settings-section {
+  container: settings-section / inline-size;
   display: grid;
-  grid-template-columns: minmax(0, 0.78fr) minmax(360px, 1fr);
+  grid-template-columns: minmax(min(100%, 280px), 0.78fr) minmax(min(100%, 360px), 1fr);
   gap: 22px;
   align-items: start;
+  min-width: 0;
+  overflow: hidden;
   padding: 22px;
   border: 1px solid var(--line);
   border-radius: 16px;
@@ -6471,6 +6483,12 @@ html[data-theme="dark"] input::file-selector-button {
 .settings-billing-alert svg {
   flex: 0 0 auto;
   margin-top: 2px;
+}
+
+.settings-billing-alert span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
 .settings-section {
@@ -6532,6 +6550,12 @@ html[data-theme="dark"] input::file-selector-button {
   line-height: 1.1;
 }
 
+.settings-page-hero > *,
+.settings-section-copy {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .settings-section-panel {
   container-type: inline-size;
   display: grid;
@@ -6543,6 +6567,7 @@ html[data-theme="dark"] input::file-selector-button {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .settings-profile-avatar {
@@ -6557,6 +6582,11 @@ html[data-theme="dark"] input::file-selector-button {
   display: block;
 }
 
+.settings-profile-row > div:last-child {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .settings-profile-row strong {
   color: var(--ink-0);
   font-weight: 950;
@@ -6569,27 +6599,31 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-inline-link {
   width: fit-content;
+  max-width: 100%;
+  justify-content: center;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .settings-profile-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 158px), 1fr));
   align-items: stretch;
   gap: 12px;
-  flex-wrap: wrap;
-  width: min(100%, 430px);
+  width: min(100%, 460px);
 }
 
 .settings-profile-actions form {
   display: flex;
-  flex: 1 1 170px;
-  min-width: min(100%, 150px);
+  min-width: 0;
   margin: 0;
 }
 
 .settings-profile-actions .primary-button,
 .settings-profile-actions .ghost-button {
-  flex: 1 1 170px;
-  min-width: min(100%, 150px);
+  width: 100%;
+  min-width: 0;
   min-height: 48px;
   justify-content: center;
   padding-inline: 18px;
@@ -6608,16 +6642,17 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-billing-head {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 170px), auto);
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  flex-wrap: wrap;
+  min-width: 0;
 }
 
 .settings-billing-head form {
   display: flex;
-  flex: 0 1 210px;
+  min-width: 0;
   max-width: 100%;
   margin: 0;
 }
@@ -6815,12 +6850,32 @@ html[data-theme="dark"] input::file-selector-button {
   margin: 8px 0 0;
   color: var(--ink-2);
   line-height: 1.45;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
 .settings-billing-note {
   margin: 0;
   color: var(--ink-2);
   line-height: 1.5;
+}
+
+@container (max-width: 430px) {
+  .settings-profile-actions,
+  .settings-billing-head,
+  .settings-export-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-billing-head form,
+  .settings-billing-head .ghost-button,
+  .settings-inline-link {
+    width: 100%;
+  }
+
+  .settings-profile-row {
+    align-items: flex-start;
+  }
 }
 
 .rf-studio-stat-label {
