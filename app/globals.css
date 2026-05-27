@@ -1548,18 +1548,25 @@ html[data-theme="dark"] textarea {
 
 .templates-page-hero {
   width: min(1200px, 100%);
+  min-width: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 280px), auto);
   align-items: end;
   gap: 28px;
   margin: 56px auto 26px;
   padding: clamp(28px, 5vw, 48px);
+  overflow: hidden;
+  container: templates-hero / inline-size;
   border: 1px solid var(--line);
   border-radius: 18px;
   background:
     linear-gradient(135deg, rgba(255, 253, 248, 0.94), rgba(244, 236, 223, 0.74)),
     var(--surface-warm);
   box-shadow: var(--shadow-soft);
+}
+
+.templates-page-hero > * {
+  min-width: 0;
 }
 
 .templates-page-hero h1 {
@@ -1571,6 +1578,7 @@ html[data-theme="dark"] textarea {
   font-weight: 650;
   letter-spacing: 0;
   line-height: 1.02;
+  overflow-wrap: anywhere;
   text-wrap: balance;
 }
 
@@ -1580,23 +1588,40 @@ html[data-theme="dark"] textarea {
   color: var(--ink-2);
   font-size: 1.04rem;
   line-height: 1.62;
+  overflow-wrap: anywhere;
 }
 
 .templates-page-actions {
+  min-width: 0;
+  max-width: 100%;
   display: flex;
   flex-wrap: wrap;
+  align-items: stretch;
   gap: 10px;
   justify-content: flex-end;
 }
 
+.templates-page-actions .primary-button,
+.templates-page-actions .ghost-button {
+  flex: 1 1 150px;
+  min-width: min(100%, 150px);
+  justify-content: center;
+  line-height: 1.12;
+  white-space: normal;
+  text-wrap: balance;
+}
+
 .templates-selection-status {
   width: min(1200px, 100%);
+  min-width: 0;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 16px;
   margin: 0 auto 16px;
   padding: 14px 16px;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: color-mix(in srgb, var(--surface) 88%, rgba(137, 209, 190, 0.16));
@@ -1604,6 +1629,7 @@ html[data-theme="dark"] textarea {
 }
 
 .templates-selection-status div {
+  min-width: 0;
   display: grid;
   gap: 2px;
 }
@@ -1611,12 +1637,23 @@ html[data-theme="dark"] textarea {
 .templates-selection-status strong {
   color: var(--ink-0);
   font-size: 1.2rem;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.templates-selection-status .btn {
+  flex: 0 1 170px;
+  min-width: min(100%, 150px);
+  justify-content: center;
+  line-height: 1.12;
+  white-space: normal;
+  text-wrap: balance;
 }
 
 .templates-page-grid {
   width: min(1200px, 100%);
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(min(100%, 260px), 1fr));
   gap: 16px;
   margin: 0 auto;
 }
@@ -1624,6 +1661,7 @@ html[data-theme="dark"] textarea {
 .templates-page-card {
   min-width: 0;
   overflow: hidden;
+  container: template-page-card / inline-size;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: rgba(255, 253, 248, 0.9);
@@ -1646,9 +1684,11 @@ html[data-theme="dark"] textarea {
 }
 
 .templates-page-card-copy {
+  min-width: 0;
   display: grid;
   gap: 10px;
   padding: 16px;
+  overflow: hidden;
 }
 
 .templates-page-card-copy p {
@@ -1656,13 +1696,26 @@ html[data-theme="dark"] textarea {
   color: var(--ink-2);
   font-size: 0.92rem;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .template-card-actions {
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.template-card-actions .btn,
+.template-card-actions button {
+  flex: 1 1 132px;
+  min-width: min(100%, 126px);
+  justify-content: center;
+  line-height: 1.12;
+  white-space: normal;
+  text-align: center;
+  text-wrap: balance;
 }
 
 .template-select-button.selected {

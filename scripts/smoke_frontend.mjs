@@ -353,6 +353,17 @@ async function checkPublicShell(baseUrl) {
     }))
   ).join("\n");
 
+  requireCondition(/\.templates-page-hero\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*container:\s*templates-hero\s*\/\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "templates hero was missing overflow-safe container sizing");
+  requireCondition(/\.templates-page-hero\s*>\s*\*\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "templates hero children can still force horizontal overflow");
+  requireCondition(/\.templates-page-actions\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s.test(stylesheetText), "templates hero actions can still crowd the hero");
+  requireCondition(/\.templates-page-actions\s+\.primary-button,\s*\.templates-page-actions\s+\.ghost-button\s*\{(?=[^}]*flex:\s*(?:1\s+1\s+)?150px)(?=[^}]*min-width:\s*min\(100%,\s*150px\))(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "templates hero buttons can still render cramped labels");
+  requireCondition(/\.templates-selection-status\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "templates selected-status row can still overflow");
+  requireCondition(/\.templates-selection-status\s+strong\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "templates selected label can still overflow");
+  requireCondition(/\.templates-page-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(min\(100%,\s*260px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "templates cards can still shrink below a comfortable width");
+  requireCondition(/\.templates-page-card\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)(?=[^}]*container:\s*template-page-card\s*\/\s*inline-size)[^}]*\}/s.test(stylesheetText), "templates cards were missing container overflow safeguards");
+  requireCondition(/\.template-card-actions\s+\.btn,\s*\.template-card-actions\s+button\s*\{(?=[^}]*flex:\s*(?:1\s+1\s+)?132px)(?=[^}]*min-width:\s*min\(100%,\s*126px\))(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "template card action buttons can still render cramped labels");
+  pass("templates page includes overflow-safe cards and actions");
+
   requireCondition(stylesheetText.includes(".dash-stat-value"), "landing dashboard stat styles were missing");
   requireCondition(/\.dash-mock\s*\{(?=[^}]*container-type:\s*inline-size)[^}]*\}/s.test(stylesheetText), "landing dashboard mock was missing container sizing");
   requireCondition(/\.dash-main\s*\{(?=[^}]*container:\s*dash-main\s*\/\s*inline-size)[^}]*\}/s.test(stylesheetText), "landing dashboard main column was missing named container sizing");
