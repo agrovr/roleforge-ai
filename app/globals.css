@@ -9568,6 +9568,7 @@ html[data-theme="dark"] .rf-resume-generated {
 }
 
 .rf-intake-card {
+  container: rf-intake-card / inline-size;
   min-width: 0;
   min-height: 420px;
   display: flex;
@@ -9730,8 +9731,9 @@ html[data-theme="dark"] .rf-resume-generated {
 .rf-intake-grid .rf-target-segment {
   width: 100%;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.86fr);
+  grid-template-columns: repeat(2, minmax(min(100%, 118px), 1fr));
   gap: 4px;
+  min-width: 0;
   padding: 7px;
   border-radius: 22px;
   background: color-mix(in srgb, var(--surface-warm) 88%, white);
@@ -9747,10 +9749,13 @@ html[data-theme="dark"] .rf-resume-generated {
   font-family: var(--font-sans);
   font-size: clamp(0.7rem, 0.68vw, 0.86rem);
   font-weight: 900;
-  line-height: 1;
-  white-space: nowrap;
+  line-height: 1.08;
   overflow: hidden;
+  overflow-wrap: anywhere;
+  text-align: center;
   text-overflow: ellipsis;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .rf-intake-grid .rf-target-segment button {
@@ -9797,8 +9802,9 @@ html[data-theme="dark"] .rf-resume-generated {
 .rf-intake-grid .mode-segment {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(min(100%, 86px), 1fr));
   gap: 3px;
+  min-width: 0;
   padding: 6px;
   border-radius: 20px;
   background: color-mix(in srgb, var(--surface-warm) 86%, white);
@@ -9809,6 +9815,13 @@ html[data-theme="dark"] .rf-resume-generated {
   min-height: 40px;
   font-size: clamp(0.64rem, 0.58vw, 0.76rem);
   letter-spacing: -0.015em;
+}
+
+@container rf-intake-card (max-width: 310px) {
+  .rf-intake-grid .rf-target-segment,
+  .rf-intake-grid .mode-segment {
+    grid-template-columns: 1fr;
+  }
 }
 
 .rf-intake-grid .rf-company-field {

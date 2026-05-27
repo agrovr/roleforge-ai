@@ -575,10 +575,15 @@ async function checkPublicShell(baseUrl) {
   pass("legacy studio cards and status chips include overflow-safe safeguards");
 
   requireCondition(/\.rf-intake-card-header\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "workflow intake card headers can still clip narrow labels");
+  requireCondition(/\.rf-intake-card\s*\{(?=[^}]*container:\s*rf-intake-card\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "workflow intake cards were missing container overflow safeguards");
   requireCondition(/\.rf-intake-next\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "workflow intake next badge can still overflow its header");
   requireCondition(/\.rf-intake-grid\s+\.rf-file-copy\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*245px)[^}]*\}/s.test(stylesheetText), "workflow file copy can still force upload card overflow");
   requireCondition(/\.rf-intake-grid\s+\.rf-file-copy\s+strong\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "workflow uploaded filenames can still overflow");
   requireCondition(/\.rf-intake-grid\s+\.rf-file-action\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "workflow file action button can still render cramped");
+  requireCondition(/\.rf-intake-grid\s+\.rf-target-segment\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(min\(100%,\s*118px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "workflow target segment can still squeeze its tabs");
+  requireCondition(/\.rf-intake-grid\s+\.mode-segment\s*\{(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(min\(100%,\s*86px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "workflow mode segment can still squeeze mode labels");
+  requireCondition(/\.rf-intake-grid\s+\.rf-target-segment\s+button,\s*\.rf-intake-grid\s+\.mode-segment\s+button\s*\{(?=[^}]*line-height:\s*1\.08)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-align:\s*center)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "workflow segmented buttons can still render clipped labels");
+  requireCondition(/@container\s+rf-intake-card\s*\(max-width:\s*310px\)\s*\{[^}]*\.rf-intake-grid\s+\.rf-target-segment,\s*\.rf-intake-grid\s+\.mode-segment\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText), "workflow segmented controls are missing compact stacking");
   pass("studio workflow intake cards include long-label safeguards");
 
   requireCondition(/\.history-filter-bar\s*\{(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText), "history filters can still force panel overflow");
