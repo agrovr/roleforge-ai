@@ -364,6 +364,15 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.template-card-actions\s+\.btn,\s*\.template-card-actions\s+button\s*\{(?=[^}]*flex:\s*(?:1\s+1\s+)?132px)(?=[^}]*min-width:\s*min\(100%,\s*126px\))(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "template card action buttons can still render cramped labels");
   pass("templates page includes overflow-safe cards and actions");
 
+  requireCondition(/\.steps,\s*\.features-grid\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "landing step and feature grids were missing overflow-safe containers");
+  requireCondition(/\.feature-card,\s*\.step\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "landing step and feature cards can still overflow their grid tracks");
+  requireCondition(/\.feature-card\s*\{(?=[^}]*container:\s*feature-card\s*\/\s*inline-size)[^}]*\}/s.test(stylesheetText), "feature cards were missing container sizing");
+  requireCondition(/\.step\s+\.step-title,\s*\.step\s+h4,\s*\.step\s+h3,\s*\.feature-card\s+h3,\s*\.feature-card\s+h4\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "landing card headings can still render cramped text");
+  requireCondition(/\.feature-card-list\s+li\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*line-height:\s*1\.35)[^}]*\}/s.test(stylesheetText), "feature list rows can still squeeze card text");
+  requireCondition(/\.feature-card-list\s+li\s+span:last-child\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "feature list labels can still overflow cards");
+  requireCondition(/@media\s*\(max-width:\s*1180px\)\s*\{[^}]*\.steps,\s*\.features-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s.test(stylesheetText), "landing step and feature grids can still stay cramped before mobile");
+  pass("landing step and feature cards include overflow-safe layout rules");
+
   requireCondition(stylesheetText.includes(".dash-stat-value"), "landing dashboard stat styles were missing");
   requireCondition(/\.dash-mock\s*\{(?=[^}]*container-type:\s*inline-size)[^}]*\}/s.test(stylesheetText), "landing dashboard mock was missing container sizing");
   requireCondition(/\.dash-main\s*\{(?=[^}]*container:\s*dash-main\s*\/\s*inline-size)[^}]*\}/s.test(stylesheetText), "landing dashboard main column was missing named container sizing");
