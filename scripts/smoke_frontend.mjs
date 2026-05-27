@@ -399,6 +399,12 @@ async function checkPublicShell(baseUrl) {
     /\.dash-main-head\s+\.btn-sm\s*\{(?=[^}]*min-width:\s*min\(100%,\s*150px\))(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText),
     "landing dashboard CTA can still render cramped in the studio mock",
   );
+  requireCondition(/\.dash-resume-card\s*\{(?=[^}]*container:\s*dash-resume-card\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "landing dashboard resume card can still overflow");
+  requireCondition(/\.dash-resume-title\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "landing dashboard resume title can still render cramped");
+  requireCondition(/\.dash-resume-meta\s+span\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "landing dashboard resume metadata can still overflow");
+  requireCondition(/\.dash-resume-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*112px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "landing dashboard resume actions can still bunch together");
+  requireCondition(/\.dash-resume-actions\s+\.btn\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*min-height:\s*38px)(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "landing dashboard resume action labels can still render cramped");
+  requireCondition(/@container\s+dash-resume-card\s*\(max-width:\s*520px\)\s*\{[\s\S]*?\.dash-resume-card\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText), "landing dashboard resume card is missing compact container stacking");
   pass("landing dashboard stat cards include overflow-safe styles");
 
   requireCondition(stylesheetText.includes(".nav-cta-short"), "landing mobile nav compact CTA styles were missing");
