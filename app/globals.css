@@ -5672,6 +5672,9 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .rf-studio-hero h1 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   margin: 3px 0 4px;
   color: var(--ink-0);
   font-family: var(--font-display);
@@ -5681,13 +5684,13 @@ html[data-theme="dark"] input::file-selector-button {
   line-height: 0.96;
   max-width: min(100%, 24ch);
   width: 100%;
-  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow-wrap: normal;
+  white-space: normal;
+  overflow-wrap: anywhere;
   word-break: normal;
-  hyphens: none;
+  hyphens: auto;
+  text-wrap: balance;
 }
 
 .rf-studio-hero p {

@@ -524,6 +524,10 @@ async function checkPublicShell(baseUrl) {
   pass("settings export and billing cards include overflow-safe typography");
 
   requireCondition(
+    /\.rf-studio-hero\s+h1\s*\{(?=[^}]*display:\s*-webkit-box)(?=[^}]*-webkit-line-clamp:\s*2)(?=[^}]*white-space:\s*normal)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText),
+    "studio hero title can still collapse into a clipped one-line label",
+  );
+  requireCondition(
     /\.studio-top-button\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*justify-content:\s*center)[^}]*\}/s.test(stylesheetText),
     "studio top action buttons can still force header overflow",
   );
