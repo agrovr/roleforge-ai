@@ -403,6 +403,16 @@ async function checkPublicShell(baseUrl) {
   requireCondition(!home.text.includes("The&nbsp;resume&nbsp;that"), "landing hero headline still prevents narrow-phone wrapping");
   pass("landing mobile nav includes compact one-row styles");
 
+  requireCondition(/\.cta-band\s*\{(?=[^}]*container:\s*cta-band\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*isolation:\s*isolate)[^}]*\}/s.test(stylesheetText), "landing final CTA can still overflow its full-bleed container");
+  requireCondition(/\.cta-band\s*>\s*\*\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "landing final CTA children can still force overflow");
+  requireCondition(/\.cta-band\s+\.btn\s*\{(?=[^}]*flex:\s*(?:1\s+1\s+)?184px)(?=[^}]*min-width:\s*min\(100%,\s*164px\))(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "landing final CTA buttons can still render cramped labels");
+  requireCondition(/\.cta-visual\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "landing final CTA visual can still spill out");
+  requireCondition(/@media\s*\(max-width:\s*900px\)[\s\S]*?\.cta-band\s*\{(?=[^}]*width:\s*min\(100%,\s*(?:calc\()?100vw\s*-\s*32px\)?\))(?=[^}]*margin-left:\s*0)(?=[^}]*padding:\s*44px\s+28px)[^}]*\}/.test(stylesheetText), "landing final CTA is missing tablet containment");
+  requireCondition(/@media\s*\(max-width:\s*620px\)[\s\S]*?\.cta-band\s+\.cta-cluster\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*1fr)[^}]*\}/.test(stylesheetText), "landing final CTA buttons are missing narrow stacking");
+  requireCondition(/\.footer-inner\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "footer columns can still force overflow");
+  requireCondition(/\.footer-tag,\s*\.footer-col\s+a,\s*\.footer-col\s+span,\s*\.footer-meta\s+span\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "footer copy can still overflow narrow columns");
+  pass("landing final CTA and footer include overflow-safe layout guards");
+
   requireCondition(/@media\s*\(max-width:\s*1040px\)[\s\S]*?\.login-panel\s*\{[^}]*grid-template-columns:\s*1fr/.test(stylesheetText), "login page can still stay cramped at tablet widths");
   requireCondition(/\.login-shell\s*\{(?=[^}]*overflow-x:\s*clip)[^}]*\}/s.test(stylesheetText), "login page can still create horizontal overflow");
   requireCondition(/\.login-nav\s+\.brand\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "login nav brand can still force the home action off-screen");
