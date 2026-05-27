@@ -1735,16 +1735,16 @@ html[data-theme="dark"] textarea {
 
 .template-card-actions {
   min-width: 0;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 128px), 1fr));
   align-items: center;
   gap: 10px;
-  flex-wrap: wrap;
 }
 
 .template-card-actions .btn,
 .template-card-actions button {
-  flex: 1 1 132px;
-  min-width: min(100%, 126px);
+  width: 100%;
+  min-width: 0;
   justify-content: center;
   line-height: 1.12;
   white-space: normal;
@@ -1812,25 +1812,48 @@ html[data-theme="dark"] textarea {
   display: flex;
   justify-content: space-between;
   gap: 12px;
+  min-width: 0;
+  flex-wrap: wrap;
   padding: 14px 18px;
   border-top: 1px solid var(--line);
 }
 
 .template-name {
+  min-width: 0;
+  max-width: 100%;
   font-weight: 800;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .template-title-row {
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: start;
+  gap: 8px;
+  min-width: 0;
 }
 
 .template-tag {
+  max-width: 100%;
   color: var(--ink-3);
   font-size: 0.82rem;
   font-weight: 700;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+  text-align: right;
+  text-wrap: balance;
+}
+
+@container template-page-card (max-width: 310px) {
+  .template-title-row {
+    grid-template-columns: 1fr;
+  }
+
+  .template-tag {
+    text-align: left;
+  }
 }
 
 .pricing-grid {
