@@ -519,11 +519,32 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.rf-diff-readiness\s*\{(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(min\(100%,\s*150px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "live preview diff readiness chips can still squeeze narrow cards");
   pass("live preview tabs and status chips include wrapping safeguards");
 
+  requireCondition(/\.suggestion\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "suggestion cards can still overflow their column");
+  requireCondition(/\.suggestion-head\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s.test(stylesheetText), "suggestion headers can still squeeze long badges");
+  requireCondition(/\.suggestion-tag\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "suggestion tags can still clip long labels");
+  requireCondition(/\.suggestion-actions\s+\.btn\s*\{(?=[^}]*flex:\s*(?:1\s+1\s+)?132px)(?=[^}]*min-width:\s*min\(100%,\s*124px\))(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "suggestion action buttons can still render cramped labels");
+  requireCondition(/\.studio-jd\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "job target card can still overflow with long targets");
+  requireCondition(/\.studio-jd-meta\s+span\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "job target metadata can still squeeze long labels");
+  requireCondition(/\.pill,\s*\.mini-keyword,\s*\.kw\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "keyword pills can still force row overflow");
+  requireCondition(/\.ats-item\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "ATS cards can still overflow with long issue text");
+  requireCondition(/\.generated-summary\s+span\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "generated asset summary pills can still render cramped");
+  requireCondition(/\.generated-card\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "generated asset cards can still overflow their grid");
+  requireCondition(/\.generated-head\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "generated asset headers can still clip long labels");
+  requireCondition(/\.generated-action-note\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "generated empty action notes can still force card overflow");
+  pass("studio suggestion, target, ATS, and generated asset cards include overflow safeguards");
+
   requireCondition(/\.rf-studio-stat\s*\{(?=[^}]*container:\s*rf-studio-stat\s*\/\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "studio metric cards were missing container sizing");
   requireCondition(/\.rf-studio-stat-row\s*\{(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*font-size:\s*clamp\(1\.62rem,\s*17cqi,\s*2\.18rem\))(?=[^}]*line-height:\s*1\.02)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "studio metric values can still overflow or clip");
   requireCondition(/\.rf-studio-stat-row\s+small\s*\{(?=[^}]*line-height:\s*1\.15)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "studio metric units can still squeeze value rows");
   requireCondition(/@container\s+rf-studio-stat\s*\(max-width:\s*220px\)\s*\{[^}]*\.rf-studio-stat-row\s*\{[^}]*font-size:\s*clamp\(1\.42rem,\s*16cqi,\s*1\.72rem\)/s.test(stylesheetText), "studio metric values are missing fitted type for compact cards");
   pass("studio metric cards include fitted overflow-safe typography");
+
+  requireCondition(/\.rf-intake-card-header\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "workflow intake card headers can still clip narrow labels");
+  requireCondition(/\.rf-intake-next\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "workflow intake next badge can still overflow its header");
+  requireCondition(/\.rf-intake-grid\s+\.rf-file-copy\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*245px)[^}]*\}/s.test(stylesheetText), "workflow file copy can still force upload card overflow");
+  requireCondition(/\.rf-intake-grid\s+\.rf-file-copy\s+strong\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "workflow uploaded filenames can still overflow");
+  requireCondition(/\.rf-intake-grid\s+\.rf-file-action\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "workflow file action button can still render cramped");
+  pass("studio workflow intake cards include long-label safeguards");
 
   requireCondition(/\.history-filter-bar\s*\{(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText), "history filters can still force panel overflow");
   requireCondition(/\.history-filter-bar\s+button\s*\{(?=[^}]*line-height:\s*1\.08)(?=[^}]*text-align:\s*center)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "history filter labels can still render cramped");

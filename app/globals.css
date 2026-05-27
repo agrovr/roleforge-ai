@@ -3692,6 +3692,7 @@ html[data-theme="dark"] .result-box {
 .mini-keyword,
 .kw {
   display: inline-flex;
+  max-width: 100%;
   align-items: center;
   min-height: 28px;
   padding: 5px 9px;
@@ -3701,6 +3702,11 @@ html[data-theme="dark"] .result-box {
   color: var(--ink-2);
   font-size: 0.8rem;
   font-weight: 800;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .pill.good,
@@ -7606,6 +7612,8 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .suggestion {
+  min-width: 0;
+  overflow: hidden;
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -7614,12 +7622,15 @@ html[data-theme="dark"] input::file-selector-button {
 
 .suggestion-head {
   display: flex;
+  min-width: 0;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 10px;
 }
 
 .suggestion-tag {
+  max-width: 100%;
   padding: 4px 8px;
   border-radius: 999px;
   background: var(--brand-soft);
@@ -7627,6 +7638,9 @@ html[data-theme="dark"] input::file-selector-button {
   font-size: 0.66rem;
   font-weight: 950;
   letter-spacing: 0.08em;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
   text-transform: uppercase;
 }
 
@@ -7641,10 +7655,15 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .suggestion-meta {
+  min-width: 0;
+  max-width: 100%;
   color: var(--ink-3);
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 800;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .suggestion-body {
@@ -7654,11 +7673,14 @@ html[data-theme="dark"] input::file-selector-button {
 
 .suggestion-before,
 .suggestion-after {
+  min-width: 0;
   padding: 11px;
   border: 1px solid var(--line);
   border-radius: 8px;
   color: var(--ink-2);
   line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .suggestion-before {
@@ -7673,10 +7695,21 @@ html[data-theme="dark"] input::file-selector-button {
 
 .suggestion-actions {
   display: flex;
-  align-items: center;
+  min-width: 0;
+  align-items: stretch;
   gap: 8px;
   flex-wrap: wrap;
   margin-top: 10px;
+}
+
+.suggestion-actions .btn {
+  flex: 1 1 132px;
+  min-width: min(100%, 124px);
+  max-width: 100%;
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .rf-studio-page .btn {
@@ -7699,6 +7732,8 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .studio-jd {
+  min-width: 0;
+  overflow: hidden;
   margin: 16px;
   padding: 16px;
   border: 1px solid var(--line);
@@ -7708,6 +7743,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .studio-jd-meta {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
@@ -7718,8 +7754,13 @@ html[data-theme="dark"] input::file-selector-button {
 
 .studio-jd-meta span {
   display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
   align-items: center;
   gap: 5px;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .studio-jd p {
@@ -7732,6 +7773,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .kw-section {
+  min-width: 0;
   margin: 16px;
 }
 
@@ -7775,10 +7817,15 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .ats-score {
+  max-width: 100%;
   color: var(--good);
   font-family: var(--font-display);
-  font-size: 1.7rem;
+  font-size: clamp(1.18rem, 9cqi, 1.7rem);
   font-weight: 700;
+  line-height: 1;
+  overflow-wrap: anywhere;
+  text-align: right;
+  text-wrap: balance;
 }
 
 .ats-list {
@@ -7790,6 +7837,8 @@ html[data-theme="dark"] input::file-selector-button {
 .ats-item {
   display: grid;
   grid-template-columns: 34px minmax(0, 1fr);
+  min-width: 0;
+  overflow: hidden;
   gap: 11px;
   padding: 13px;
   border: 1px solid var(--line);
@@ -7815,12 +7864,16 @@ html[data-theme="dark"] input::file-selector-button {
   display: block;
   color: var(--ink-0);
   font-weight: 900;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .ats-item p {
   margin: 4px 0 0;
   color: var(--ink-2);
   font-size: 0.83rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .rf-generated-grid {
@@ -7830,6 +7883,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .generated-summary {
   display: flex;
+  min-width: 0;
   flex-wrap: wrap;
   gap: 8px;
   padding: 0 16px 2px;
@@ -7837,8 +7891,11 @@ html[data-theme="dark"] input::file-selector-button {
 
 .generated-summary span {
   display: inline-flex;
+  min-width: 0;
+  max-width: 100%;
   min-height: 32px;
   align-items: center;
+  flex-wrap: wrap;
   gap: 7px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -7847,6 +7904,10 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--ink-3);
   font-size: 0.78rem;
   font-weight: 850;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .generated-summary span.ready {
@@ -7856,14 +7917,19 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .generated-summary strong {
+  min-width: 0;
   color: var(--ink-0);
   font-size: 0.72rem;
   letter-spacing: 0.1em;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
   text-transform: uppercase;
 }
 
 .generated-card {
   scroll-margin-top: 128px;
+  min-width: 0;
+  overflow: hidden;
   padding: 16px;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -7889,20 +7955,28 @@ html[data-theme="dark"] input::file-selector-button {
 
 .generated-head {
   display: flex;
+  min-width: 0;
   align-items: center;
+  flex-wrap: wrap;
   gap: 7px;
   color: var(--ink-3);
   font-size: 0.75rem;
   font-weight: 950;
   letter-spacing: 0.1em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
   text-transform: uppercase;
 }
 
 .generated-body {
+  min-width: 0;
   margin-top: 12px;
   color: var(--ink-1);
   line-height: 1.65;
+  overflow-wrap: anywhere;
   white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .generated-scroll {
@@ -7918,6 +7992,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .generated-action-note {
   display: inline-flex;
+  max-width: 100%;
   min-height: 30px;
   align-items: center;
   border: 1px solid var(--line);
@@ -7926,6 +8001,10 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--ink-3);
   font-size: 0.78rem;
   font-weight: 800;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .generated-list {
@@ -7937,6 +8016,8 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .generated-list li {
+  min-width: 0;
+  overflow: hidden;
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -7946,6 +8027,9 @@ html[data-theme="dark"] input::file-selector-button {
 .generated-list strong,
 .generated-list span {
   display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .generated-list span {
@@ -9267,8 +9351,10 @@ html[data-theme="dark"] .rf-resume-generated {
 
 .rf-intake-card-header {
   display: flex;
+  min-width: 0;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
   margin: 0;
   padding: 20px 22px;
@@ -9278,13 +9364,16 @@ html[data-theme="dark"] .rf-resume-generated {
   color: #fffaf0;
   font-family: var(--font-sans);
   font-size: 1.08rem;
-  line-height: 1;
+  line-height: 1.12;
   font-weight: 900;
   letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .rf-intake-next {
   flex: 0 0 auto;
+  max-width: 100%;
   min-height: 24px;
   padding: 5px 9px;
   border: 1px solid rgba(255, 250, 240, 0.32);
@@ -9294,7 +9383,11 @@ html[data-theme="dark"] .rf-resume-generated {
   font-size: 0.64rem;
   font-weight: 950;
   letter-spacing: 0.14em;
-  line-height: 1;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
   text-transform: uppercase;
 }
 
@@ -9339,21 +9432,28 @@ html[data-theme="dark"] .rf-resume-generated {
 }
 
 .rf-intake-grid .rf-file-copy {
+  min-width: 0;
   max-width: 245px;
   justify-items: center;
   gap: 9px;
 }
 
 .rf-intake-grid .rf-file-copy strong {
+  max-width: 100%;
   font-family: var(--font-sans);
   font-size: 1.12rem;
   line-height: 1.08;
   font-weight: 950;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .rf-intake-grid .rf-file-copy small {
+  max-width: 100%;
   font-size: 1rem;
   line-height: 1.32;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .rf-intake-grid .rf-file-action {
@@ -9367,6 +9467,11 @@ html[data-theme="dark"] .rf-resume-generated {
   font-family: var(--font-sans);
   font-size: 0.98rem;
   font-weight: 900;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
   box-shadow: 0 16px 34px -24px rgba(11, 16, 41, 0.88);
 }
 
