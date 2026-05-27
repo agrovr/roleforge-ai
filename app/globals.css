@@ -2134,7 +2134,7 @@ html[data-theme="dark"] textarea {
 .cta-band {
   container: cta-band / inline-size;
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 1fr);
+  grid-template-columns: minmax(0, 1.08fr) minmax(min(100%, 360px), 0.92fr);
   align-items: center;
   gap: 48px;
   min-width: 0;
@@ -2142,8 +2142,8 @@ html[data-theme="dark"] textarea {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  width: calc(100vw - 56px);
-  margin-left: calc(50% - 50vw + 28px);
+  width: 100%;
+  margin-left: 0;
   min-height: 470px;
   padding: 86px 64px;
   border-radius: var(--radius-xl);
@@ -2156,9 +2156,15 @@ html[data-theme="dark"] textarea {
 }
 
 .cta-section .section-inner {
-  width: 100%;
-  max-width: none;
-  padding-inline: 28px;
+  width: min(1520px, 100%);
+  max-width: 1520px;
+  padding-inline: 0;
+}
+
+.cta-band > div:first-child {
+  position: relative;
+  z-index: 2;
+  max-width: min(100%, 640px);
 }
 
 .cta-band::before {
@@ -2241,6 +2247,8 @@ html[data-theme="dark"] textarea {
 .cta-visual {
   position: relative;
   align-self: center;
+  justify-self: end;
+  width: min(100%, 560px);
   min-width: 0;
   max-width: 100%;
   min-height: 390px;
@@ -2258,9 +2266,9 @@ html[data-theme="dark"] textarea {
 
 .cta-visual .resume-card.back {
   left: auto;
-  right: clamp(180px, 16vw, 260px);
+  right: clamp(105px, 14vw, 190px);
   top: 42px;
-  width: clamp(225px, 16vw, 260px);
+  width: clamp(210px, 15vw, 248px);
   height: clamp(352px, 25vw, 405px);
   transform: rotate(-8deg);
   opacity: 0.7;
@@ -7349,11 +7357,12 @@ html[data-theme="dark"] input::file-selector-button {
   font-family: var(--font-sans);
   font-size: clamp(0.68rem, 0.58rem + 0.32vw, 0.82rem);
   font-weight: 900;
-  line-height: 1.1;
-  white-space: nowrap !important;
+  line-height: 1.08;
+  white-space: normal;
   overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
   text-align: center;
+  text-wrap: balance;
 }
 
 .rf-target-segment {
