@@ -5666,12 +5666,15 @@ html[data-theme="dark"] input::file-selector-button {
 
 .studio-hero-actions .ghost-button,
 .studio-hero-actions .primary-button {
-  min-width: 128px;
+  min-width: min(100%, 128px);
   justify-content: center;
   padding-inline: 18px;
   font-size: 0.92rem;
-  line-height: 1;
-  white-space: nowrap;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .studio-hero-actions .primary-button svg,
@@ -5990,7 +5993,8 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-project-item small {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  max-width: 100%;
   margin-top: 2px;
   padding: 7px 9px;
   border: 1px solid var(--line);
@@ -6000,7 +6004,12 @@ html[data-theme="dark"] input::file-selector-button {
   font-size: 0.72rem;
   font-weight: 950;
   letter-spacing: 0.08em;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
   text-transform: uppercase;
+  white-space: normal;
 }
 
 .settings-project-empty {
@@ -6928,6 +6937,17 @@ html[data-theme="dark"] input::file-selector-button {
 .settings-price-card form,
 .settings-price-card button {
   width: 100%;
+}
+
+.settings-price-card .primary-button {
+  min-width: 0;
+  min-height: 48px;
+  justify-content: center;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .settings-plan-active-card {

@@ -513,8 +513,14 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.settings-export-item\s*\{(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "settings export rows can still force panel overflow");
   requireCondition(/\.settings-export-item\s+span\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*line-height:\s*1\.18)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "settings export labels can still render cramped");
   requireCondition(/\.settings-export-item\s+small\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*line-height:\s*1\.18)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "settings export descriptions can still squeeze rows");
+  requireCondition(
+    /\.settings-project-item\s+small\s*\{(?=[^}]*(?:flex:\s*0\s+1\s+auto|flex:\s*0\s+auto))(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-item\s+small\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText),
+    "settings saved-project status pills can still squeeze or overflow",
+  );
   requireCondition(/\.settings-price-card\s*\{(?=[^}]*container:\s*settings-price-card\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "settings price cards were missing container sizing");
   requireCondition(/\.settings-price-card\s+strong\s*\{(?=[^}]*font-size:\s*clamp\(2\.05rem,\s*19cqi,\s*2\.58rem\))(?=[^}]*line-height:\s*1)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings price values can still clip or overflow");
+  requireCondition(/\.settings-price-card\s+\.primary-button\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*min-height:\s*48px)(?=[^}]*line-height:\s*1\.12)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "settings price buttons can still render cramped labels");
   requireCondition(/@container\s+settings-price-card\s*\(max-width:\s*220px\)\s*\{[^}]*\.settings-price-card\s+strong\s*\{[^}]*font-size:\s*clamp\(1\.78rem,\s*18cqi,\s*2\.08rem\)/s.test(stylesheetText), "settings price values are missing fitted type for compact cards");
   requireCondition(/\.settings-export-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*150px\),\s*auto\))[^}]*\}/s.test(stylesheetText), "settings export template action can still squeeze its link");
   requireCondition(/\.settings-usage-card\s*\{(?=[^}]*container:\s*settings-usage-card\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "settings usage card was missing container sizing");
@@ -535,6 +541,10 @@ async function checkPublicShell(baseUrl) {
   requireCondition(
     /@media\s*\(max-width:\s*720px\)[\s\S]*?\.studio-top-button\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*text-align:\s*center)[^}]*\}/.test(stylesheetText),
     "studio top action buttons can still overflow on mobile",
+  );
+  requireCondition(
+    /\.studio-hero-actions\s+\.ghost-button,\s*\.studio-hero-actions\s+\.primary-button\s*\{(?=[^}]*min-width:\s*min\(100%,\s*128px\))(?=[^}]*line-height:\s*1\.12)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText),
+    "studio hero action buttons can still overflow at tablet widths",
   );
   requireCondition(
     /@media\s*\(max-width:\s*720px\)[\s\S]*?\.studio-hero-actions\s+\.ghost-button,\s*\.studio-hero-actions\s+\.primary-button\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*line-height:\s*1\.12)[^}]*\}/.test(stylesheetText),
