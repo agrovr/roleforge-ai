@@ -88,6 +88,29 @@ test("normalizes inline headings and bullet markers for plain preview", () => {
   ]);
 });
 
+test("normalizes common resume bullet glyphs for plain preview", () => {
+  const lines = buildPlainResumeLines(["\u25E6 Improved onboarding", "\u2013 Reduced manual review", "\u2043 Matched keywords"].join("\n"));
+
+  assert.deepEqual(lines, [
+    { text: "Improved onboarding", kind: "bullet" },
+    { text: "Reduced manual review", kind: "bullet" },
+    { text: "Matched keywords", kind: "bullet" },
+  ]);
+});
+
+test("recognizes additional resume section headings", () => {
+  const lines = buildPlainResumeLines(
+    ["Leadership Experience", "Program Lead | Campus Org | 2024", "Relevant Coursework: Data Structures, Databases"].join("\n"),
+  );
+
+  assert.deepEqual(lines, [
+    { text: "Experience", kind: "heading" },
+    { text: "Program Lead | Campus Org | 2024", kind: "body" },
+    { text: "Education", kind: "heading" },
+    { text: "Data Structures, Databases", kind: "body" },
+  ]);
+});
+
 test("caps plain preview lines so long restored runs cannot overgrow the card", () => {
   const lines = Array.from({ length: 120 }, (_, index) => `Line ${index + 1}`).join("\n");
 

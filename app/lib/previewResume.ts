@@ -16,6 +16,12 @@ const RESUME_SECTION_TITLES: Record<string, string> = {
   "work experience": "Experience",
   "professional experience": "Experience",
   "relevant experience": "Experience",
+  "additional experience": "Experience",
+  "leadership experience": "Experience",
+  "volunteer experience": "Experience",
+  "community experience": "Experience",
+  "professional experience & projects": "Experience",
+  "experience & projects": "Experience",
   "employment history": "Experience",
   "work history": "Experience",
   "selected experience": "Experience",
@@ -29,9 +35,21 @@ const RESUME_SECTION_TITLES: Record<string, string> = {
   "selected projects": "Projects",
   education: "Education",
   certifications: "Certifications",
+  licenses: "Certifications",
+  "licenses and certifications": "Certifications",
+  training: "Certifications",
+  "professional development": "Certifications",
   awards: "Awards",
   achievements: "Achievements",
+  publications: "Achievements",
+  activities: "Achievements",
+  "community involvement": "Achievements",
+  coursework: "Education",
+  "relevant coursework": "Education",
 };
+
+const BULLET_MARKER_PATTERN = "[-*•●▪▫◦‣⁃–—]";
+const BULLET_MARKER_REGEX = new RegExp(`^${BULLET_MARKER_PATTERN}\\s+`);
 
 export function normalizeResumeLine(line: string) {
   return line
@@ -39,7 +57,8 @@ export function normalizeResumeLine(line: string) {
     .replace(/^```[a-z]*$/i, "")
     .replace(/^#{1,4}\s*/, "")
     .replace(/\*\*/g, "")
-    .replace(/^\s*[•●]\s*/, "- ")
+    .replace(/^\s*[•●▪▫◦‣⁃]\s*/, "- ")
+    .replace(/^\s*[–—]\s+/, "- ")
     .trim();
 }
 
@@ -156,11 +175,11 @@ export function parseResumeText(text?: string): ParsedResume | null {
 }
 
 export function isBulletLine(line: string) {
-  return /^[-•*]\s+/.test(line);
+  return BULLET_MARKER_REGEX.test(line);
 }
 
 export function cleanBulletLine(line: string) {
-  return line.replace(/^[-•*]\s+/, "");
+  return line.replace(BULLET_MARKER_REGEX, "");
 }
 
 function looksLikeDateRange(line: string) {
