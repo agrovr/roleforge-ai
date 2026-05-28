@@ -10819,6 +10819,11 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     justify-content: center;
   }
 
+  .templates-selection-status .btn {
+    flex: 0 0 auto;
+    min-height: 42px;
+  }
+
   .settings-hero-status {
     justify-items: start;
   }
