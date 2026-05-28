@@ -6527,7 +6527,24 @@ html[data-theme="dark"] input::file-selector-button {
 .settings-page-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.settings-page-actions .btn {
+  min-width: 0;
+  justify-content: center;
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.settings-page-actions .theme-toggle {
+  flex: 0 0 auto;
 }
 
 .settings-page-layout {
@@ -10710,6 +10727,7 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
   .settings-page-actions {
     margin-left: auto;
+    max-width: 100%;
   }
 
   .settings-page-actions .btn {
