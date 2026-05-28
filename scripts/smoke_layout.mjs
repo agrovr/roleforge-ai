@@ -274,7 +274,10 @@ async function main(argv = process.argv.slice(2)) {
     chrome = spawn(chromePath, [
       "--headless=new",
       "--disable-gpu",
+      "--disable-dev-shm-usage",
+      "--disable-extensions",
       "--hide-scrollbars",
+      "--no-sandbox",
       "--no-first-run",
       "--no-default-browser-check",
       `--remote-debugging-port=${port}`,
