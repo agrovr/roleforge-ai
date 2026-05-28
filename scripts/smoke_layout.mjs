@@ -298,7 +298,7 @@ async function signInSmokeAccount() {
   return { cookie: cookieHeaderFromSession(supabaseUrl, JSON.parse(text)), source: "ROLEFORGE_SMOKE_EMAIL/ROLEFORGE_SMOKE_PASSWORD" };
 }
 
-async function fetchJsonWithRetry(url, attempts = 30) {
+async function fetchJsonWithRetry(url, attempts = 90) {
   let lastError = null;
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     try {
@@ -310,7 +310,8 @@ async function fetchJsonWithRetry(url, attempts = 30) {
     }
     await delay(250);
   }
-  throw lastError || new Error(`Could not fetch ${url}`);
+  const reason = lastError instanceof Error ? lastError.message : String(lastError || "no response");
+  throw new Error(`Could not fetch ${url} after ${attempts} attempts: ${reason}`);
 }
 
 async function openCdpPage(port, baseUrl) {
