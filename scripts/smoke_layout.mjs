@@ -8,7 +8,7 @@ import { createServer } from "node:net";
 import { cookieHeaderFromSession } from "./smoke_frontend.mjs";
 
 const DEFAULT_BASE_URL = "https://roleforgeai.vercel.app";
-const VIEWPORTS = [390, 768, 1024, 1366, 1712];
+const VIEWPORTS = [390, 768, 1024, 1366, 1712, 1920];
 const PUBLIC_THEMES = ["light", "dark"];
 const PAGE_CHECKS = [
   {
@@ -21,8 +21,11 @@ const PAGE_CHECKS = [
     containedSelectors: [
       { container: ".hero-stage", selector: ".hero-stage .resume-card", tolerance: 8 },
       { container: ".hero-stage", selector: ".hero-badge", tolerance: 8 },
+      { container: ".dash-mock", selector: ".dash-mock .btn", tolerance: 4 },
       { container: ".cta-band", selector: ".cta-visual .resume-card", tolerance: 8 },
       { container: ".cta-band", selector: ".cta-band > div:first-child", tolerance: 4 },
+      { container: ".cta-band", selector: ".cta-band h2", tolerance: 4 },
+      { container: ".cta-band", selector: ".cta-band .cta-cluster", tolerance: 4 },
     ],
     selectors: [
       ".nav",
@@ -42,7 +45,10 @@ const PAGE_CHECKS = [
       ".hero-trust",
       ".hero-sub",
       ".dash-main-head .btn",
+      ".dash-mock .dash-stat-label",
       ".dash-stat-value",
+      ".dash-mock .dash-stat-delta",
+      ".dash-resume-actions .btn",
       ".price-card .btn",
       ".cta-band h2",
       ".cta-band p",

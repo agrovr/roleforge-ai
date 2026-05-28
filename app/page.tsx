@@ -66,9 +66,9 @@ function Hero({ studioHref }: Pick<LandingLinks, "studioHref">) {
           <span>AI-assisted resume tailoring for focused applications</span>
         </div>
         <h1 className="display h1">
-          The resume that{" "}<br />
+          <span className="hero-line">The resume that</span><br />
           <span className="italic underline-brand">actually fits</span>{" "}<br />
-          the role.
+          <span className="hero-line">the role.</span>
         </h1>
         <p className="hero-sub">
           Upload your resume, add a job target, review structure and keyword signals, then export a cleaner draft from the same guided workspace.

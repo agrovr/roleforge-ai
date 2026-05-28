@@ -12506,3 +12506,118 @@ body,
     transform: rotate(8deg) translate(62px, 28px);
   }
 }
+
+/* Last-pass containment for the surfaces users screenshot most often. Keep it
+   at the end so older responsive overrides cannot reopen clipped states. */
+.hero,
+.dash-mock,
+.cta-section,
+.settings-section {
+  min-width: 0;
+  overflow-x: clip;
+}
+
+.dash-mock {
+  width: min(100%, var(--container));
+}
+
+.dash-main-head,
+.dash-stat,
+.dash-resume-actions,
+.settings-profile-actions,
+.settings-billing-head,
+.settings-plan-active-card,
+.cta-band,
+.cta-band > div:first-child,
+.cta-cluster {
+  min-width: 0;
+}
+
+.dash-main-head .btn-sm,
+.dash-resume-actions .btn,
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button,
+.settings-billing-head .ghost-button,
+.settings-plan-active-card .settings-inline-link,
+.cta-band .btn {
+  max-width: 100%;
+  min-inline-size: 0;
+  overflow-wrap: normal;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.dash-mock .dash-stat {
+  justify-content: start;
+}
+
+.dash-mock .dash-stat-value {
+  margin-block: 10px 8px;
+}
+
+.hero-line {
+  display: inline-block;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+@media (min-width: 1181px) {
+  .cta-band {
+    grid-template-columns: minmax(0, 600px) minmax(300px, 430px);
+    justify-content: space-between;
+  }
+
+  .cta-band h2 {
+    max-width: min(100%, 13ch);
+    font-size: clamp(3.15rem, 4vw, 4.35rem);
+  }
+
+  .cta-visual {
+    justify-self: end;
+    overflow: hidden;
+  }
+}
+
+@media (min-width: 1501px) {
+  .hero {
+    grid-template-columns: minmax(0, 640px) minmax(0, 500px);
+    gap: clamp(34px, 3vw, 48px);
+  }
+
+  .hero-stage {
+    width: min(100%, 500px);
+  }
+
+  .hero .h1 {
+    font-size: clamp(3.85rem, 4.55vw, 4.75rem);
+    line-height: 1.06;
+  }
+
+  .cta-band {
+    padding-inline: clamp(56px, 5vw, 72px);
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1180px) {
+  .cta-band h2 {
+    font-size: clamp(2.9rem, 6.8vw, 4.1rem);
+  }
+
+  .cta-visual {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 900px) {
+  .dash-mock .dash-stat {
+    min-block-size: auto;
+  }
+
+  .cta-band {
+    overflow: hidden;
+  }
+
+  .hero-line {
+    white-space: normal;
+  }
+}
