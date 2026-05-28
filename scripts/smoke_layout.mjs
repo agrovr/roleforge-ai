@@ -5,6 +5,7 @@ import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createServer } from "node:net";
+import { cookieHeaderFromSession } from "./smoke_frontend.mjs";
 
 const DEFAULT_BASE_URL = "https://roleforgeai.vercel.app";
 const VIEWPORTS = [390, 768, 1024, 1366, 1712];
@@ -35,6 +36,35 @@ const PAGE_CHECKS = [
     path: "/login?next=%2Fapp&account=signin-required",
     name: "login",
     selectors: [".login-nav", ".login-panel", ".login-copy", ".login-card", ".studio-oauth-button"],
+  },
+  {
+    path: "/app",
+    name: "signed-in studio",
+    requiresAuth: true,
+    selectors: [
+      ".rf-studio-page",
+      ".rf-studio-topbar",
+      ".rf-studio-layout",
+      ".rf-studio-rail",
+      ".rf-studio-main",
+      ".rf-studio-hero",
+      ".rf-workflow-panel",
+      ".rf-live-card",
+    ],
+  },
+  {
+    path: "/settings",
+    name: "signed-in settings",
+    requiresAuth: true,
+    selectors: [
+      ".settings-page-shell",
+      ".settings-page-topbar",
+      ".settings-page-layout",
+      ".settings-page-nav",
+      ".settings-page-main",
+      ".settings-page-hero",
+      ".settings-section",
+    ],
   },
 ];
 
@@ -67,6 +97,11 @@ function parseArgs(argv) {
 
     if (name === "--require-chrome") {
       options.requireChrome = true;
+      continue;
+    }
+
+    if (name === "--require-signed-in-layout") {
+      options.requireSignedInLayout = true;
       continue;
     }
 
@@ -149,6 +184,54 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function readBooleanEnv(name) {
+  return ["1", "true", "yes"].includes((process.env[name] || "").trim().toLowerCase());
+}
+
+function firstNonEmptyEnv(...names) {
+  for (const name of names) {
+    const value = process.env[name]?.trim();
+    if (value) return value;
+  }
+  return "";
+}
+
+async function signInSmokeAccount() {
+  const cookieFromEnv = process.env.ROLEFORGE_SMOKE_COOKIE?.trim();
+  if (cookieFromEnv) return { cookie: cookieFromEnv, source: "ROLEFORGE_SMOKE_COOKIE" };
+
+  const supabaseUrl = firstNonEmptyEnv("ROLEFORGE_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_URL");
+  const supabaseKey = firstNonEmptyEnv(
+    "ROLEFORGE_SUPABASE_PUBLISHABLE_KEY",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+  );
+  const email = firstNonEmptyEnv("ROLEFORGE_SMOKE_EMAIL");
+  const password = firstNonEmptyEnv("ROLEFORGE_SMOKE_PASSWORD");
+
+  if (!email && !password) return null;
+  if (!email || !password) throw new Error("ROLEFORGE_SMOKE_EMAIL and ROLEFORGE_SMOKE_PASSWORD must be configured together");
+  if (!supabaseUrl) throw new Error("ROLEFORGE_SUPABASE_URL is required for signed-in layout smoke");
+  if (!supabaseKey) throw new Error("ROLEFORGE_SUPABASE_PUBLISHABLE_KEY is required for signed-in layout smoke");
+
+  const authUrl = new URL("/auth/v1/token", supabaseUrl);
+  authUrl.searchParams.set("grant_type", "password");
+  const response = await fetch(authUrl, {
+    method: "POST",
+    headers: {
+      "User-Agent": "RoleForge rendered layout smoke",
+      "Content-Type": "application/json",
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+    },
+    body: JSON.stringify({ email, password }),
+  });
+  const text = await response.text();
+  if (!response.ok) throw new Error(`Supabase smoke sign-in failed with ${response.status}: ${text.slice(0, 160)}`);
+
+  return { cookie: cookieHeaderFromSession(supabaseUrl, JSON.parse(text)), source: "ROLEFORGE_SMOKE_EMAIL/ROLEFORGE_SMOKE_PASSWORD" };
+}
+
 async function fetchJsonWithRetry(url, attempts = 30) {
   let lastError = null;
   for (let attempt = 0; attempt < attempts; attempt += 1) {
@@ -192,6 +275,7 @@ async function openCdpPage(port, baseUrl) {
   }
 
   await send("Page.enable");
+  await send("Network.enable");
   await send("Runtime.enable");
   await send("Emulation.setScrollbarsHidden", { hidden: true });
   await send("Page.navigate", { url: `${baseUrl}/` });
@@ -200,7 +284,8 @@ async function openCdpPage(port, baseUrl) {
   return { send, close: () => socket.close() };
 }
 
-async function evaluateLayout(send, baseUrl, page, width) {
+async function evaluateLayout(send, baseUrl, page, width, cookie) {
+  await send("Network.setExtraHTTPHeaders", { headers: cookie ? { Cookie: cookie } : {} });
   await send("Emulation.setDeviceMetricsOverride", {
     width,
     height: 1100,
@@ -266,6 +351,12 @@ async function main(argv = process.argv.slice(2)) {
   const args = parseArgs(argv);
   const baseUrl = normalizeBaseUrl(args.baseUrl || process.env.ROLEFORGE_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL);
   const chromePath = findChrome(args.chromePath);
+  const requireSignedInLayout = args.requireSignedInLayout ?? readBooleanEnv("ROLEFORGE_REQUIRE_SIGNED_IN_LAYOUT_SMOKE");
+  const signedInSession = await signInSmokeAccount();
+  if (signedInSession) pass(`signed-in layout smoke configured with ${signedInSession.source}`);
+  else if (requireSignedInLayout) throw new Error("Signed-in layout smoke requires ROLEFORGE_SMOKE_COOKIE or ROLEFORGE_SMOKE_EMAIL/ROLEFORGE_SMOKE_PASSWORD");
+  else skip("signed-in layout smoke skipped because smoke account credentials are not configured");
+
   const userDataDir = mkdtempSync(join(tmpdir(), "roleforge-layout-smoke-"));
   const port = await freePort();
   let chrome = null;
@@ -294,8 +385,9 @@ async function main(argv = process.argv.slice(2)) {
     try {
       const reports = [];
       for (const pageCheck of PAGE_CHECKS) {
+        if (pageCheck.requiresAuth && !signedInSession?.cookie) continue;
         for (const width of VIEWPORTS) {
-          const report = await evaluateLayout(page.send, baseUrl, pageCheck, width);
+          const report = await evaluateLayout(page.send, baseUrl, pageCheck, width, pageCheck.requiresAuth ? signedInSession.cookie : "");
           reports.push(report);
         }
       }
@@ -312,7 +404,8 @@ async function main(argv = process.argv.slice(2)) {
         throw new Error(`Rendered layout smoke found ${failures.length} issue(s): ${JSON.stringify(failures.slice(0, 8))}`);
       }
 
-      pass(`rendered layout smoke passed ${PAGE_CHECKS.length} pages across ${VIEWPORTS.length} viewport widths`);
+      const checkedPageCount = new Set(reports.map((report) => report.page)).size;
+      pass(`rendered layout smoke passed ${checkedPageCount} pages across ${VIEWPORTS.length} viewport widths`);
     } finally {
       page.close();
     }
