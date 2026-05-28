@@ -5,6 +5,35 @@ import { pathToFileURL } from "node:url";
 const DEFAULT_BASE_URL = "https://roleforgeai.vercel.app";
 const DEFAULT_BACKEND_URL = "https://roleforge-api-224015900616.us-central1.run.app";
 const SUPABASE_COOKIE_CHUNK_SIZE = 3180;
+const SMOKE_RESUME_TEXT = [
+  "Avery Stone",
+  "Product Operations Manager",
+  "avery@example.com",
+  "",
+  "Professional Summary",
+  "Product operations lead with experience organizing launch plans, improving handoffs, and turning stakeholder notes into clear execution steps.",
+  "",
+  "Experience",
+  "Project Lead, Operations",
+  "- Coordinated roadmap reviews across product, design, and engineering.",
+  "- Improved launch readiness with clearer risks, owners, and next steps.",
+].join("\n");
+const SMOKE_TAILORED_TEXT = [
+  "Avery Stone",
+  "Product Operations Manager",
+  "avery@example.com",
+  "",
+  "Professional Summary",
+  "Product operations lead with launch planning, stakeholder communication, and execution-readiness experience.",
+  "",
+  "Experience",
+  "Project Lead, Operations",
+  "- Coordinated roadmap reviews across product, design, and engineering teams.",
+  "- Improved launch readiness with clearer risks, owners, and next steps.",
+  "",
+  "Skills",
+  "Roadmapping, Launch Planning, Stakeholder Communication",
+].join("\n");
 
 function normalizeBaseUrl(value) {
   const raw = (value || DEFAULT_BASE_URL).trim().replace(/\/+$/, "");
@@ -34,6 +63,11 @@ export function parseSmokeArgs(argv) {
 
     if (name === "--expect-premium-access") {
       options.expectPremiumAccess = true;
+      continue;
+    }
+
+    if (name === "--require-backend-workflow-smoke") {
+      options.requireBackendWorkflowSmoke = true;
       continue;
     }
 
@@ -160,7 +194,7 @@ async function signInSmokeAccount() {
   const email = firstNonEmptyEnv("ROLEFORGE_SMOKE_EMAIL");
   const password = firstNonEmptyEnv("ROLEFORGE_SMOKE_PASSWORD");
 
-  if (!email && !password) return "";
+  if (!email && !password) return null;
   requireCondition(email && password, "ROLEFORGE_SMOKE_EMAIL and ROLEFORGE_SMOKE_PASSWORD must be configured together");
   requireCondition(supabaseUrl, "ROLEFORGE_SUPABASE_URL is required for smoke account sign-in");
   requireCondition(supabaseKey, "ROLEFORGE_SUPABASE_PUBLISHABLE_KEY is required for smoke account sign-in");
@@ -181,7 +215,10 @@ async function signInSmokeAccount() {
   requireCondition(result.ok, `Supabase smoke sign-in failed with ${result.status}: ${text.slice(0, 160)}`);
 
   const payload = JSON.parse(text);
-  return cookieHeaderFromSession(supabaseUrl, payload);
+  return {
+    accessToken: payload.access_token,
+    cookie: cookieHeaderFromSession(supabaseUrl, payload),
+  };
 }
 
 export function parseCookieHeader(cookie) {
@@ -227,14 +264,20 @@ export function mergeSetCookieHeaders(cookie, response) {
 async function requestAbsolute(url, options = {}) {
   const response = await fetch(url, {
     method: options.method || "GET",
+    body: options.body,
     redirect: options.redirect || "manual",
     headers: {
       "User-Agent": "RoleForge frontend smoke",
+      ...(options.cookie ? { Cookie: options.cookie } : {}),
       ...(options.headers || {}),
     },
   });
   const text = await response.text();
   return { response, text };
+}
+
+async function requestBackend(backendUrl, path, options = {}) {
+  return requestAbsolute(`${backendUrl}${path}`, options);
 }
 
 function requireCondition(condition, message) {
@@ -876,8 +919,170 @@ async function checkSignedInSavedProjectRoundTrip(baseUrl, cookie) {
   return signedInCookie;
 }
 
+export async function checkSignedInBackendWorkflowBridge(baseUrl, backendUrl, cookie, accessToken, options = {}) {
+  const requireBackendWorkflowSmoke = Boolean(options.requireBackendWorkflowSmoke);
+
+  if (!accessToken) {
+    requireCondition(
+      !requireBackendWorkflowSmoke,
+      "Backend workflow smoke requires ROLEFORGE_SMOKE_EMAIL/ROLEFORGE_SMOKE_PASSWORD or ROLEFORGE_SMOKE_ACCESS_TOKEN",
+    );
+    skip("backend workflow smoke skipped because no smoke access token is available");
+    return cookie;
+  }
+
+  let signedInCookie = cookie;
+  let createdProjectId = "";
+  let pendingError = null;
+
+  const uploadForm = new FormData();
+  uploadForm.set("file", new Blob([SMOKE_RESUME_TEXT], { type: "text/plain" }), "roleforge-smoke-resume.txt");
+
+  const upload = await requestBackend(backendUrl, "/upload", {
+    method: "POST",
+    body: uploadForm,
+    redirect: "follow",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  requireCondition(upload.response.ok, `backend smoke upload returned ${upload.response.status}: ${upload.text.slice(0, 160)}`);
+  const uploadPayload = JSON.parse(upload.text);
+  requireCondition(uploadPayload.resume_id, "backend smoke upload did not return a resume id");
+  requireCondition(uploadPayload.format === "txt", `backend smoke upload did not detect TXT: ${upload.text.slice(0, 160)}`);
+  requireCondition(uploadPayload.text_preview?.includes("Avery Stone"), "backend smoke upload preview did not include resume text");
+
+  const exportPayload = {
+    title: "RoleForge Smoke Resume",
+    filename: "roleforge-smoke-tailored-resume-engineer.pdf",
+    content: SMOKE_TAILORED_TEXT,
+    format: "pdf",
+    template: "engineer",
+  };
+  const exported = await requestBackend(backendUrl, "/export", {
+    method: "POST",
+    redirect: "follow",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(exportPayload),
+  });
+  requireCondition(exported.response.ok, `backend smoke export returned ${exported.response.status}: ${exported.text.slice(0, 160)}`);
+  const exportedPayload = JSON.parse(exported.text);
+  const downloadFilename = exportedPayload.download_filename || exportedPayload.filename;
+  requireCondition(
+    typeof downloadFilename === "string" && downloadFilename.endsWith(".pdf"),
+    `backend smoke export did not return a PDF filename: ${exported.text.slice(0, 160)}`,
+  );
+
+  const downloadUrl = `/api/workflow/download/${encodeURIComponent(downloadFilename)}`;
+  const proxiedHead = await request(baseUrl, downloadUrl, { method: "HEAD", cookie: signedInCookie, redirect: "follow" });
+  signedInCookie = mergeSetCookieHeaders(signedInCookie, proxiedHead.response);
+  requireCondition(proxiedHead.response.ok, `frontend workflow download HEAD returned ${proxiedHead.response.status}`);
+  requireCondition(
+    (proxiedHead.response.headers.get("content-type") || "").startsWith("application/pdf"),
+    `frontend workflow download HEAD was not PDF: ${proxiedHead.response.headers.get("content-type") || "(missing)"}`,
+  );
+
+  const proxiedDownload = await request(baseUrl, downloadUrl, { cookie: signedInCookie, redirect: "follow" });
+  signedInCookie = mergeSetCookieHeaders(signedInCookie, proxiedDownload.response);
+  requireCondition(proxiedDownload.response.ok, `frontend workflow download returned ${proxiedDownload.response.status}`);
+  requireCondition(
+    (proxiedDownload.response.headers.get("content-type") || "").startsWith("application/pdf"),
+    `frontend workflow download was not PDF: ${proxiedDownload.response.headers.get("content-type") || "(missing)"}`,
+  );
+  requireCondition(proxiedDownload.text.startsWith("%PDF"), "frontend workflow download did not return PDF bytes");
+
+  const smokeRun = buildSmokeSavedRunPayload({
+    id: `roleforge-smoke-workflow-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    filename: uploadPayload.filename || "roleforge-smoke-resume.txt",
+    sourceResumeName: uploadPayload.filename || "roleforge-smoke-resume.txt",
+    jobTarget: "RoleForge backend workflow smoke target",
+    roleHint: "RoleForge backend workflow smoke target",
+    score: 90,
+    atsScore: 92,
+    downloadUrl,
+    downloadFilename,
+    downloadFormat: "pdf",
+    payload: {
+      studioSnapshot: {
+        sourcePreviewText: uploadPayload.text_preview || SMOKE_RESUME_TEXT,
+        jdText: "RoleForge backend workflow smoke target",
+        inputMode: "text",
+        tailoringMode: "balanced",
+        downloadUrl,
+        downloadFormat: "pdf",
+        downloads: { pdf: downloadUrl },
+        templateSlug: "engineer",
+        templateName: "Engineer",
+        uploadMeta: {
+          resume_id: uploadPayload.resume_id,
+          filename: uploadPayload.filename || "roleforge-smoke-resume.txt",
+          format: uploadPayload.format || "txt",
+          character_count: uploadPayload.character_count || SMOKE_RESUME_TEXT.length,
+          text_preview: uploadPayload.text_preview || SMOKE_RESUME_TEXT,
+          text_preview_truncated: uploadPayload.text_preview_truncated === true,
+        },
+        result: {
+          run_id: `roleforge-smoke-workflow-${downloadFilename}`,
+          tailored_text: SMOKE_TAILORED_TEXT,
+          change_log: ["Smoke backend upload, export, protected download, and saved-project bridge"],
+          suggestions: [],
+          ats_before: { issues: [] },
+          ats_after: { issues: [] },
+        },
+      },
+    },
+  });
+
+  try {
+    const created = await request(baseUrl, "/api/saved-runs", {
+      cookie: signedInCookie,
+      method: "POST",
+      redirect: "follow",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(smokeRun),
+    });
+    signedInCookie = mergeSetCookieHeaders(signedInCookie, created.response);
+    requireCondition(created.response.ok, `backend workflow saved project create returned ${created.response.status}: ${created.text.slice(0, 160)}`);
+    const createdPayload = JSON.parse(created.text);
+    createdProjectId = createdPayload.projectId;
+    requireCondition(createdProjectId, "backend workflow saved project create did not return a project id");
+
+    const listed = await request(baseUrl, "/api/saved-runs", { cookie: signedInCookie, redirect: "follow" });
+    signedInCookie = mergeSetCookieHeaders(signedInCookie, listed.response);
+    requireCondition(listed.response.ok, `backend workflow saved project list returned ${listed.response.status}`);
+    const listedPayload = JSON.parse(listed.text);
+    const createdRun = listedPayload.runs?.find((run) => run.id === smokeRun.id || run.projectId === createdProjectId);
+    requireCondition(createdRun, "backend workflow saved project list did not include the smoke run");
+    requireCondition(createdRun.downloadUrl === downloadUrl, "backend workflow saved project did not preserve the protected download URL");
+    requireCondition(createdRun.snapshot?.result?.tailored_text === SMOKE_TAILORED_TEXT, "backend workflow saved project did not preserve the restorable tailored draft");
+  } catch (error) {
+    pendingError = error;
+  } finally {
+    if (createdProjectId) {
+      try {
+        const deleted = await request(baseUrl, `/api/saved-runs/${encodeURIComponent(createdProjectId)}`, {
+          cookie: signedInCookie,
+          method: "DELETE",
+          redirect: "follow",
+        });
+        signedInCookie = mergeSetCookieHeaders(signedInCookie, deleted.response);
+        requireCondition(deleted.response.ok, `backend workflow saved project delete returned ${deleted.response.status}: ${deleted.text.slice(0, 160)}`);
+      } catch (cleanupError) {
+        if (!pendingError) pendingError = cleanupError;
+        else console.error(`Backend workflow saved project cleanup failed: ${cleanupError instanceof Error ? cleanupError.message : String(cleanupError)}`);
+      }
+    }
+  }
+
+  if (pendingError) throw pendingError;
+
+  pass("signed-in backend workflow supports upload, PDF export, protected download proxy, and saved-project restore data");
+  return signedInCookie;
+}
+
 async function checkSignedInStatus(baseUrl, cookie, options) {
-  const { cookieSource, expectPremiumAccess, requireSignedInSmoke } = options;
+  const { accessToken, backendUrl, cookieSource, expectPremiumAccess, requireBackendWorkflowSmoke, requireSignedInSmoke } = options;
 
   if (!cookie) {
     requireCondition(!requireSignedInSmoke, "ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE requires ROLEFORGE_SMOKE_COOKIE or a dedicated ROLEFORGE_SMOKE_EMAIL/ROLEFORGE_SMOKE_PASSWORD account");
@@ -923,6 +1128,9 @@ async function checkSignedInStatus(baseUrl, cookie, options) {
   pass("signed-in saved projects API returns account runs");
 
   signedInCookie = await checkSignedInSavedProjectRoundTrip(baseUrl, signedInCookie);
+  signedInCookie = await checkSignedInBackendWorkflowBridge(baseUrl, backendUrl, signedInCookie, accessToken, {
+    requireBackendWorkflowSmoke,
+  });
 
   const settings = await request(baseUrl, "/settings", { cookie: signedInCookie, redirect: "follow" });
   requireCondition(settings.response.ok, `signed-in settings returned ${settings.response.status}`);
@@ -941,11 +1149,15 @@ async function main(argv = process.argv.slice(2)) {
     || (isLocalBaseUrl(baseUrl) ? process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_BASE_URL : baseUrl),
   );
   const cookieFromEnv = process.env.ROLEFORGE_SMOKE_COOKIE?.trim();
-  const cookieFromSmokeAccount = cookieFromEnv ? "" : await signInSmokeAccount();
+  const tokenFromEnv = process.env.ROLEFORGE_SMOKE_ACCESS_TOKEN?.trim();
+  const smokeAccount = cookieFromEnv ? null : await signInSmokeAccount();
+  const cookieFromSmokeAccount = smokeAccount?.cookie || "";
   const cookie = cookieFromEnv || cookieFromSmokeAccount;
+  const accessToken = tokenFromEnv || smokeAccount?.accessToken || "";
   const cookieSource = cookieFromEnv ? "ROLEFORGE_SMOKE_COOKIE" : cookieFromSmokeAccount ? "ROLEFORGE_SMOKE_EMAIL/ROLEFORGE_SMOKE_PASSWORD" : "";
   const requireSignedInSmoke = args.requireSignedInSmoke ?? readBooleanEnv("ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE");
   const expectPremiumAccess = args.expectPremiumAccess ?? readBooleanEnv("ROLEFORGE_EXPECT_PREMIUM_ACCESS");
+  const requireBackendWorkflowSmoke = args.requireBackendWorkflowSmoke ?? readBooleanEnv("ROLEFORGE_REQUIRE_BACKEND_WORKFLOW_SMOKE");
 
   try {
     await checkPublicShell(baseUrl);
@@ -956,7 +1168,14 @@ async function main(argv = process.argv.slice(2)) {
     await checkBillingWebhookGate(baseUrl);
     await checkCrawlerMetadata(baseUrl, canonicalUrl);
     await checkBackendCapabilities(backendUrl);
-    await checkSignedInStatus(baseUrl, cookie, { cookieSource, expectPremiumAccess, requireSignedInSmoke });
+    await checkSignedInStatus(baseUrl, cookie, {
+      accessToken,
+      backendUrl,
+      cookieSource,
+      expectPremiumAccess,
+      requireBackendWorkflowSmoke,
+      requireSignedInSmoke,
+    });
   } catch (error) {
     fail(error instanceof Error ? error.message : String(error));
   }

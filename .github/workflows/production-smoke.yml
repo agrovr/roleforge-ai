@@ -20,7 +20,7 @@ jobs:
           node-version: 22
 
       - name: Smoke live frontend
-        run: node scripts/smoke_frontend.mjs --require-signed-in-smoke
+        run: node scripts/smoke_frontend.mjs --require-signed-in-smoke --require-backend-workflow-smoke
         env:
           ROLEFORGE_SITE_URL: https://roleforgeai.vercel.app
           ROLEFORGE_BACKEND_URL: https://roleforge-api-224015900616.us-central1.run.app
