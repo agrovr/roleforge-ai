@@ -535,7 +535,7 @@ async function checkPublicShell(baseUrl) {
     "button icons can still squeeze action labels",
   );
   requireCondition(
-    /\.settings-profile-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*210px\),\s*1fr\)\))(?=[^}]*width:\s*min\(100%,\s*520px\))[^}]*\}/s.test(stylesheetText),
+    /\.settings-profile-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*190px\),\s*1fr\)\))(?=[^}]*width:\s*min\(100%,\s*460px\))[^}]*\}/s.test(stylesheetText),
     "settings profile actions can still crowd or over-expand adjacent buttons",
   );
   requireCondition(
@@ -547,7 +547,7 @@ async function checkPublicShell(baseUrl) {
     "settings account action buttons can still render cramped labels",
   );
   requireCondition(
-    /\.settings-billing-head\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*220px\),\s*auto\))(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText),
+    /\.settings-billing-head\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*190px\),\s*220px\))(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText),
     "settings billing header can still squeeze billing actions",
   );
   requireCondition(

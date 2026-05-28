@@ -11972,3 +11972,128 @@ body,
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Final visual QA pass for the launch surfaces. Keep wide editorial sections
+   centered and keep paired account/billing controls balanced at odd widths. */
+.cta-band {
+  margin-inline: auto;
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 300px), 430px);
+  padding: clamp(44px, 5vw, 64px);
+}
+
+.cta-band::before {
+  right: 0;
+  width: min(360px, 34%);
+}
+
+.cta-band .btn-ghost {
+  border-color: rgba(255, 247, 233, 0.38);
+  background: rgba(255, 253, 248, 0.94);
+  color: var(--ink-1);
+}
+
+.cta-band .btn-ghost:hover,
+.cta-band .btn-ghost:focus-visible {
+  border-color: rgba(255, 247, 233, 0.72);
+  background: #fffdf8;
+  color: var(--ink-0);
+}
+
+.settings-profile-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  width: min(100%, 460px);
+}
+
+.settings-profile-actions > .primary-button,
+.settings-profile-actions > .ghost-button,
+.settings-profile-actions > form {
+  width: 100%;
+  min-width: 0;
+}
+
+.settings-profile-actions > form {
+  display: flex;
+}
+
+.settings-billing-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 190px), 220px);
+  min-width: 0;
+}
+
+.settings-billing-head form {
+  width: 100%;
+  max-width: 220px;
+}
+
+@container settings-section (max-width: 760px) {
+  .settings-billing-head form {
+    max-width: none;
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 1120px) {
+  .cta-band {
+    grid-template-columns: 1fr;
+    gap: clamp(22px, 5vw, 34px);
+  }
+
+  .cta-band > div:first-child,
+  .cta-band h2,
+  .cta-band p {
+    max-width: 100%;
+  }
+
+  .cta-visual {
+    justify-self: stretch;
+    width: 100%;
+    min-height: clamp(230px, 36vw, 320px);
+  }
+
+  .cta-visual .resume-card {
+    right: auto;
+    left: 52%;
+    top: 2px;
+    transform: translateX(-16%) rotate(5deg);
+  }
+
+  .cta-visual .resume-card.back {
+    right: auto;
+    left: 52%;
+    transform: translateX(-76%) rotate(-8deg);
+  }
+}
+
+@media (max-width: 620px) {
+  .cta-band {
+    width: 100%;
+    padding: 34px 24px;
+    border-radius: 18px;
+  }
+
+  .cta-band h2 {
+    font-size: clamp(2.55rem, 14vw, 3.6rem);
+    line-height: 1.04;
+  }
+
+  .cta-band p {
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .cta-band .cta-cluster {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .cta-band .btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .cta-visual {
+    display: none;
+  }
+}
