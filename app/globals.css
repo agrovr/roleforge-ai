@@ -12097,3 +12097,97 @@ body,
     display: none;
   }
 }
+
+/* Landing/CTA responsive polish: keep the editorial resume art inside the
+   composed panel instead of letting rotated paper edges crowd the copy. */
+@media (min-width: 1181px) and (max-width: 1500px) {
+  .hero {
+    grid-template-columns: minmax(0, 0.98fr) minmax(360px, 0.82fr);
+    gap: clamp(28px, 3.2vw, 44px);
+  }
+
+  .hero-stage {
+    width: min(100%, 560px);
+    height: clamp(500px, 42vw, 560px);
+  }
+
+  .resume-card-front {
+    width: clamp(328px, 25vw, 356px);
+    height: clamp(452px, 34vw, 486px);
+  }
+
+  .resume-card-back-l {
+    width: clamp(260px, 20vw, 286px);
+    height: clamp(384px, 30vw, 410px);
+    transform: rotate(-9deg) translate(-88px, 22px);
+  }
+
+  .resume-card-back-r {
+    width: clamp(246px, 19vw, 270px);
+    height: clamp(370px, 29vw, 398px);
+    transform: rotate(7deg) translate(112px, 32px);
+  }
+
+  .cta-band {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.58fr);
+    gap: clamp(24px, 3.4vw, 42px);
+  }
+
+  .cta-visual {
+    width: min(100%, 390px);
+    min-height: 340px;
+    overflow: visible;
+  }
+
+  .cta-visual .resume-card {
+    right: 6px;
+    top: 0;
+    width: clamp(204px, 16vw, 238px);
+    height: clamp(304px, 23vw, 356px);
+  }
+
+  .cta-visual .resume-card.back {
+    right: clamp(96px, 9vw, 122px);
+    top: 34px;
+    width: clamp(178px, 14vw, 208px);
+    height: clamp(280px, 21vw, 334px);
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1180px) {
+  .cta-band {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .cta-band > div:first-child,
+  .cta-band h2,
+  .cta-band p {
+    max-width: 100%;
+  }
+
+  .cta-visual {
+    justify-self: stretch;
+    width: 100%;
+    min-height: clamp(270px, 32vw, 330px);
+    overflow: visible;
+  }
+
+  .cta-visual .resume-card {
+    right: auto;
+    left: 52%;
+    top: 0;
+    width: clamp(205px, 25vw, 252px);
+    height: clamp(304px, 38vw, 372px);
+    transform: translateX(-16%) rotate(5deg);
+  }
+
+  .cta-visual .resume-card.back {
+    right: auto;
+    left: 52%;
+    top: 30px;
+    width: clamp(180px, 21vw, 220px);
+    height: clamp(278px, 35vw, 344px);
+    transform: translateX(-76%) rotate(-8deg);
+  }
+}

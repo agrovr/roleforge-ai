@@ -9,6 +9,7 @@ import { cookieHeaderFromSession } from "./smoke_frontend.mjs";
 
 const DEFAULT_BASE_URL = "https://roleforgeai.vercel.app";
 const VIEWPORTS = [390, 768, 1024, 1366, 1712];
+const PUBLIC_THEMES = ["light", "dark"];
 const PAGE_CHECKS = [
   {
     path: "/",
@@ -25,6 +26,17 @@ const PAGE_CHECKS = [
       ".cta-band h2",
       ".cta-band .cta-cluster",
       ".footer-inner",
+    ],
+    textFitSelectors: [
+      ".hero .h1",
+      ".hero-trust",
+      ".hero-sub",
+      ".dash-main-head .btn",
+      ".dash-stat-value",
+      ".price-card .btn",
+      ".cta-band h2",
+      ".cta-band p",
+      ".cta-band .btn",
     ],
   },
   {
@@ -64,6 +76,14 @@ const PAGE_CHECKS = [
       ".settings-page-main",
       ".settings-page-hero",
       ".settings-section",
+    ],
+    textFitSelectors: [
+      ".settings-profile-row span",
+      ".settings-profile-actions .primary-button",
+      ".settings-profile-actions .ghost-button",
+      ".settings-billing-head .ghost-button",
+      ".settings-plan-active-card .settings-inline-link",
+      ".settings-section-copy h2",
     ],
   },
 ];
@@ -286,18 +306,25 @@ async function openCdpPage(port, baseUrl) {
 
 async function evaluateLayout(send, baseUrl, page, width, cookie) {
   await send("Network.setExtraHTTPHeaders", { headers: cookie ? { Cookie: cookie } : {} });
+  const themes = page.requiresAuth ? ["account"] : PUBLIC_THEMES;
+  const reports = [];
   await send("Emulation.setDeviceMetricsOverride", {
     width,
     height: 1100,
     deviceScaleFactor: 1,
     mobile: width < 700,
   });
-  await send("Page.navigate", { url: `${baseUrl}${page.path}` });
-  await delay(1800);
 
-  const expression = `(() => {
+  for (const theme of themes) {
+    const url = new URL(`${baseUrl}${page.path}`);
+    if (theme !== "account") url.searchParams.set("theme", theme);
+    await send("Page.navigate", { url: url.toString() });
+    await delay(1800);
+
+    const expression = `(() => {
     document.documentElement.style.scrollBehavior = "auto";
     const selectors = ${JSON.stringify(page.selectors)};
+    const textFitSelectors = ${JSON.stringify(page.textFitSelectors || [])};
     const failures = [];
     const viewportWidth = document.documentElement.clientWidth;
     const overflow = document.documentElement.scrollWidth - viewportWidth;
@@ -331,20 +358,48 @@ async function evaluateLayout(send, baseUrl, page, width, cookie) {
       });
     }
 
+    for (const selector of textFitSelectors) {
+      const elements = Array.from(document.querySelectorAll(selector));
+      elements.forEach((element, index) => {
+        const rect = element.getBoundingClientRect();
+        const style = window.getComputedStyle(element);
+        if (rect.width <= 0 || rect.height <= 0 || style.display === "none" || style.visibility === "hidden") return;
+
+        const inlineOverflow = element.scrollWidth - element.clientWidth;
+        const blockOverflow = element.scrollHeight - element.clientHeight;
+        const clipped = style.overflow === "hidden" || style.overflowX === "hidden" || style.overflowY === "hidden";
+        if (inlineOverflow > 3 || (clipped && blockOverflow > 3)) {
+          failures.push({
+            selector,
+            index,
+            reason: "text-clipped",
+            inlineOverflow: Math.round(inlineOverflow),
+            blockOverflow: Math.round(blockOverflow),
+            width: Math.round(rect.width),
+            height: Math.round(rect.height),
+            text: element.textContent.trim().replace(/\\s+/g, " ").slice(0, 80),
+          });
+        }
+      });
+    }
+
     return JSON.stringify({
       page: ${JSON.stringify(page.name)},
+      theme: ${JSON.stringify(theme)},
       width: window.innerWidth,
       overflow,
       failures,
     });
   })()`;
 
-  const result = await send("Runtime.evaluate", { expression, returnByValue: true });
-  if (result.error) throw new Error(result.error.message);
-  if (result.result.exceptionDetails) {
-    throw new Error(result.result.exceptionDetails.text || "Rendered layout evaluation failed");
+    const result = await send("Runtime.evaluate", { expression, returnByValue: true });
+    if (result.error) throw new Error(result.error.message);
+    if (result.result.exceptionDetails) {
+      throw new Error(result.result.exceptionDetails.text || "Rendered layout evaluation failed");
+    }
+    reports.push(JSON.parse(result.result.result.value));
   }
-  return JSON.parse(result.result.result.value);
+  return reports;
 }
 
 async function main(argv = process.argv.slice(2)) {
@@ -387,8 +442,9 @@ async function main(argv = process.argv.slice(2)) {
       for (const pageCheck of PAGE_CHECKS) {
         if (pageCheck.requiresAuth && !signedInSession?.cookie) continue;
         for (const width of VIEWPORTS) {
-          const report = await evaluateLayout(page.send, baseUrl, pageCheck, width, pageCheck.requiresAuth ? signedInSession.cookie : "");
-          reports.push(report);
+          reports.push(
+            ...(await evaluateLayout(page.send, baseUrl, pageCheck, width, pageCheck.requiresAuth ? signedInSession.cookie : "")),
+          );
         }
       }
 
@@ -397,7 +453,7 @@ async function main(argv = process.argv.slice(2)) {
         if (report.overflow > 1) {
           pageFailures.unshift({ reason: "document-overflow", overflow: report.overflow });
         }
-        return pageFailures.map((failure) => ({ ...failure, page: report.page, width: report.width }));
+        return pageFailures.map((failure) => ({ ...failure, page: report.page, theme: report.theme, width: report.width }));
       });
 
       if (failures.length) {
