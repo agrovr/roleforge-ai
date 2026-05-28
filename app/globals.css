@@ -5692,7 +5692,7 @@ html[data-theme="dark"] input::file-selector-button {
   font-size: clamp(2.25rem, 4vw, 3.65rem);
   font-weight: 650;
   letter-spacing: 0;
-  line-height: 0.96;
+  line-height: 1.06;
   max-width: min(100%, 24ch);
   width: 100%;
   overflow: hidden;
@@ -12201,22 +12201,22 @@ body,
 
 .dash-main-head .btn-sm {
   flex: 0 0 auto;
-  min-width: 172px;
-  white-space: nowrap;
+  min-width: min(100%, 160px);
+  white-space: normal;
 }
 
 .dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
 }
 
 .dash-mock .dash-stat {
-  min-block-size: 124px;
-  padding: clamp(14px, 2.7cqi, 18px);
+  min-block-size: 136px;
+  padding: clamp(16px, 3.2cqi, 20px);
 }
 
 .dash-mock .dash-stat-value {
-  font-size: clamp(1.22rem, 7.2cqi, 1.7rem);
-  line-height: 1.02;
+  font-size: clamp(1.12rem, 5.4cqi, 1.46rem);
+  line-height: 1.12;
   overflow-wrap: anywhere;
 }
 
@@ -12245,12 +12245,12 @@ body,
 .settings-billing-head .ghost-button {
   min-width: 0;
   padding-inline: 18px;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .settings-plan-active-card .settings-inline-link {
-  min-width: 168px;
-  white-space: nowrap;
+  min-width: min(100%, 156px);
+  white-space: normal;
 }
 
 @media (min-width: 1181px) and (max-width: 1500px) {
@@ -12266,38 +12266,38 @@ body,
 
   .hero-stage {
     justify-self: center;
-    width: min(100%, 520px);
-    height: clamp(450px, 38vw, 520px);
+    width: min(100%, 492px);
+    height: clamp(430px, 36vw, 500px);
   }
 
   .resume-card-front {
-    width: clamp(292px, 22vw, 336px);
-    height: clamp(420px, 31.5vw, 470px);
-    transform: rotate(-2deg) translateX(6px);
+    width: clamp(276px, 20vw, 316px);
+    height: clamp(398px, 29vw, 448px);
+    transform: rotate(-2deg) translateX(18px);
   }
 
   .resume-card-back-l {
-    width: clamp(236px, 17.5vw, 268px);
-    height: clamp(350px, 26vw, 390px);
-    transform: rotate(-9deg) translate(-76px, 24px);
+    width: clamp(222px, 16.5vw, 252px);
+    height: clamp(332px, 24.5vw, 372px);
+    transform: rotate(-8deg) translate(-56px, 26px);
   }
 
   .resume-card-back-r {
-    width: clamp(224px, 17vw, 252px);
-    height: clamp(340px, 25.5vw, 378px);
-    transform: rotate(7deg) translate(88px, 34px);
+    width: clamp(212px, 16vw, 238px);
+    height: clamp(322px, 24vw, 360px);
+    transform: rotate(6deg) translate(72px, 34px);
   }
 
   .hero-stage:hover .resume-card-front {
-    transform: rotate(-1deg) translate(6px, -6px);
+    transform: rotate(-1deg) translate(18px, -6px);
   }
 
   .hero-stage:hover .resume-card-back-l {
-    transform: rotate(-10deg) translate(-86px, 26px);
+    transform: rotate(-9deg) translate(-64px, 28px);
   }
 
   .hero-stage:hover .resume-card-back-r {
-    transform: rotate(8deg) translate(98px, 38px);
+    transform: rotate(7deg) translate(80px, 38px);
   }
 
   .b-score,
