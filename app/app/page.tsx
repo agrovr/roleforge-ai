@@ -20,6 +20,11 @@ import {
 import { buildWorkflowExportPayload } from "../lib/exportPayload";
 import { formatInterviewPrepForClipboard } from "../lib/generatedAssets";
 import {
+  derivePreviewPanelState,
+  previewStatusTone,
+  type PreviewMode,
+} from "../lib/previewPanel";
+import {
   RESUME_TEMPLATE_COOKIE,
   RESUME_TEMPLATE_STORAGE_KEY,
   getResumeTemplate,
@@ -139,7 +144,6 @@ type UploadResponse = {
 type ExportResponse = { saved_to: string; download_filename: string };
 type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error";
 type InputMode = "text" | "url";
-type PreviewMode = "tailored" | "original" | "diff";
 type HistoryFilter = "all" | "account" | "local";
 type PreviewUploadState = "idle" | "reading" | "ready" | "error";
 type DownloadState = "idle" | "checking" | "ready" | "expired";
@@ -224,10 +228,6 @@ function fileUploadKey(file: File | null) {
 function saveResumeTemplatePreference(slug: ResumeTemplateSlug) {
   window.localStorage.setItem(RESUME_TEMPLATE_STORAGE_KEY, slug);
   document.cookie = `${RESUME_TEMPLATE_COOKIE}=${encodeURIComponent(slug)}; Path=/; Max-Age=31536000; SameSite=Lax`;
-}
-
-function countReadableLines(text?: string) {
-  return (text ?? "").split(/\r?\n/).filter((line) => line.trim()).length;
 }
 
 function countReadableWords(text?: string) {
@@ -2450,39 +2450,31 @@ export default function Page() {
   const targetUrlPlaceholder = fileSelected
     ? "https://company.com/careers/job - add the role link next"
     : "https://company.com/careers/job";
-  const sourceLineCount = countReadableLines(sourcePreviewText);
-  const tailoredLineCount = countReadableLines(result?.tailored_text);
   const coverLetterWordCount = countReadableWords(coverLetterText);
   const interviewQuestionCount = interviewPrep.length;
-  const hasSourcePreview = Boolean(sourcePreviewText.trim());
-  const hasTailoredPreview = Boolean(result?.tailored_text?.trim());
   const hasGeneratedAssets = Boolean(coverLetterText || interviewQuestionCount);
   const restoredRunOpen = Boolean(restoredHistoryId);
-  const restoredSourceMissing = restoredRunOpen && hasTailoredPreview && !hasSourcePreview;
-  const sourcePreviewUnavailable = Boolean((uploadMeta || file) && previewUploadState === "ready" && !hasSourcePreview);
-  const sourcePreviewSample = isSourcePreviewSample(
-    sourcePreviewText,
-    uploadMeta?.character_count,
-    uploadMeta?.text_preview_truncated,
-  );
-  const previewTabState = {
-    tailored: hasTailoredPreview ? "Ready" : stage === "tailoring" ? "Running" : "Waiting",
-    original: hasSourcePreview
-      ? sourcePreviewSample
-        ? "Sample"
-        : "Ready"
-      : previewUploadState === "reading"
-        ? "Reading"
-        : sourcePreviewUnavailable || restoredSourceMissing
-          ? "Unavailable"
-          : "Waiting",
-    diff:
-      hasSourcePreview && hasTailoredPreview
-        ? "Ready"
-        : hasTailoredPreview
-          ? "Partial"
-          : "Waiting",
-  };
+  const previewPanelState = derivePreviewPanelState({
+    mode: previewMode,
+    stage,
+    uploadState: previewUploadState,
+    sourceText: sourcePreviewText,
+    tailoredText: result?.tailored_text,
+    sourceCharacterCount: uploadMeta?.character_count,
+    sourcePreviewTruncated: uploadMeta?.text_preview_truncated,
+    uploadFilename: uploadMeta?.filename ?? file?.name,
+    selectedTemplateName: selectedTemplate.name,
+    selectedDownloadFormat: downloadFormat,
+    downloadReady,
+    restoredRunOpen,
+    keywordTotal,
+    presentKeywordCount: presentKeywords.length,
+    changeLogCount: result?.change_log?.length ?? 0,
+  });
+  const sourcePreviewUnavailable = previewPanelState.sourcePreviewUnavailable;
+  const previewTabState = previewPanelState.tabState;
+  const previewTitle = previewPanelState.title;
+  const previewStatusItems = previewPanelState.statusItems;
 
   useEffect(() => {
     if (selectedExportFormat !== "pdf" && !selectedExportAllowed) {
@@ -2490,80 +2482,6 @@ export default function Page() {
       setExportNotice(null);
     }
   }, [selectedExportAllowed, selectedExportFormat]);
-  const previewTitle =
-    previewMode === "original"
-      ? sourcePreviewUnavailable
-        ? "Original resume · preview unavailable"
-        : restoredSourceMissing
-          ? "Original resume · source not saved"
-        : sourcePreviewSample
-          ? "Original resume · source sample"
-          : "Original resume · before tailoring"
-      : previewMode === "diff"
-        ? "Change notes · before export"
-        : hasTailoredPreview
-          ? "Tailored resume · AI edits applied"
-          : "Tailored resume · waiting for run";
-  const previewStatusItems =
-    previewMode === "original"
-      ? [
-          {
-            label: "Source",
-            value: hasSourcePreview
-              ? `${sourceLineCount || 1} source line${sourceLineCount === 1 ? "" : "s"} ${sourcePreviewSample ? "shown from sample" : "extracted"}`
-              : previewUploadState === "reading"
-                ? "Reading source document"
-                : previewUploadState === "error"
-                  ? "Source preview needs another try"
-                  : sourcePreviewUnavailable
-                    ? "Source preview unavailable"
-                    : restoredSourceMissing
-                      ? "Original source was not saved"
-                    : "Upload a resume to see the original",
-          },
-          { label: "File", value: uploadMeta?.filename ?? file?.name ?? "No source file selected" },
-          { label: "State", value: restoredRunOpen ? (hasSourcePreview ? "Restored run source" : "Tailored draft restored") : "Before AI edits" },
-        ]
-      : previewMode === "diff"
-        ? [
-            { label: "Original", value: hasSourcePreview ? "Original side ready" : restoredSourceMissing ? "Original side not saved" : "Original side waiting" },
-            { label: "Tailored", value: hasTailoredPreview ? "Tailored side ready" : "Tailored side waiting" },
-            { label: "Notes", value: result?.change_log?.length ? `${result.change_log.length} change note${result.change_log.length === 1 ? "" : "s"}` : "Change notes appear after a run" },
-          ]
-        : [
-            {
-              label: "Draft",
-              value: hasTailoredPreview
-                ? `${tailoredLineCount || 1} tailored line${tailoredLineCount === 1 ? "" : "s"} generated`
-                : stage === "tailoring"
-                  ? "Tailored draft is generating"
-                  : "Run Tailor to generate a draft",
-            },
-            { label: "Keywords", value: keywordTotal ? `${presentKeywords.length}/${keywordTotal} keywords matched` : "Run needed for keyword match" },
-            {
-              label: "Export",
-              value: restoredRunOpen
-                ? `${selectedTemplate.name} saved run open`
-                : downloadReady
-                  ? `${selectedTemplate.name} ${downloadFormat.toUpperCase()} ready`
-                  : `${selectedTemplate.name} direction selected`,
-            },
-          ];
-  const previewStatusTone = (value: string, index: number) => {
-    const normalized = value.toLowerCase();
-    return (previewUploadState === "error" && previewMode === "original" && index === 0) ||
-      normalized.includes("waiting") ||
-      normalized.includes("pending") ||
-      normalized.includes("unavailable") ||
-      normalized.includes("not saved") ||
-      normalized.includes("was not saved") ||
-      normalized.includes("needs another try") ||
-      normalized.includes("upload a resume") ||
-      normalized.includes("appear after a run") ||
-      normalized.includes("run tailor")
-      ? "warn"
-      : "";
-  };
   const generatedAssetSummary = [
     {
       label: "Letter",
@@ -3076,7 +2994,10 @@ export default function Page() {
                 >
                   <div className="rf-preview-status" aria-label="Preview status">
                     {previewStatusItems.map((item, index) => (
-                      <span className={previewStatusTone(item.value, index)} key={`${item.label}-${item.value}`}>
+                      <span
+                        className={previewStatusTone(item.value, { uploadState: previewUploadState, mode: previewMode, index })}
+                        key={`${item.label}-${item.value}`}
+                      >
                         <strong>{item.label}</strong>
                         {item.value}
                       </span>

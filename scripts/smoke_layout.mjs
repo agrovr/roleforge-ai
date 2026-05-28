@@ -14,6 +14,10 @@ const PAGE_CHECKS = [
   {
     path: "/",
     name: "landing",
+    noOverlapPairs: [
+      [".hero-copy", ".hero-stage"],
+      [".cta-band > div:first-child", ".cta-visual"],
+    ],
     selectors: [
       ".nav",
       ".hero",
@@ -325,6 +329,7 @@ async function evaluateLayout(send, baseUrl, page, width, cookie) {
     document.documentElement.style.scrollBehavior = "auto";
     const selectors = ${JSON.stringify(page.selectors)};
     const textFitSelectors = ${JSON.stringify(page.textFitSelectors || [])};
+    const noOverlapPairs = ${JSON.stringify(page.noOverlapPairs || [])};
     const failures = [];
     const viewportWidth = document.documentElement.clientWidth;
     const overflow = document.documentElement.scrollWidth - viewportWidth;
@@ -381,6 +386,28 @@ async function evaluateLayout(send, baseUrl, page, width, cookie) {
           });
         }
       });
+    }
+
+    for (const [leftSelector, rightSelector] of noOverlapPairs) {
+      const left = document.querySelector(leftSelector);
+      const right = document.querySelector(rightSelector);
+      if (!left || !right) continue;
+
+      const leftRect = left.getBoundingClientRect();
+      const rightRect = right.getBoundingClientRect();
+      const visible = leftRect.width > 0 && leftRect.height > 0 && rightRect.width > 0 && rightRect.height > 0;
+      const verticalOverlap = Math.max(0, Math.min(leftRect.bottom, rightRect.bottom) - Math.max(leftRect.top, rightRect.top));
+      const horizontalOverlap = Math.max(0, Math.min(leftRect.right, rightRect.right) - Math.max(leftRect.left, rightRect.left));
+      if (visible && verticalOverlap > 20 && horizontalOverlap > 2) {
+        failures.push({
+          selector: leftSelector + " / " + rightSelector,
+          reason: "overlap",
+          horizontalOverlap: Math.round(horizontalOverlap),
+          verticalOverlap: Math.round(verticalOverlap),
+          leftRight: Math.round(leftRect.right),
+          rightLeft: Math.round(rightRect.left),
+        });
+      }
     }
 
     return JSON.stringify({
