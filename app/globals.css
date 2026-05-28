@@ -11777,6 +11777,191 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   }
 }
 
+/* Visual QA guardrails: keep editorial display type and layered resume art
+   from pushing controls or copy outside the viewport at awkward zoom widths. */
+html,
+body,
+.page-shell,
+.settings-page-shell {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.section-inner,
+.templates-head,
+.footer-inner,
+.footer-meta {
+  max-width: min(var(--container), calc(100vw - 32px));
+}
+
+.dash-mock .dash-stat {
+  min-block-size: 128px;
+  padding: clamp(14px, 3.2cqi, 18px);
+}
+
+.dash-mock .dash-stat-value {
+  font-size: clamp(1.02rem, 3.6cqi, 1.32rem);
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.dash-mock .dash-stat-delta {
+  font-size: clamp(0.78rem, 2.6cqi, 0.9rem);
+}
+
+.settings-profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  width: min(100%, 500px);
+  gap: 10px;
+}
+
+.settings-profile-actions form {
+  flex: 1 1 144px;
+}
+
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button,
+.settings-billing-head .ghost-button,
+.settings-plan-active-card .settings-inline-link {
+  min-height: 46px;
+  padding-inline: 16px;
+  font-size: clamp(0.9rem, 1.45cqi, 0.98rem);
+  line-height: 1.12;
+}
+
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button {
+  width: 100%;
+}
+
+.settings-billing-head form {
+  justify-self: end;
+  width: min(100%, 190px);
+}
+
+.settings-billing-head .ghost-button {
+  min-width: 0;
+}
+
+.settings-plan-active-card .settings-inline-link {
+  flex: 0 1 160px;
+  min-width: min(100%, 140px);
+}
+
+@media (min-width: 1181px) and (max-width: 1320px) {
+  .hero {
+    grid-template-columns: minmax(0, 0.98fr) minmax(390px, 0.78fr);
+    gap: clamp(28px, 3vw, 42px);
+  }
+
+  .hero .h1 {
+    font-size: clamp(3.25rem, 5.05vw, 4.85rem);
+  }
+
+  .hero-stage {
+    width: min(100%, 540px);
+    height: clamp(500px, 43vw, 560px);
+  }
+
+  .resume-card-front {
+    width: 340px;
+    height: 468px;
+  }
+
+  .resume-card-back-l {
+    width: 278px;
+    height: 402px;
+    transform: rotate(-9deg) translate(-82px, 24px);
+  }
+
+  .resume-card-back-r {
+    width: 258px;
+    height: 386px;
+    transform: rotate(7deg) translate(104px, 34px);
+  }
+
+  .hero-stage:hover .resume-card-back-l {
+    transform: rotate(-10deg) translate(-96px, 26px);
+  }
+
+  .hero-stage:hover .resume-card-back-r {
+    transform: rotate(8deg) translate(118px, 38px);
+  }
+}
+
+@media (min-width: 981px) and (max-width: 1440px) {
+  .cta-section .section-inner {
+    width: min(100%, calc(100vw - 32px));
+    max-width: min(1240px, calc(100vw - 32px));
+  }
+
+  .cta-band {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
+    padding: clamp(36px, 5vw, 58px);
+  }
+
+  .cta-band > div:first-child {
+    max-width: min(100%, 720px);
+  }
+
+  .cta-band h2 {
+    max-width: min(100%, 18ch);
+  }
+
+  .cta-band p {
+    max-width: min(100%, 52ch);
+  }
+
+  .cta-visual {
+    justify-self: stretch;
+    width: 100%;
+    min-height: clamp(260px, 28vw, 350px);
+  }
+
+  .cta-visual .resume-card {
+    right: auto;
+    left: 52%;
+    top: 4px;
+    width: clamp(218px, 20vw, 276px);
+    height: clamp(320px, 30vw, 402px);
+    transform: translateX(-10%) rotate(5deg);
+  }
+
+  .cta-visual .resume-card.back {
+    right: auto;
+    left: 52%;
+    top: 34px;
+    width: clamp(188px, 17vw, 236px);
+    height: clamp(288px, 27vw, 372px);
+    transform: translateX(-72%) rotate(-8deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .section-inner,
+  .templates-head,
+  .footer-inner,
+  .footer-meta {
+    max-width: calc(100vw - 24px);
+  }
+
+  .settings-profile-actions,
+  .settings-profile-actions form,
+  .settings-billing-head form,
+  .settings-plan-active-card .settings-inline-link {
+    width: 100%;
+  }
+
+  .settings-profile-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
