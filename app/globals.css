@@ -11390,7 +11390,9 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   min-width: 0;
   max-width: 100%;
   text-align: center;
-  overflow-wrap: anywhere;
+  hyphens: none;
+  overflow-wrap: normal;
+  word-break: keep-all;
 }
 
 .dash-main {
@@ -11398,7 +11400,8 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 }
 
 .dash-mock {
-  max-width: min(100%, 1320px);
+  max-width: min(100%, 1240px);
+  overflow: hidden;
 }
 
 .dash-mock-body,
@@ -11410,7 +11413,7 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 }
 
 .dash-mock .dash-stats {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
 }
 
 .dash-stat {
@@ -11418,9 +11421,11 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 }
 
 .dash-stat-value {
-  font-size: clamp(1.18rem, 5.8cqi, 1.58rem);
-  line-height: 1.04;
+  font-size: clamp(1.06rem, 4.8cqi, 1.38rem);
+  line-height: 1.08;
   hyphens: none;
+  overflow-wrap: normal;
+  text-wrap: balance;
   word-break: normal;
 }
 
@@ -11435,11 +11440,14 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 }
 
 .cta-section .section-inner {
-  width: min(100%, 1320px);
+  width: min(100%, 1240px);
+  overflow: visible;
 }
 
 .cta-band {
+  width: min(100%, 1240px);
   max-width: 100%;
+  margin-inline: auto;
 }
 
 .cta-band h2 {
@@ -11465,20 +11473,31 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 .settings-inline-link {
   min-width: 0;
   max-width: 100%;
-  overflow-wrap: anywhere;
+  hyphens: none;
+  overflow-wrap: normal;
+  word-break: keep-all;
   white-space: normal;
 }
 
 .settings-profile-actions {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 176px), 1fr));
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  width: min(100%, 520px);
 }
 
 .settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 190px), auto);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 220px), auto);
+  min-width: 0;
 }
 
 .settings-billing-head .ghost-button {
-  min-width: min(100%, 190px);
+  min-width: min(100%, 220px);
+  width: 100%;
+  min-height: 50px;
+  line-height: 1.12;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .price-card .btn,
@@ -11489,6 +11508,7 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   min-height: 50px;
   line-height: 1.12;
   text-wrap: balance;
+  word-break: keep-all;
 }
 
 .price-card .btn {
@@ -11507,13 +11527,16 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 }
 
 .cta-section .section-inner {
-  width: min(100%, 1320px);
+  width: min(100%, 1240px);
+  overflow: visible;
 }
 
 .cta-band {
-  grid-template-columns: minmax(0, 0.92fr) minmax(0, 0.78fr);
+  width: min(100%, 1240px);
+  margin-inline: auto;
+  grid-template-columns: minmax(0, 0.96fr) minmax(280px, 0.68fr);
   gap: clamp(24px, 4vw, 48px);
-  padding: clamp(42px, 5vw, 72px);
+  padding: clamp(42px, 5vw, 68px) clamp(34px, 4.5vw, 62px);
 }
 
 .cta-band > div:first-child {
@@ -11521,8 +11544,8 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 }
 
 .cta-band h2 {
-  max-width: min(100%, 13ch);
-  font-size: clamp(2.55rem, 4.1vw, 4.25rem);
+  max-width: min(100%, 16ch);
+  font-size: clamp(2.35rem, 3.55vw, 3.82rem);
   overflow-wrap: normal;
   word-break: normal;
 }
@@ -11533,25 +11556,28 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
 .cta-visual {
   justify-self: center;
-  width: min(100%, 500px);
-  min-height: clamp(320px, 29vw, 390px);
+  width: min(100%, 430px);
+  min-width: 0;
+  max-width: 100%;
+  min-height: clamp(300px, 27vw, 360px);
+  overflow: hidden;
 }
 
 .cta-visual .resume-card {
-  right: clamp(18px, 3vw, 56px);
-  width: clamp(226px, 16vw, 278px);
-  height: clamp(334px, 23vw, 410px);
+  right: clamp(12px, 2vw, 34px);
+  width: clamp(214px, 15vw, 252px);
+  height: clamp(316px, 22vw, 372px);
 }
 
 .cta-visual .resume-card.back {
-  right: clamp(94px, 11vw, 154px);
-  width: clamp(196px, 13.5vw, 238px);
-  height: clamp(306px, 21vw, 382px);
+  right: clamp(100px, 10vw, 138px);
+  width: clamp(184px, 12.5vw, 218px);
+  height: clamp(286px, 20vw, 350px);
 }
 
 @container dash-main (min-width: 1120px) {
   .dash-mock .dash-stats {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(230px, 1fr));
   }
 }
 
@@ -11563,7 +11589,7 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
 @container dash-stat (max-width: 260px) {
   .dash-stat-value {
-    font-size: clamp(1.08rem, 5.2cqi, 1.32rem);
+    font-size: clamp(1rem, 4.8cqi, 1.2rem);
   }
 }
 
@@ -11572,6 +11598,21 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     grid-template-columns: 1fr;
   }
 
+  .settings-billing-head form,
+  .settings-billing-head .ghost-button {
+    width: 100%;
+  }
+}
+
+@container settings-section (max-width: 920px) {
+  .settings-profile-actions,
+  .settings-billing-head {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-profile-actions form,
+  .settings-profile-actions .primary-button,
+  .settings-profile-actions .ghost-button,
   .settings-billing-head form,
   .settings-billing-head .ghost-button {
     width: 100%;
@@ -11597,25 +11638,25 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   .cta-visual {
     justify-self: stretch;
     width: 100%;
-    min-height: clamp(250px, 46cqi, 340px);
+    min-height: clamp(260px, 48cqi, 360px);
   }
 
   .cta-visual .resume-card {
     right: auto;
     left: 50%;
     top: 6px;
-    width: clamp(218px, 44cqi, 282px);
-    height: clamp(310px, 64cqi, 410px);
-    transform: translateX(-26%) rotate(5deg);
+    width: clamp(210px, 42cqi, 270px);
+    height: clamp(304px, 62cqi, 392px);
+    transform: translateX(-18%) rotate(5deg);
   }
 
   .cta-visual .resume-card.back {
     right: auto;
     left: 50%;
     top: 34px;
-    width: clamp(188px, 38cqi, 242px);
-    height: clamp(290px, 58cqi, 386px);
-    transform: translateX(-82%) rotate(-8deg);
+    width: clamp(178px, 36cqi, 230px);
+    height: clamp(278px, 56cqi, 368px);
+    transform: translateX(-76%) rotate(-8deg);
   }
 }
 

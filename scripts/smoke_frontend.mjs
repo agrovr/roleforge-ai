@@ -424,11 +424,11 @@ async function checkPublicShell(baseUrl) {
   requireCondition(stylesheetText.includes(".dash-stat-value"), "landing dashboard stat styles were missing");
   requireCondition(/\.dash-mock\s*\{(?=[^}]*container-type:\s*inline-size)[^}]*\}/s.test(stylesheetText), "landing dashboard mock was missing container sizing");
   requireCondition(/\.dash-main\s*\{(?=[^}]*container:\s*dash-main\s*\/\s*inline-size)[^}]*\}/s.test(stylesheetText), "landing dashboard main column was missing named container sizing");
-  requireCondition(/\.dash-stats\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*210px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "landing dashboard stats can still squeeze cards at desktop widths");
+  requireCondition(/\.dash-mock\s+\.dash-stats\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*230px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "landing dashboard stats can still squeeze cards at desktop widths");
   requireCondition(/@container\s+dash-main\s*\(max-width:\s*1260px\)\s*\{[^}]*\.dash-stats\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s.test(stylesheetText), "landing dashboard stats do not collapse to two columns before cramped widths");
   requireCondition(/@container\s+dash-main\s*\(max-width:\s*460px\)\s*\{[^}]*\.dash-stats\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText), "landing dashboard stats do not collapse to one column on narrow widths");
   requireCondition(/\.dash-stat-value\s*\{(?=[^}]*font-size:\s*clamp\(1\.36rem,\s*4\.2cqi,\s*1\.72rem\))(?=[^}]*hyphens:\s*auto)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "landing dashboard stat values are not using overflow-safe fitted type");
-  requireCondition(/\.dash-stat-value\s*\{(?=[^}]*font-size:\s*clamp\(1\.18rem,\s*5\.8cqi,\s*1\.58rem\))(?=[^}]*line-height:\s*1\.04)(?=[^}]*hyphens:\s*none)(?=[^}]*word-break:\s*normal)[^}]*\}/s.test(stylesheetText), "landing dashboard stat values are missing the final fitted-type override");
+  requireCondition(/\.dash-stat-value\s*\{(?=[^}]*font-size:\s*clamp\(1\.06rem,\s*4\.8cqi,\s*1\.38rem\))(?=[^}]*line-height:\s*1\.08)(?=[^}]*hyphens:\s*none)(?=[^}]*overflow-wrap:\s*normal)(?=[^}]*word-break:\s*normal)[^}]*\}/s.test(stylesheetText), "landing dashboard stat values are missing the final fitted-type override");
   requireCondition(/@container\s+dash-stat\s*\(max-width:\s*310px\)\s*\{[^}]*\.dash-stat-value\s*\{[^}]*font-size:\s*clamp\(1\.26rem,\s*7\.6cqi,\s*1\.56rem\)/s.test(stylesheetText), "landing dashboard stat values are missing fitted type for medium cards");
   requireCondition(/@container\s+dash-stat\s*\(max-width:\s*250px\)\s*\{[^}]*\.dash-stat-value\s*\{[^}]*font-size:\s*clamp\(1\.18rem,\s*9\.5cqi,\s*1\.4rem\)/s.test(stylesheetText), "landing dashboard stat values are missing fitted type for compact cards");
   requireCondition(/@container\s+dash-stat\s*\(max-width:\s*210px\)\s*\{[^}]*\.dash-stat-value\s*\{[^}]*font-size:\s*clamp\(1\.08rem,\s*9cqi,\s*1\.25rem\)/s.test(stylesheetText), "landing dashboard stat values are missing fitted type for cramped cards");
@@ -469,12 +469,12 @@ async function checkPublicShell(baseUrl) {
 
   requireCondition(/\.cta-band\s*\{(?=[^}]*container:\s*cta-band\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*width:\s*100%)(?=[^}]*margin-left:\s*0)(?=[^}]*isolation:\s*isolate)[^}]*\}/s.test(stylesheetText), "landing final CTA can still overflow its container");
   requireCondition(/\.cta-band\s*>\s*\*\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "landing final CTA children can still force overflow");
-  requireCondition(/\.cta-section\s+\.section-inner\s*\{(?=[^}]*width:\s*min\(100%\s*,\s*1320px\))[^}]*\}/s.test(stylesheetText), "landing final CTA section still uses unsafe full-bleed padding math");
+  requireCondition(/\.cta-section\s+\.section-inner\s*\{(?=[^}]*width:\s*min\(100%\s*,\s*1240px\))(?=[^}]*overflow:\s*visible)[^}]*\}/s.test(stylesheetText), "landing final CTA section still uses unsafe full-bleed padding math");
   requireCondition(/\.cta-band\s+\.btn\s*\{(?=[^}]*flex:\s*(?:1\s+1\s+)?184px)(?=[^}]*min-width:\s*min\(100%,\s*164px\))(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "landing final CTA buttons can still render cramped labels");
-  requireCondition(/\.cta-visual\s*\{(?=[^}]*(?:justify-self:\s*end|place-self:\s*center\s+end))(?=[^}]*width:\s*min\(100%\s*,\s*560px\))(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "landing final CTA visual can still spill out");
+  requireCondition(/\.cta-visual\s*\{(?=[^}]*(?:justify-self:\s*center|justify-self:\s*end|place-self:\s*center\s+end))(?=[^}]*width:\s*min\(100%\s*,\s*430px\))(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "landing final CTA visual can still spill out");
   requireCondition(/@container\s+cta-band\s*\(max-width:\s*980px\)\s*\{[\s\S]*?\.cta-band\s*\{(?=[^}]*grid-template-columns:\s*1fr)(?=[^}]*padding:\s*clamp\(28px,\s*5cqi,\s*48px\))[^}]*\}/s.test(stylesheetText), "landing final CTA is missing container-based tablet stacking");
-  requireCondition(/@container\s+cta-band\s*\(max-width:\s*980px\)\s*\{[\s\S]*?\.cta-visual\s+\.resume-card\s*\{(?=[^}]*left:\s*50%)(?=[^}]*transform:\s*translate(?:X)?\(-26%\)\s*rotate\(5deg\))[^}]*\}/s.test(stylesheetText), "landing final CTA front resume art can still clip on tablet widths");
-  requireCondition(/@container\s+cta-band\s*\(max-width:\s*980px\)\s*\{[\s\S]*?\.cta-visual\s+\.resume-card\.back\s*\{(?=[^}]*left:\s*50%)(?=[^}]*transform:\s*translate(?:X)?\(-82%\)\s*rotate\(-8deg\))[^}]*\}/s.test(stylesheetText), "landing final CTA back resume art can still clip on tablet widths");
+  requireCondition(/@container\s+cta-band\s*\(max-width:\s*980px\)\s*\{[\s\S]*?\.cta-visual\s+\.resume-card\s*\{(?=[^}]*left:\s*50%)(?=[^}]*transform:\s*translate(?:X)?\(-18%\)\s*rotate\(5deg\))[^}]*\}/s.test(stylesheetText), "landing final CTA front resume art can still clip on tablet widths");
+  requireCondition(/@container\s+cta-band\s*\(max-width:\s*980px\)\s*\{[\s\S]*?\.cta-visual\s+\.resume-card\.back\s*\{(?=[^}]*left:\s*50%)(?=[^}]*transform:\s*translate(?:X)?\(-76%\)\s*rotate\(-8deg\))[^}]*\}/s.test(stylesheetText), "landing final CTA back resume art can still clip on tablet widths");
   requireCondition(/@media\s*\(max-width:\s*900px\)[\s\S]*?\.cta-band\s*\{(?=[^}]*width:\s*min\(100%,\s*(?:calc\()?100vw\s*-\s*32px\)?\))(?=[^}]*margin-left:\s*0)(?=[^}]*padding:\s*44px\s+28px)[^}]*\}/.test(stylesheetText), "landing final CTA is missing tablet containment");
   requireCondition(/@media\s*\(max-width:\s*620px\)[\s\S]*?\.cta-band\s+\.cta-cluster\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*1fr)[^}]*\}/.test(stylesheetText), "landing final CTA buttons are missing narrow stacking");
   requireCondition(/\.footer-inner\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "footer columns can still force overflow");
@@ -527,7 +527,7 @@ async function checkPublicShell(baseUrl) {
     "button icons can still squeeze action labels",
   );
   requireCondition(
-    /\.settings-profile-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*158px\),\s*1fr\)\))(?=[^}]*width:\s*min\(100%,\s*460px\))[^}]*\}/s.test(stylesheetText),
+    /\.settings-profile-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*210px\),\s*1fr\)\))(?=[^}]*width:\s*min\(100%,\s*520px\))[^}]*\}/s.test(stylesheetText),
     "settings profile actions can still crowd or over-expand adjacent buttons",
   );
   requireCondition(
@@ -539,7 +539,7 @@ async function checkPublicShell(baseUrl) {
     "settings account action buttons can still render cramped labels",
   );
   requireCondition(
-    /\.settings-billing-head\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*170px\),\s*auto\))(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText),
+    /\.settings-billing-head\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*220px\),\s*auto\))(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText),
     "settings billing header can still squeeze billing actions",
   );
   requireCondition(
@@ -547,7 +547,7 @@ async function checkPublicShell(baseUrl) {
     "settings billing form can still collapse the manage billing button",
   );
   requireCondition(
-    /\.settings-billing-head\s+\.ghost-button\s*\{(?=[^}]*min-width:\s*min\(100%,\s*170px\))(?=[^}]*min-height:\s*48px)(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)(?=[^}]*width:\s*100%)[^}]*\}/s.test(stylesheetText),
+    /\.settings-billing-head\s+\.ghost-button\s*\{(?=[^}]*min-width:\s*min\(100%,\s*220px\))(?=[^}]*min-height:\s*50px)(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)(?=[^}]*width:\s*100%)[^}]*\}/s.test(stylesheetText),
     "settings billing action button can still render cramped labels",
   );
   requireCondition(
@@ -557,6 +557,10 @@ async function checkPublicShell(baseUrl) {
   requireCondition(
     /@container\s*\(max-width:\s*430px\)\s*\{[\s\S]*?\.settings-profile-actions,\s*\.settings-billing-head,\s*\.settings-export-actions\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText),
     "settings controls are missing compact container stacking",
+  );
+  requireCondition(
+    /@container\s+settings-section\s*\(max-width:\s*920px\)\s*\{[\s\S]*?\.settings-profile-actions,\s*\.settings-billing-head\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText),
+    "settings actions are missing earlier stacking for medium panels",
   );
   pass("settings action buttons include spacing and wrap safeguards");
 
