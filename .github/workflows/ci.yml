@@ -49,7 +49,7 @@ jobs:
 
       - name: Smoke production shell
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: npm run smoke:frontend
+        run: npm run smoke:frontend -- --require-signed-in-smoke
         env:
           ROLEFORGE_BACKEND_URL: https://roleforge-api-224015900616.us-central1.run.app
           ROLEFORGE_SMOKE_COOKIE: ${{ secrets.ROLEFORGE_SMOKE_COOKIE }}
