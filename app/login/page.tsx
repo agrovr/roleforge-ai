@@ -106,8 +106,8 @@ export default async function LoginPage({ searchParams }: { searchParams: LoginS
             </>
           ) : (
             <div className="login-disabled">
-              <strong>Sign-in is unavailable right now.</strong>
-              <p>The public site is available, but the protected studio cannot open from here yet.</p>
+              <strong>Sign-in is temporarily unavailable.</strong>
+              <p>The public site is available. Please try opening the protected studio again shortly.</p>
             </div>
           )}
         </div>

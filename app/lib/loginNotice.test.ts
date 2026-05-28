@@ -12,7 +12,7 @@ test("formats login status notices for auth redirects", () => {
 });
 
 test("treats missing auth configuration as an error notice", () => {
-  assert.equal(loginNoticeCopy("account-not-configured"), "Sign-in is unavailable right now. Try again shortly.");
+  assert.equal(loginNoticeCopy("account-not-configured"), "Sign-in is temporarily unavailable. Try again shortly.");
   assert.equal(loginNoticeTone("account-not-configured"), "error");
 });
 

@@ -31,7 +31,7 @@ export async function POST(request: Request) {
   const serviceSupabase = createRoleForgeServiceClient();
 
   if (!stripe || !billingConfig.checkoutConfigured || !serviceSupabase) {
-    return NextResponse.json({ error: "Billing is not configured yet." }, { status: 503 });
+    return NextResponse.json({ error: "Billing is temporarily unavailable. Try again shortly." }, { status: 503 });
   }
 
   const formData = await request.formData();

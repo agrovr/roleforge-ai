@@ -828,7 +828,7 @@ function accountNoticeLabel(value: string, detail = "") {
     case "signed-out":
       return "You are signed out.";
     case "account-not-configured":
-      return "Sign-in is unavailable right now.";
+      return "Sign-in is temporarily unavailable.";
     case "signin-error":
       if (safeDetail) return `Sign-in could not finish: ${safeDetail}`;
       return "Sign-in could not start. Check the email and try again.";
@@ -2897,8 +2897,8 @@ export default function Page() {
                     </>
                   ) : (
                     <>
-                      <strong>Sign-in unavailable</strong>
-                      <p>Account access is unavailable right now.</p>
+                      <strong>Sign-in temporarily unavailable</strong>
+                      <p>Account access is taking a moment. Try again shortly.</p>
                     </>
                   )}
                   <div className="studio-account-list">

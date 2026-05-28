@@ -62,3 +62,11 @@ test("prioritizes account, usage, and busy blockers", () => {
   assert.equal(tailorActionState({ ...readyInput, busy: true }).label, "Tailoring...");
   assert.equal(tailorActionState({ ...readyInput, readingResume: true }).label, "Reading resume...");
 });
+
+test("uses customer-facing copy when tailoring is temporarily unavailable", () => {
+  assert.deepEqual(tailorActionState({ ...readyInput, backendReady: false }), {
+    canRun: false,
+    label: "Run Tailor",
+    disabledReason: "Resume tailoring is temporarily unavailable. Try again shortly.",
+  });
+});

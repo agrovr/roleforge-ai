@@ -95,6 +95,6 @@ export function tailorActionState(input: TailorActionInput): TailorActionState {
   return {
     canRun,
     label: "Run Tailor",
-    disabledReason: canRun ? "" : input.backendReady ? "Complete the required fields before running Tailor." : "Resume tailoring is unavailable right now.",
+    disabledReason: canRun ? "" : input.backendReady ? "Complete the required fields before running Tailor." : "Resume tailoring is temporarily unavailable. Try again shortly.",
   };
 }

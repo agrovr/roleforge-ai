@@ -11382,6 +11382,209 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   }
 }
 
+/* Responsive guardrails for the editorial UI. These keep big display type,
+   action buttons, and layered resume art from colliding at awkward widths. */
+.btn,
+.primary-button,
+.ghost-button {
+  min-width: 0;
+  max-width: 100%;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.dash-main {
+  overflow: hidden;
+}
+
+.dash-stat {
+  min-inline-size: 0;
+}
+
+.dash-stat-value {
+  font-size: clamp(1.28rem, 9cqi, 1.68rem);
+  line-height: 1.06;
+  word-break: keep-all;
+}
+
+.dash-stat-label,
+.dash-stat-delta {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.cta-section {
+  overflow-x: clip;
+}
+
+.cta-section .section-inner {
+  width: min(100%, 1320px);
+}
+
+.cta-band {
+  max-width: 100%;
+}
+
+.cta-band h2 {
+  max-width: min(100%, 14ch);
+}
+
+.cta-visual {
+  contain: paint;
+}
+
+.settings-billing-head,
+.settings-profile-actions,
+.settings-plan-active-card,
+.settings-export-actions {
+  min-width: 0;
+}
+
+.settings-billing-head .ghost-button,
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button,
+.settings-plan-active-card .settings-inline-link,
+.settings-export-actions .btn,
+.settings-inline-link {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+@container cta-band (max-width: 980px) {
+  .cta-band {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: clamp(28px, 5cqi, 48px);
+  }
+
+  .cta-band > div:first-child {
+    max-width: 100%;
+  }
+
+  .cta-band h2 {
+    max-width: 15ch;
+    font-size: clamp(2.65rem, 10cqi, 4.2rem);
+  }
+
+  .cta-visual {
+    justify-self: stretch;
+    width: 100%;
+    min-height: clamp(250px, 46cqi, 340px);
+  }
+
+  .cta-visual .resume-card {
+    right: auto;
+    left: 50%;
+    top: 6px;
+    width: clamp(218px, 44cqi, 282px);
+    height: clamp(310px, 64cqi, 410px);
+    transform: translateX(-26%) rotate(5deg);
+  }
+
+  .cta-visual .resume-card.back {
+    right: auto;
+    left: 50%;
+    top: 34px;
+    width: clamp(188px, 38cqi, 242px);
+    height: clamp(290px, 58cqi, 386px);
+    transform: translateX(-82%) rotate(-8deg);
+  }
+}
+
+@container dash-main (max-width: 720px) {
+  .dash-main {
+    gap: 18px;
+    padding: clamp(18px, 4cqi, 26px);
+  }
+
+  .dash-main-head {
+    align-items: stretch;
+  }
+
+  .dash-main-head .btn-sm {
+    width: 100%;
+  }
+
+  .dash-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container dash-main (max-width: 500px) {
+  .dash-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@container settings-section (max-width: 620px) {
+  .settings-billing-head {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-billing-head form,
+  .settings-billing-head .ghost-button,
+  .settings-plan-active-card .settings-inline-link {
+    width: 100%;
+  }
+
+  .settings-plan-active-card {
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 1180px) {
+  .hero-stage {
+    max-width: calc(100vw - 40px);
+  }
+}
+
+@media (max-width: 720px) {
+  .hero-stage {
+    height: clamp(340px, 86vw, 460px);
+  }
+
+  .resume-card-front {
+    width: min(300px, 76vw);
+    height: min(430px, 110vw);
+  }
+
+  .hero-badge {
+    min-width: 0;
+    max-width: min(220px, 70vw);
+    padding: 10px 12px;
+    font-size: 0.8rem;
+  }
+
+  .hero-badge .b-icon {
+    width: 31px;
+    height: 31px;
+  }
+
+  .b-score {
+    right: 8px;
+  }
+
+  .b-keyword {
+    right: 8px;
+    bottom: 76px;
+  }
+
+  .b-ats {
+    left: 8px;
+    bottom: 18px;
+  }
+
+  .cta-band h2 {
+    max-width: 100%;
+  }
+
+  .cta-visual {
+    min-height: 230px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

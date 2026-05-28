@@ -30,7 +30,7 @@ async function requireDownloadSession() {
 
   if (!routeClient) {
     return {
-      error: NextResponse.json({ error: "Account access is unavailable right now." }, { status: 503 }),
+      error: NextResponse.json({ error: "Account access is temporarily unavailable. Try again shortly." }, { status: 503 }),
     };
   }
 
@@ -61,7 +61,7 @@ async function proxyDownload(request: Request, context: DownloadContext) {
 
   if (!baseUrl) {
     return withSupabaseCookies(
-      NextResponse.json({ error: "Downloads are unavailable right now." }, { status: 503 }),
+      NextResponse.json({ error: "Downloads are temporarily unavailable. Try again shortly." }, { status: 503 }),
       account.routeClient.cookiesToSet,
     );
   }

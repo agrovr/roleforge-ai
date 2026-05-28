@@ -9,7 +9,7 @@ export function loginNoticeCopy(account: string | undefined) {
     case "signed-out":
       return "You are signed out.";
     case "account-not-configured":
-      return "Sign-in is unavailable right now. Try again shortly.";
+      return "Sign-in is temporarily unavailable. Try again shortly.";
     case "signin-error":
       return "Sign-in could not finish. Try Google or send a new email link.";
     default:
