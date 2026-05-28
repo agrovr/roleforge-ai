@@ -18,6 +18,12 @@ const PAGE_CHECKS = [
       [".hero-copy", ".hero-stage"],
       [".cta-band > div:first-child", ".cta-visual"],
     ],
+    containedSelectors: [
+      { container: ".hero-stage", selector: ".hero-stage .resume-card", tolerance: 8 },
+      { container: ".hero-stage", selector: ".hero-badge", tolerance: 8 },
+      { container: ".cta-band", selector: ".cta-visual .resume-card", tolerance: 8 },
+      { container: ".cta-band", selector: ".cta-band > div:first-child", tolerance: 4 },
+    ],
     selectors: [
       ".nav",
       ".hero",
@@ -373,6 +379,7 @@ async function evaluateLayout(send, baseUrl, page, width, cookie) {
     const selectors = ${JSON.stringify(page.selectors)};
     const textFitSelectors = ${JSON.stringify(page.textFitSelectors || [])};
     const noOverlapPairs = ${JSON.stringify(page.noOverlapPairs || [])};
+    const containedSelectors = ${JSON.stringify(page.containedSelectors || [])};
     const failures = [];
     const viewportWidth = document.documentElement.clientWidth;
     const overflow = document.documentElement.scrollWidth - viewportWidth;
@@ -451,6 +458,40 @@ async function evaluateLayout(send, baseUrl, page, width, cookie) {
           rightLeft: Math.round(rightRect.left),
         });
       }
+    }
+
+    for (const rule of containedSelectors) {
+      const container = document.querySelector(rule.container);
+      if (!container) continue;
+
+      const containerRect = container.getBoundingClientRect();
+      const tolerance = Number(rule.tolerance || 0);
+      const elements = Array.from(document.querySelectorAll(rule.selector));
+      elements.forEach((element, index) => {
+        const rect = element.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+        const outside =
+          rect.left < containerRect.left - tolerance ||
+          rect.right > containerRect.right + tolerance ||
+          rect.top < containerRect.top - tolerance ||
+          rect.bottom > containerRect.bottom + tolerance;
+        if (outside) {
+          failures.push({
+            selector: rule.selector,
+            container: rule.container,
+            index,
+            reason: "contained-overflow",
+            left: Math.round(rect.left),
+            right: Math.round(rect.right),
+            top: Math.round(rect.top),
+            bottom: Math.round(rect.bottom),
+            containerLeft: Math.round(containerRect.left),
+            containerRight: Math.round(containerRect.right),
+            containerTop: Math.round(containerRect.top),
+            containerBottom: Math.round(containerRect.bottom),
+          });
+        }
+      });
     }
 
     return JSON.stringify({

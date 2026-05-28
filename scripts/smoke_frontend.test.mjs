@@ -159,8 +159,14 @@ test("backend workflow smoke bridges backend export through protected frontend d
       assert.equal(options.method, "POST");
       assert.equal(options.headers.Authorization, "Bearer access-token");
       const payload = JSON.parse(options.body);
-      assert.equal(payload.format, "pdf");
       assert.equal(payload.template, "engineer");
+      if (payload.format === "docx" || payload.format === "txt") {
+        return new Response(JSON.stringify({ error: { code: "premium_required" } }), {
+          status: 402,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+      assert.equal(payload.format, "pdf");
       return new Response(JSON.stringify({
         download_filename: "run-123-roleforge-smoke-tailored-resume-engineer.pdf",
       }), { status: 200, headers: { "Content-Type": "application/json" } });
@@ -241,6 +247,118 @@ test("backend workflow smoke bridges backend export through protected frontend d
     assert.equal(nextCookie, "sb-project-auth-token=cookie");
     assert.equal(calls.some((call) => call.method === "HEAD" && call.url.includes("/api/workflow/download/")), true);
     assert.equal(calls.some((call) => call.method === "DELETE" && call.url.endsWith("/api/saved-runs/project-123")), true);
+    assert.deepEqual(calls.filter((call) => call.url === "https://roleforge-api.example.run.app/export").map((call) => JSON.parse(call.body).format), ["pdf", "docx", "txt"]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("backend workflow smoke verifies premium DOCX and TXT downloads when expected", async () => {
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  let savedVisible = true;
+
+  globalThis.fetch = async (url, options = {}) => {
+    const target = String(url);
+    calls.push({ url: target, method: options.method || "GET", headers: options.headers || {}, body: options.body });
+
+    if (target === "https://roleforge-api.example.run.app/upload") {
+      return new Response(JSON.stringify({
+        resume_id: "resume-123",
+        filename: "roleforge-smoke-resume.txt",
+        format: "txt",
+        character_count: 320,
+        text_preview: "Avery Stone\nProduct Operations Manager",
+        text_preview_truncated: false,
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+
+    if (target === "https://roleforge-api.example.run.app/export") {
+      const payload = JSON.parse(options.body);
+      const extension = payload.format;
+      return new Response(JSON.stringify({
+        download_filename: `run-123-roleforge-smoke-tailored-resume-engineer.${extension}`,
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+
+    if (target.startsWith("https://roleforge.example/api/workflow/download/")) {
+      const isDocx = target.endsWith(".docx");
+      const isTxt = target.endsWith(".txt");
+      const contentType = isDocx
+        ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        : isTxt
+          ? "text/plain"
+          : "application/pdf";
+      const body = isDocx ? "PK\u0003\u0004docx" : isTxt ? "Premium export smoke check." : "%PDF-1.4\n";
+      return new Response(options.method === "HEAD" ? null : body, {
+        status: 200,
+        headers: { "Content-Type": contentType },
+      });
+    }
+
+    if (target === "https://roleforge.example/api/saved-runs" && options.method === "POST") {
+      const payload = JSON.parse(options.body);
+      return new Response(JSON.stringify({ projectId: "project-123", runId: payload.id }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    if (target === "https://roleforge.example/api/saved-runs" && (!options.method || options.method === "GET")) {
+      return new Response(JSON.stringify({
+        runs: savedVisible
+          ? [{
+              id: "roleforge-smoke-workflow-test",
+              projectId: "project-123",
+              downloadUrl: "/api/workflow/download/run-123-roleforge-smoke-tailored-resume-engineer.pdf",
+              snapshot: {
+                result: {
+                  tailored_text: [
+                    "Avery Stone",
+                    "Product Operations Manager",
+                    "avery@example.com",
+                    "",
+                    "Professional Summary",
+                    "Product operations lead with launch planning, stakeholder communication, and execution-readiness experience.",
+                    "",
+                    "Experience",
+                    "Project Lead, Operations",
+                    "- Coordinated roadmap reviews across product, design, and engineering teams.",
+                    "- Improved launch readiness with clearer risks, owners, and next steps.",
+                    "",
+                    "Skills",
+                    "Roadmapping, Launch Planning, Stakeholder Communication",
+                  ].join("\n"),
+                },
+              },
+            }]
+          : [],
+      }), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+
+    if (target === "https://roleforge.example/api/saved-runs/project-123" && options.method === "DELETE") {
+      savedVisible = false;
+      return new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    throw new Error(`Unexpected smoke request: ${options.method || "GET"} ${target}`);
+  };
+
+  try {
+    await checkSignedInBackendWorkflowBridge(
+      "https://roleforge.example",
+      "https://roleforge-api.example.run.app",
+      "sb-project-auth-token=cookie",
+      "access-token",
+      { expectPremiumExports: true, requireBackendWorkflowSmoke: true },
+    );
+
+    assert.deepEqual(calls.filter((call) => call.url === "https://roleforge-api.example.run.app/export").map((call) => JSON.parse(call.body).format), ["pdf", "docx", "txt"]);
+    assert.equal(calls.some((call) => call.url.endsWith(".docx") && call.method === "HEAD"), true);
+    assert.equal(calls.some((call) => call.url.endsWith(".txt") && call.method === "GET"), true);
   } finally {
     globalThis.fetch = originalFetch;
   }

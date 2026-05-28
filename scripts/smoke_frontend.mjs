@@ -933,6 +933,7 @@ async function checkSignedInSavedProjectRoundTrip(baseUrl, cookie) {
 
 export async function checkSignedInBackendWorkflowBridge(baseUrl, backendUrl, cookie, accessToken, options = {}) {
   const requireBackendWorkflowSmoke = Boolean(options.requireBackendWorkflowSmoke);
+  const expectPremiumExports = Boolean(options.expectPremiumExports);
 
   if (!accessToken) {
     requireCondition(
@@ -1003,6 +1004,98 @@ export async function checkSignedInBackendWorkflowBridge(baseUrl, backendUrl, co
     `frontend workflow download was not PDF: ${proxiedDownload.response.headers.get("content-type") || "(missing)"}`,
   );
   requireCondition(proxiedDownload.text.startsWith("%PDF"), "frontend workflow download did not return PDF bytes");
+
+  const premiumExportFormats = [
+    {
+      format: "docx",
+      label: "DOCX",
+      contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      bodyCheck: (body) => body.startsWith("PK"),
+    },
+    {
+      format: "txt",
+      label: "TXT",
+      contentType: "text/plain",
+      bodyCheck: (body) => body.includes("Premium export smoke check."),
+    },
+  ];
+  const premiumExported = [];
+  const premiumGated = [];
+
+  for (const premiumFormat of premiumExportFormats) {
+    const premiumPayload = {
+      title: `RoleForge Smoke Resume ${premiumFormat.label}`,
+      filename: `roleforge-smoke-tailored-resume-engineer.${premiumFormat.format}`,
+      content: "Premium export smoke check.",
+      format: premiumFormat.format,
+      template: "engineer",
+    };
+    const premiumResult = await requestBackend(backendUrl, "/export", {
+      method: "POST",
+      redirect: "follow",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(premiumPayload),
+    });
+
+    if (premiumResult.response.status === 402) {
+      const errorPayload = JSON.parse(premiumResult.text);
+      const errorBody = typeof errorPayload.error === "object" && errorPayload.error ? errorPayload.error : errorPayload;
+      requireCondition(errorBody.code === "premium_required", `${premiumFormat.label} export did not return premium_required: ${premiumResult.text.slice(0, 160)}`);
+      requireCondition(!expectPremiumExports, `${premiumFormat.label} export was gated even though this account should have premium access`);
+      premiumGated.push(premiumFormat.label);
+      continue;
+    }
+
+    requireCondition(
+      premiumResult.response.ok,
+      `${premiumFormat.label} export returned ${premiumResult.response.status}: ${premiumResult.text.slice(0, 160)}`,
+    );
+    requireCondition(expectPremiumExports, `${premiumFormat.label} export succeeded for an account that is not expected to have premium access`);
+
+    const premiumExportPayload = JSON.parse(premiumResult.text);
+    const premiumFilename = premiumExportPayload.download_filename || premiumExportPayload.filename;
+    requireCondition(
+      typeof premiumFilename === "string" && premiumFilename.endsWith(`.${premiumFormat.format}`),
+      `${premiumFormat.label} export did not return a ${premiumFormat.label} filename: ${premiumResult.text.slice(0, 160)}`,
+    );
+    requireCondition(premiumFilename.includes("engineer"), `template direction was not reflected in ${premiumFormat.label} export filename: ${premiumFilename}`);
+
+    const premiumDownloadUrl = `/api/workflow/download/${encodeURIComponent(premiumFilename)}`;
+    const premiumHead = await request(baseUrl, premiumDownloadUrl, { method: "HEAD", cookie: signedInCookie, redirect: "follow" });
+    signedInCookie = mergeSetCookieHeaders(signedInCookie, premiumHead.response);
+    requireCondition(premiumHead.response.ok, `${premiumFormat.label} workflow download HEAD returned ${premiumHead.response.status}`);
+    requireCondition(
+      (premiumHead.response.headers.get("content-type") || "").startsWith(premiumFormat.contentType),
+      `${premiumFormat.label} workflow download HEAD content type was unexpected: ${premiumHead.response.headers.get("content-type") || "(missing)"}`,
+    );
+
+    const premiumDownload = await request(baseUrl, premiumDownloadUrl, { cookie: signedInCookie, redirect: "follow" });
+    signedInCookie = mergeSetCookieHeaders(signedInCookie, premiumDownload.response);
+    requireCondition(premiumDownload.response.ok, `${premiumFormat.label} workflow download returned ${premiumDownload.response.status}`);
+    requireCondition(
+      (premiumDownload.response.headers.get("content-type") || "").startsWith(premiumFormat.contentType),
+      `${premiumFormat.label} workflow download content type was unexpected: ${premiumDownload.response.headers.get("content-type") || "(missing)"}`,
+    );
+    requireCondition(premiumFormat.bodyCheck(premiumDownload.text), `downloaded ${premiumFormat.label} content did not match the expected file shape`);
+    premiumExported.push(premiumFormat.label);
+  }
+
+  if (expectPremiumExports) {
+    requireCondition(
+      premiumExported.join(",") === "DOCX,TXT",
+      `premium smoke did not export both premium formats: exported=${premiumExported.join(",") || "(none)"}, gated=${premiumGated.join(",") || "(none)"}`,
+    );
+    pass("signed-in premium account can export and download DOCX and TXT through the protected workflow route");
+  } else {
+    requireCondition(
+      premiumGated.join(",") === "DOCX,TXT" && premiumExported.length === 0,
+      `non-premium smoke saw mixed premium export access: exported=${premiumExported.join(",") || "(none)"}, gated=${premiumGated.join(",") || "(none)"}`,
+    );
+    pass("signed-in non-premium account keeps DOCX and TXT exports gated");
+  }
 
   const smokeRun = buildSmokeSavedRunPayload({
     id: `roleforge-smoke-workflow-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -1141,6 +1234,7 @@ async function checkSignedInStatus(baseUrl, cookie, options) {
 
   signedInCookie = await checkSignedInSavedProjectRoundTrip(baseUrl, signedInCookie);
   signedInCookie = await checkSignedInBackendWorkflowBridge(baseUrl, backendUrl, signedInCookie, accessToken, {
+    expectPremiumExports: expectPremiumAccess || (payload.entitlement.plan === "premium" && ["active", "trialing"].includes(payload.entitlement.billingStatus)),
     requireBackendWorkflowSmoke,
   });
 
