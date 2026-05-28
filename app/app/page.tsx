@@ -1549,7 +1549,7 @@ export default function Page() {
   const warnings = result?.warnings ?? [];
 
   async function upload(): Promise<UploadResponse> {
-    if (!baseUrl) throw new Error("The resume workflow is not available yet.");
+    if (!baseUrl) throw new Error("Resume tailoring is temporarily unavailable. Try again shortly.");
     if (!file) throw new Error("Select a resume file first.");
     const currentFileKey = fileUploadKey(file);
 
@@ -1574,7 +1574,7 @@ export default function Page() {
   }
 
   async function tailor(resume_id: string): Promise<TailorResult> {
-    if (!baseUrl) throw new Error("The resume workflow is not available yet.");
+    if (!baseUrl) throw new Error("Resume tailoring is temporarily unavailable. Try again shortly.");
 
     const isHttp = (value: string) => /^https?:\/\//i.test(value.trim());
     const payload: {
@@ -1606,7 +1606,7 @@ export default function Page() {
     format: ExportFormat = "pdf",
     options: { templateSlug?: ResumeTemplateSlug; updateActiveDownload?: boolean } = {},
   ): Promise<string> {
-    if (!baseUrl) throw new Error("Export is not available yet.");
+    if (!baseUrl) throw new Error("Export is temporarily unavailable. Try again shortly.");
     const requestedTemplateSlug = options.templateSlug ?? selectedTemplateSlug;
     const advertisedTemplates = capabilities?.export_templates ?? [];
     const templateSlug =

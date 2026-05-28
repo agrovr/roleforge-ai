@@ -414,7 +414,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     : "Use Manage billing for subscription changes and invoices."
                   : checkoutReady
                   ? "Checkout opens securely in Stripe. Premium access updates after the subscription syncs."
-                  : "Premium checkout is not available right now."}
+                  : "Premium checkout is temporarily unavailable. Please try again later."}
               </p>
             </div>
           </section>
