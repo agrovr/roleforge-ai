@@ -20,6 +20,10 @@ test("formats billing fallback notices without raw provider language", () => {
     tone: "neutral",
     text: "Billing is taking a moment to connect. Try again shortly.",
   });
+  assert.deepEqual(billingNotice("checkout-syncing"), {
+    tone: "neutral",
+    text: "Checkout finished, but Premium access is still syncing. Refresh billing in a moment if it does not update.",
+  });
   assert.equal(billingNotice("temporarily-unavailable", { premiumActive: true }), null);
   assert.deepEqual(billingNotice("already-premium"), {
     tone: "neutral",

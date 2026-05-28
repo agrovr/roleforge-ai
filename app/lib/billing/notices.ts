@@ -17,6 +17,11 @@ export function billingNotice(value: string | undefined, options?: { premiumActi
         tone: "neutral",
         text: "Checkout was canceled. Your current plan is unchanged.",
       };
+    case "checkout-syncing":
+      return {
+        tone: "neutral",
+        text: "Checkout finished, but Premium access is still syncing. Refresh billing in a moment if it does not update.",
+      };
     case "portal-return":
       return {
         tone: "success",

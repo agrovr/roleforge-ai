@@ -105,9 +105,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   if (checkoutSessionId) {
     const syncedCheckout = await syncCheckoutSessionEntitlement(user.id, checkoutSessionId).catch(() => false);
 
-    if (syncedCheckout) {
-      redirect("/settings?billing=checkout-success#billing");
-    }
+    redirect(`/settings?billing=${syncedCheckout ? "checkout-success" : "checkout-syncing"}#billing`);
   }
 
   const [projectCount, runCount, recentSavedRuns] = await Promise.all([
