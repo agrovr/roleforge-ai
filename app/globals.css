@@ -5692,7 +5692,7 @@ html[data-theme="dark"] input::file-selector-button {
   font-size: clamp(2.25rem, 4vw, 3.65rem);
   font-weight: 650;
   letter-spacing: 0;
-  line-height: 1.06;
+  line-height: 1.14;
   max-width: min(100%, 24ch);
   width: 100%;
   overflow: hidden;
