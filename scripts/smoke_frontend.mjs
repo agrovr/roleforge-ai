@@ -400,6 +400,7 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.templates-page-hero\s*>\s*\*\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "templates hero children can still force horizontal overflow");
   requireCondition(/\.templates-page-actions\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s.test(stylesheetText), "templates hero actions can still crowd the hero");
   requireCondition(/\.templates-page-actions\s+\.primary-button,\s*\.templates-page-actions\s+\.ghost-button\s*\{(?=[^}]*flex:\s*(?:1\s+1\s+)?150px)(?=[^}]*min-width:\s*min\(100%,\s*150px\))(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "templates hero buttons can still render cramped labels");
+  requireCondition(/@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?\.templates-page-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*1fr)[^}]*\}/s.test(stylesheetText), "templates hero actions can still squeeze side-by-side on mobile");
   requireCondition(/\.templates-selection-status\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "templates selected-status row can still overflow");
   requireCondition(/\.templates-selection-status\s+strong\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "templates selected label can still overflow");
   requireCondition(/\.templates-page-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(min\(100%,\s*260px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "templates cards can still shrink below a comfortable width");
@@ -454,7 +455,9 @@ async function checkPublicShell(baseUrl) {
   requireCondition(stylesheetText.includes(".nav-cta-short"), "landing mobile nav compact CTA styles were missing");
   requireCondition(/\.nav-link-secondary,\s*\.nav-link-account,\s*\.nav-divider\s*\{\s*display:\s*none/.test(stylesheetText), "landing mobile nav still exposes full navigation links");
   requireCondition(/\.nav\s+\.btn-brand\s*\{[^}]*min-width:\s*0/.test(stylesheetText), "landing mobile nav CTA can still force header overflow");
+  requireCondition(/body\s*\{[\s\S]*?overflow-x:\s*clip/s.test(stylesheetText), "landing page can still expose decorative horizontal overflow");
   requireCondition(/@media\s*\(max-width:\s*355px\)/.test(stylesheetText), "landing nav was missing narrow-phone overflow protection");
+  requireCondition(/@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.nav\s+\.btn-brand\s*\{[^}]*display:\s*none/s.test(stylesheetText), "landing narrow-phone nav still shows a clipped CTA");
   requireCondition(!home.text.includes("The&nbsp;resume&nbsp;that"), "landing hero headline still prevents narrow-phone wrapping");
   pass("landing mobile nav includes compact one-row styles");
 

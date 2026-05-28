@@ -9209,6 +9209,7 @@ body {
   background:
     radial-gradient(circle at 18% 0%, rgba(216, 154, 65, 0.08), transparent 28rem),
     linear-gradient(180deg, var(--bg) 0%, #f8f3ea 42%, var(--bg-alt) 100%);
+  overflow-x: clip;
 }
 
 .nav {
@@ -10797,6 +10798,11 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     justify-content: center;
   }
 
+  .templates-page-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
   .templates-page-card .template-thumb {
     height: 320px;
   }
@@ -11085,6 +11091,20 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 @media (max-width: 520px) {
   .login-nav-actions .btn-sm {
     display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .nav .btn-brand {
+    display: none;
+  }
+
+  .nav-links {
+    flex: 0 0 auto;
+  }
+
+  .nav-inner {
+    justify-content: space-between;
   }
 }
 
