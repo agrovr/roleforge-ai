@@ -59,3 +59,9 @@ jobs:
           ROLEFORGE_SMOKE_PASSWORD: ${{ secrets.ROLEFORGE_SMOKE_PASSWORD }}
           ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE: ${{ vars.ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE }}
           ROLEFORGE_EXPECT_PREMIUM_ACCESS: ${{ vars.ROLEFORGE_EXPECT_PREMIUM_ACCESS }}
+
+      - name: Smoke rendered production layout
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: npm run smoke:layout -- --require-chrome
+        env:
+          ROLEFORGE_SITE_URL: https://roleforgeai.vercel.app
