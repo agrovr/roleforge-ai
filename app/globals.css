@@ -13699,7 +13699,7 @@ body,
   .cta-visual {
     justify-self: center;
     inline-size: min(100%, 520px);
-    min-block-size: clamp(320px, 38vw, 388px);
+    min-block-size: clamp(344px, 42vw, 398px);
   }
 }
 

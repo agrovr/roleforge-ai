@@ -23,6 +23,10 @@ const PAGE_CHECKS = [
       { container: ".hero-stage", selector: ".hero-stage .resume-card", tolerance: 8 },
       { container: ".hero-stage", selector: ".hero-badge", tolerance: 8 },
       { container: ".dash-mock", selector: ".dash-mock .btn", tolerance: 4 },
+      { container: "closest:.dash-stat", selector: ".dash-mock .dash-stat-label", tolerance: 4 },
+      { container: "closest:.dash-stat", selector: ".dash-mock .dash-stat-value", tolerance: 4 },
+      { container: "closest:.dash-stat", selector: ".dash-mock .dash-stat-delta", tolerance: 4 },
+      { container: "closest:.cta-visual", selector: ".cta-visual .resume-card", tolerance: 2 },
       { container: ".cta-band", selector: ".cta-visual .resume-card", tolerance: 8 },
       { container: ".cta-band", selector: ".cta-band > div:first-child", tolerance: 4 },
       { container: ".cta-band", selector: ".cta-band h2", tolerance: 4 },
@@ -107,6 +111,12 @@ const PAGE_CHECKS = [
       ".history-actions .ghost-button",
       ".history-export-actions .btn",
     ],
+    containedSelectors: [
+      { container: "closest:.rf-studio-stat", selector: ".rf-studio-stat-row", tolerance: 4 },
+      { container: "closest:.rf-studio-stat", selector: ".rf-studio-stat p", tolerance: 4 },
+      { container: "closest:.rf-intake-card", selector: ".rf-file-drop", tolerance: 4 },
+      { container: "closest:.rf-preview-wrap", selector: ".rf-preview-status", tolerance: 4 },
+    ],
   },
   {
     path: "/settings",
@@ -144,6 +154,12 @@ const PAGE_CHECKS = [
       ".settings-billing-head .ghost-button",
       ".settings-plan-active-card .settings-inline-link",
       ".settings-section-copy h2",
+    ],
+    containedSelectors: [
+      { container: "closest:.settings-metric", selector: ".settings-metric strong", tolerance: 4 },
+      { container: "closest:.settings-metric", selector: ".settings-metric span", tolerance: 4 },
+      { container: "closest:.settings-price-card", selector: ".settings-price-card .primary-button", tolerance: 4 },
+      { container: "closest:.settings-plan-active-card", selector: ".settings-plan-active-card .settings-inline-link", tolerance: 4 },
     ],
   },
 ];
@@ -469,13 +485,28 @@ async function evaluateLayout(send, baseUrl, page, width, cookie) {
     }
 
     for (const rule of containedSelectors) {
-      const container = document.querySelector(rule.container);
-      if (!container) continue;
+      const closestSelector = typeof rule.container === "string" && rule.container.startsWith("closest:")
+        ? rule.container.slice("closest:".length)
+        : "";
+      const staticContainer = closestSelector ? null : document.querySelector(rule.container);
+      if (!closestSelector && !staticContainer) continue;
 
-      const containerRect = container.getBoundingClientRect();
       const tolerance = Number(rule.tolerance || 0);
       const elements = Array.from(document.querySelectorAll(rule.selector));
       elements.forEach((element, index) => {
+        const container = closestSelector ? element.closest(closestSelector) : staticContainer;
+        if (!container) {
+          failures.push({
+            selector: rule.selector,
+            container: rule.container,
+            index,
+            reason: "container-missing",
+            text: element.textContent.trim().replace(/\\s+/g, " ").slice(0, 80),
+          });
+          return;
+        }
+
+        const containerRect = container.getBoundingClientRect();
         const rect = element.getBoundingClientRect();
         if (rect.width <= 0 || rect.height <= 0) return;
         const outside =
