@@ -8,7 +8,7 @@ import { createServer } from "node:net";
 import { cookieHeaderFromSession } from "./smoke_frontend.mjs";
 
 const DEFAULT_BASE_URL = "https://roleforgeai.vercel.app";
-const VIEWPORTS = [390, 768, 1024, 1366, 1712, 1920];
+const VIEWPORTS = [390, 640, 768, 900, 1024, 1180, 1366, 1500, 1712];
 const PUBLIC_THEMES = ["light", "dark"];
 const PAGE_CHECKS = [
   {
@@ -16,6 +16,7 @@ const PAGE_CHECKS = [
     name: "landing",
     noOverlapPairs: [
       [".hero-copy", ".hero-stage"],
+      [".hero-copy", ".hero-stage .resume-card-front"],
       [".cta-band > div:first-child", ".cta-visual"],
     ],
     containedSelectors: [
@@ -48,6 +49,7 @@ const PAGE_CHECKS = [
       ".dash-mock .dash-stat-label",
       ".dash-stat-value",
       ".dash-mock .dash-stat-delta",
+      ".dash-main-head .btn",
       ".dash-resume-actions .btn",
       ".price-card .btn",
       ".cta-band h2",
@@ -519,6 +521,97 @@ async function evaluateLayout(send, baseUrl, page, width, cookie) {
   return reports;
 }
 
+async function evaluatePreviewTabs(send, baseUrl, cookie) {
+  if (!cookie) return [];
+
+  await send("Network.setExtraHTTPHeaders", { headers: { Cookie: cookie } });
+  await send("Emulation.setDeviceMetricsOverride", {
+    width: 1366,
+    height: 1100,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+  await send("Page.navigate", { url: `${baseUrl}/app` });
+  await delay(3200);
+
+  const expression = `(async () => {
+    const checks = [
+      { mode: "tailored", id: "preview-tab-tailored", labels: ["Draft", "Keywords", "Export"] },
+      { mode: "original", id: "preview-tab-original", labels: ["Source", "File", "State"] },
+      { mode: "diff", id: "preview-tab-diff", labels: ["Original", "Tailored", "Notes"] },
+    ];
+    const failures = [];
+
+    for (const check of checks) {
+      const button = document.getElementById(check.id);
+      if (!button) {
+        failures.push({ selector: "#" + check.id, reason: "missing" });
+        continue;
+      }
+
+      button.click();
+      await new Promise((resolve) => setTimeout(resolve, 250));
+
+      const panel = document.getElementById("preview-panel");
+      if (!panel) {
+        failures.push({ selector: "#preview-panel", reason: "missing" });
+        continue;
+      }
+
+      if (panel.getAttribute("data-preview-mode") !== check.mode) {
+        failures.push({
+          selector: "#preview-panel",
+          reason: "preview-mode-not-restored",
+          expected: check.mode,
+          actual: panel.getAttribute("data-preview-mode"),
+        });
+      }
+
+      if (panel.getAttribute("aria-labelledby") !== check.id) {
+        failures.push({
+          selector: "#preview-panel",
+          reason: "tabpanel-label-mismatch",
+          expected: check.id,
+          actual: panel.getAttribute("aria-labelledby"),
+        });
+      }
+
+      if (button.getAttribute("aria-selected") !== "true") {
+        failures.push({ selector: "#" + check.id, reason: "tab-not-selected" });
+      }
+
+      const labels = Array.from(panel.querySelectorAll(".rf-preview-status strong"))
+        .map((element) => element.textContent.trim())
+        .filter(Boolean);
+      for (const label of check.labels) {
+        if (!labels.includes(label)) {
+          failures.push({
+            selector: "#preview-panel",
+            reason: "status-label-missing",
+            mode: check.mode,
+            label,
+            labels,
+          });
+        }
+      }
+    }
+
+    return JSON.stringify({
+      page: "signed-in studio preview tabs",
+      theme: "account",
+      width: window.innerWidth,
+      failures,
+    });
+  })()`;
+
+  const result = await send("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true });
+  if (result.error) throw new Error(result.error.message);
+  if (result.result.exceptionDetails) {
+    throw new Error(result.result.exceptionDetails.text || "Preview tab interaction evaluation failed");
+  }
+  return [JSON.parse(result.result.result.value)];
+}
+
 async function main(argv = process.argv.slice(2)) {
   const args = parseArgs(argv);
   const baseUrl = normalizeBaseUrl(args.baseUrl || process.env.ROLEFORGE_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL);
@@ -564,8 +657,9 @@ async function main(argv = process.argv.slice(2)) {
           );
         }
       }
+      const interactionReports = await evaluatePreviewTabs(page.send, baseUrl, signedInSession?.cookie || "");
 
-      const failures = reports.flatMap((report) => {
+      const failures = [...reports, ...interactionReports].flatMap((report) => {
         const pageFailures = [...report.failures];
         if (report.overflow > 1) {
           pageFailures.unshift({ reason: "document-overflow", overflow: report.overflow });
@@ -578,7 +672,8 @@ async function main(argv = process.argv.slice(2)) {
       }
 
       const checkedPageCount = new Set(reports.map((report) => report.page)).size;
-      pass(`rendered layout smoke passed ${checkedPageCount} pages across ${VIEWPORTS.length} viewport widths`);
+      const interactionLabel = interactionReports.length ? " with preview tab interactions" : "";
+      pass(`rendered layout smoke passed ${checkedPageCount} pages across ${VIEWPORTS.length} viewport widths${interactionLabel}`);
     } finally {
       page.close();
     }
