@@ -12993,3 +12993,220 @@ body,
     justify-self: stretch;
   }
 }
+
+/* Composition repair: one final source of truth for the screenshot-prone
+   marketing and settings surfaces after the earlier responsive guardrails. */
+.hero {
+  grid-template-columns: minmax(0, 0.98fr) minmax(0, 0.82fr);
+  gap: clamp(28px, 4vw, 58px);
+  overflow: hidden;
+}
+
+.hero-copy {
+  max-inline-size: min(100%, 680px);
+}
+
+.hero .h1 {
+  max-inline-size: 100%;
+  font-size: clamp(3.15rem, 5.25vw, 5rem);
+  line-height: 1.07;
+  overflow-wrap: normal;
+}
+
+.hero-stage {
+  justify-self: center;
+  inline-size: min(100%, 520px);
+  block-size: clamp(440px, 38vw, 560px);
+  max-inline-size: 100%;
+  overflow: hidden;
+}
+
+.hero-stage .resume-card {
+  max-inline-size: none;
+}
+
+.resume-card-front {
+  inline-size: clamp(292px, 23vw, 360px);
+  block-size: clamp(410px, 32vw, 492px);
+}
+
+.resume-card-back-l {
+  inline-size: clamp(236px, 18vw, 292px);
+  block-size: clamp(350px, 27vw, 424px);
+  transform: rotate(-8deg) translate(clamp(-76px, -5vw, -46px), 24px);
+}
+
+.resume-card-back-r {
+  inline-size: clamp(224px, 17vw, 278px);
+  block-size: clamp(336px, 26vw, 402px);
+  transform: rotate(7deg) translate(clamp(56px, 5.2vw, 88px), 32px);
+}
+
+.hero-stage:hover .resume-card-back-l {
+  transform: rotate(-9deg) translate(clamp(-84px, -5.4vw, -54px), 26px);
+}
+
+.hero-stage:hover .resume-card-back-r {
+  transform: rotate(8deg) translate(clamp(64px, 5.6vw, 98px), 36px);
+}
+
+.hero-badge {
+  max-inline-size: min(236px, 52%);
+  min-inline-size: 0;
+}
+
+.hero-badge > div:last-child {
+  min-inline-size: 0;
+}
+
+.hero-badge,
+.hero-badge .b-meta {
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.dash-main-head {
+  align-items: flex-start;
+}
+
+.dash-main-head .btn-sm {
+  flex: 0 1 190px;
+  inline-size: max-content;
+  max-inline-size: 100%;
+}
+
+.dash-mock .dash-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+
+.dash-mock .dash-stat {
+  min-block-size: 132px;
+  padding: clamp(16px, 2.2cqi, 22px);
+}
+
+.dash-mock .dash-stat-value {
+  font-size: clamp(1.45rem, 8.5cqi, 2.08rem);
+  line-height: 1.05;
+  overflow-wrap: normal;
+  text-wrap: balance;
+}
+
+.dash-mock .dash-stat-delta {
+  max-inline-size: 22ch;
+  font-size: clamp(0.84rem, 3.4cqi, 0.98rem);
+  line-height: 1.35;
+}
+
+.settings-profile-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 228px), 1fr));
+  inline-size: min(100%, 560px);
+  gap: 10px;
+}
+
+.settings-profile-actions form,
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button {
+  inline-size: 100%;
+  max-inline-size: 100%;
+}
+
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button,
+.settings-billing-head .ghost-button,
+.settings-plan-active-card .settings-inline-link,
+.settings-export-actions .btn,
+.price-card .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 48px;
+  padding-inline: clamp(14px, 2cqi, 22px);
+  font-size: clamp(0.9rem, 2.4cqi, 0.98rem);
+  line-height: 1.12;
+  overflow-wrap: normal;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.settings-billing-head {
+  grid-template-columns: minmax(0, 1fr) minmax(184px, 232px);
+  gap: 12px;
+}
+
+.settings-billing-head form {
+  justify-self: end;
+  inline-size: 100%;
+  max-inline-size: 232px;
+}
+
+.settings-plan-active-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(156px, max-content);
+  align-items: center;
+}
+
+.settings-plan-active-card .settings-inline-link {
+  justify-self: end;
+  inline-size: max-content;
+  min-inline-size: 156px;
+}
+
+@media (max-width: 1180px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding-block: 54px 72px;
+  }
+
+  .hero-copy {
+    max-inline-size: 760px;
+  }
+
+  .hero-stage {
+    justify-self: stretch;
+    inline-size: min(100%, 620px);
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .hero .h1 {
+    font-size: clamp(2.9rem, 14vw, 4.5rem);
+  }
+
+  .hero-stage {
+    block-size: clamp(390px, 104vw, 470px);
+  }
+
+  .hero-badge {
+    max-inline-size: min(226px, 74vw);
+  }
+
+  .dash-main-head .btn-sm,
+  .settings-billing-head form,
+  .settings-plan-active-card .settings-inline-link {
+    inline-size: 100%;
+    max-inline-size: none;
+    justify-self: stretch;
+  }
+
+  .settings-billing-head,
+  .settings-plan-active-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@container settings-section (max-width: 620px) {
+  .settings-billing-head,
+  .settings-plan-active-card {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-billing-head form,
+  .settings-plan-active-card .settings-inline-link {
+    inline-size: 100%;
+    max-inline-size: none;
+    justify-self: stretch;
+  }
+}
