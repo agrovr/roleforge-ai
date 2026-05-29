@@ -378,7 +378,7 @@ async function evaluateLayout(send, baseUrl, page, width, cookie) {
     const url = new URL(`${baseUrl}${page.path}`);
     if (theme !== "account") url.searchParams.set("theme", theme);
     await send("Page.navigate", { url: url.toString() });
-    await delay(1800);
+    await delay(page.requiresAuth ? 3200 : 1800);
 
     const expression = `(() => {
     document.documentElement.style.scrollBehavior = "auto";
