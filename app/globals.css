@@ -12621,3 +12621,215 @@ body,
     white-space: normal;
   }
 }
+
+/* Final screenshot repair pass: keep the marketing mockups readable at large
+   browser widths and keep action buttons from crowding their cards. */
+.steps {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 235px), 1fr));
+}
+
+.step {
+  min-block-size: 212px;
+}
+
+.step .step-title,
+.dash-stat-value {
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+.dash-mock .dash-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+}
+
+.dash-mock .dash-stat {
+  min-block-size: 142px;
+  padding: clamp(18px, 2.2vw, 24px);
+}
+
+.dash-mock .dash-stat-value {
+  max-width: 100%;
+  font-size: clamp(2rem, 2.8vw, 3.25rem);
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+.dash-mock .dash-stat-delta {
+  max-width: 18ch;
+  font-size: clamp(0.96rem, 1.15vw, 1.08rem);
+  line-height: 1.35;
+  overflow-wrap: normal;
+  text-wrap: balance;
+}
+
+.dash-resume-actions {
+  align-items: stretch;
+}
+
+.dash-resume-actions .btn,
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button,
+.settings-billing-head .ghost-button,
+.settings-plan-active-card .settings-inline-link {
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  min-block-size: 48px;
+  padding-inline: clamp(16px, 2vw, 24px);
+  overflow: hidden;
+  text-align: center;
+}
+
+.settings-billing-head .ghost-button,
+.settings-plan-active-card .settings-inline-link {
+  justify-self: end;
+}
+
+.settings-billing-head {
+  gap: 24px;
+}
+
+.cta-section .section-inner {
+  width: min(100%, 1440px);
+  max-width: min(1440px, calc(100vw - 48px));
+}
+
+.cta-band {
+  grid-template-columns: minmax(0, 0.96fr) minmax(300px, 0.72fr);
+  gap: clamp(24px, 3vw, 44px);
+  padding: clamp(54px, 5.4vw, 78px) clamp(42px, 5vw, 70px);
+}
+
+.cta-band > div:first-child {
+  max-width: min(100%, 570px);
+}
+
+.cta-band h2 {
+  max-width: 13ch;
+  font-size: clamp(3rem, 4.1vw, 4.35rem);
+  overflow-wrap: normal;
+}
+
+.cta-band p {
+  max-width: 43ch;
+  font-size: clamp(1.05rem, 1.25vw, 1.18rem);
+}
+
+.cta-visual {
+  width: min(100%, 430px);
+  min-height: clamp(340px, 28vw, 390px);
+}
+
+.cta-visual .resume-card {
+  right: clamp(8px, 2.2vw, 36px);
+  top: 8px;
+  width: clamp(220px, 16vw, 270px);
+  height: clamp(330px, 24vw, 400px);
+}
+
+.cta-visual .resume-card.back {
+  right: clamp(96px, 11vw, 150px);
+  top: 48px;
+  width: clamp(190px, 13.5vw, 235px);
+  height: clamp(306px, 22vw, 368px);
+}
+
+.hero {
+  max-width: min(var(--container), calc(100vw - 48px));
+  padding-inline: clamp(24px, 3.6vw, 48px);
+}
+
+.hero-stage {
+  width: min(100%, 520px);
+}
+
+@media (min-width: 1501px) {
+  .cta-band {
+    grid-template-columns: minmax(0, 590px) minmax(320px, 430px);
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 600px) minmax(0, 500px);
+  }
+}
+
+@media (max-width: 1180px) {
+  .dash-mock .dash-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cta-band {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-band h2,
+  .cta-band p,
+  .cta-band > div:first-child {
+    max-width: 100%;
+  }
+
+  .cta-visual {
+    justify-self: center;
+    width: min(100%, 520px);
+  }
+}
+
+@media (max-width: 760px) {
+  .dash-mock .dash-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-mock .dash-stat-value {
+    font-size: clamp(2.2rem, 11vw, 3.2rem);
+  }
+
+  .settings-billing-head .ghost-button,
+  .settings-plan-active-card .settings-inline-link,
+  .settings-profile-actions .primary-button,
+  .settings-profile-actions .ghost-button,
+  .settings-profile-actions form {
+    width: 100%;
+    justify-self: stretch;
+  }
+
+  .cta-section .section-inner {
+    max-width: calc(100vw - 24px);
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1180px) {
+  .hero-stage {
+    width: min(100%, 680px);
+    height: clamp(500px, 56vw, 560px);
+  }
+
+  .resume-card-front {
+    width: clamp(340px, 34vw, 370px);
+    height: clamp(472px, 46vw, 510px);
+    transform: rotate(-2deg) translateX(0);
+  }
+
+  .resume-card-back-l {
+    width: clamp(270px, 28vw, 310px);
+    height: clamp(386px, 40vw, 438px);
+    transform: rotate(-8deg) translate(-84px, 24px);
+  }
+
+  .resume-card-back-r {
+    width: clamp(260px, 27vw, 294px);
+    height: clamp(378px, 38vw, 420px);
+    transform: rotate(7deg) translate(98px, 30px);
+  }
+
+  .hero-stage:hover .resume-card-front {
+    transform: rotate(-1deg) translateY(-6px);
+  }
+
+  .hero-stage:hover .resume-card-back-l {
+    transform: rotate(-9deg) translate(-92px, 26px);
+  }
+
+  .hero-stage:hover .resume-card-back-r {
+    transform: rotate(8deg) translate(106px, 34px);
+  }
+}

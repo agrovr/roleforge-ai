@@ -7,6 +7,7 @@ import {
   historyDownloads,
   historyGroupSummary,
   historyGroupStatus,
+  lockedHistoryDownloadFormats,
   historyRunActionCopy,
   historyRunStatus,
   historyStorageLabel,
@@ -92,6 +93,28 @@ test("filters premium history downloads for free accounts", () => {
     { format: "docx", url: "https://downloads.example/resume.docx" },
     { format: "txt", url: "https://downloads.example/resume.txt" },
   ]);
+});
+
+test("labels premium-only saved downloads as locked for free accounts", () => {
+  const item = historyItem({
+    downloadFormat: "docx",
+    downloadUrl: "https://downloads.example/resume.docx",
+    downloads: {},
+    snapshot: undefined,
+  });
+
+  assert.deepEqual(lockedHistoryDownloadFormats(item, freeEntitlement), ["docx"]);
+  assert.deepEqual(historyDownloadEntries(item, freeEntitlement), []);
+  assert.deepEqual(historyRunStatus(item, freeEntitlement), {
+    label: "Premium locked",
+    detail: "DOCX needs Premium; run Tailor again for PDF",
+    tone: "legacy",
+  });
+  assert.deepEqual(historyRunStatus(item, premiumEntitlement), {
+    label: "Download only",
+    detail: "Older saved run with 1 download ready",
+    tone: "download",
+  });
 });
 
 test("falls back to an allowed primary download when the latest format is locked", () => {
@@ -257,6 +280,32 @@ test("summarizes saved project availability across grouped versions", () => {
   });
 });
 
+test("summarizes premium-locked versions with the current entitlement", () => {
+  const groups = groupHistoryItems([
+    historyItem({
+      id: "premium-only",
+      createdAt: "2026-05-15T20:00:00.000Z",
+      downloadFormat: "txt",
+      downloadUrl: "https://downloads.example/resume.txt",
+      downloads: {},
+      snapshot: undefined,
+    }),
+  ]);
+
+  assert.equal(historyGroupSummary(groups[0], freeEntitlement), "1 run · best 72/100 · 1 premium-locked");
+  assert.deepEqual(historyGroupStatus(groups[0], freeEntitlement), {
+    label: "Premium locked",
+    detail: "1 premium-locked",
+    tone: "legacy",
+  });
+  assert.equal(historyGroupSummary(groups[0], premiumEntitlement), "1 run · best 72/100 · 1 download-ready");
+  assert.deepEqual(historyGroupStatus(groups[0], premiumEntitlement), {
+    label: "Download ready",
+    detail: "1 download-ready",
+    tone: "download",
+  });
+});
+
 test("guides saved-run download and export actions by availability", () => {
   assert.deepEqual(historyRunActionCopy(historyItem({
     downloadUrl: "#",
@@ -286,6 +335,18 @@ test("guides saved-run download and export actions by availability", () => {
     downloadFallbackLabel: "Run Tailor again",
     downloadFallbackTitle: "Run Tailor again to create a fresh export.",
     exportHeading: "Run Tailor again to create a fresh export",
+    blockedExportTitle: "This older saved run cannot be re-exported because the tailored draft was not saved.",
+  });
+
+  assert.deepEqual(historyRunActionCopy(historyItem({
+    downloadFormat: "txt",
+    downloadUrl: "https://downloads.example/resume.txt",
+    downloads: {},
+    snapshot: undefined,
+  }), "PDF", freeEntitlement), {
+    downloadFallbackLabel: "Premium locked",
+    downloadFallbackTitle: "TXT download needs Premium. Run Tailor again to create a PDF.",
+    exportHeading: "Reactivate Premium or run Tailor again for PDF",
     blockedExportTitle: "This older saved run cannot be re-exported because the tailored draft was not saved.",
   });
 });

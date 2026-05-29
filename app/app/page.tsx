@@ -3419,7 +3419,7 @@ export default function Page() {
                       const restorable = hasRestorableSnapshot(entry);
                       const primaryDownload = primaryHistoryDownloadFor(entry);
                       const availableDownloadCount = historyDownloadEntriesFor(entry).length;
-                      const groupStatus = historyGroupStatus(group);
+                      const groupStatus = historyGroupStatus(group, accountStatus?.entitlement);
                       const entryStatus = historyRunStatus(entry, accountStatus?.entitlement);
                       const canManageProject = Boolean(group.accountItem?.projectId && signedIn);
                       const isEditingProject = Boolean(canManageProject && editingProjectId === group.accountItem?.projectId);
@@ -3473,7 +3473,7 @@ export default function Page() {
                               </span>
                             </div>
                             <div className="history-project-meta" aria-label="Project run summary">
-                              <span>{historyGroupSummary(group)}</span>
+                              <span>{historyGroupSummary(group, accountStatus?.entitlement)}</span>
                               <span>{entryStatus.detail}</span>
                               <span>{entry.mode} mode</span>
                               {entryTemplateName ? <span>{entryTemplateName} direction</span> : null}

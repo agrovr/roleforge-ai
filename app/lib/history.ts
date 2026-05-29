@@ -100,6 +100,15 @@ export function historyDownloadEntries(item: HistoryItem, entitlement?: ExportEn
   });
 }
 
+export function lockedHistoryDownloadFormats(item: HistoryItem, entitlement?: ExportEntitlement | null) {
+  const downloads = historyDownloads(item);
+  return EXPORT_FORMAT_ORDER.filter((format) => downloads[format] && !exportFormatAllowed(format, entitlement));
+}
+
+function formatListLabel(formats: ExportFormat[]) {
+  return formats.map((format) => format.toUpperCase()).join(" / ");
+}
+
 export function primaryHistoryDownload(item: HistoryItem, entitlement?: ExportEntitlement | null) {
   const downloads = historyDownloadEntries(item, entitlement);
   const latestFormat = item.downloadFormat ?? item.snapshot?.downloadFormat ?? "pdf";
@@ -155,24 +164,26 @@ export function historyStorageLabel(group: HistoryGroup) {
   return "This browser";
 }
 
-function historyGroupAvailabilityCounts(group: HistoryGroup) {
+function historyGroupAvailabilityCounts(group: HistoryGroup, entitlement?: ExportEntitlement | null) {
   return group.items.reduce(
     (counts, item) => {
       if (hasRestorableSnapshot(item)) counts.restorable += 1;
-      else if (Object.keys(historyDownloads(item)).length) counts.downloadOnly += 1;
+      else if (historyDownloadEntries(item, entitlement).length) counts.downloadOnly += 1;
+      else if (lockedHistoryDownloadFormats(item, entitlement).length) counts.premiumLocked += 1;
       else counts.needsReExport += 1;
       return counts;
     },
-    { restorable: 0, downloadOnly: 0, needsReExport: 0 },
+    { restorable: 0, downloadOnly: 0, premiumLocked: 0, needsReExport: 0 },
   );
 }
 
-export function historyGroupSummary(group: HistoryGroup) {
+export function historyGroupSummary(group: HistoryGroup, entitlement?: ExportEntitlement | null) {
   const runLabel = `${group.items.length} run${group.items.length === 1 ? "" : "s"}`;
-  const counts = historyGroupAvailabilityCounts(group);
+  const counts = historyGroupAvailabilityCounts(group, entitlement);
   const restoreParts = [
     counts.restorable ? `${counts.restorable} restore-ready` : "",
     counts.downloadOnly ? `${counts.downloadOnly} download-ready` : "",
+    counts.premiumLocked ? `${counts.premiumLocked} premium-locked` : "",
     counts.needsReExport ? `${counts.needsReExport} needs re-export` : "",
   ].filter(Boolean);
   const restoreLabel = restoreParts.join(" · ");
@@ -182,6 +193,8 @@ export function historyGroupSummary(group: HistoryGroup) {
 export function historyRunStatus(item: HistoryItem, entitlement?: ExportEntitlement | null): HistoryAvailabilityStatus {
   const restorable = hasRestorableSnapshot(item);
   const downloadCount = historyDownloadEntries(item, entitlement).length;
+  const lockedFormats = lockedHistoryDownloadFormats(item, entitlement);
+  const lockedLabel = formatListLabel(lockedFormats);
   const downloadLabel = `${downloadCount} download${downloadCount === 1 ? "" : "s"} ready`;
 
   if (restorable && downloadCount) {
@@ -193,6 +206,14 @@ export function historyRunStatus(item: HistoryItem, entitlement?: ExportEntitlem
   }
 
   if (restorable) {
+    if (lockedFormats.length) {
+      return {
+        label: "Restore ready",
+        detail: `Opens in studio; ${lockedLabel} needs Premium or export PDF`,
+        tone: "restore",
+      };
+    }
+
     return {
       label: "Restore ready",
       detail: "Opens in studio; export again for a file",
@@ -208,6 +229,14 @@ export function historyRunStatus(item: HistoryItem, entitlement?: ExportEntitlem
     };
   }
 
+  if (lockedFormats.length) {
+    return {
+      label: "Premium locked",
+      detail: `${lockedLabel} needs Premium; run Tailor again for PDF`,
+      tone: "legacy",
+    };
+  }
+
   return {
     label: "Needs re-export",
     detail: "Run Tailor again to create a fresh export",
@@ -215,11 +244,12 @@ export function historyRunStatus(item: HistoryItem, entitlement?: ExportEntitlem
   };
 }
 
-export function historyGroupStatus(group: HistoryGroup): HistoryAvailabilityStatus {
-  const counts = historyGroupAvailabilityCounts(group);
+export function historyGroupStatus(group: HistoryGroup, entitlement?: ExportEntitlement | null): HistoryAvailabilityStatus {
+  const counts = historyGroupAvailabilityCounts(group, entitlement);
   const parts = [
     counts.restorable ? `${counts.restorable} restore-ready` : "",
     counts.downloadOnly ? `${counts.downloadOnly} download-ready` : "",
+    counts.premiumLocked ? `${counts.premiumLocked} premium-locked` : "",
     counts.needsReExport ? `${counts.needsReExport} needs re-export` : "",
   ].filter(Boolean);
   const detail = parts.join(" · ");
@@ -236,6 +266,10 @@ export function historyGroupStatus(group: HistoryGroup): HistoryAvailabilityStat
     return { label: "Download ready", detail, tone: "download" };
   }
 
+  if (counts.premiumLocked) {
+    return { label: "Premium locked", detail, tone: "legacy" };
+  }
+
   return { label: "Needs re-export", detail, tone: "legacy" };
 }
 
@@ -246,6 +280,8 @@ export function historyRunActionCopy(
 ): HistoryRunActionCopy {
   const restorable = hasRestorableSnapshot(item);
   const hasAllowedDownload = historyDownloadEntries(item, entitlement).length > 0;
+  const lockedFormats = lockedHistoryDownloadFormats(item, entitlement);
+  const lockedLabel = formatListLabel(lockedFormats);
 
   if (restorable) {
     return {
@@ -261,6 +297,15 @@ export function historyRunActionCopy(
       downloadFallbackLabel: `Download ${formatLabel}`,
       downloadFallbackTitle: `Download the saved ${formatLabel} export.`,
       exportHeading: "Only the saved download link is available",
+      blockedExportTitle: "This older saved run cannot be re-exported because the tailored draft was not saved.",
+    };
+  }
+
+  if (lockedFormats.length) {
+    return {
+      downloadFallbackLabel: "Premium locked",
+      downloadFallbackTitle: `${lockedLabel} download needs Premium. Run Tailor again to create a PDF.`,
+      exportHeading: "Reactivate Premium or run Tailor again for PDF",
       blockedExportTitle: "This older saved run cannot be re-exported because the tailored draft was not saved.",
     };
   }
