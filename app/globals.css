@@ -13390,3 +13390,161 @@ body,
     display: none;
   }
 }
+
+/* True final visual clamp. This file has several historical responsive passes;
+   these rules intentionally sit at EOF so the public CTA and settings controls
+   cannot regress at desktop zoom widths. */
+@media (min-width: 761px) {
+  .cta-section,
+  .cta-section .section-inner,
+  .cta-band {
+    overflow: hidden;
+  }
+
+  .cta-section .section-inner {
+    width: min(100%, 1260px);
+    max-inline-size: min(1260px, calc(100vw - 48px));
+  }
+
+  .cta-band {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 410px);
+    align-items: center;
+    gap: clamp(28px, 4vw, 54px);
+    padding: clamp(44px, 5vw, 66px);
+  }
+
+  .cta-band > div:first-child {
+    max-inline-size: min(100%, 620px);
+  }
+
+  .cta-band h2 {
+    max-inline-size: min(100%, 15ch);
+    font-size: clamp(2.45rem, 3.65vw, 3.76rem);
+    line-height: 1.04;
+  }
+
+  .cta-cluster .btn {
+    flex: 1 1 190px;
+    min-inline-size: min(100%, 180px);
+    justify-content: center;
+  }
+
+  .cta-visual {
+    display: block;
+    justify-self: end;
+    inline-size: min(100%, 410px);
+    min-block-size: clamp(338px, 28vw, 390px);
+    overflow: hidden;
+    contain: paint;
+  }
+
+  .cta-visual .resume-card {
+    inset-inline-end: clamp(16px, 2vw, 28px);
+    inset-block-start: 14px;
+    inline-size: clamp(204px, 15vw, 240px);
+    block-size: clamp(300px, 22vw, 356px);
+  }
+
+  .cta-visual .resume-card.back {
+    inset-inline-end: clamp(100px, 9.2vw, 132px);
+    inset-block-start: 42px;
+    inline-size: clamp(176px, 12.6vw, 208px);
+    block-size: clamp(276px, 20vw, 326px);
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1180px) {
+  .cta-band {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-band > div:first-child,
+  .cta-band h2,
+  .cta-band p {
+    max-inline-size: 100%;
+  }
+
+  .cta-visual {
+    justify-self: center;
+    inline-size: min(100%, 500px);
+    min-block-size: clamp(334px, 44vw, 390px);
+  }
+
+  .cta-visual .resume-card {
+    inset-inline-end: auto;
+    left: 52%;
+    transform: translateX(-18%) rotate(5deg);
+  }
+
+  .cta-visual .resume-card.back {
+    inset-inline-end: auto;
+    left: 52%;
+    transform: translateX(-78%) rotate(-8deg);
+  }
+}
+
+.settings-profile-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(170px, 1fr));
+  inline-size: min(100%, 520px);
+  gap: 12px;
+}
+
+.settings-profile-actions form,
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button {
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button,
+.settings-billing-head .ghost-button,
+.settings-plan-active-card .settings-inline-link {
+  justify-content: center;
+  min-block-size: 48px;
+  max-inline-size: 100%;
+  font-size: clamp(0.9rem, 1.5cqi, 0.98rem);
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.settings-billing-head {
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 220px);
+  gap: 12px;
+}
+
+.settings-billing-head form,
+.settings-billing-head .ghost-button {
+  inline-size: 100%;
+  max-inline-size: 220px;
+  justify-self: end;
+}
+
+.settings-plan-active-card {
+  grid-template-columns: minmax(0, 1fr) minmax(150px, max-content);
+  gap: 14px;
+}
+
+.settings-plan-active-card .settings-inline-link {
+  justify-self: end;
+  min-inline-size: 150px;
+}
+
+@container settings-section (max-width: 700px) {
+  .settings-profile-actions,
+  .settings-billing-head,
+  .settings-plan-active-card {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-billing-head form,
+  .settings-billing-head .ghost-button,
+  .settings-plan-active-card .settings-inline-link {
+    inline-size: 100%;
+    max-inline-size: none;
+    justify-self: stretch;
+  }
+}
