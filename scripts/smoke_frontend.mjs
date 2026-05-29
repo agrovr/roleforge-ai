@@ -713,7 +713,38 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.history-sync-badge\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-align:\s*center)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "history badge labels can still render cramped");
   requireCondition(/\.history-actions\s+\.ghost-button\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*min-height:\s*40px)(?=[^}]*padding:\s*8px\s+12px)(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "history action buttons can still render cramped labels");
   requireCondition(/\.history-action-download\s*\{(?=[^}]*min-width:\s*min\(100%,\s*132px\))[^}]*\}/s.test(stylesheetText), "history download action can still force row overflow");
+  requireCondition(
+    /\.history-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*128px\),\s*1fr\)\))(?=[^}]*inline-size:\s*min\(100%,\s*560px\))[^}]*\}/s.test(stylesheetText),
+    "history actions can still crowd in medium-width cards",
+  );
+  requireCondition(
+    /\.history-export-actions,\s*\.history-download-panel\s*>\s*div\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*118px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText),
+    "history export and download action rows can still crowd",
+  );
+  requireCondition(
+    /@media\s*\(max-width:\s*1180px\)[\s\S]*?\.history-item,\s*\.history-version-list\s+article,\s*\.history-selected-run\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/s.test(stylesheetText),
+    "history cards are missing medium-width stacking",
+  );
   pass("history controls include label wrapping safeguards");
+
+  requireCondition(
+    /\.rf-studio-top-actions\s*\{(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s.test(stylesheetText),
+    "studio top actions can still force horizontal overflow at zoom widths",
+  );
+  requireCondition(
+    /@media\s*\(max-width:\s*1180px\)[\s\S]*?\.studio-top-button\s*\{[^}]*flex:\s*(?:1\s+1\s+)?150px/s.test(stylesheetText),
+    "studio top action buttons are missing medium-width wrapping",
+  );
+  requireCondition(
+    /\.settings-page-layout\s*\{(?=[^}]*grid-template-columns:\s*220px\s+minmax\(0,\s*1fr\))[^}]*\}/s.test(stylesheetText) &&
+      /@media\s*\(max-width:\s*900px\)[\s\S]*?\.settings-page-layout\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/s.test(stylesheetText),
+    "settings page layout is missing tablet stacking",
+  );
+  requireCondition(
+    /@media\s*\(max-width:\s*560px\)[\s\S]*?\.settings-page-topbar\s*\{(?=[^}]*align-items:\s*stretch)(?=[^}]*flex-direction:\s*column)[^}]*\}/s.test(stylesheetText),
+    "settings topbar can still crowd on phone widths",
+  );
+  pass("signed-in workspace pages include zoom-width layout safeguards");
 
   requireCondition(/\.faq-q\s*\{[^}]*min-height:\s*44px/.test(stylesheetText), "FAQ rows are missing comfortable touch targets");
   requireCondition(/\.login-nav-actions\s+\.btn-sm\s*\{[^}]*min-height:\s*44px/.test(stylesheetText), "login nav actions are missing comfortable touch targets");

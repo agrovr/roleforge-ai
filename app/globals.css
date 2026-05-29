@@ -14304,3 +14304,189 @@ body,
     width: min(100%, calc(100vw - 28px));
   }
 }
+
+/* Signed-in workspace repair: keep the studio, History, and Settings surfaces
+   composed when browser zoom or medium-width screens reduce the useful canvas. */
+.rf-studio-page,
+.settings-page-shell {
+  max-inline-size: 100vw;
+  overflow-x: clip;
+}
+
+.rf-studio-topbar,
+.rf-studio-layout,
+.rf-studio-main,
+.rf-studio-main > *,
+.studio-card,
+.studio-history-panel,
+.history-content-grid,
+.history-project-list,
+.history-detail-panel,
+.settings-page-layout,
+.settings-page-main,
+.settings-page-hero,
+.settings-section,
+.settings-section-panel {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.rf-studio-top-actions,
+.history-title-row,
+.history-detail-heading,
+.history-export-upgrade,
+.settings-page-topbar,
+.settings-billing-head,
+.settings-plan-active-card {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.rf-studio-top-actions {
+  flex-wrap: wrap;
+}
+
+.history-title-row strong,
+.history-detail-panel h3,
+.history-detail-heading,
+.history-detail-badges span,
+.history-export-panel strong,
+.history-export-upgrade,
+.history-version-formats,
+.settings-page-hero h1,
+.settings-section-copy h2,
+.settings-billing-note {
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.history-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 128px), 1fr));
+  inline-size: min(100%, 560px);
+  justify-self: end;
+}
+
+.history-actions .ghost-button,
+.history-confirm-actions .ghost-button,
+.history-detail-actions .btn,
+.history-export-actions .btn,
+.history-download-panel .btn,
+.history-version-list .btn,
+.history-version-more {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  min-block-size: 40px;
+  justify-content: center;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.history-export-actions,
+.history-download-panel > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 118px), 1fr));
+  inline-size: 100%;
+  justify-content: stretch;
+}
+
+.history-version-list article > div {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.settings-billing-head form,
+.settings-price-card form,
+.settings-profile-actions form {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+@media (max-width: 1180px) {
+  .rf-studio-top-actions {
+    justify-content: flex-start;
+  }
+
+  .studio-top-button {
+    flex: 1 1 150px;
+  }
+
+  .rf-studio-top-actions .theme-toggle,
+  .rf-studio-top-actions .studio-account-menu {
+    flex: 0 0 auto;
+  }
+
+  .history-item,
+  .history-version-list article,
+  .history-selected-run {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .history-actions,
+  .history-detail-actions,
+  .history-export-panel {
+    inline-size: 100%;
+    justify-self: stretch;
+  }
+
+  .history-export-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .settings-page-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-page-nav {
+    position: static;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr));
+  }
+
+  .settings-page-hero,
+  .settings-section {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-hero-status,
+  .settings-plan-includes {
+    justify-items: start;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .settings-page-shell {
+    padding-inline: 14px;
+  }
+
+  .settings-page-topbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .settings-page-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    justify-content: stretch;
+  }
+
+  .settings-page-actions .btn {
+    inline-size: 100%;
+  }
+
+  .history-actions,
+  .history-detail-actions,
+  .history-export-actions,
+  .history-download-panel > div,
+  .settings-profile-actions,
+  .settings-billing-head,
+  .settings-price-grid,
+  .settings-plan-active-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
