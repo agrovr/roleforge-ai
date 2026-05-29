@@ -13933,3 +13933,164 @@ body,
     font-size: clamp(0.9rem, 4vw, 1rem);
   }
 }
+
+/* Current visual QA repair: keep the public mockups composed at browser zoom
+   widths, where the effective CSS viewport can be much smaller than the
+   screenshot canvas. */
+.dash-mock .dash-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 282px), 1fr));
+}
+
+.dash-mock .dash-stat {
+  min-block-size: clamp(136px, 12cqi, 156px);
+  padding: clamp(18px, 2.4cqi, 24px);
+  overflow: hidden;
+}
+
+.dash-mock .dash-stat-value {
+  font-size: clamp(1.24rem, 4.1cqi, 1.68rem);
+  line-height: 1.06;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+@container dash-main (max-width: 1280px) {
+  .dash-mock .dash-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container dash-main (max-width: 620px) {
+  .dash-mock .dash-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cta-section {
+  padding-inline: clamp(18px, 3vw, 32px);
+  overflow: hidden;
+}
+
+.cta-section .section-inner {
+  inline-size: min(100%, 1240px);
+  max-inline-size: calc(100vw - clamp(36px, 6vw, 72px));
+  margin-inline: auto;
+  overflow: visible;
+}
+
+.cta-band {
+  inline-size: 100%;
+  max-inline-size: 100%;
+  margin-inline: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 300px), 390px);
+  gap: clamp(26px, 3.4vw, 48px);
+}
+
+.cta-band > div:first-child,
+.cta-band h2,
+.cta-band p,
+.cta-band .cta-cluster {
+  min-inline-size: 0;
+}
+
+.cta-band h2 {
+  max-inline-size: min(100%, 15ch);
+  font-size: clamp(2.32rem, 3.3vw, 3.56rem);
+}
+
+.cta-band .btn {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  white-space: normal;
+}
+
+.cta-visual {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow: hidden;
+}
+
+@media (min-width: 981px) and (max-width: 1440px) {
+  .cta-section .section-inner {
+    max-inline-size: min(980px, calc(100vw - 40px));
+  }
+
+  .cta-band {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
+    padding: clamp(36px, 5vw, 58px);
+  }
+
+  .cta-band > div:first-child,
+  .cta-band h2,
+  .cta-band p,
+  .cta-band .cta-cluster {
+    max-inline-size: 100%;
+  }
+
+  .cta-visual {
+    justify-self: center;
+    inline-size: min(100%, 500px);
+    min-block-size: clamp(320px, 42vw, 390px);
+  }
+
+  .cta-visual .resume-card {
+    left: 52%;
+    transform: translateX(-10%) rotate(5deg);
+  }
+
+  .cta-visual .resume-card.back {
+    left: 52%;
+    transform: translateX(-78%) rotate(-8deg);
+  }
+}
+
+@media (max-width: 980px) {
+  .cta-section .section-inner {
+    max-inline-size: calc(100vw - 32px);
+  }
+
+  .cta-band {
+    grid-template-columns: 1fr;
+    padding: clamp(34px, 6vw, 50px) clamp(22px, 5vw, 34px);
+  }
+
+  .cta-band > div:first-child,
+  .cta-band h2,
+  .cta-band p,
+  .cta-band .cta-cluster,
+  .cta-band .btn {
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  .cta-band h2 {
+    font-size: clamp(2rem, 9vw, 3rem);
+    overflow-wrap: anywhere;
+  }
+
+  .cta-band .cta-cluster {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cta-visual {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .cta-section .section-inner {
+    max-inline-size: calc(100vw - 24px);
+  }
+
+  .cta-band {
+    padding: 32px 22px;
+  }
+
+  .cta-band .cta-cluster {
+    grid-template-columns: 1fr;
+  }
+}

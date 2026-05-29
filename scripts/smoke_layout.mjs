@@ -695,7 +695,12 @@ async function main(argv = process.argv.slice(2)) {
         if (report.overflow > 1) {
           pageFailures.unshift({ reason: "document-overflow", overflow: report.overflow });
         }
-        return pageFailures.map((failure) => ({ ...failure, page: report.page, theme: report.theme, width: report.width }));
+        return pageFailures.map((failure) => ({
+          ...failure,
+          page: report.page,
+          theme: report.theme,
+          viewportWidth: report.width,
+        }));
       });
 
       if (failures.length) {
