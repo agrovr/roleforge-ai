@@ -13708,6 +13708,7 @@ body,
   .settings-profile-actions,
   .settings-billing-head,
   .settings-plan-active-card,
+  .cta-band,
   .cta-band .cta-cluster {
     grid-template-columns: 1fr;
   }
@@ -13886,6 +13887,7 @@ body,
   .settings-profile-actions,
   .settings-billing-head,
   .settings-plan-active-card,
+  .cta-band,
   .cta-band .cta-cluster {
     grid-template-columns: 1fr;
   }
@@ -13907,5 +13909,27 @@ body,
 
   .cta-band {
     padding: 34px 24px;
+  }
+
+  .cta-band,
+  .cta-band > div:first-child,
+  .cta-band h2,
+  .cta-band p,
+  .cta-band .cta-cluster,
+  .cta-band .btn {
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  .cta-band h2 {
+    font-size: clamp(2rem, 10.8vw, 2.78rem);
+    overflow-wrap: anywhere;
+  }
+
+  .cta-band .btn {
+    min-inline-size: 0;
+    padding-inline: 14px;
+    font-size: clamp(0.9rem, 4vw, 1rem);
   }
 }
