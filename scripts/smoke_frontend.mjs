@@ -1186,6 +1186,54 @@ export async function checkSignedInBackendWorkflowBridge(baseUrl, backendUrl, co
   return signedInCookie;
 }
 
+export function validateSignedInAuthStatusPayload(payload, options = {}) {
+  const expectPremiumAccess = Boolean(options.expectPremiumAccess);
+  const entitlement = payload?.entitlement;
+  const usage = payload?.usage;
+  const premiumActive = entitlement?.plan === "premium" && ["active", "trialing"].includes(entitlement?.billingStatus);
+
+  requireCondition(payload?.configured === true && payload?.enabled === true, "auth status did not report enabled Supabase auth");
+  requireCondition(payload?.user?.id, "auth status did not include a signed-in user");
+  requireCondition(entitlement?.plan, "auth status did not include an account plan");
+  requireCondition(entitlement?.exportFormats?.pdf === true, "auth status did not include PDF export access");
+  requireCondition(
+    entitlement.monthlyRunLimit === null || Number.isFinite(entitlement.monthlyRunLimit),
+    "auth status did not include a valid entitlement monthly run limit",
+  );
+
+  if (usage === null || usage === undefined) {
+    requireCondition(
+      typeof payload?.next === "string" && /usage|refresh|saved projects/i.test(payload.next),
+      "auth status without usage did not include customer-facing refresh guidance",
+    );
+  } else {
+    requireCondition(typeof usage.monthlyRuns === "number" && Number.isFinite(usage.monthlyRuns), "auth status usage did not include monthlyRuns");
+    requireCondition(
+      usage.monthlyRunLimit === null || (typeof usage.monthlyRunLimit === "number" && Number.isFinite(usage.monthlyRunLimit)),
+      "auth status usage did not include a valid monthlyRunLimit",
+    );
+    requireCondition(
+      usage.remainingRuns === null || (typeof usage.remainingRuns === "number" && Number.isFinite(usage.remainingRuns)),
+      "auth status usage did not include a valid remainingRuns",
+    );
+    requireCondition(typeof usage.runLimited === "boolean", "auth status usage did not include runLimited");
+
+    if (premiumActive) {
+      requireCondition(entitlement.monthlyRunLimit === null, "premium auth status entitlement should not report a free monthly limit");
+      requireCondition(usage.monthlyRunLimit === null, "premium auth status usage should not report a free monthly limit");
+      requireCondition(usage.remainingRuns === null, "premium auth status usage should not report finite remaining runs");
+      requireCondition(usage.runLimited === false, "premium auth status should not be run limited");
+    }
+  }
+
+  if (expectPremiumAccess) {
+    requireCondition(entitlement.plan === "premium", `signed-in smoke expected premium plan, got ${entitlement.plan}`);
+    requireCondition(entitlement.billingStatus === "active" || entitlement.billingStatus === "trialing", `signed-in smoke expected active premium billing, got ${entitlement.billingStatus}`);
+    requireCondition(entitlement.exportFormats?.docx === true, "signed-in premium smoke did not include DOCX export access");
+    requireCondition(entitlement.exportFormats?.txt === true, "signed-in premium smoke did not include TXT export access");
+  }
+}
+
 async function checkSignedInStatus(baseUrl, cookie, options) {
   const { accessToken, backendUrl, cookieSource, expectPremiumAccess, requireBackendWorkflowSmoke, requireSignedInSmoke } = options;
 
@@ -1203,19 +1251,13 @@ async function checkSignedInStatus(baseUrl, cookie, options) {
   signedInCookie = mergeSetCookieHeaders(signedInCookie, status.response);
   requireCondition(status.response.ok, `auth status returned ${status.response.status}`);
   const payload = JSON.parse(status.text);
-  requireCondition(payload.configured === true && payload.enabled === true, "auth status did not report enabled Supabase auth");
-  requireCondition(payload.user?.id, "auth status did not include a signed-in user");
-  requireCondition(payload.entitlement?.plan, "auth status did not include an account plan");
+  validateSignedInAuthStatusPayload(payload, { expectPremiumAccess });
 
   if (expectPremiumAccess) {
-    requireCondition(payload.entitlement.plan === "premium", `signed-in smoke expected premium plan, got ${payload.entitlement.plan}`);
-    requireCondition(payload.entitlement.billingStatus === "active" || payload.entitlement.billingStatus === "trialing", `signed-in smoke expected active premium billing, got ${payload.entitlement.billingStatus}`);
-    requireCondition(payload.entitlement.exportFormats?.docx === true, "signed-in premium smoke did not include DOCX export access");
-    requireCondition(payload.entitlement.exportFormats?.txt === true, "signed-in premium smoke did not include TXT export access");
     pass("signed-in auth status confirms premium export access");
   }
 
-  pass("signed-in auth status returns account and plan state");
+  pass("signed-in auth status returns account, plan, and usage state");
 
   const app = await request(baseUrl, "/app", { cookie: signedInCookie, redirect: "follow" });
   signedInCookie = mergeSetCookieHeaders(signedInCookie, app.response);

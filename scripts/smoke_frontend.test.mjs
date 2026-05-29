@@ -10,6 +10,7 @@ import {
   parseSmokeArgs,
   parseCookieHeader,
   supabaseStorageKey,
+  validateSignedInAuthStatusPayload,
 } from "./smoke_frontend.mjs";
 
 function buildSession(overrides = {}) {
@@ -130,6 +131,95 @@ test("parses frontend smoke CLI target options", () => {
 test("rejects unknown frontend smoke CLI options", () => {
   assert.throws(() => parseSmokeArgs(["--not-real"]), /Unknown argument/);
   assert.throws(() => parseSmokeArgs(["--base-url"]), /requires a value/);
+});
+
+function signedInStatusPayload(overrides = {}) {
+  return {
+    configured: true,
+    enabled: true,
+    provider: "supabase",
+    user: { id: "user-id", email: "smoke@example.com", name: "Smoke User" },
+    entitlement: {
+      plan: "free",
+      billingStatus: "none",
+      exportFormats: { pdf: true, docx: false, txt: false },
+      projectStorage: true,
+      monthlyRunLimit: 5,
+      currentPeriodEnd: null,
+      cancelAtPeriodEnd: false,
+      cancelAt: null,
+      canceledAt: null,
+    },
+    usage: {
+      currentPeriodStart: "2026-05-01T00:00:00.000Z",
+      currentPeriodEnd: "2026-06-01T00:00:00.000Z",
+      monthlyRuns: 2,
+      monthlyRunLimit: 5,
+      remainingRuns: 3,
+      runLimited: false,
+    },
+    next: "Saved projects sync to your account when a completed run is available.",
+    ...overrides,
+  };
+}
+
+test("signed-in auth status smoke validates plan and usage shape", () => {
+  assert.doesNotThrow(() => validateSignedInAuthStatusPayload(signedInStatusPayload()));
+});
+
+test("signed-in auth status smoke accepts pending usage refresh guidance", () => {
+  assert.doesNotThrow(() => validateSignedInAuthStatusPayload(signedInStatusPayload({
+    usage: null,
+    next: "Saved projects sync is active. Usage will refresh shortly.",
+  })));
+});
+
+test("signed-in auth status smoke verifies premium unlimited usage", () => {
+  assert.doesNotThrow(() => validateSignedInAuthStatusPayload(signedInStatusPayload({
+    entitlement: {
+      plan: "premium",
+      billingStatus: "active",
+      exportFormats: { pdf: true, docx: true, txt: true },
+      projectStorage: true,
+      monthlyRunLimit: null,
+      currentPeriodEnd: "2026-06-01T00:00:00.000Z",
+      cancelAtPeriodEnd: false,
+      cancelAt: null,
+      canceledAt: null,
+    },
+    usage: {
+      currentPeriodStart: "2026-05-01T00:00:00.000Z",
+      currentPeriodEnd: "2026-06-01T00:00:00.000Z",
+      monthlyRuns: 24,
+      monthlyRunLimit: null,
+      remainingRuns: null,
+      runLimited: false,
+    },
+  }), { expectPremiumAccess: true }));
+});
+
+test("signed-in auth status smoke rejects premium accounts with free usage limits", () => {
+  assert.throws(() => validateSignedInAuthStatusPayload(signedInStatusPayload({
+    entitlement: {
+      plan: "premium",
+      billingStatus: "active",
+      exportFormats: { pdf: true, docx: true, txt: true },
+      projectStorage: true,
+      monthlyRunLimit: null,
+      currentPeriodEnd: "2026-06-01T00:00:00.000Z",
+      cancelAtPeriodEnd: false,
+      cancelAt: null,
+      canceledAt: null,
+    },
+    usage: {
+      currentPeriodStart: "2026-05-01T00:00:00.000Z",
+      currentPeriodEnd: "2026-06-01T00:00:00.000Z",
+      monthlyRuns: 5,
+      monthlyRunLimit: 5,
+      remainingRuns: 0,
+      runLimited: true,
+    },
+  }), { expectPremiumAccess: true }), /premium auth status usage should not report a free monthly limit/);
 });
 
 test("backend workflow smoke bridges backend export through protected frontend download and saved projects", async () => {
