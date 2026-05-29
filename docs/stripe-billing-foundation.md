@@ -45,7 +45,7 @@ After creating the endpoint, add its signing secret to Vercel as `STRIPE_WEBHOOK
 - Checkout stops and returns to `/settings?billing=temporarily-unavailable#billing` if the entitlement lookup fails or the Stripe customer ID cannot be saved.
 - Billing portal access stops and returns to `/settings?billing=temporarily-unavailable#billing` if the entitlement lookup fails.
 - Premium is only granted by Stripe webhook events.
-- Active or trialing subscriptions set `plan = 'premium'`, unlock premium export entitlements, and set `monthly_run_limit = null`.
+- Active or trialing subscriptions set `plan = 'premium'`, unlock premium export entitlements, and set `monthly_run_limit = null`. The app also treats active/trialing Premium as unlimited if stale numeric feature data is present.
 - Canceled, incomplete, past-due, or missing subscriptions fall back to free entitlements.
 - Free entitlement keeps PDF export available and sets `monthly_run_limit = 5`.
 
