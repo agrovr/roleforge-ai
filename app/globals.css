@@ -14094,3 +14094,213 @@ body,
     grid-template-columns: 1fr;
   }
 }
+
+/* Mobile surface repair: the protected login and template library pages use
+   oversized editorial type, so keep their copy and previews inside the phone
+   viewport instead of relying on horizontal clipping. */
+.login-shell,
+.templates-page-shell {
+  max-inline-size: 100vw;
+  overflow-x: hidden;
+}
+
+.login-panel,
+.login-copy,
+.login-card,
+.templates-page-hero,
+.templates-selection-status,
+.templates-page-grid,
+.templates-page-card {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.login-copy h1,
+.login-copy p,
+.login-benefits span,
+.login-card-head h2,
+.login-card-head p,
+.templates-page-hero h1,
+.templates-page-hero p,
+.templates-page-card-copy p {
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.templates-page-card .template-thumb {
+  display: grid;
+  place-items: start center;
+}
+
+.templates-page-card .template-thumb .r-doc,
+.templates-page-card .template-thumb .r-doc * {
+  max-inline-size: 100%;
+}
+
+.templates-page-card .template-thumb .r-doc {
+  inline-size: 100%;
+  min-inline-size: 0;
+  overflow: hidden;
+}
+
+.templates-page-card .template-thumb .r-contact,
+.templates-page-card .template-thumb .r-copy,
+.templates-page-card .template-thumb .r-bullet {
+  overflow-wrap: anywhere;
+}
+
+.templates-page-card .template-thumb .r-doc.modern {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+}
+
+.templates-page-card .template-thumb .r-side,
+.templates-page-card .template-thumb .r-main {
+  min-inline-size: 0;
+}
+
+@media (max-width: 760px) {
+  .login-shell,
+  .templates-page-shell {
+    inline-size: 100%;
+    padding-inline: 16px;
+  }
+
+  .login-panel {
+    inline-size: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    overflow: visible;
+  }
+
+  .login-copy h1 {
+    font-size: clamp(2.42rem, 12vw, 3rem);
+    line-height: 0.98;
+  }
+
+  .login-copy p {
+    font-size: clamp(0.98rem, 4.7vw, 1.08rem);
+    line-height: 1.48;
+  }
+
+  .login-benefits {
+    gap: 12px;
+  }
+
+  .login-benefits span {
+    align-items: flex-start;
+    line-height: 1.28;
+  }
+
+  .login-studio-preview,
+  .login-card {
+    inline-size: 100%;
+    border-radius: 18px;
+  }
+
+  .login-card {
+    padding: 18px;
+  }
+
+  .login-card-head h2 {
+    font-size: clamp(1.82rem, 9.6vw, 2.32rem);
+  }
+
+  .login-status {
+    width: 100%;
+    justify-content: flex-start;
+    border-radius: 18px;
+  }
+
+  .templates-page-shell {
+    padding-block-end: 48px;
+  }
+
+  .templates-page-hero,
+  .templates-selection-status,
+  .templates-page-grid {
+    inline-size: min(100%, calc(100vw - 32px));
+    width: min(100%, calc(100vw - 32px));
+    margin-inline: auto;
+  }
+
+  .templates-page-hero {
+    padding: 22px;
+  }
+
+  .templates-page-hero h1 {
+    font-size: clamp(2.48rem, 13vw, 3.45rem);
+    line-height: 1.02;
+  }
+
+  .templates-page-hero p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .templates-page-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .templates-page-card .template-thumb {
+    block-size: clamp(314px, 92vw, 352px);
+    padding-inline: 10px;
+  }
+
+  .templates-page-card .template-thumb .r-doc {
+    block-size: 112%;
+    font-size: 5.8px;
+    inline-size: 112%;
+    padding: 16px;
+    transform: scale(0.88);
+    transform-origin: top center;
+  }
+
+  .templates-page-card .template-thumb .r-doc.modern {
+    block-size: 116%;
+    font-size: 5.4px;
+    inline-size: 116%;
+    transform: scale(0.86);
+  }
+
+  .templates-page-card .template-thumb .r-doc.modern .r-side {
+    padding: 16px 10px;
+  }
+
+  .templates-page-card .template-thumb .r-doc.modern .r-main {
+    padding: 16px 10px 16px 0;
+  }
+
+  .template-title-row,
+  .template-card-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .template-tag {
+    text-align: left;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-shell,
+  .templates-page-shell {
+    padding-inline: 14px;
+  }
+
+  .login-copy h1 {
+    font-size: clamp(2.28rem, 11.6vw, 2.82rem);
+  }
+
+  .templates-page-hero {
+    padding: 20px;
+  }
+
+  .templates-page-hero h1 {
+    font-size: clamp(2.34rem, 12.4vw, 3.1rem);
+  }
+
+  .templates-page-hero,
+  .templates-selection-status,
+  .templates-page-grid {
+    inline-size: min(100%, calc(100vw - 28px));
+    width: min(100%, calc(100vw - 28px));
+  }
+}

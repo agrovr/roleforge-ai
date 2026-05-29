@@ -65,11 +65,46 @@ const PAGE_CHECKS = [
     path: "/templates",
     name: "templates",
     selectors: [".templates-page-hero", ".templates-page-actions", ".templates-selection-status", ".templates-page-grid"],
+    textFitSelectors: [
+      ".templates-page-hero h1",
+      ".templates-page-hero p",
+      ".templates-page-actions .primary-button",
+      ".templates-page-actions .ghost-button",
+      ".templates-selection-status strong",
+      ".templates-selection-status .btn",
+      ".templates-page-card-copy p",
+      ".template-card-actions .btn",
+    ],
+    containedSelectors: [
+      { container: ".templates-page-shell", selector: ".templates-page-hero", tolerance: 4 },
+      { container: ".templates-page-shell", selector: ".templates-selection-status", tolerance: 4 },
+      { container: ".templates-page-shell", selector: ".templates-page-grid", tolerance: 4 },
+      { container: "closest:.template-thumb", selector: ".templates-page-card .template-thumb .r-doc", tolerance: 4 },
+    ],
   },
   {
     path: "/login?next=%2Fapp&account=signin-required",
     name: "login",
     selectors: [".login-nav", ".login-panel", ".login-copy", ".login-card", ".studio-oauth-button"],
+    textFitSelectors: [
+      ".login-copy h1",
+      ".login-copy p",
+      ".login-benefits span",
+      ".login-preview-top strong",
+      ".login-preview-sheet strong",
+      ".login-status",
+      ".login-card-head h2",
+      ".login-card-head p",
+      ".login-session-strip span",
+      ".studio-oauth-button",
+      ".studio-account-submit",
+    ],
+    containedSelectors: [
+      { container: ".login-shell", selector: ".login-panel", tolerance: 4 },
+      { container: ".login-panel", selector: ".login-card", tolerance: 4 },
+      { container: ".login-panel", selector: ".login-copy", tolerance: 4 },
+      { container: "closest:.login-card", selector: ".login-status", tolerance: 4 },
+    ],
   },
   {
     path: "/app",
@@ -721,8 +756,12 @@ async function main(argv = process.argv.slice(2)) {
     fail(error instanceof Error ? error.message : String(error));
   } finally {
     if (chrome && !chrome.killed) chrome.kill();
-    await delay(300);
-    rmSync(userDataDir, { recursive: true, force: true });
+    await delay(500);
+    try {
+      rmSync(userDataDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 120 });
+    } catch (error) {
+      skip(`Chrome profile cleanup skipped: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 }
 
