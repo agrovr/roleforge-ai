@@ -59,11 +59,6 @@ function booleanFeature(features: Record<string, unknown> | null, key: string, f
   return typeof value === "boolean" ? value : fallback;
 }
 
-function numberFeature(features: Record<string, unknown> | null, key: string, fallback: number | null) {
-  const value = features?.[key];
-  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
-}
-
 function premiumBooleanFeature(features: Record<string, unknown> | null, key: string, premiumActive: boolean) {
   return premiumActive ? booleanFeature(features, key, true) : false;
 }
@@ -84,7 +79,7 @@ export function entitlementFromRow(row?: EntitlementRow | null): AccountEntitlem
       txt: premiumBooleanFeature(features, "export_txt", premiumActive),
     },
     projectStorage: booleanFeature(features, "project_storage", true),
-    monthlyRunLimit: premiumActive ? numberFeature(features, "monthly_run_limit", null) : FREE_ENTITLEMENT.monthlyRunLimit,
+    monthlyRunLimit: premiumActive ? null : FREE_ENTITLEMENT.monthlyRunLimit,
     currentPeriodEnd: row.current_period_end,
     cancelAtPeriodEnd: Boolean(row.cancel_at_period_end),
     cancelAt: row.cancel_at ?? null,
