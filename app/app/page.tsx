@@ -69,7 +69,7 @@ import {
 import { createRoleForgeBrowserClient } from "../lib/supabase/client";
 import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun } from "../lib/supabase/savedProjectClient";
 import { tailorActionState } from "../lib/tailorAction";
-import { monthlyRunAllowanceSentence, runWord } from "../lib/usage";
+import { accountUsageSummary, monthlyRunAllowanceSentence, runWord } from "../lib/usage";
 import {
   DEFAULT_UPLOAD_FORMATS,
   normalizeWorkflowCapabilities,
@@ -975,11 +975,17 @@ export default function Page() {
   const usage = accountStatus?.usage ?? null;
   const errorLimit = numberDetail(workflowError?.details, "monthly_limit");
   const errorRuns = numberDetail(workflowError?.details, "monthly_runs");
-  const monthlyRunLimit = usage ? usage.monthlyRunLimit : errorLimit ?? FREE_ENTITLEMENT.monthlyRunLimit;
-  const monthlyRuns = usage?.monthlyRuns ?? errorRuns ?? monthlyRunLimit;
+  const usageSummary = accountUsageSummary({
+    usage,
+    entitlement: accountStatus?.entitlement ?? FREE_ENTITLEMENT,
+    limitError,
+    errorMonthlyRuns: errorRuns,
+    errorMonthlyLimit: errorLimit,
+  });
+  const monthlyRunLimit = usageSummary.monthlyRunLimit;
   const resetAt = usage?.currentPeriodEnd || stringDetail(workflowError?.details, "reset_at");
   const resetLabel = formatResetDate(resetAt);
-  const usageLabel = typeof monthlyRunLimit === "number" ? `${monthlyRuns}/${monthlyRunLimit} ${runWord(monthlyRuns)} used` : "Premium runs are unlimited";
+  const usageLabel = usageSummary.label;
 
   const workflowHeaders = useCallback(async (extra: Record<string, string> = {}) => {
     if (!supabaseClient) return extra;
@@ -2541,7 +2547,11 @@ export default function Page() {
         ? accountStatus.usage.monthlyRunLimit === null
           ? `${accountStatus.usage.monthlyRuns} ${runWord(accountStatus.usage.monthlyRuns)} this month. Premium is unlimited.`
           : `${accountStatus.usage.monthlyRuns}/${accountStatus.usage.monthlyRunLimit} free ${runWord(accountStatus.usage.monthlyRuns)} used this month.`
-        : "Sign in to see run usage.",
+        : accountStatus?.entitlement?.monthlyRunLimit === null
+          ? "Premium is unlimited. Usage is refreshing."
+          : signedIn
+            ? "Usage is refreshing."
+            : "Sign in to see run usage.",
       href: "/settings#usage",
     },
     {

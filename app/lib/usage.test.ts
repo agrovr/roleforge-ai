@@ -5,6 +5,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { FREE_ENTITLEMENT, type AccountEntitlement } from "./entitlements";
 import {
+  accountUsageSummary,
   currentUsagePeriod,
   loadAccountUsage,
   monthlyRunAllowanceLabel,
@@ -123,4 +124,38 @@ test("calculates usage progress without invalid widths", () => {
   assert.equal(usageProgressPercent({ monthlyRuns: 10, monthlyRunLimit: 5, runLimited: true }), 100);
   assert.equal(usageProgressPercent({ monthlyRuns: 0, monthlyRunLimit: 0, runLimited: true }), 100);
   assert.equal(usageProgressPercent({ monthlyRuns: 0, monthlyRunLimit: null, runLimited: false }), 100);
+});
+
+test("summarizes pending usage without showing a false free limit", () => {
+  assert.deepEqual(
+    accountUsageSummary({ usage: null, entitlement: premiumEntitlement }),
+    {
+      monthlyRuns: 0,
+      monthlyRunLimit: null,
+      pending: true,
+      label: "Premium runs are unlimited",
+    },
+  );
+
+  assert.deepEqual(
+    accountUsageSummary({ usage: null, entitlement: freeEntitlement }),
+    {
+      monthlyRuns: 0,
+      monthlyRunLimit: 5,
+      pending: true,
+      label: "Usage refresh pending",
+    },
+  );
+});
+
+test("summarizes usage limit errors even when the backend omits run counts", () => {
+  assert.deepEqual(
+    accountUsageSummary({ usage: null, entitlement: freeEntitlement, limitError: true, errorMonthlyLimit: 5 }),
+    {
+      monthlyRuns: 5,
+      monthlyRunLimit: 5,
+      pending: false,
+      label: "5/5 runs used",
+    },
+  );
 });

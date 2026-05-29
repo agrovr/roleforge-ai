@@ -12,6 +12,13 @@ export type AccountUsage = {
 };
 
 type CountResult = { count: number | null; error: unknown };
+type AccountUsageSummaryInput = {
+  usage?: AccountUsage | null;
+  entitlement: Pick<AccountEntitlement, "monthlyRunLimit">;
+  limitError?: boolean;
+  errorMonthlyRuns?: number | null;
+  errorMonthlyLimit?: number | null;
+};
 
 export function runWord(count: number | null) {
   return count === 1 ? "run" : "runs";
@@ -31,6 +38,40 @@ export function usageProgressPercent(usage: Pick<AccountUsage, "monthlyRuns" | "
   if (usage.monthlyRunLimit === null) return 100;
   if (usage.monthlyRunLimit <= 0) return usage.runLimited ? 100 : 0;
   return Math.min(100, (usage.monthlyRuns / usage.monthlyRunLimit) * 100);
+}
+
+export function accountUsageSummary({
+  usage,
+  entitlement,
+  limitError = false,
+  errorMonthlyRuns,
+  errorMonthlyLimit,
+}: AccountUsageSummaryInput) {
+  const monthlyRunLimit = usage
+    ? usage.monthlyRunLimit
+    : errorMonthlyLimit ?? entitlement.monthlyRunLimit;
+  const monthlyRuns =
+    usage?.monthlyRuns ??
+    errorMonthlyRuns ??
+    (limitError && typeof monthlyRunLimit === "number" ? monthlyRunLimit : 0);
+
+  if (!usage && !limitError) {
+    return {
+      monthlyRuns,
+      monthlyRunLimit,
+      pending: true,
+      label: monthlyRunLimit === null ? "Premium runs are unlimited" : "Usage refresh pending",
+    };
+  }
+
+  return {
+    monthlyRuns,
+    monthlyRunLimit,
+    pending: false,
+    label: typeof monthlyRunLimit === "number"
+      ? `${monthlyRuns}/${monthlyRunLimit} ${runWord(monthlyRuns)} used`
+      : "Premium runs are unlimited",
+  };
 }
 
 export function currentUsagePeriod(now = new Date()) {

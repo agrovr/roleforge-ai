@@ -38,7 +38,9 @@ export async function GET() {
   }
 
   const entitlement = user && supabase ? await loadAccountEntitlement(supabase, user.id) : FREE_ENTITLEMENT;
-  const usage = user && supabase ? await loadAccountUsage(supabase, user.id, entitlement) : null;
+  const usage = user && supabase
+    ? await loadAccountUsage(supabase, user.id, entitlement).catch(() => null)
+    : null;
 
   return NextResponse.json({
     configured: true,
@@ -48,7 +50,9 @@ export async function GET() {
     entitlement,
     usage,
     next: user
-      ? "Saved projects sync to your account when a completed run is available."
+      ? usage
+        ? "Saved projects sync to your account when a completed run is available."
+        : "Saved projects sync is active. Usage will refresh shortly."
       : "Use email or Google sign-in to sync completed runs to saved projects.",
   });
 }
