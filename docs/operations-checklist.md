@@ -37,12 +37,12 @@ Backend health with exact deployed revision:
 
 Frontend:
 
-- `Frontend CI` runs tests, lint, typecheck, build, waits for Vercel, then smokes production, including the backend `/capabilities` contract.
-- `Production Smoke` runs daily and can be manually dispatched for the live frontend and backend workflow contract.
+- `Frontend CI` runs tests, lint, typecheck, build, waits for Vercel, then smokes production with signed-in account checks, backend workflow bridging, and the backend `/capabilities` contract.
+- `Production Smoke` runs daily and can be manually dispatched for the live frontend, signed-in account paths, rendered layout, and backend workflow contract.
 - Repository variables for signed-in smoke account auth: `ROLEFORGE_SUPABASE_URL` and `ROLEFORGE_SUPABASE_PUBLISHABLE_KEY`.
-- Optional secrets for signed-in smoke: `ROLEFORGE_SMOKE_EMAIL` and `ROLEFORGE_SMOKE_PASSWORD` for a dedicated non-personal smoke account. The smoke script signs in through Supabase Auth and builds the app's SSR cookie shape.
+- Required secrets for signed-in smoke on `main`: `ROLEFORGE_SMOKE_EMAIL` and `ROLEFORGE_SMOKE_PASSWORD` for a dedicated non-personal smoke account. The smoke script signs in through Supabase Auth and builds the app's SSR cookie shape.
 - Fallback secret: `ROLEFORGE_SMOKE_COOKIE` for a one-off dedicated smoke account cookie. Do not use a personal browser cookie in CI.
-- Optional repository variable: `ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE=true` after the smoke account credentials or cookie are configured, so CI fails if signed-in account checks are skipped.
+- Repository variable: keep `ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE=true` so readiness checks match the mandatory signed-in CI behavior.
 - Optional repository variable: `ROLEFORGE_EXPECT_PREMIUM_ACCESS=true` when the smoke account should have premium access and should fail if DOCX/TXT access disappears.
 
 Backend:

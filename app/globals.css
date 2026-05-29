@@ -13548,3 +13548,176 @@ body,
     justify-self: stretch;
   }
 }
+
+/* Screenshot-width layout audit: keep the public CTA, studio mock stats, and
+   settings actions composed when browser zoom reduces the effective viewport. */
+.dash-main-head,
+.dash-mock .dash-stat,
+.settings-profile-actions,
+.settings-billing-head,
+.settings-plan-active-card,
+.cta-section,
+.cta-section .section-inner,
+.cta-band,
+.cta-band > div:first-child,
+.cta-visual {
+  min-inline-size: 0;
+}
+
+.dash-main-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, max-content);
+  align-items: start;
+}
+
+.dash-main-head .btn-sm {
+  inline-size: 100%;
+  max-inline-size: 190px;
+  justify-self: end;
+}
+
+.dash-mock .dash-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 245px), 1fr));
+  gap: clamp(12px, 1.6cqi, 18px);
+}
+
+.dash-mock .dash-stat {
+  min-block-size: clamp(136px, 12cqi, 156px);
+  padding: clamp(18px, 2.8cqi, 24px);
+}
+
+.dash-mock .dash-stat-value {
+  font-size: clamp(1.18rem, 4.2cqi, 1.54rem);
+  line-height: 1.08;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.dash-mock .dash-stat-delta {
+  max-inline-size: 24ch;
+  overflow-wrap: anywhere;
+}
+
+.settings-profile-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  inline-size: min(100%, 560px);
+}
+
+.settings-profile-actions form,
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button {
+  inline-size: 100%;
+}
+
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button,
+.settings-billing-head .ghost-button,
+.settings-plan-active-card .settings-inline-link,
+.settings-export-actions .btn,
+.price-card .btn,
+.cta-band .btn {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  min-block-size: 50px;
+  padding-inline: clamp(14px, 2cqi, 22px);
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.settings-billing-head {
+  grid-template-columns: minmax(0, 1fr) minmax(178px, 220px);
+}
+
+.settings-plan-active-card {
+  grid-template-columns: minmax(0, 1fr) minmax(154px, max-content);
+}
+
+.cta-section {
+  padding-inline: clamp(16px, 2.6vw, 28px);
+  overflow: hidden;
+}
+
+.cta-section .section-inner {
+  inline-size: 100%;
+  max-inline-size: min(1260px, calc(100vw - clamp(32px, 5.2vw, 56px)));
+}
+
+.cta-band {
+  inline-size: 100%;
+  margin-inline: auto;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.cta-band h2 {
+  max-inline-size: 14ch;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.cta-band p {
+  max-inline-size: 44ch;
+}
+
+.cta-visual {
+  max-inline-size: 100%;
+}
+
+@media (min-width: 1441px) {
+  .cta-band {
+    grid-template-columns: minmax(0, 0.96fr) minmax(320px, 410px);
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1440px) {
+  .cta-band {
+    max-inline-size: 980px;
+    grid-template-columns: 1fr;
+    gap: clamp(26px, 4vw, 42px);
+  }
+
+  .cta-band > div:first-child,
+  .cta-band h2,
+  .cta-band p {
+    max-inline-size: 100%;
+  }
+
+  .cta-band .cta-cluster {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-inline-size: 560px;
+  }
+
+  .cta-band .btn {
+    inline-size: 100%;
+  }
+
+  .cta-visual {
+    justify-self: center;
+    inline-size: min(100%, 520px);
+    min-block-size: clamp(320px, 38vw, 388px);
+  }
+}
+
+@media (max-width: 760px) {
+  .dash-main-head,
+  .settings-profile-actions,
+  .settings-billing-head,
+  .settings-plan-active-card,
+  .cta-band .cta-cluster {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-main-head .btn-sm,
+  .settings-billing-head form,
+  .settings-billing-head .ghost-button,
+  .settings-plan-active-card .settings-inline-link {
+    inline-size: 100%;
+    max-inline-size: none;
+    justify-self: stretch;
+  }
+}

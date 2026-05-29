@@ -8,7 +8,7 @@ import { createServer } from "node:net";
 import { cookieHeaderFromSession } from "./smoke_frontend.mjs";
 
 const DEFAULT_BASE_URL = "https://roleforgeai.vercel.app";
-const VIEWPORTS = [390, 640, 768, 900, 1024, 1180, 1366, 1500, 1712];
+const VIEWPORTS = [390, 640, 768, 900, 1024, 1180, 1366, 1440, 1500, 1712];
 const PUBLIC_THEMES = ["light", "dark"];
 const PAGE_CHECKS = [
   {
