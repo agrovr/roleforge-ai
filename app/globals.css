@@ -13214,7 +13214,7 @@ body,
 /* Visual QA guardrails: keep the public marketing mockups and settings
    controls composed at the odd viewport and zoom widths users screenshot. */
 .dash-mock .dash-stats {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
 }
 
 .dash-mock .dash-stat {
@@ -13223,11 +13223,13 @@ body,
 }
 
 .dash-mock .dash-stat-value {
-  font-size: clamp(1.22rem, 4.4cqi, 1.72rem);
-  line-height: 1.04;
+  font-size: clamp(1.06rem, 4.8cqi, 1.38rem);
+  line-height: 1.08;
   max-inline-size: 100%;
-  overflow-wrap: anywhere;
+  hyphens: none;
+  overflow-wrap: normal;
   text-wrap: balance;
+  word-break: normal;
 }
 
 .dash-mock .dash-stat-label,
