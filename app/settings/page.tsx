@@ -105,6 +105,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()),
     billingStatus: entitlement.billingStatus,
   });
+  const portalActionTitle = portalReady
+    ? "Open Stripe billing management"
+    : premiumActive
+      ? "Billing management is temporarily unavailable."
+      : "Start Premium before managing billing.";
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName = accountDisplayName(user);
   const planFeatures = premiumActive
@@ -325,11 +330,17 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 <span className={`settings-status-pill ${premiumEnding ? "ready" : billingTone}`}>
                   {billingLabel}
                 </span>
-                <form action="/api/billing/portal" method="post">
-                  <button className="ghost-button" type="submit" disabled={!portalReady}>
-                    Manage billing
-                  </button>
-                </form>
+                {portalReady ? (
+                  <form action="/api/billing/portal" method="post">
+                    <button className="ghost-button" type="submit" title={portalActionTitle}>
+                      Manage billing
+                    </button>
+                  </form>
+                ) : (
+                  <span className="ghost-button settings-disabled-action" aria-disabled="true" title={portalActionTitle}>
+                    No billing portal yet
+                  </span>
+                )}
               </div>
               {premiumActive ? (
                 <div className="settings-plan-active-card">
