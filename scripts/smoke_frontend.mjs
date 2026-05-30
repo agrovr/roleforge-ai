@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 const DEFAULT_BASE_URL = "https://roleforgeai.vercel.app";
@@ -395,6 +396,7 @@ async function checkPublicShell(baseUrl) {
       return stylesheet.text;
     }))
   ).join("\n");
+  const sourceStylesheetText = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
 
   requireCondition(/\.templates-page-hero\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*container:\s*templates-hero\s*\/\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "templates hero was missing overflow-safe container sizing");
   requireCondition(/\.templates-page-hero\s*>\s*\*\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "templates hero children can still force horizontal overflow");
@@ -502,6 +504,15 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.footer-inner\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "footer columns can still force overflow");
   requireCondition(/\.footer-tag,\s*\.footer-col\s+a,\s*\.footer-col\s+span,\s*\.footer-meta\s+span\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "footer copy can still overflow narrow columns");
   pass("landing final CTA and footer include overflow-safe layout guards");
+
+  const finalCtaGuardIndex = sourceStylesheetText.lastIndexOf("/* Final CTA screenshot fix:");
+  requireCondition(finalCtaGuardIndex >= 0, "landing final CTA was missing the cascade-final screenshot guard");
+  const finalCtaGuard = sourceStylesheetText.slice(finalCtaGuardIndex);
+  requireCondition(/\.cta-section\s+\.section-inner\s*\{(?=[^}]*inline-size:\s*min\(100%,\s*1180px\))(?=[^}]*max-inline-size:\s*calc\(100vw\s*-\s*clamp\(40px,\s*6\.4vw,\s*80px\)\))[^}]*\}/s.test(finalCtaGuard), "landing final CTA screenshot guard does not constrain the outer width last in the cascade");
+  requireCondition(/\.cta-band\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*280px\),\s*360px\))(?=[^}]*padding:\s*clamp\(38px,\s*4\.6vw,\s*56px\))[^}]*\}/s.test(finalCtaGuard), "landing final CTA screenshot guard does not define the final desktop card grid");
+  requireCondition(/\.cta-visual\s*\{(?=[^}]*inline-size:\s*min\(100%,\s*360px\))(?=[^}]*min-block-size:\s*clamp\(300px,\s*24vw,\s*350px\))[^}]*\}/s.test(finalCtaGuard), "landing final CTA screenshot guard does not contain the final resume artwork box");
+  requireCondition(/@media\s*\(min-width:\s*1181px\)\s+and\s+\(max-width:\s*1580px\)\s*\{[\s\S]*?\.cta-visual\s+\.resume-card\s*\{(?=[^}]*left:\s*52%)(?=[^}]*transform:\s*translateX\(-18%\)\s*rotate\(5deg\))[^}]*\}/s.test(finalCtaGuard), "landing final CTA screenshot guard does not keep desktop-zoom resume art inside the card");
+  pass("landing final CTA screenshot guard is cascade-final");
 
   requireCondition(/@media\s*\(max-width:\s*1040px\)[\s\S]*?\.login-panel\s*\{[^}]*grid-template-columns:\s*1fr/.test(stylesheetText), "login page can still stay cramped at tablet widths");
   requireCondition(/\.login-shell\s*\{(?=[^}]*overflow-x:\s*clip)[^}]*\}/s.test(stylesheetText), "login page can still create horizontal overflow");
