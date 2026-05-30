@@ -12,9 +12,8 @@ import { billingNotice } from "../lib/billing/notices";
 import { billingReadiness } from "../lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
-import { groupHistoryItems, historyGroupStatus, type HistoryItem } from "../lib/history";
-import { RESUME_TEMPLATE_COOKIE, getResumeTemplate, isResumeTemplateSlug } from "../lib/resumeTemplates";
-import { savedRunHistoryHref } from "../lib/savedRunLinks";
+import { RESUME_TEMPLATE_COOKIE, getResumeTemplate } from "../lib/resumeTemplates";
+import { settingsProjectSummaries } from "../lib/settingsProjects";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 import { loadSavedRuns } from "../lib/supabase/savedProjects";
 import {
@@ -44,32 +43,6 @@ function formatPlanDate(value: string | null) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
-}
-
-function formatSavedRunDate(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-}
-
-function savedRunCanRestore(run: { snapshot?: Record<string, unknown> }) {
-  const result = run.snapshot?.result;
-  if (!result || typeof result !== "object") return false;
-  const tailoredText = (result as { tailored_text?: unknown }).tailored_text;
-  return typeof tailoredText === "string" && Boolean(tailoredText.trim());
-}
-
-function savedRunTemplateName(run: { snapshot?: Record<string, unknown> }) {
-  if (typeof run.snapshot?.templateName === "string" && run.snapshot.templateName.trim()) {
-    return run.snapshot.templateName;
-  }
-
-  const templateSlug = run.snapshot?.templateSlug;
-  if (typeof templateSlug === "string" && isResumeTemplateSlug(templateSlug)) {
-    return getResumeTemplate(templateSlug).name;
-  }
-
-  return "";
 }
 
 async function countRows(
@@ -159,9 +132,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const usageTrackWidth = usageProgressPercent(usage);
   const projectCountLabel = projectCount === 1 ? "Project" : "Projects";
   const runCountLabel = runCount === 1 ? "Run" : "Runs";
-  const savedHistoryItems = recentSavedRuns as HistoryItem[];
-  const syncedRecentIds = recentSavedRuns.flatMap((run) => [run.id, run.accountRunId].filter(Boolean) as string[]);
-  const recentProjectGroups = groupHistoryItems(savedHistoryItems, syncedRecentIds).slice(0, 3);
+  const recentProjectSummaries = settingsProjectSummaries(recentSavedRuns, entitlement);
 
   return (
     <main className="settings-page-shell">
@@ -258,32 +229,22 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <span>{runCountLabel}</span>
                 </div>
               </div>
-              {recentProjectGroups.length ? (
+              {recentProjectSummaries.length ? (
                 <div className="settings-project-list" aria-label="Recent saved projects">
-                  {recentProjectGroups.map((group) => {
-                    const restoreRun = group.items.find(savedRunCanRestore);
-                    const linkRun = restoreRun ?? group.latest;
-                    const status = historyGroupStatus(group, entitlement);
-                    const templateName = savedRunTemplateName(group.latest);
-                    const versionLabel = `${group.items.length} ${group.items.length === 1 ? "version" : "versions"}`;
-                    return (
-                      <Link
-                        className="settings-project-item"
-                        href={savedRunHistoryHref(linkRun, { restore: Boolean(restoreRun) })}
-                        key={group.key}
-                        aria-label={`Open ${group.title} in History`}
-                      >
-                        <div>
-                          <strong>{group.title}</strong>
-                          <span>
-                            {group.target} · {versionLabel} · best {group.bestScore}/100 · latest {formatSavedRunDate(group.latest.createdAt)}
-                            {templateName ? ` · ${templateName}` : ""}
-                          </span>
-                        </div>
-                        <small title={status.detail}>{restoreRun ? "Restore" : status.label}</small>
-                      </Link>
-                    );
-                  })}
+                  {recentProjectSummaries.map((project) => (
+                    <Link
+                      className="settings-project-item"
+                      href={project.href}
+                      key={project.key}
+                      aria-label={`Open ${project.title} in History`}
+                    >
+                      <div>
+                        <strong>{project.title}</strong>
+                        <span>{project.detail}</span>
+                      </div>
+                      <small title={project.actionDetail}>{project.actionLabel}</small>
+                    </Link>
+                  ))}
                 </div>
               ) : (
                 <div className="settings-project-empty">
