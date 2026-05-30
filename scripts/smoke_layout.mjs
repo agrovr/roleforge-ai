@@ -700,6 +700,7 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
   const smokeRunId = `roleforge-layout-history-${Date.now()}`;
   const smokeFilename = "roleforge-layout-smoke.pdf";
   const smokeTarget = "RoleForge layout smoke restore target";
+  const expectedOrigin = new URL(baseUrl).origin;
 
   await send("Network.setExtraHTTPHeaders", { headers: { Cookie: cookie } });
   await send("Emulation.setDeviceMetricsOverride", {
@@ -708,10 +709,10 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
     deviceScaleFactor: 1,
     mobile: false,
   });
-  await send("Page.navigate", { url: `${baseUrl}/app` });
-  await delay(3200);
 
-  const seedExpression = `(() => {
+  const seedScript = `(() => {
+    try {
+    if (location.origin !== ${JSON.stringify(expectedOrigin)}) return;
     const run = {
       id: ${JSON.stringify(smokeRunId)},
       createdAt: "2026-05-30T12:00:00.000Z",
@@ -756,16 +757,15 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
     };
     localStorage.setItem("resume-tailor-history-v1", JSON.stringify([run]));
     localStorage.setItem("roleforge-synced-history-v1", JSON.stringify([]));
-    return true;
+    } catch (error) {
+      console.warn("RoleForge layout smoke history seed failed", error);
+    }
   })()`;
-  const seedResult = await send("Runtime.evaluate", { expression: seedExpression, returnByValue: true });
+  const seedResult = await send("Page.addScriptToEvaluateOnNewDocument", { source: seedScript });
   if (seedResult.error) throw new Error(seedResult.error.message);
-  if (seedResult.result.exceptionDetails) {
-    throw new Error(seedResult.result.exceptionDetails.text || "History seed evaluation failed");
-  }
 
   await send("Page.navigate", { url: `${baseUrl}/app#history` });
-  await delay(3600);
+  await delay(1200);
 
   const expression = `(async () => {
     const failures = [];
@@ -773,19 +773,65 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
     const text = (selector) => document.querySelector(selector)?.textContent?.replace(/\\s+/g, " ").trim() || "";
     const smokeFilename = ${JSON.stringify(smokeFilename)};
     const smokeTarget = ${JSON.stringify(smokeTarget)};
+    const waitFor = async (selector, timeout = 9000) => {
+      const deadline = performance.now() + timeout;
+      let element = document.querySelector(selector);
+      while (!element && performance.now() < deadline) {
+        await wait(125);
+        element = document.querySelector(selector);
+      }
+      return element;
+    };
+    const waitForText = async (needle, timeout = 9000) => {
+      const deadline = performance.now() + timeout;
+      while (performance.now() < deadline) {
+        if ((document.body.textContent || "").includes(needle)) return true;
+        await wait(125);
+      }
+      return false;
+    };
 
-    const historyPanel = document.querySelector(".studio-history-panel");
-    if (!historyPanel) failures.push({ selector: ".studio-history-panel", reason: "missing" });
-
-    const historyText = document.body.textContent || "";
-    if (!historyText.includes(smokeFilename)) {
-      failures.push({ selector: ".history-project-list", reason: "seeded-run-missing", text: historyText.slice(0, 180) });
+    const appShell = await waitFor(".rf-studio-page");
+    if (!appShell) {
+      failures.push({
+        selector: ".rf-studio-page",
+        reason: "signed-in-app-not-rendered",
+        href: location.href,
+        readyState: document.readyState,
+        text: (document.body.textContent || "").replace(/\\s+/g, " ").trim().slice(0, 220),
+      });
+      return JSON.stringify({
+        page: "signed-in history restore",
+        theme: "account",
+        width: window.innerWidth,
+        failures,
+      });
     }
 
+    const historyPanel = await waitFor(".studio-history-panel");
+    if (!historyPanel) failures.push({ selector: ".studio-history-panel", reason: "missing" });
+
+    if (!(await waitForText(smokeFilename))) {
+      failures.push({
+        selector: ".history-project-list",
+        reason: "seeded-run-missing",
+        href: location.href,
+        storage: localStorage.getItem("resume-tailor-history-v1")?.slice(0, 180) || "",
+        text: (document.body.textContent || "").replace(/\\s+/g, " ").trim().slice(0, 220),
+      });
+    }
+
+    await waitFor(".history-action-details");
     const detailsButton = Array.from(document.querySelectorAll(".history-action-details"))
       .find((button) => button.getAttribute("aria-label")?.includes(smokeFilename));
     if (!detailsButton) {
-      failures.push({ selector: ".history-action-details", reason: "missing" });
+      failures.push({
+        selector: ".history-action-details",
+        reason: "missing",
+        actions: Array.from(document.querySelectorAll(".history-actions button, .history-actions a"))
+          .map((button) => button.textContent.trim().replace(/\\s+/g, " "))
+          .slice(0, 8),
+      });
     } else {
       detailsButton.click();
       await wait(450);
@@ -799,12 +845,18 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
     const restoreButton = Array.from(document.querySelectorAll(".history-action-restore"))
       .find((button) => button.getAttribute("aria-label")?.includes(smokeFilename));
     if (!restoreButton) {
-      failures.push({ selector: ".history-action-restore", reason: "missing" });
+      failures.push({
+        selector: ".history-action-restore",
+        reason: "missing",
+        actions: Array.from(document.querySelectorAll(".history-actions button, .history-actions a"))
+          .map((button) => button.textContent.trim().replace(/\\s+/g, " "))
+          .slice(0, 8),
+      });
     } else if (restoreButton.disabled) {
       failures.push({ selector: ".history-action-restore", reason: "disabled" });
     } else {
       restoreButton.click();
-      await wait(650);
+      await waitForText("Saved run restored", 6000);
       const heroTitle = document.querySelector(".rf-studio-hero h1");
       const previewPanel = document.getElementById("preview-panel");
       if (!heroTitle?.getAttribute("title")?.includes("roleforge-layout-smoke")) {

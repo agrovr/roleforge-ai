@@ -15926,3 +15926,178 @@ body,
 }
 
 /* End final CTA screenshot fix. */
+
+/* Final design fit sweep: keep marketing mockups and account controls calm at
+   awkward browser zooms without changing the product flow. */
+.hero {
+  max-inline-size: min(var(--container), calc(100vw - clamp(36px, 5vw, 76px)));
+  grid-template-columns: minmax(0, 0.96fr) minmax(0, 0.72fr);
+  gap: clamp(28px, 3.2vw, 48px);
+  padding-inline: clamp(20px, 2.6vw, 34px);
+}
+
+.hero-copy {
+  inline-size: 100%;
+  max-inline-size: min(100%, 640px);
+}
+
+.hero .h1 {
+  max-inline-size: min(100%, 11.6ch);
+  font-size: clamp(3rem, 4.8vw, 4.65rem);
+  line-height: 1.08;
+}
+
+.hero-stage {
+  inline-size: min(100%, 450px);
+  block-size: clamp(410px, 34vw, 500px);
+}
+
+.hero-stage .resume-card {
+  max-inline-size: none;
+}
+
+.hero-stage .resume-card-front {
+  inline-size: clamp(270px, 21vw, 330px);
+  block-size: clamp(386px, 29vw, 464px);
+}
+
+.hero-stage .resume-card-back-l {
+  inline-size: clamp(218px, 16.2vw, 270px);
+  block-size: clamp(326px, 24.2vw, 398px);
+  transform: rotate(-8deg) translate(clamp(-58px, -4.2vw, -42px), 22px);
+}
+
+.hero-stage .resume-card-back-r {
+  inline-size: clamp(210px, 15.4vw, 256px);
+  block-size: clamp(316px, 23.4vw, 382px);
+  transform: rotate(7deg) translate(clamp(46px, 3.8vw, 66px), 28px);
+}
+
+.hero-stage:hover .resume-card-front {
+  transform: rotate(-1deg) translateY(-5px);
+}
+
+.hero-stage:hover .resume-card-back-l {
+  transform: rotate(-9deg) translate(clamp(-66px, -4.6vw, -50px), 24px);
+}
+
+.hero-stage:hover .resume-card-back-r {
+  transform: rotate(8deg) translate(clamp(54px, 4.2vw, 76px), 32px);
+}
+
+.dash-mock .dash-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+}
+
+.dash-mock .dash-stat {
+  justify-content: start;
+  min-block-size: 144px;
+  padding: clamp(20px, 2cqi, 24px);
+}
+
+.dash-stat-label,
+.dash-stat-value,
+.dash-stat-delta {
+  inline-size: 100%;
+}
+
+.dash-mock .dash-stat-value {
+  font-size: clamp(1.14rem, 2.1cqi, 1.36rem);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.dash-mock .dash-stat-delta {
+  max-inline-size: 100%;
+}
+
+.settings-profile-actions {
+  inline-size: min(100%, 540px);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 168px), 1fr));
+}
+
+.settings-profile-actions form,
+.settings-billing-head form {
+  inline-size: 100%;
+}
+
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button,
+.settings-billing-head .ghost-button,
+.settings-plan-active-card .settings-inline-link,
+.settings-export-actions .btn,
+.price-card .btn {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  min-block-size: 46px;
+  padding-inline: clamp(12px, 1.2vw, 18px);
+  font-size: clamp(0.84rem, 1vw, 0.95rem);
+  line-height: 1.12;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.settings-billing-head {
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 172px), 210px);
+}
+
+.settings-billing-head .ghost-button {
+  inline-size: 100%;
+}
+
+.settings-plan-active-card {
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 132px), 156px);
+}
+
+.settings-plan-active-card .settings-inline-link {
+  inline-size: 100%;
+  justify-self: stretch;
+}
+
+@media (max-width: 1180px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-copy {
+    max-inline-size: min(100%, 720px);
+  }
+
+  .hero .h1 {
+    font-size: clamp(2.7rem, 7vw, 4.25rem);
+  }
+
+  .hero-stage {
+    inline-size: min(100%, 480px);
+    block-size: clamp(390px, 54vw, 460px);
+  }
+}
+
+@media (max-width: 820px) {
+  .dash-main-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dash-main-head .btn-sm {
+    inline-size: 100%;
+    max-inline-size: none;
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 760px) {
+  .hero {
+    max-inline-size: calc(100vw - 28px);
+  }
+
+  .hero .h1 {
+    font-size: clamp(2.45rem, 11vw, 3.45rem);
+  }
+
+  .settings-billing-head,
+  .settings-plan-active-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
