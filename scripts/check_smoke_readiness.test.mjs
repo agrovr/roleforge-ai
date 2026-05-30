@@ -44,6 +44,17 @@ test("reports missing signed-in smoke credentials and gate variables", () => {
   );
 });
 
+test("accepts frontend cookie smoke credentials as a fallback", () => {
+  const findings = evaluateRepoReadiness(frontendConfig, {
+    variables: ["ROLEFORGE_SUPABASE_URL", "ROLEFORGE_SUPABASE_PUBLISHABLE_KEY", "ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE"],
+    variableValues: { ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE: "true" },
+    secrets: ["ROLEFORGE_SMOKE_COOKIE"],
+  });
+
+  assert.equal(findings.filter((finding) => !finding.ok).length, 0);
+  assert.equal(findings.some((finding) => finding.level === "warn"), true);
+});
+
 test("prints safe setup commands without secret values", () => {
   const commands = buildSetupCommands(frontendConfig, {
     variables: ["ROLEFORGE_SUPABASE_URL", "ROLEFORGE_SUPABASE_PUBLISHABLE_KEY"],

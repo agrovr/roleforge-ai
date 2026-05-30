@@ -65,6 +65,7 @@ jobs:
         run: npm run smoke:layout -- --require-chrome --require-signed-in-layout
         env:
           ROLEFORGE_SITE_URL: https://roleforgeai.vercel.app
+          ROLEFORGE_SMOKE_COOKIE: ${{ secrets.ROLEFORGE_SMOKE_COOKIE }}
           ROLEFORGE_SUPABASE_URL: ${{ vars.ROLEFORGE_SUPABASE_URL }}
           ROLEFORGE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.ROLEFORGE_SUPABASE_PUBLISHABLE_KEY }}
           ROLEFORGE_SMOKE_EMAIL: ${{ secrets.ROLEFORGE_SMOKE_EMAIL }}
