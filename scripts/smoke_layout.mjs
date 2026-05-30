@@ -700,7 +700,6 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
   const smokeRunId = `roleforge-layout-history-${Date.now()}`;
   const smokeFilename = "roleforge-layout-smoke.pdf";
   const smokeTarget = "RoleForge layout smoke restore target";
-  const expectedOrigin = new URL(baseUrl).origin;
 
   await send("Network.setExtraHTTPHeaders", { headers: { Cookie: cookie } });
   await send("Emulation.setDeviceMetricsOverride", {
@@ -709,10 +708,11 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
     deviceScaleFactor: 1,
     mobile: false,
   });
+  await send("Page.navigate", { url: `${baseUrl}/app` });
+  await delay(3200);
 
-  const seedScript = `(() => {
+  const seedExpression = `(() => {
     try {
-    if (location.origin !== ${JSON.stringify(expectedOrigin)}) return;
     const run = {
       id: ${JSON.stringify(smokeRunId)},
       createdAt: "2026-05-30T12:00:00.000Z",
@@ -757,15 +757,27 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
     };
     localStorage.setItem("resume-tailor-history-v1", JSON.stringify([run]));
     localStorage.setItem("roleforge-synced-history-v1", JSON.stringify([]));
+    return localStorage.getItem("resume-tailor-history-v1");
     } catch (error) {
       console.warn("RoleForge layout smoke history seed failed", error);
+      return "";
     }
   })()`;
-  const seedResult = await send("Page.addScriptToEvaluateOnNewDocument", { source: seedScript });
+  const seedResult = await send("Runtime.evaluate", { expression: seedExpression, returnByValue: true });
   if (seedResult.error) throw new Error(seedResult.error.message);
+  if (seedResult.result.exceptionDetails) {
+    throw new Error(seedResult.result.exceptionDetails.text || "History seed evaluation failed");
+  }
+  const seededHistory = seedResult.result.result.value || "";
+  if (!seededHistory.includes(smokeFilename)) {
+    throw new Error(`History seed did not persist before reload: ${String(seededHistory).slice(0, 180)}`);
+  }
 
-  await send("Page.navigate", { url: `${baseUrl}/app#history` });
-  await delay(1200);
+  const historyUrl = new URL(`${baseUrl}/app`);
+  historyUrl.searchParams.set("layoutSmokeHistory", smokeRunId);
+  historyUrl.hash = "history";
+  await send("Page.navigate", { url: historyUrl.toString() });
+  await delay(1600);
 
   const expression = `(async () => {
     const failures = [];
