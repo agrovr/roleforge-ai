@@ -700,9 +700,6 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
   const smokeRunId = `roleforge-layout-history-${Date.now()}`;
   const smokeFilename = "roleforge-layout-smoke.pdf";
   const smokeTarget = "RoleForge layout smoke restore target";
-  const smokeSecondRunId = `${smokeRunId}-second`;
-  const smokeSecondFilename = "roleforge-layout-second.pdf";
-  const smokeSecondTarget = "RoleForge second restore target";
 
   await send("Network.setExtraHTTPHeaders", { headers: { Cookie: cookie } });
   await send("Emulation.setDeviceMetricsOverride", {
@@ -761,49 +758,7 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
         }
       }
     };
-    const secondRun = {
-      id: ${JSON.stringify(smokeSecondRunId)},
-      createdAt: "2026-05-30T12:05:00.000Z",
-      filename: ${JSON.stringify(smokeSecondFilename)},
-      mode: "balanced",
-      score: 88,
-      downloadUrl: "/api/workflow/download/roleforge-layout-second.pdf",
-      downloadFormat: "pdf",
-      downloads: { pdf: "/api/workflow/download/roleforge-layout-second.pdf" },
-      roleHint: ${JSON.stringify(smokeSecondTarget)},
-      saved: false,
-      source: "local",
-      snapshot: {
-        sourcePreviewText: "RoleForge second original resume source.",
-        jdText: ${JSON.stringify(smokeSecondTarget)},
-        inputMode: "text",
-        tailoringMode: "balanced",
-        downloadUrl: "/api/workflow/download/roleforge-layout-second.pdf",
-        downloadFormat: "pdf",
-        downloads: { pdf: "/api/workflow/download/roleforge-layout-second.pdf" },
-        templateSlug: "classic",
-        templateName: "Classic",
-        uploadMeta: {
-          resume_id: ${JSON.stringify(smokeSecondRunId)},
-          filename: ${JSON.stringify(smokeSecondFilename)},
-          format: "pdf",
-          character_count: 40,
-          text_preview: "RoleForge second original resume source.",
-          text_preview_truncated: false
-        },
-        result: {
-          run_id: ${JSON.stringify(smokeSecondRunId)},
-          tailored_text: "RoleForge second restored draft opened cleanly.",
-          tailoring_mode: "balanced",
-          score_summary: { fit_after: 88, ats_after: 90, fit_delta: 9, issues_resolved: 1 },
-          change_log: ["Second restore change note"],
-          suggestions: ["Second restore suggestion"],
-          ats_before: { issues: [] },
-          ats_after: { issues: [] }
-        }
-      }
-    };
-    localStorage.setItem("resume-tailor-history-v1", JSON.stringify([secondRun, run]));
+    localStorage.setItem("resume-tailor-history-v1", JSON.stringify([run]));
     localStorage.setItem("roleforge-synced-history-v1", JSON.stringify([]));
     return localStorage.getItem("resume-tailor-history-v1");
     } catch (error) {
@@ -833,7 +788,6 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
     const text = (selector) => document.querySelector(selector)?.textContent?.replace(/\\s+/g, " ").trim() || "";
     const smokeFilename = ${JSON.stringify(smokeFilename)};
     const smokeTarget = ${JSON.stringify(smokeTarget)};
-    const smokeSecondFilename = ${JSON.stringify(smokeSecondFilename)};
     const waitFor = async (selector, timeout = 9000) => {
       const deadline = performance.now() + timeout;
       let element = document.querySelector(selector);
@@ -878,13 +832,6 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
         reason: "seeded-run-missing",
         href: location.href,
         storage: localStorage.getItem("resume-tailor-history-v1")?.slice(0, 180) || "",
-        text: (document.body.textContent || "").replace(/\\s+/g, " ").trim().slice(0, 220),
-      });
-    }
-    if (!(await waitForText(smokeSecondFilename))) {
-      failures.push({
-        selector: ".history-project-list",
-        reason: "second-seeded-run-missing",
         text: (document.body.textContent || "").replace(/\\s+/g, " ").trim().slice(0, 220),
       });
     }
@@ -998,29 +945,18 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
           }
         }
 
-        const secondHistoryItem = Array.from(document.querySelectorAll(".history-item"))
-          .find((item) => item.textContent.includes(smokeSecondFilename));
-        const secondRestoreButton = secondHistoryItem?.querySelector(".history-action-restore");
-        if (!secondRestoreButton) {
-          failures.push({
-            selector: ".history-action-restore",
-            reason: "second-restore-missing",
-            secondItemText: secondHistoryItem?.textContent.replace(/\\s+/g, " ").trim().slice(0, 180) || "",
-          });
+        const newResumeButton = Array.from(document.querySelectorAll("button"))
+          .find((button) => button.textContent.replace(/\\s+/g, " ").trim().includes("New resume"));
+        if (!newResumeButton) {
+          failures.push({ selector: "button", reason: "new-resume-button-missing" });
         } else {
-          secondRestoreButton.click();
-          await waitForText("RoleForge second restored draft opened cleanly.", 6000);
-          const refreshedSuggestionsPanel = document.querySelector("#suggestions");
-          if (!refreshedSuggestionsPanel?.textContent.includes("0/2 reviewed")) {
-            failures.push({
-              selector: ".suggestion-review-status",
-              reason: "review-decisions-not-reset-after-second-restore",
-              text: refreshedSuggestionsPanel?.textContent.slice(0, 220) || "",
-            });
+          newResumeButton.click();
+          await waitForText("Suggestions are waiting", 6000);
+          if (document.querySelector("#suggestions .suggestion.reviewed, #suggestions .suggestion.edit")) {
+            failures.push({ selector: "#suggestions .suggestion", reason: "review-state-carried-into-new-resume" });
           }
-          if (Array.from(refreshedSuggestionsPanel?.querySelectorAll(".suggestion") || [])
-            .some((card) => card.classList.contains("reviewed") || card.classList.contains("edit"))) {
-            failures.push({ selector: "#suggestions .suggestion", reason: "old-review-card-state-carried-over" });
+          if (!document.querySelector("#suggestions .empty-state")) {
+            failures.push({ selector: "#suggestions .empty-state", reason: "new-resume-suggestions-empty-state-missing" });
           }
         }
       }
