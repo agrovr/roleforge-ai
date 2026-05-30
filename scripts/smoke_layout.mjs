@@ -998,10 +998,15 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
           }
         }
 
-        const secondRestoreButton = Array.from(document.querySelectorAll(".history-action-restore"))
-          .find((button) => button.getAttribute("aria-label")?.includes(smokeSecondFilename));
+        const secondHistoryItem = Array.from(document.querySelectorAll(".history-item"))
+          .find((item) => item.textContent.includes(smokeSecondFilename));
+        const secondRestoreButton = secondHistoryItem?.querySelector(".history-action-restore");
         if (!secondRestoreButton) {
-          failures.push({ selector: ".history-action-restore", reason: "second-restore-missing" });
+          failures.push({
+            selector: ".history-action-restore",
+            reason: "second-restore-missing",
+            secondItemText: secondHistoryItem?.textContent.replace(/\\s+/g, " ").trim().slice(0, 180) || "",
+          });
         } else {
           secondRestoreButton.click();
           await waitForText("RoleForge second restored draft opened cleanly.", 6000);
