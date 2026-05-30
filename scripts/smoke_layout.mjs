@@ -694,6 +694,149 @@ async function evaluatePreviewTabs(send, baseUrl, cookie) {
   return [JSON.parse(result.result.result.value)];
 }
 
+async function evaluateHistoryRestore(send, baseUrl, cookie) {
+  if (!cookie) return [];
+
+  const smokeRunId = `roleforge-layout-history-${Date.now()}`;
+  const smokeFilename = "roleforge-layout-smoke.pdf";
+  const smokeTarget = "RoleForge layout smoke restore target";
+
+  await send("Network.setExtraHTTPHeaders", { headers: { Cookie: cookie } });
+  await send("Emulation.setDeviceMetricsOverride", {
+    width: 1366,
+    height: 1100,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+  await send("Page.navigate", { url: `${baseUrl}/app` });
+  await delay(3200);
+
+  const seedExpression = `(() => {
+    const run = {
+      id: ${JSON.stringify(smokeRunId)},
+      createdAt: "2026-05-30T12:00:00.000Z",
+      filename: ${JSON.stringify(smokeFilename)},
+      mode: "balanced",
+      score: 91,
+      downloadUrl: "/api/workflow/download/roleforge-layout-smoke.pdf",
+      downloadFormat: "pdf",
+      downloads: { pdf: "/api/workflow/download/roleforge-layout-smoke.pdf" },
+      roleHint: ${JSON.stringify(smokeTarget)},
+      saved: false,
+      source: "local",
+      snapshot: {
+        sourcePreviewText: "RoleForge layout smoke original resume source.",
+        jdText: ${JSON.stringify(smokeTarget)},
+        inputMode: "text",
+        tailoringMode: "balanced",
+        downloadUrl: "/api/workflow/download/roleforge-layout-smoke.pdf",
+        downloadFormat: "pdf",
+        downloads: { pdf: "/api/workflow/download/roleforge-layout-smoke.pdf" },
+        templateSlug: "classic",
+        templateName: "Classic",
+        uploadMeta: {
+          resume_id: ${JSON.stringify(smokeRunId)},
+          filename: ${JSON.stringify(smokeFilename)},
+          format: "pdf",
+          character_count: 48,
+          text_preview: "RoleForge layout smoke original resume source.",
+          text_preview_truncated: false
+        },
+        result: {
+          run_id: ${JSON.stringify(smokeRunId)},
+          tailored_text: "RoleForge smoke tailored draft restored into the studio.",
+          tailoring_mode: "balanced",
+          score_summary: { fit_after: 91, ats_after: 93, fit_delta: 12, issues_resolved: 2 },
+          change_log: ["Layout smoke restored a saved run"],
+          suggestions: [],
+          ats_before: { issues: [] },
+          ats_after: { issues: [] }
+        }
+      }
+    };
+    localStorage.setItem("resume-tailor-history-v1", JSON.stringify([run]));
+    localStorage.setItem("roleforge-synced-history-v1", JSON.stringify([]));
+    return true;
+  })()`;
+  const seedResult = await send("Runtime.evaluate", { expression: seedExpression, returnByValue: true });
+  if (seedResult.error) throw new Error(seedResult.error.message);
+  if (seedResult.result.exceptionDetails) {
+    throw new Error(seedResult.result.exceptionDetails.text || "History seed evaluation failed");
+  }
+
+  await send("Page.navigate", { url: `${baseUrl}/app#history` });
+  await delay(3600);
+
+  const expression = `(async () => {
+    const failures = [];
+    const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const text = (selector) => document.querySelector(selector)?.textContent?.replace(/\\s+/g, " ").trim() || "";
+    const smokeFilename = ${JSON.stringify(smokeFilename)};
+    const smokeTarget = ${JSON.stringify(smokeTarget)};
+
+    const historyPanel = document.querySelector(".studio-history-panel");
+    if (!historyPanel) failures.push({ selector: ".studio-history-panel", reason: "missing" });
+
+    const historyText = document.body.textContent || "";
+    if (!historyText.includes(smokeFilename)) {
+      failures.push({ selector: ".history-project-list", reason: "seeded-run-missing", text: historyText.slice(0, 180) });
+    }
+
+    const detailsButton = Array.from(document.querySelectorAll(".history-action-details"))
+      .find((button) => button.getAttribute("aria-label")?.includes(smokeFilename));
+    if (!detailsButton) {
+      failures.push({ selector: ".history-action-details", reason: "missing" });
+    } else {
+      detailsButton.click();
+      await wait(450);
+      const detailPanel = document.querySelector(".history-detail-panel");
+      if (!detailPanel) failures.push({ selector: ".history-detail-panel", reason: "missing-after-details-click" });
+      else if (!detailPanel.textContent.includes(smokeTarget)) {
+        failures.push({ selector: ".history-detail-panel", reason: "wrong-detail-content", text: detailPanel.textContent.slice(0, 180) });
+      }
+    }
+
+    const restoreButton = Array.from(document.querySelectorAll(".history-action-restore"))
+      .find((button) => button.getAttribute("aria-label")?.includes(smokeFilename));
+    if (!restoreButton) {
+      failures.push({ selector: ".history-action-restore", reason: "missing" });
+    } else if (restoreButton.disabled) {
+      failures.push({ selector: ".history-action-restore", reason: "disabled" });
+    } else {
+      restoreButton.click();
+      await wait(650);
+      const heroTitle = document.querySelector(".rf-studio-hero h1");
+      const previewPanel = document.getElementById("preview-panel");
+      if (!heroTitle?.getAttribute("title")?.includes("roleforge-layout-smoke")) {
+        failures.push({ selector: ".rf-studio-hero h1", reason: "restore-did-not-update-title", text: heroTitle?.textContent || "" });
+      }
+      if (!text(".rf-studio-hero").includes("Saved run restored")) {
+        failures.push({ selector: ".rf-studio-hero", reason: "restore-detail-missing", text: text(".rf-studio-hero") });
+      }
+      if (previewPanel?.getAttribute("data-preview-mode") !== "tailored") {
+        failures.push({ selector: "#preview-panel", reason: "restore-did-not-open-tailored-preview", actual: previewPanel?.getAttribute("data-preview-mode") || "(missing)" });
+      }
+      if (!document.body.textContent.includes("RoleForge smoke tailored draft restored into the studio.")) {
+        failures.push({ selector: "#preview-panel", reason: "restored-tailored-text-missing" });
+      }
+    }
+
+    return JSON.stringify({
+      page: "signed-in history restore",
+      theme: "account",
+      width: window.innerWidth,
+      failures,
+    });
+  })()`;
+
+  const result = await send("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true });
+  if (result.error) throw new Error(result.error.message);
+  if (result.result.exceptionDetails) {
+    throw new Error(result.result.exceptionDetails.text || "History restore interaction evaluation failed");
+  }
+  return [JSON.parse(result.result.result.value)];
+}
+
 async function main(argv = process.argv.slice(2)) {
   const args = parseArgs(argv);
   const baseUrl = normalizeBaseUrl(args.baseUrl || process.env.ROLEFORGE_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL);
@@ -746,7 +889,10 @@ async function main(argv = process.argv.slice(2)) {
           }
         }
       }
-      const interactionReports = await evaluatePreviewTabs(page.send, baseUrl, signedInSession?.cookie || "");
+      const interactionReports = [
+        ...(await evaluatePreviewTabs(page.send, baseUrl, signedInSession?.cookie || "")),
+        ...(await evaluateHistoryRestore(page.send, baseUrl, signedInSession?.cookie || "")),
+      ];
 
       const failures = [...reports, ...interactionReports].flatMap((report) => {
         const pageFailures = [...report.failures];
