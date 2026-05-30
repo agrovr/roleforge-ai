@@ -6133,8 +6133,7 @@ html[data-theme="dark"] input::file-selector-button {
   text-wrap: pretty;
 }
 
-.settings-download-button,
-.settings-coming-soon {
+.settings-download-button {
   width: fit-content;
   margin-top: auto;
 }
@@ -11102,7 +11101,6 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   }
 
   .settings-download-button,
-  .settings-coming-soon,
   .settings-profile-actions .primary-button,
   .settings-profile-actions .ghost-button,
   .settings-profile-actions form,
