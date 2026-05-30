@@ -2297,6 +2297,7 @@ export default function Page() {
 
   function onSelectExportFormat(format: ExportCapability) {
     const label = format.label || format.format.toUpperCase();
+    setSelectedExportFormat(format.format);
 
     if (!format.enabled) {
       setExportNotice({ format: format.format, label });
@@ -2519,10 +2520,13 @@ export default function Page() {
 
   useEffect(() => {
     if (selectedExportFormat !== "pdf" && !selectedExportAllowed) {
-      setSelectedExportFormat("pdf");
-      setExportNotice(null);
+      setExportNotice((current) =>
+        current?.format === selectedExportFormat
+          ? current
+          : { format: selectedExportFormat, label: selectedFormatLabel },
+      );
     }
-  }, [selectedExportAllowed, selectedExportFormat]);
+  }, [selectedExportAllowed, selectedExportFormat, selectedFormatLabel]);
   const generatedAssetSummary = [
     {
       label: "Letter",

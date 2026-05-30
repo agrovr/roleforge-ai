@@ -16503,3 +16503,163 @@ body {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* May 30 follow-up: remove the remaining wide-viewport drift seen in review
+   screenshots and keep compact dashboard/settings labels inside their cards. */
+.page-shell {
+  inline-size: 100%;
+  max-inline-size: 100vw;
+  overflow-x: hidden;
+}
+
+.nav,
+.logos,
+.section,
+.dash-section,
+.templates,
+.footer,
+.hero {
+  box-sizing: border-box;
+  max-inline-size: 100vw;
+}
+
+.hero {
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  align-items: center;
+  gap: clamp(28px, 3vw, 46px);
+}
+
+.hero .h1 {
+  max-inline-size: min(100%, 11ch);
+  font-size: clamp(2.72rem, 3.8vw, 4.18rem);
+}
+
+.hero-sub {
+  max-inline-size: min(100%, 48ch);
+}
+
+.hero-stage {
+  inline-size: min(100%, 360px);
+  block-size: clamp(350px, 28vw, 430px);
+}
+
+.hero-stage .resume-card-front {
+  inline-size: clamp(236px, 17vw, 286px);
+  block-size: clamp(338px, 25vw, 406px);
+}
+
+.hero-stage .resume-card-back-l {
+  inline-size: clamp(190px, 13.2vw, 224px);
+  block-size: clamp(282px, 20vw, 334px);
+  transform: rotate(-8deg) translate(clamp(-42px, -2.8vw, -26px), 18px);
+}
+
+.hero-stage .resume-card-back-r {
+  inline-size: clamp(182px, 12.6vw, 214px);
+  block-size: clamp(274px, 19vw, 322px);
+  transform: rotate(7deg) translate(clamp(28px, 2.8vw, 46px), 24px);
+}
+
+.hero-stage:hover .resume-card-front {
+  transform: rotate(-1deg) translateY(-5px);
+}
+
+.hero-stage:hover .resume-card-back-l {
+  transform: rotate(-9deg) translate(clamp(-48px, -3.2vw, -32px), 21px);
+}
+
+.hero-stage:hover .resume-card-back-r {
+  transform: rotate(8deg) translate(clamp(34px, 3.2vw, 54px), 28px);
+}
+
+@media (max-width: 1760px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    max-inline-size: min(1120px, calc(100vw - clamp(32px, 5vw, 72px)));
+    justify-items: start;
+  }
+
+  .hero-copy {
+    max-inline-size: min(100%, 760px);
+  }
+
+  .hero-stage {
+    justify-self: center;
+    inline-size: min(100%, 540px);
+    block-size: clamp(390px, 36vw, 500px);
+  }
+}
+
+.dash-mock .dash-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+.dash-mock .dash-stat {
+  min-block-size: 142px;
+}
+
+.dash-mock .dash-stat-value {
+  font-size: clamp(1.28rem, 3.4cqi, 1.62rem);
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+}
+
+.dash-main-head .btn-sm,
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button,
+.settings-billing-head .ghost-button,
+.settings-plan-active-card .settings-inline-link,
+.price-card .btn {
+  gap: 8px;
+  text-wrap: balance;
+}
+
+.settings-profile-actions {
+  inline-size: min(100%, 560px);
+  grid-template-columns: minmax(218px, max-content) minmax(132px, max-content);
+  justify-content: start;
+}
+
+.settings-profile-actions > .primary-button {
+  min-inline-size: 218px;
+}
+
+.settings-profile-actions > form {
+  min-inline-size: 132px;
+}
+
+.settings-billing-head {
+  grid-template-columns: minmax(0, 1fr) minmax(198px, max-content);
+}
+
+.settings-billing-head form,
+.settings-billing-head .ghost-button {
+  min-inline-size: 198px;
+}
+
+.settings-plan-active-card {
+  grid-template-columns: minmax(0, 1fr) minmax(164px, max-content);
+}
+
+.settings-plan-active-card .settings-inline-link {
+  min-inline-size: 164px;
+}
+
+@media (max-width: 820px) {
+  .settings-profile-actions,
+  .settings-billing-head,
+  .settings-plan-active-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-profile-actions > .primary-button,
+  .settings-profile-actions > form,
+  .settings-billing-head form,
+  .settings-billing-head .ghost-button,
+  .settings-plan-active-card .settings-inline-link {
+    inline-size: 100%;
+    min-inline-size: 0;
+    max-inline-size: none;
+    justify-self: stretch;
+  }
+}

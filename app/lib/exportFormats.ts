@@ -68,6 +68,9 @@ export function selectedExportStatusMessage({
   downloadMessage?: string;
   hasTailoredText: boolean;
 }) {
+  if (!exportFormatAllowed(selectedFormat, entitlement)) {
+    return hasTailoredText ? `${selectedFormat.toUpperCase()} exports unlock with Premium. PDF remains available.` : "";
+  }
   if (downloadFormat === selectedFormat) return downloadMessage ?? "";
   if (!hasTailoredText) return "";
   if (!downloadUrl || downloadState !== "ready" || !exportFormatAllowed(downloadFormat, entitlement)) return "";

@@ -129,6 +129,21 @@ test("explains when another export is ready but the selected format is not", () 
   );
 });
 
+test("explains locked selected formats without hiding the selected choice", () => {
+  assert.equal(
+    selectedExportStatusMessage({
+      downloadFormat: "pdf",
+      downloadState: "ready",
+      downloadUrl: "/api/workflow/download/run.pdf",
+      selectedFormat: "txt",
+      entitlement: freeEntitlement,
+      downloadMessage: "PDF download is ready.",
+      hasTailoredText: true,
+    }),
+    "TXT exports unlock with Premium. PDF remains available.",
+  );
+});
+
 test("hides selected export status copy when no generated draft exists", () => {
   assert.equal(
     selectedExportStatusMessage({
