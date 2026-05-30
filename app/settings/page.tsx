@@ -12,7 +12,7 @@ import { billingNotice } from "../lib/billing/notices";
 import { billingReadiness } from "../lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
-import { historyRunStatus } from "../lib/history";
+import { groupHistoryItems, historyGroupStatus, type HistoryItem } from "../lib/history";
 import { RESUME_TEMPLATE_COOKIE, getResumeTemplate, isResumeTemplateSlug } from "../lib/resumeTemplates";
 import { savedRunHistoryHref } from "../lib/savedRunLinks";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
@@ -159,7 +159,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const usageTrackWidth = usageProgressPercent(usage);
   const projectCountLabel = projectCount === 1 ? "Project" : "Projects";
   const runCountLabel = runCount === 1 ? "Run" : "Runs";
-  const recentProjectRuns = recentSavedRuns.slice(0, 3);
+  const savedHistoryItems = recentSavedRuns as HistoryItem[];
+  const syncedRecentIds = recentSavedRuns.flatMap((run) => [run.id, run.accountRunId].filter(Boolean) as string[]);
+  const recentProjectGroups = groupHistoryItems(savedHistoryItems, syncedRecentIds).slice(0, 3);
 
   return (
     <main className="settings-page-shell">
@@ -256,27 +258,29 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <span>{runCountLabel}</span>
                 </div>
               </div>
-              {recentProjectRuns.length ? (
+              {recentProjectGroups.length ? (
                 <div className="settings-project-list" aria-label="Recent saved projects">
-                  {recentProjectRuns.map((run) => {
-                    const canRestore = savedRunCanRestore(run);
-                    const status = historyRunStatus(run, entitlement);
-                    const templateName = savedRunTemplateName(run);
+                  {recentProjectGroups.map((group) => {
+                    const restoreRun = group.items.find(savedRunCanRestore);
+                    const linkRun = restoreRun ?? group.latest;
+                    const status = historyGroupStatus(group, entitlement);
+                    const templateName = savedRunTemplateName(group.latest);
+                    const versionLabel = `${group.items.length} ${group.items.length === 1 ? "version" : "versions"}`;
                     return (
                       <Link
                         className="settings-project-item"
-                        href={savedRunHistoryHref(run, { restore: canRestore })}
-                        key={run.accountRunId ?? run.id}
-                        aria-label={`Open ${run.projectTitle || run.roleHint} in History`}
+                        href={savedRunHistoryHref(linkRun, { restore: Boolean(restoreRun) })}
+                        key={group.key}
+                        aria-label={`Open ${group.title} in History`}
                       >
                         <div>
-                          <strong>{run.projectTitle || run.roleHint}</strong>
+                          <strong>{group.title}</strong>
                           <span>
-                            {run.filename} · {formatSavedRunDate(run.createdAt)} · {run.score}/100
+                            {group.target} · {versionLabel} · best {group.bestScore}/100 · latest {formatSavedRunDate(group.latest.createdAt)}
                             {templateName ? ` · ${templateName}` : ""}
                           </span>
                         </div>
-                        <small title={status.detail}>{canRestore ? "Restore" : status.label}</small>
+                        <small title={status.detail}>{restoreRun ? "Restore" : status.label}</small>
                       </Link>
                     );
                   })}
