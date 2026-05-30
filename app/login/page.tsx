@@ -51,9 +51,9 @@ export default async function LoginPage({ searchParams }: { searchParams: LoginS
           <h1 id="login-title" className="display">Sign in to your RoleForge studio.</h1>
           <p>{notice}</p>
           <div className="login-benefits" aria-label="Account benefits">
-            <span><RoleForgeIcon name="check" size={14} /> Saved projects stay with your account</span>
-            <span><RoleForgeIcon name="lock" size={14} /> The studio is protected from anonymous use</span>
-            <span><RoleForgeIcon name="download" size={14} /> PDF exports remain available after runs</span>
+            <span><RoleForgeIcon name="check" size={14} /> <span className="login-benefit-copy">Saved projects stay with your account</span></span>
+            <span><RoleForgeIcon name="lock" size={14} /> <span className="login-benefit-copy">The studio is protected from anonymous use</span></span>
+            <span><RoleForgeIcon name="download" size={14} /> <span className="login-benefit-copy">PDF exports remain available after runs</span></span>
           </div>
           <div className="login-studio-preview" aria-label="Protected studio preview">
             <div className="login-preview-top">

@@ -9,6 +9,7 @@ import { cookieHeaderFromSession } from "./smoke_frontend.mjs";
 
 const DEFAULT_BASE_URL = "https://roleforgeai.vercel.app";
 const VIEWPORTS = [390, 640, 768, 900, 1024, 1180, 1366, 1440, 1500, 1712];
+const NARROW_DESKTOP_VIEWPORTS = [390, 430];
 const PUBLIC_THEMES = ["light", "dark"];
 const PAGE_CHECKS = [
   {
@@ -416,15 +417,16 @@ async function openCdpPage(port, baseUrl) {
   return { send, close: () => socket.close() };
 }
 
-async function evaluateLayout(send, baseUrl, page, width, cookie) {
+async function evaluateLayout(send, baseUrl, page, width, cookie, options = {}) {
   await send("Network.setExtraHTTPHeaders", { headers: cookie ? { Cookie: cookie } : {} });
   const themes = page.requiresAuth ? ["account"] : PUBLIC_THEMES;
   const reports = [];
+  const viewportMode = options.viewportMode || "responsive";
   await send("Emulation.setDeviceMetricsOverride", {
     width,
     height: 1100,
     deviceScaleFactor: 1,
-    mobile: width < 700,
+    mobile: options.mobile ?? width < 700,
   });
 
   for (const theme of themes) {
@@ -491,6 +493,19 @@ async function evaluateLayout(send, baseUrl, page, width, cookie) {
             blockOverflow: Math.round(blockOverflow),
             width: Math.round(rect.width),
             height: Math.round(rect.height),
+            text: element.textContent.trim().replace(/\\s+/g, " ").slice(0, 80),
+          });
+        }
+
+        if (rect.left < -1 || rect.right > window.innerWidth + 1) {
+          failures.push({
+            selector,
+            index,
+            reason: "text-viewport-clipped",
+            left: Math.round(rect.left),
+            right: Math.round(rect.right),
+            width: Math.round(rect.width),
+            viewport: window.innerWidth,
             text: element.textContent.trim().replace(/\\s+/g, " ").slice(0, 80),
           });
         }
@@ -571,6 +586,7 @@ async function evaluateLayout(send, baseUrl, page, width, cookie) {
     return JSON.stringify({
       page: ${JSON.stringify(page.name)},
       theme: ${JSON.stringify(theme)},
+      viewportMode: ${JSON.stringify(viewportMode)},
       width: window.innerWidth,
       overflow,
       failures,
@@ -722,6 +738,13 @@ async function main(argv = process.argv.slice(2)) {
             ...(await evaluateLayout(page.send, baseUrl, pageCheck, width, pageCheck.requiresAuth ? signedInSession.cookie : "")),
           );
         }
+        if (!pageCheck.requiresAuth) {
+          for (const width of NARROW_DESKTOP_VIEWPORTS) {
+            reports.push(
+              ...(await evaluateLayout(page.send, baseUrl, pageCheck, width, "", { mobile: false, viewportMode: "narrow-desktop" })),
+            );
+          }
+        }
       }
       const interactionReports = await evaluatePreviewTabs(page.send, baseUrl, signedInSession?.cookie || "");
 
@@ -734,6 +757,7 @@ async function main(argv = process.argv.slice(2)) {
           ...failure,
           page: report.page,
           theme: report.theme,
+          viewportMode: report.viewportMode,
           viewportWidth: report.width,
         }));
       });
@@ -744,7 +768,7 @@ async function main(argv = process.argv.slice(2)) {
 
       const checkedPageCount = new Set(reports.map((report) => report.page)).size;
       const interactionLabel = interactionReports.length ? " with preview tab interactions" : "";
-      pass(`rendered layout smoke passed ${checkedPageCount} pages across ${VIEWPORTS.length} viewport widths${interactionLabel}`);
+      pass(`rendered layout smoke passed ${checkedPageCount} pages across ${VIEWPORTS.length} responsive widths and ${NARROW_DESKTOP_VIEWPORTS.length} narrow desktop widths${interactionLabel}`);
     } finally {
       page.close();
     }

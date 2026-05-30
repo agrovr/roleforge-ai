@@ -15486,6 +15486,109 @@ body,
   }
 }
 
+/* Narrow viewport visibility guard: headless screenshots and desktop browsers
+   can run at phone-sized widths without mobile emulation, so prevent hidden
+   overflow from clipping public copy at the right edge. */
+.hero,
+.login-shell,
+.login-panel,
+.templates-page-shell,
+.templates-page-hero {
+  box-sizing: border-box;
+}
+
+.hero-copy,
+.hero-sub,
+.hero-ctas,
+.hero-actions,
+.hero-meta,
+.login-copy,
+.login-benefits,
+.login-benefits span,
+.login-benefit-copy,
+.templates-page-hero,
+.templates-page-actions {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.hero-sub,
+.login-benefit-copy,
+.templates-page-hero p {
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.login-benefits span {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+@media (max-width: 520px) {
+  .hero,
+  .templates-page-shell,
+  .login-shell {
+    inline-size: 100%;
+    max-inline-size: 100vw;
+    overflow-x: clip;
+  }
+
+  .hero {
+    width: calc(100vw - 28px);
+    padding-inline: 0;
+  }
+
+  .hero-copy,
+  .hero-sub,
+  .hero-ctas,
+  .hero-actions,
+  .hero-meta {
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  .hero-ctas,
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .hero-ctas .btn,
+  .hero-actions .btn {
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+
+  .login-shell,
+  .templates-page-shell {
+    padding-inline: 14px;
+  }
+
+  .login-panel,
+  .templates-page-hero,
+  .templates-selection-status,
+  .templates-page-grid {
+    inline-size: 100%;
+    width: 100%;
+    max-inline-size: 100%;
+  }
+
+  .login-benefits span {
+    align-items: start;
+  }
+
+  .templates-page-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .templates-page-actions .primary-button,
+  .templates-page-actions .ghost-button {
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+}
+
 /* Final CTA screenshot fix: this must stay last because older visual repair
    layers above also target the same marketing callout. */
 .cta-section {
