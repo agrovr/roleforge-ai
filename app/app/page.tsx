@@ -31,6 +31,7 @@ import {
   isResumeTemplateSlug,
   type ResumeTemplateSlug,
 } from "../lib/resumeTemplates";
+import { buildReviewSuggestionCards, type ReviewSuggestionCard } from "../lib/reviewSuggestions";
 import { parseTargetUrl } from "../lib/targetLabel";
 import {
   formatHistoryTimestamp,
@@ -185,7 +186,7 @@ type AccountStatus = {
   next: string;
 };
 type ExportNotice = { format: ExportFormat; label: string };
-type StudioSuggestion = { label: string; meta: string; before?: string; after: string; tone?: "good" | "warn" | "neutral" };
+type ReviewDecision = "reviewed" | "edit";
 
 const HISTORY_KEY = "resume-tailor-history-v1";
 const SYNCED_HISTORY_KEY = "roleforge-synced-history-v1";
@@ -954,6 +955,7 @@ export default function Page() {
   const [previewUploadError, setPreviewUploadError] = useState("");
   const [sourcePreviewText, setSourcePreviewText] = useState("");
   const [result, setResult] = useState<TailorResult | null>(null);
+  const [reviewDecisions, setReviewDecisions] = useState<Record<string, ReviewDecision>>({});
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [downloadFormat, setDownloadFormat] = useState<ExportFormat>("pdf");
   const [selectedExportFormat, setSelectedExportFormat] = useState<ExportFormat>("pdf");
@@ -1283,6 +1285,18 @@ export default function Page() {
       document.getElementById(`preview-tab-${mode}`)?.focus({ preventScroll: true });
     }, 40);
   }, [openPreviewMode]);
+
+  const markReviewDecision = useCallback((suggestionId: string, decision: ReviewDecision) => {
+    setReviewDecisions((current) => {
+      const next = { ...current };
+      if (next[suggestionId] === decision) {
+        delete next[suggestionId];
+      } else {
+        next[suggestionId] = decision;
+      }
+      return next;
+    });
+  }, []);
 
   const openAccountSummaryLink = useCallback((event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     setAccountPanelOpen(false);
@@ -2713,23 +2727,15 @@ export default function Page() {
   const coverRailActive = activeTab === "cover";
   const interviewRailActive = activeTab === "interview";
 
-  const suggestionCards: StudioSuggestion[] = result
-    ? [
-        ...(result.change_log ?? []).slice(0, 2).map((change, index) => ({
-          label: index === 0 ? "Keyword" : "Quantify",
-          meta: `Change ${index + 1}`,
-          before: "Original wording",
-          after: change,
-          tone: index === 0 ? "good" as const : "neutral" as const,
-        })),
-        ...(result.suggestions ?? []).slice(0, 4).map((suggestion, index) => ({
-          label: index % 2 ? "ATS" : "Add keyword",
-          meta: `Suggestion ${index + 1}`,
-          after: suggestion,
-          tone: index % 2 ? "warn" as const : "good" as const,
-        })),
-      ].slice(0, 4)
-    : [];
+  const suggestionCards: ReviewSuggestionCard[] = useMemo(
+    () => buildReviewSuggestionCards({ changes: result?.change_log, suggestions: result?.suggestions }),
+    [result?.change_log, result?.suggestions],
+  );
+  const reviewedSuggestionCount = suggestionCards.filter((suggestion) => reviewDecisions[suggestion.id] === "reviewed").length;
+  const editSuggestionCount = suggestionCards.filter((suggestion) => reviewDecisions[suggestion.id] === "edit").length;
+  const suggestionReviewSummary = suggestionCards.length
+    ? `${reviewedSuggestionCount}/${suggestionCards.length} reviewed${editSuggestionCount ? ` · ${editSuggestionCount} to edit` : ""}`
+    : "Ready after a completed run";
 
   if (accountStatus === null) {
     return <StudioAccountGate state="loading" />;
@@ -3055,24 +3061,50 @@ export default function Page() {
                     <div className="eyebrow">AI suggestions</div>
                     <h2 className="panel-title">{suggestionCards.length || "No"} changes for your review</h2>
                   </div>
+                  <span className="suggestion-review-status">{suggestionReviewSummary}</span>
                 </div>
                 <div className="suggestion-list">
-                  {suggestionCards.length ? suggestionCards.map((suggestion, index) => (
-                    <article className="suggestion" key={`${suggestion.label}-${suggestion.meta}-${index}`}>
-                      <div className="suggestion-head">
-                        <span className={`suggestion-tag ${suggestion.tone === "good" ? "good" : suggestion.tone === "warn" ? "warn" : ""}`}>{suggestion.label}</span>
-                        <span className="suggestion-meta">{suggestion.meta}</span>
-                      </div>
-                      <div className="suggestion-body">
-                        {suggestion.before ? <div className="suggestion-before">{suggestion.before}</div> : null}
-                        <div className="suggestion-after">{suggestion.after}</div>
-                      </div>
-                      <div className="suggestion-actions">
-                        <button className="btn btn-brand btn-sm" type="button" onClick={() => openPreviewMode("diff")}><RoleForgeIcon name="check" size={12} />Review changes</button>
-                        <button className="btn btn-soft btn-sm" type="button" onClick={() => openPreviewMode("tailored")}>View draft</button>
-                      </div>
-                    </article>
-                  )) : (
+                  {suggestionCards.length ? suggestionCards.map((suggestion) => {
+                    const decision = reviewDecisions[suggestion.id];
+                    return (
+                      <article className={`suggestion${decision ? ` ${decision}` : ""}`} key={suggestion.id}>
+                        <div className="suggestion-head">
+                          <span className={`suggestion-tag ${suggestion.tone === "good" ? "good" : suggestion.tone === "warn" ? "warn" : ""}`}>{suggestion.label}</span>
+                          <span className="suggestion-meta">{suggestion.meta}</span>
+                          {decision ? (
+                            <span className={`suggestion-decision ${decision}`}>
+                              <RoleForgeIcon name={decision === "reviewed" ? "check" : "edit"} size={12} />
+                              {decision === "reviewed" ? "Reviewed" : "Needs edit"}
+                            </span>
+                          ) : null}
+                        </div>
+                        <div className="suggestion-body">
+                          <div className="suggestion-after">{suggestion.after}</div>
+                        </div>
+                        <div className="suggestion-actions">
+                          <button
+                            className="btn btn-brand btn-sm suggestion-decision-button reviewed"
+                            type="button"
+                            aria-pressed={decision === "reviewed"}
+                            onClick={() => markReviewDecision(suggestion.id, "reviewed")}
+                          >
+                            <RoleForgeIcon name="check" size={12} />Reviewed
+                          </button>
+                          <button
+                            className="btn btn-soft btn-sm suggestion-decision-button edit"
+                            type="button"
+                            aria-pressed={decision === "edit"}
+                            onClick={() => markReviewDecision(suggestion.id, "edit")}
+                          >
+                            <RoleForgeIcon name="edit" size={12} />Needs edit
+                          </button>
+                          <button className="btn btn-soft btn-sm" type="button" onClick={() => openPreviewMode(suggestion.kind === "change" ? "diff" : "tailored")}>
+                            {suggestion.kind === "change" ? "View changes" : "View draft"}
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  }) : (
                     <div className="empty-state">
                       <strong>Suggestions are waiting</strong>
                       <p>Run the workflow and generated change notes will appear here.</p>

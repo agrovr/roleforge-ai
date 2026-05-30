@@ -8034,6 +8034,20 @@ html[data-theme="dark"] input::file-selector-button {
   background: var(--surface-2);
 }
 
+.suggestion.reviewed {
+  border-color: color-mix(in srgb, var(--good) 30%, var(--line));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--good-soft) 72%, transparent), transparent),
+    var(--surface-2);
+}
+
+.suggestion.edit {
+  border-color: color-mix(in srgb, var(--warn) 36%, var(--line));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--warn-soft) 74%, transparent), transparent),
+    var(--surface-2);
+}
+
 .suggestion-head {
   display: flex;
   min-width: 0;
@@ -8080,6 +8094,47 @@ html[data-theme="dark"] input::file-selector-button {
   text-wrap: balance;
 }
 
+.suggestion-review-status,
+.suggestion-decision {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink-2);
+  font-size: 0.76rem;
+  font-weight: 900;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.suggestion-review-status {
+  padding: 8px 10px;
+  background: var(--surface-2);
+}
+
+.suggestion-decision {
+  margin-left: auto;
+  padding: 5px 8px;
+  font-family: var(--font-sans);
+}
+
+.suggestion-decision.reviewed {
+  border-color: color-mix(in srgb, var(--good) 36%, var(--line));
+  background: var(--good-soft);
+  color: var(--good);
+}
+
+.suggestion-decision.edit {
+  border-color: color-mix(in srgb, var(--warn) 38%, var(--line));
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
 .suggestion-body {
   display: grid;
   gap: 8px;
@@ -8124,6 +8179,18 @@ html[data-theme="dark"] input::file-selector-button {
   text-align: center;
   text-wrap: balance;
   white-space: normal;
+}
+
+.suggestion-decision-button.reviewed[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--brand) 38%, var(--line));
+  background: var(--brand-soft);
+  color: var(--brand-dark);
+}
+
+.suggestion-decision-button.edit[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--warn) 38%, var(--line));
+  background: var(--warn-soft);
+  color: var(--warn);
 }
 
 .rf-studio-page .btn {
@@ -8553,6 +8620,41 @@ html[data-theme="dark"] .rf-resume-paper {
 html[data-theme="dark"] .suggestion-after {
   background: rgba(133, 215, 158, 0.14);
   color: var(--ink-1);
+}
+
+html[data-theme="dark"] .suggestion-review-status,
+html[data-theme="dark"] .suggestion-decision {
+  border-color: rgba(255, 247, 233, 0.14);
+  background: rgba(255, 247, 233, 0.06);
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .suggestion.reviewed {
+  border-color: rgba(133, 215, 158, 0.34);
+  background:
+    linear-gradient(180deg, rgba(133, 215, 158, 0.12), transparent),
+    rgba(25, 31, 52, 0.9);
+}
+
+html[data-theme="dark"] .suggestion.edit {
+  border-color: rgba(240, 201, 109, 0.34);
+  background:
+    linear-gradient(180deg, rgba(240, 201, 109, 0.12), transparent),
+    rgba(25, 31, 52, 0.9);
+}
+
+html[data-theme="dark"] .suggestion-decision.reviewed,
+html[data-theme="dark"] .suggestion-decision-button.reviewed[aria-pressed="true"] {
+  border-color: rgba(133, 215, 158, 0.34);
+  background: rgba(133, 215, 158, 0.14);
+  color: #c8f0df;
+}
+
+html[data-theme="dark"] .suggestion-decision.edit,
+html[data-theme="dark"] .suggestion-decision-button.edit[aria-pressed="true"] {
+  border-color: rgba(240, 201, 109, 0.34);
+  background: rgba(240, 201, 109, 0.14);
+  color: #f6d884;
 }
 
 html[data-theme="dark"] .rf-rail-upgrade {
