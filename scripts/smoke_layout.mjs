@@ -1030,10 +1030,12 @@ async function main(argv = process.argv.slice(2)) {
           }
         }
       }
-      const interactionReports = [
-        ...(await evaluatePreviewTabs(page.send, baseUrl, signedInSession?.cookie || "")),
-        ...(await evaluateHistoryRestore(page.send, baseUrl, signedInSession?.cookie || "")),
-      ];
+      const interactionReports = signedInSession?.cookie
+        ? [
+            ...(await evaluatePreviewTabs(page.send, baseUrl, signedInSession.cookie)),
+            ...(await evaluateHistoryRestore(page.send, baseUrl, signedInSession.cookie)),
+          ]
+        : [];
 
       const failures = [...reports, ...interactionReports].flatMap((report) => {
         const pageFailures = [...report.failures];

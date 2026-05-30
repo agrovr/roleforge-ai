@@ -16317,3 +16317,189 @@ body {
     transform: rotate(7deg) translate(clamp(28px, 8vw, 42px), 26px);
   }
 }
+
+/* May 30 visual fit lock: the public pages are often checked in wide browser
+   windows with zoom enabled, where older overrides could still make the hero
+   art, studio preview cards, and settings actions crowd each other. */
+.hero {
+  box-sizing: border-box;
+  inline-size: min(100%, var(--container));
+  max-inline-size: min(var(--container), calc(100vw - clamp(28px, 4.8vw, 84px)));
+  margin-inline: auto;
+  grid-template-columns: minmax(0, 0.98fr) minmax(340px, 0.62fr);
+  gap: clamp(30px, 3.6vw, 54px);
+  padding-inline: clamp(24px, 3.4vw, 48px);
+  overflow: clip;
+}
+
+.hero-copy {
+  max-inline-size: min(100%, 690px);
+}
+
+.hero .h1 {
+  max-inline-size: min(100%, 12ch);
+  font-size: clamp(2.85rem, 4.35vw, 4.45rem);
+  line-height: 1.08;
+}
+
+.hero-stage {
+  justify-self: end;
+  inline-size: min(100%, 410px);
+  block-size: clamp(390px, 30vw, 470px);
+}
+
+.hero-stage .resume-card-front {
+  inline-size: clamp(258px, 19vw, 306px);
+  block-size: clamp(370px, 27vw, 432px);
+}
+
+.hero-stage .resume-card-back-l {
+  inline-size: clamp(206px, 15vw, 244px);
+  block-size: clamp(306px, 22.5vw, 362px);
+  transform: rotate(-8deg) translate(clamp(-46px, -3vw, -30px), 22px);
+}
+
+.hero-stage .resume-card-back-r {
+  inline-size: clamp(198px, 14.4vw, 236px);
+  block-size: clamp(298px, 21.8vw, 352px);
+  transform: rotate(7deg) translate(clamp(34px, 3vw, 52px), 28px);
+}
+
+.hero-stage:hover .resume-card-front {
+  transform: rotate(-1deg) translateY(-5px);
+}
+
+.hero-stage:hover .resume-card-back-l {
+  transform: rotate(-9deg) translate(clamp(-54px, -3.6vw, -38px), 24px);
+}
+
+.hero-stage:hover .resume-card-back-r {
+  transform: rotate(8deg) translate(clamp(42px, 3.6vw, 62px), 32px);
+}
+
+.dash-mock .dash-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+
+.dash-mock .dash-stat {
+  min-inline-size: 0;
+  min-block-size: 136px;
+  overflow: clip;
+}
+
+.dash-mock .dash-stat-value {
+  font-size: clamp(1.55rem, 2.4cqi, 2rem);
+  line-height: 1.04;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.settings-profile-actions {
+  inline-size: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.settings-profile-actions > .primary-button {
+  flex: 0 1 230px;
+}
+
+.settings-profile-actions > form {
+  flex: 0 1 150px;
+  inline-size: auto;
+}
+
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button,
+.settings-billing-head .ghost-button,
+.settings-plan-active-card .settings-inline-link,
+.settings-export-actions .btn,
+.price-card .btn {
+  min-block-size: 48px;
+  padding-inline: clamp(16px, 1.4vw, 22px);
+  font-size: clamp(0.92rem, 1vw, 1rem);
+  line-height: 1.12;
+  overflow-wrap: normal;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.settings-profile-actions .ghost-button {
+  inline-size: 100%;
+}
+
+.settings-billing-head {
+  grid-template-columns: minmax(0, 1fr) minmax(224px, max-content);
+}
+
+.settings-billing-head form {
+  justify-self: end;
+  inline-size: auto;
+  max-inline-size: none;
+}
+
+.settings-billing-head .ghost-button {
+  inline-size: auto;
+  min-inline-size: 224px;
+}
+
+.settings-plan-active-card {
+  grid-template-columns: minmax(0, 1fr) minmax(176px, max-content);
+}
+
+.settings-plan-active-card .settings-inline-link {
+  inline-size: auto;
+  min-inline-size: 176px;
+  justify-self: end;
+}
+
+@media (max-width: 1620px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.54fr);
+  }
+
+  .hero-stage {
+    inline-size: min(100%, 380px);
+    block-size: clamp(360px, 30vw, 440px);
+  }
+}
+
+@media (max-width: 1360px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+  }
+
+  .hero-stage {
+    justify-self: center;
+    inline-size: min(100%, 500px);
+    block-size: clamp(370px, 45vw, 470px);
+  }
+}
+
+@media (max-width: 760px) {
+  .hero {
+    max-inline-size: calc(100vw - 24px);
+    padding-inline: clamp(18px, 5vw, 26px);
+  }
+
+  .settings-profile-actions,
+  .settings-profile-actions > .primary-button,
+  .settings-profile-actions > form,
+  .settings-billing-head form,
+  .settings-billing-head .ghost-button,
+  .settings-plan-active-card .settings-inline-link {
+    inline-size: 100%;
+    max-inline-size: none;
+    min-inline-size: 0;
+    justify-self: stretch;
+  }
+
+  .settings-billing-head,
+  .settings-plan-active-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
