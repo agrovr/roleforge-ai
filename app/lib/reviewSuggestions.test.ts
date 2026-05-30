@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { buildReviewSuggestionCards } from "./reviewSuggestions";
+import { buildReviewSuggestionCards, reviewSuggestionWorkspaceKey } from "./reviewSuggestions";
 
 test("builds review cards from generated change notes and suggestions", () => {
   const cards = buildReviewSuggestionCards({
@@ -28,4 +28,41 @@ test("limits review cards for a compact studio panel", () => {
   });
 
   assert.deepEqual(cards.map((card) => card.after), ["one", "two", "three", "four"]);
+});
+
+test("changes review workspace keys when the active draft changes", () => {
+  const first = reviewSuggestionWorkspaceKey({
+    sourceId: "history-1",
+    runId: "run-1",
+    tailoredText: "Draft A",
+    changes: ["Change one"],
+    suggestions: ["Suggestion one"],
+  });
+  const second = reviewSuggestionWorkspaceKey({
+    sourceId: "history-2",
+    runId: "run-1",
+    tailoredText: "Draft A",
+    changes: ["Change one"],
+    suggestions: ["Suggestion one"],
+  });
+  const third = reviewSuggestionWorkspaceKey({
+    sourceId: "history-1",
+    runId: "run-1",
+    tailoredText: "Draft B",
+    changes: ["Change one"],
+    suggestions: ["Suggestion one"],
+  });
+
+  assert.notEqual(first, second);
+  assert.notEqual(first, third);
+  assert.equal(
+    reviewSuggestionWorkspaceKey({
+      sourceId: "history-1",
+      runId: "run-1",
+      tailoredText: "Draft A",
+      changes: [" Change one "],
+      suggestions: ["Suggestion one"],
+    }),
+    first,
+  );
 });

@@ -10,6 +10,15 @@ export type ReviewSuggestionCard = {
   kind: ReviewSuggestionKind;
 };
 
+export type ReviewSuggestionWorkspaceInput = {
+  sourceId?: string | null;
+  runId?: string | null;
+  generatedAt?: string | null;
+  tailoredText?: string | null;
+  changes?: string[] | null;
+  suggestions?: string[] | null;
+};
+
 function stableSuggestionId(prefix: string, index: number, text: string) {
   let hash = 0;
   for (let charIndex = 0; charIndex < text.length; charIndex += 1) {
@@ -52,4 +61,18 @@ export function buildReviewSuggestionCards({
     }));
 
   return [...changeCards, ...suggestionCards].slice(0, limit);
+}
+
+export function reviewSuggestionWorkspaceKey(input: ReviewSuggestionWorkspaceInput) {
+  const changes = (input.changes ?? []).map((value) => value.trim()).filter(Boolean).join("\n");
+  const suggestions = (input.suggestions ?? []).map((value) => value.trim()).filter(Boolean).join("\n");
+  const content = [
+    input.sourceId?.trim() ?? "",
+    input.runId?.trim() ?? "",
+    input.generatedAt?.trim() ?? "",
+    input.tailoredText?.trim() ?? "",
+    changes,
+    suggestions,
+  ].join("\n---\n");
+  return stableSuggestionId("review-workspace", 0, content);
 }

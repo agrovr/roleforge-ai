@@ -31,7 +31,11 @@ import {
   isResumeTemplateSlug,
   type ResumeTemplateSlug,
 } from "../lib/resumeTemplates";
-import { buildReviewSuggestionCards, type ReviewSuggestionCard } from "../lib/reviewSuggestions";
+import {
+  buildReviewSuggestionCards,
+  reviewSuggestionWorkspaceKey,
+  type ReviewSuggestionCard,
+} from "../lib/reviewSuggestions";
 import { parseTargetUrl } from "../lib/targetLabel";
 import {
   formatHistoryTimestamp,
@@ -2726,6 +2730,22 @@ export default function Page() {
   const atsRailActive = activeTab === "ats";
   const coverRailActive = activeTab === "cover";
   const interviewRailActive = activeTab === "interview";
+
+  const reviewWorkspaceKey = useMemo(
+    () => reviewSuggestionWorkspaceKey({
+      sourceId: restoredHistoryId,
+      runId: result?.run_id,
+      generatedAt: result?.generated_at,
+      tailoredText: result?.tailored_text,
+      changes: result?.change_log,
+      suggestions: result?.suggestions,
+    }),
+    [restoredHistoryId, result?.run_id, result?.generated_at, result?.tailored_text, result?.change_log, result?.suggestions],
+  );
+
+  useEffect(() => {
+    setReviewDecisions({});
+  }, [reviewWorkspaceKey]);
 
   const suggestionCards: ReviewSuggestionCard[] = useMemo(
     () => buildReviewSuggestionCards({ changes: result?.change_log, suggestions: result?.suggestions }),
