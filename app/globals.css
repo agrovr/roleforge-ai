@@ -14687,3 +14687,259 @@ body,
     justify-self: stretch;
   }
 }
+
+/* May 29 visual QA: keep the public marketing and settings surfaces composed
+   when the browser is zoomed or captured at awkward screenshot widths. */
+html,
+body,
+.page-shell,
+.shell {
+  max-inline-size: 100%;
+  overflow-x: hidden;
+}
+
+.hero {
+  inline-size: min(100%, var(--container));
+  max-inline-size: calc(100% - clamp(24px, 4.2vw, 64px));
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.78fr);
+  align-items: center;
+  overflow: hidden;
+}
+
+.hero-copy {
+  max-inline-size: min(100%, 720px);
+}
+
+.hero .h1 {
+  max-inline-size: 100%;
+  text-wrap: balance;
+}
+
+.hero-stage {
+  justify-self: end;
+  inline-size: min(100%, 460px);
+  block-size: 500px;
+  contain: paint;
+}
+
+.hero-stage .resume-card {
+  transform-origin: center;
+}
+
+.resume-card-front {
+  inline-size: 318px;
+  block-size: 446px;
+  transform: rotate(-2deg) translateX(0);
+}
+
+.resume-card-back-l {
+  inline-size: 254px;
+  block-size: 374px;
+  transform: rotate(-8deg) translate(-54px, 24px);
+}
+
+.resume-card-back-r {
+  inline-size: 240px;
+  block-size: 356px;
+  transform: rotate(7deg) translate(58px, 32px);
+}
+
+.hero-stage:hover .resume-card-front {
+  transform: rotate(-1deg) translate(0, -6px);
+}
+
+.hero-stage:hover .resume-card-back-l {
+  transform: rotate(-9deg) translate(-62px, 26px);
+}
+
+.hero-stage:hover .resume-card-back-r {
+  transform: rotate(8deg) translate(66px, 36px);
+}
+
+.dash-mock .dash-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 282px), 1fr));
+  align-items: stretch;
+}
+
+.dash-mock .dash-stat {
+  min-block-size: clamp(118px, 14cqi, 138px);
+  overflow: hidden;
+}
+
+.dash-mock .dash-stat-value {
+  font-size: clamp(1.42rem, 4.2cqi, 1.92rem);
+  line-height: 1.04;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  hyphens: none;
+}
+
+.dash-mock .dash-stat-delta {
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+}
+
+.dash-main-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  align-items: start;
+}
+
+.dash-main-head .btn-sm {
+  inline-size: max-content;
+  max-inline-size: min(100%, 188px);
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.settings-profile-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 164px), max-content));
+  justify-content: start;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.settings-profile-actions form,
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button {
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button,
+.settings-billing-head .ghost-button,
+.settings-plan-active-card .settings-inline-link {
+  max-inline-size: 100%;
+  padding-inline: 18px;
+  white-space: normal;
+  text-wrap: balance;
+}
+
+.settings-billing-head {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 220px);
+  align-items: start;
+}
+
+.settings-billing-head form,
+.settings-billing-head .ghost-button {
+  inline-size: 100%;
+  max-inline-size: 220px;
+}
+
+.settings-plan-active-card {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 160px);
+}
+
+.settings-plan-active-card .settings-inline-link {
+  inline-size: 100%;
+}
+
+@media (min-width: 1181px) and (max-width: 1480px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.68fr);
+  }
+
+  .hero-stage {
+    inline-size: min(100%, 420px);
+    block-size: 470px;
+  }
+
+  .resume-card-front {
+    inline-size: 294px;
+    block-size: 414px;
+  }
+
+  .resume-card-back-l {
+    inline-size: 232px;
+    block-size: 346px;
+    transform: rotate(-8deg) translate(-44px, 22px);
+  }
+
+  .resume-card-back-r {
+    inline-size: 220px;
+    block-size: 332px;
+    transform: rotate(7deg) translate(48px, 30px);
+  }
+}
+
+@media (max-width: 1180px) {
+  .hero {
+    grid-template-columns: 1fr;
+    max-inline-size: calc(100% - 32px);
+  }
+
+  .hero-copy {
+    max-inline-size: min(100%, 760px);
+  }
+
+  .hero-stage {
+    justify-self: center;
+    inline-size: min(100%, 500px);
+    block-size: 430px;
+  }
+
+  .resume-card-front {
+    inline-size: 286px;
+    block-size: 402px;
+  }
+
+  .resume-card-back-l {
+    inline-size: 230px;
+    block-size: 338px;
+    transform: rotate(-8deg) translate(-48px, 20px);
+  }
+
+  .resume-card-back-r {
+    inline-size: 218px;
+    block-size: 324px;
+    transform: rotate(7deg) translate(52px, 26px);
+  }
+}
+
+@container dash-main (max-width: 760px) {
+  .dash-main-head {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-main-head .btn-sm {
+    inline-size: 100%;
+    max-inline-size: none;
+    justify-self: stretch;
+    white-space: normal;
+  }
+}
+
+@container dash-main (max-width: 1260px) {
+  .dash-mock .dash-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container dash-main (max-width: 620px) {
+  .dash-mock .dash-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@container settings-section (max-width: 920px) {
+  .settings-billing-head,
+  .settings-plan-active-card {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-billing-head form,
+  .settings-billing-head .ghost-button,
+  .settings-plan-active-card .settings-inline-link {
+    inline-size: 100%;
+    max-inline-size: none;
+    justify-self: stretch;
+  }
+}
+
+@container settings-section (max-width: 430px) {
+  .settings-profile-actions {
+    grid-template-columns: 1fr;
+  }
+}
