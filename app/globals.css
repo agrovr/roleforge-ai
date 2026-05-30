@@ -1955,12 +1955,42 @@ html[data-theme="dark"] textarea {
   border-color: var(--ink-0);
 }
 
+.price-card-top {
+  display: flex;
+  min-inline-size: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .price-name {
   color: var(--brand-dark);
   font-weight: 850;
 }
 
 .price-card.featured .price-name {
+  color: var(--brand-soft);
+}
+
+.price-status {
+  max-inline-size: 52%;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 0.72rem;
+  font-weight: 850;
+  line-height: 1.12;
+  text-align: right;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.price-card.featured .price-status {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--brand-soft);
 }
 
@@ -2038,6 +2068,16 @@ html[data-theme="dark"] textarea {
 }
 
 @container price-card (max-width: 340px) {
+  .price-card-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .price-status {
+    max-inline-size: 100%;
+    text-align: left;
+  }
+
   .price-amount .v {
     font-size: clamp(2rem, 14cqi, 2.45rem);
   }

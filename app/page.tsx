@@ -5,12 +5,14 @@ import { ResumePreview } from "./components/ResumePreview";
 import { RoleForgeIcon } from "./components/RoleForgeIcons";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { PREMIUM_PRICE } from "./lib/billing/stripe";
-import { FREE_ENTITLEMENT } from "./lib/entitlements";
+import { FREE_ENTITLEMENT, loadAccountEntitlement } from "./lib/entitlements";
 import { createRoleForgeServerClient } from "./lib/supabase/server";
 import { monthlyRunAllowanceLabel } from "./lib/usage";
 
 type LandingLinks = {
   signedIn: boolean;
+  premiumActive: boolean;
+  premiumEnding: boolean;
   studioHref: string;
   premiumHref: string;
 };
@@ -25,9 +27,13 @@ async function getLandingLinks(): Promise<LandingLinks> {
     data: { user },
   } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
   const signedIn = Boolean(user);
+  const entitlement = user && supabase ? await loadAccountEntitlement(supabase, user.id) : FREE_ENTITLEMENT;
+  const premiumActive = entitlement.plan === "premium" && ["active", "trialing"].includes(entitlement.billingStatus);
 
   return {
     signedIn,
+    premiumActive,
+    premiumEnding: premiumActive && entitlement.cancelAtPeriodEnd,
     studioHref: signedIn ? "/app" : "/login?next=/app",
     premiumHref: signedIn ? "/settings#billing" : `/login?next=${encodeURIComponent("/settings#billing")}`,
   };
@@ -411,7 +417,17 @@ function Features() {
   );
 }
 
-function Pricing({ studioHref, premiumHref }: Pick<LandingLinks, "studioHref" | "premiumHref">) {
+function Pricing({
+  studioHref,
+  premiumHref,
+  signedIn,
+  premiumActive,
+  premiumEnding,
+}: Pick<LandingLinks, "studioHref" | "premiumHref" | "signedIn" | "premiumActive" | "premiumEnding">) {
+  const freeStatus = signedIn && !premiumActive ? "Current plan" : "Starter plan";
+  const premiumStatus = premiumActive ? (premiumEnding ? "Active until period end" : "Current plan") : "Upgrade";
+  const premiumCta = premiumActive ? "Manage Premium" : signedIn ? "View plans" : "Sign in to upgrade";
+
   return (
     <section className="section" id="pricing">
       <div className="section-inner">
@@ -424,7 +440,10 @@ function Pricing({ studioHref, premiumHref }: Pick<LandingLinks, "studioHref" | 
         </div>
         <div className="pricing-grid two">
           <article className="price-card">
-            <div className="price-name">Studio</div>
+            <div className="price-card-top">
+              <div className="price-name">Studio</div>
+              <span className="price-status">{freeStatus}</span>
+            </div>
             <div className="price-amount"><span className="v">$0</span></div>
             <div className="price-desc">Start with {FREE_RUN_ALLOWANCE} for upload, targeting, review, and PDF export.</div>
             <ul className="price-list">
@@ -437,15 +456,22 @@ function Pricing({ studioHref, premiumHref }: Pick<LandingLinks, "studioHref" | 
             <Link className="btn btn-soft btn-lg" href={studioHref}>Open studio</Link>
           </article>
           <article className="price-card featured">
-            <div className="price-name">Premium</div>
+            <div className="price-card-top">
+              <div className="price-name">Premium</div>
+              <span className="price-status">{premiumStatus}</span>
+            </div>
             <div className="price-amount"><span className="v">${PREMIUM_MONTHLY_PRICE}</span><span className="m">/mo</span></div>
-            <div className="price-desc">${PREMIUM_YEARLY_PRICE}/year for early users. Premium unlocks unlimited runs plus DOCX and TXT exports.</div>
+            <div className="price-desc">
+              {premiumActive
+                ? "Your account has unlimited runs plus PDF, DOCX, and TXT exports in the studio."
+                : `$${PREMIUM_YEARLY_PRICE}/year for early users. Premium unlocks unlimited runs plus DOCX and TXT exports.`}
+            </div>
             <ul className="price-list">
               <li><RoleForgeIcon name="check" size={14} />Unlimited tailoring runs</li>
               <li><RoleForgeIcon name="check" size={14} />DOCX and TXT exports</li>
               <li><RoleForgeIcon name="check" size={14} />No monthly run cap</li>
             </ul>
-            <Link className="btn btn-brand btn-lg" href={premiumHref}>View plans</Link>
+            <Link className="btn btn-brand btn-lg" href={premiumHref}>{premiumCta}</Link>
           </article>
         </div>
       </div>
@@ -544,7 +570,13 @@ export default async function Landing() {
       <StudioPreview studioHref={links.studioHref} />
       <Templates />
       <Features />
-      <Pricing studioHref={links.studioHref} premiumHref={links.premiumHref} />
+      <Pricing
+        signedIn={links.signedIn}
+        studioHref={links.studioHref}
+        premiumHref={links.premiumHref}
+        premiumActive={links.premiumActive}
+        premiumEnding={links.premiumEnding}
+      />
       <FAQ />
       <CTABand studioHref={links.studioHref} />
       <Footer />

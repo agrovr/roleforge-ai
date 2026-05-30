@@ -519,8 +519,14 @@ async function checkPublicShell(baseUrl) {
 
   requireCondition(/\.pricing-grid\.two\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(min\(100%,\s*360px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "pricing cards can still shrink below comfortable desktop widths");
   requireCondition(/\.price-card\s*\{(?=[^}]*container:\s*price-card\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "pricing cards were missing container overflow safeguards");
+  requireCondition(home.text.includes("Starter plan") && home.text.includes("Upgrade"), "landing pricing is missing plan-aware status labels");
+  requireCondition(
+    /\.price-card-top\s*\{(?=[^}]*display:\s*flex)(?=[^}]*min-inline-size:\s*0)(?=[^}]*justify-content:\s*space-between)[^}]*\}/s.test(stylesheetText) &&
+      /\.price-status\s*\{(?=[^}]*max-inline-size:\s*52%)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText),
+    "pricing plan status labels can still crowd price cards",
+  );
   requireCondition(/\.price-amount\s+\.v\s*\{(?=[^}]*font-size:\s*clamp\(2\.35rem,\s*15cqi,\s*3\.25rem\))(?=[^}]*line-height:\s*1)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "pricing amounts can still clip or overflow");
-  requireCondition(/@container\s+price-card\s*\(max-width:\s*340px\)\s*\{[^}]*\.price-amount\s+\.v\s*\{[^}]*font-size:\s*clamp\(2rem,\s*14cqi,\s*2\.45rem\)/s.test(stylesheetText), "pricing amounts are missing fitted type for compact cards");
+  requireCondition(/@container\s+price-card\s*\(max-width:\s*340px\)\s*\{[\s\S]*?\.price-amount\s+\.v\s*\{[^}]*font-size:\s*clamp\(2rem,\s*14cqi,\s*2\.45rem\)/s.test(stylesheetText), "pricing amounts are missing fitted type for compact cards");
   requireCondition(/\.price-list\s+li\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*line-height:\s*1\.35)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "pricing feature rows can still squeeze card text");
   requireCondition(/\.price-card\s+\.btn,\s*\.price-card\s+button\s*\{(?=[^}]*width:\s*100%)(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "pricing CTA buttons can still render cramped labels");
   pass("pricing cards include overflow-safe typography and actions");
