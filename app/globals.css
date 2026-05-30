@@ -12145,109 +12145,6 @@ body,
   }
 }
 
-/* Final CTA screenshot fix: this must stay last because older visual repair
-   layers above also target the same marketing callout. */
-.cta-section {
-  padding-inline: clamp(20px, 3.2vw, 40px);
-  overflow-x: clip;
-}
-
-.cta-section .section-inner {
-  inline-size: min(100%, 1180px);
-  max-inline-size: calc(100vw - clamp(40px, 6.4vw, 80px));
-  margin-inline: auto;
-  overflow: visible;
-}
-
-.cta-band {
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 280px), 360px);
-  gap: clamp(24px, 3.2vw, 42px);
-  min-height: auto;
-  padding: clamp(38px, 4.6vw, 56px);
-}
-
-.cta-band > div:first-child {
-  max-inline-size: min(100%, 560px);
-}
-
-.cta-band h2 {
-  max-inline-size: min(100%, 13ch);
-  font-size: clamp(2.25rem, 3.2vw, 3.4rem);
-}
-
-.cta-band p {
-  max-inline-size: min(100%, 42ch);
-}
-
-.cta-band .cta-cluster {
-  max-inline-size: min(100%, 500px);
-}
-
-.cta-visual {
-  inline-size: min(100%, 360px);
-  min-block-size: clamp(300px, 24vw, 350px);
-  justify-self: end;
-}
-
-.cta-visual .resume-card {
-  inset-inline-end: clamp(12px, 1.8vw, 20px);
-  inset-block-start: 14px;
-  inline-size: clamp(188px, 13vw, 218px);
-  block-size: clamp(282px, 19.4vw, 326px);
-}
-
-.cta-visual .resume-card.back {
-  inset-inline-end: clamp(84px, 7.4vw, 110px);
-  inset-block-start: 44px;
-  inline-size: clamp(160px, 11vw, 188px);
-  block-size: clamp(252px, 17.4vw, 296px);
-}
-
-@media (min-width: 1181px) and (max-width: 1580px) {
-  .cta-section .section-inner {
-    max-inline-size: min(980px, calc(100vw - 48px));
-  }
-
-  .cta-band {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .cta-band > div:first-child,
-  .cta-band h2,
-  .cta-band p,
-  .cta-band .cta-cluster {
-    max-inline-size: 100%;
-  }
-
-  .cta-visual {
-    justify-self: center;
-    inline-size: min(100%, 500px);
-    min-block-size: clamp(320px, 36vw, 390px);
-  }
-
-  .cta-visual .resume-card {
-    inset-inline-end: auto;
-    left: 52%;
-    transform: translateX(-18%) rotate(5deg);
-  }
-
-  .cta-visual .resume-card.back {
-    inset-inline-end: auto;
-    left: 52%;
-    transform: translateX(-76%) rotate(-8deg);
-  }
-}
-
-@media (max-width: 760px) {
-  .cta-section .section-inner {
-    max-inline-size: calc(100vw - 24px);
-  }
-
-  .cta-band {
-    padding: 32px 22px;
-  }
-}
-
 /* Landing/CTA responsive polish: keep the editorial resume art inside the
    composed panel instead of letting rotated paper edges crowd the copy. */
 @media (min-width: 1181px) and (max-width: 1500px) {
@@ -15588,3 +15485,141 @@ body,
     display: none;
   }
 }
+
+/* Final CTA screenshot fix: this must stay last because older visual repair
+   layers above also target the same marketing callout. */
+.cta-section {
+  padding-inline: clamp(20px, 3.2vw, 40px);
+  overflow-x: clip;
+}
+
+.cta-section .section-inner {
+  inline-size: min(100%, 1180px);
+  max-inline-size: calc(100vw - clamp(40px, 6.4vw, 80px));
+  margin-inline: auto;
+  overflow: visible;
+}
+
+.cta-band {
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 280px), 360px);
+  gap: clamp(24px, 3.2vw, 42px);
+  min-height: auto;
+  padding: clamp(38px, 4.6vw, 56px);
+}
+
+.cta-band > div:first-child {
+  max-inline-size: min(100%, 560px);
+}
+
+.cta-band h2 {
+  max-inline-size: min(100%, 13ch);
+  font-size: clamp(2.25rem, 3.2vw, 3.4rem);
+}
+
+.cta-band p {
+  max-inline-size: min(100%, 42ch);
+}
+
+.cta-band .cta-cluster {
+  max-inline-size: min(100%, 500px);
+}
+
+.cta-visual {
+  inline-size: min(100%, 360px);
+  min-block-size: clamp(324px, 26vw, 382px);
+  justify-self: end;
+}
+
+.cta-visual .resume-card {
+  inset-inline-end: clamp(12px, 1.8vw, 20px);
+  inset-block-start: 14px;
+  inline-size: clamp(188px, 13vw, 218px);
+  block-size: clamp(282px, 19.4vw, 326px);
+}
+
+.cta-visual .resume-card.back {
+  inset-inline-end: clamp(84px, 7.4vw, 110px);
+  inset-block-start: 44px;
+  inline-size: clamp(160px, 11vw, 188px);
+  block-size: clamp(252px, 17.4vw, 296px);
+}
+
+@media (min-width: 1181px) and (max-width: 1580px) {
+  .cta-section .section-inner {
+    max-inline-size: min(980px, calc(100vw - 48px));
+  }
+
+  .cta-band {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cta-band > div:first-child,
+  .cta-band h2,
+  .cta-band p,
+  .cta-band .cta-cluster {
+    max-inline-size: 100%;
+  }
+
+  .cta-visual {
+    justify-self: center;
+    inline-size: min(100%, 500px);
+    min-block-size: clamp(320px, 36vw, 390px);
+  }
+
+  .cta-visual .resume-card {
+    inset-inline-end: auto;
+    left: 52%;
+    transform: translateX(-18%) rotate(5deg);
+  }
+
+  .cta-visual .resume-card.back {
+    inset-inline-end: auto;
+    left: 52%;
+    transform: translateX(-76%) rotate(-8deg);
+  }
+}
+
+@media (max-width: 760px) {
+  .cta-section .section-inner {
+    max-inline-size: calc(100vw - 24px);
+  }
+
+  .cta-band {
+    grid-template-columns: 1fr;
+    min-block-size: 0;
+    padding: 32px 22px;
+  }
+
+  .cta-band,
+  .cta-band > div:first-child,
+  .cta-band h2,
+  .cta-band p,
+  .cta-band .cta-cluster,
+  .cta-band .btn {
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  .cta-band h2 {
+    font-size: clamp(2.2rem, 10vw, 3rem);
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .cta-band .cta-cluster {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .cta-band .btn {
+    min-inline-size: 0;
+    padding-inline: 16px;
+  }
+
+  .cta-visual {
+    display: none;
+  }
+}
+
+/* End final CTA screenshot fix. */
