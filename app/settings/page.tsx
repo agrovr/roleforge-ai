@@ -110,6 +110,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     : premiumActive
       ? "Billing management is unavailable right now."
       : "Start Premium to open billing management.";
+  const inactiveBillingActionLabel = premiumActive ? "Billing unavailable right now" : "Billing opens after checkout";
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName = accountDisplayName(user);
   const planFeatures = premiumActive
@@ -338,7 +339,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   </form>
                 ) : (
                   <span className="ghost-button settings-disabled-action" aria-disabled="true" title={portalActionTitle}>
-                    Billing opens after checkout
+                    {inactiveBillingActionLabel}
                   </span>
                 )}
               </div>
