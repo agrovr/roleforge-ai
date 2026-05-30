@@ -14490,3 +14490,200 @@ body,
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Layout fit repair: this final layer keeps oversized editorial labels from
+   crowding narrow cards and keeps the landing paper stack composed at zoom. */
+.hero {
+  max-inline-size: min(var(--container), calc(100vw - clamp(28px, 4.8vw, 72px)));
+  grid-template-columns: minmax(0, 0.98fr) minmax(min(100%, 320px), 0.72fr);
+  gap: clamp(26px, 3.2vw, 48px);
+  padding-inline: clamp(20px, 3vw, 42px);
+}
+
+.hero-copy,
+.hero-stage {
+  min-inline-size: 0;
+}
+
+.hero-stage {
+  inline-size: min(100%, 500px);
+  block-size: clamp(400px, 32vw, 510px);
+}
+
+.hero-stage::before {
+  inset: 10% 8%;
+}
+
+.resume-card-front {
+  inline-size: clamp(264px, 19vw, 326px);
+  block-size: clamp(382px, 28vw, 456px);
+  transform: rotate(-2deg) translateX(4px);
+}
+
+.resume-card-back-l {
+  inline-size: clamp(218px, 16vw, 258px);
+  block-size: clamp(324px, 23vw, 382px);
+  transform: rotate(-8deg) translate(clamp(-58px, -4vw, -36px), 22px);
+}
+
+.resume-card-back-r {
+  inline-size: clamp(206px, 15vw, 246px);
+  block-size: clamp(312px, 22vw, 368px);
+  transform: rotate(7deg) translate(clamp(44px, 4vw, 70px), 30px);
+}
+
+.hero-stage:hover .resume-card-front {
+  transform: rotate(-1deg) translate(4px, -6px);
+}
+
+.hero-stage:hover .resume-card-back-l {
+  transform: rotate(-9deg) translate(clamp(-66px, -4.4vw, -44px), 24px);
+}
+
+.hero-stage:hover .resume-card-back-r {
+  transform: rotate(8deg) translate(clamp(52px, 4.4vw, 80px), 34px);
+}
+
+.hero-badge {
+  max-inline-size: min(222px, 58%);
+  padding: 10px 12px;
+  gap: 10px;
+  font-size: clamp(0.78rem, 1.2vw, 0.88rem);
+  line-height: 1.18;
+}
+
+.hero-badge .b-icon {
+  flex: 0 0 32px;
+  inline-size: 32px;
+  block-size: 32px;
+}
+
+.dash-mock .dash-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+}
+
+.dash-mock .dash-stat {
+  min-block-size: 126px;
+  overflow: visible;
+  gap: 10px;
+  padding: clamp(16px, 2.1cqi, 22px);
+}
+
+.dash-mock .dash-stat-value {
+  margin-block: 2px;
+  font-size: clamp(1.08rem, 3.4cqi, 1.42rem);
+  line-height: 1.04;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.dash-mock .dash-stat-delta {
+  max-inline-size: 100%;
+  font-size: clamp(0.8rem, 1.7cqi, 0.92rem);
+}
+
+.dash-main-head {
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 184px);
+}
+
+.dash-main-head .btn-sm {
+  max-inline-size: 184px;
+  min-block-size: 44px;
+}
+
+.settings-profile-actions,
+.settings-billing-head,
+.settings-plan-active-card,
+.settings-export-actions {
+  gap: 12px;
+}
+
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button,
+.settings-billing-head .ghost-button,
+.settings-plan-active-card .settings-inline-link,
+.settings-export-actions .btn,
+.price-card .btn {
+  min-block-size: 48px;
+  padding-inline: clamp(14px, 1.7cqi, 20px);
+  font-size: clamp(0.88rem, 1.65cqi, 0.98rem);
+  line-height: 1.1;
+}
+
+.settings-profile-actions .primary-button {
+  min-inline-size: 0;
+}
+
+.settings-billing-head {
+  grid-template-columns: minmax(0, 1fr) minmax(210px, 248px);
+}
+
+.settings-billing-head form,
+.settings-billing-head .ghost-button {
+  max-inline-size: 248px;
+}
+
+.settings-plan-active-card {
+  grid-template-columns: minmax(0, 1fr) minmax(146px, 176px);
+}
+
+.settings-plan-active-card .settings-inline-link {
+  inline-size: 100%;
+  min-inline-size: 0;
+}
+
+@container dash-main (max-width: 980px) {
+  .dash-mock .dash-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container dash-main (max-width: 560px) {
+  .dash-main-head,
+  .dash-mock .dash-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-main-head .btn-sm {
+    inline-size: 100%;
+    max-inline-size: none;
+    justify-self: stretch;
+  }
+}
+
+@media (min-width: 1181px) and (max-width: 1480px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.64fr);
+  }
+
+  .hero-stage {
+    inline-size: min(100%, 450px);
+  }
+}
+
+@media (max-width: 1180px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    max-inline-size: min(var(--container), calc(100vw - 32px));
+  }
+
+  .hero-stage {
+    inline-size: min(100%, 560px);
+    margin-inline: auto;
+  }
+}
+
+@container settings-section (max-width: 840px) {
+  .settings-billing-head,
+  .settings-plan-active-card {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-billing-head form,
+  .settings-billing-head .ghost-button,
+  .settings-plan-active-card .settings-inline-link {
+    inline-size: 100%;
+    max-inline-size: none;
+    justify-self: stretch;
+  }
+}

@@ -190,10 +190,10 @@ function StudioPreview({ studioHref }: Pick<LandingLinks, "studioHref">) {
   ] as const;
 
   const stats = [
-    ["Resume", "Ready", "PDF, DOCX, or TXT"],
-    ["Target", "Added", "Paste text or URL"],
-    ["Review", "Reviewed", "Approve each change"],
-    ["Export", "PDF", "Free workflow"],
+    ["Resume", "Ready", "PDF, DOCX, TXT"],
+    ["Target", "Added", "Text or URL"],
+    ["Review", "Checked", "Review changes"],
+    ["Export", "PDF", "Free export"],
   ] as const;
 
   const tips = [
