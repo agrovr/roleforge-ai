@@ -748,8 +748,11 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
           tailored_text: "RoleForge smoke tailored draft restored into the studio.",
           tailoring_mode: "balanced",
           score_summary: { fit_after: 91, ats_after: 93, fit_delta: 12, issues_resolved: 2 },
-          change_log: ["Layout smoke restored a saved run"],
-          suggestions: [],
+          change_log: [
+            "Layout smoke restored a saved run",
+            "Layout smoke improved keyword coverage"
+          ],
+          suggestions: ["Review the restored draft before exporting"],
           ats_before: { issues: [] },
           ats_after: { issues: [] }
         }
@@ -882,6 +885,65 @@ async function evaluateHistoryRestore(send, baseUrl, cookie) {
       }
       if (!document.body.textContent.includes("RoleForge smoke tailored draft restored into the studio.")) {
         failures.push({ selector: "#preview-panel", reason: "restored-tailored-text-missing" });
+      }
+
+      const suggestionsPanel = document.querySelector("#suggestions");
+      if (!suggestionsPanel) {
+        failures.push({ selector: "#suggestions", reason: "missing" });
+      } else {
+        const suggestionCards = Array.from(suggestionsPanel.querySelectorAll(".suggestion"));
+        if (suggestionCards.length < 3) {
+          failures.push({ selector: "#suggestions .suggestion", reason: "seeded-suggestions-missing", count: suggestionCards.length });
+        }
+
+        if (!suggestionsPanel.textContent.includes("0/3 reviewed")) {
+          failures.push({ selector: ".suggestion-review-status", reason: "initial-review-summary-missing", text: suggestionsPanel.textContent.slice(0, 220) });
+        }
+
+        const firstReviewedButton = suggestionCards[0]?.querySelector(".suggestion-decision-button.reviewed");
+        if (!firstReviewedButton) {
+          failures.push({ selector: ".suggestion-decision-button.reviewed", reason: "missing" });
+        } else {
+          firstReviewedButton.click();
+          await wait(250);
+          if (!suggestionsPanel.textContent.includes("1/3 reviewed")) {
+            failures.push({ selector: ".suggestion-review-status", reason: "reviewed-summary-not-updated", text: suggestionsPanel.textContent.slice(0, 220) });
+          }
+          if (!suggestionCards[0]?.classList.contains("reviewed")) {
+            failures.push({ selector: "#suggestions .suggestion:first-child", reason: "reviewed-card-state-missing" });
+          }
+        }
+
+        const secondEditButton = suggestionCards[1]?.querySelector(".suggestion-decision-button.edit");
+        if (!secondEditButton) {
+          failures.push({ selector: ".suggestion-decision-button.edit", reason: "missing" });
+        } else {
+          secondEditButton.click();
+          await wait(250);
+          if (!suggestionsPanel.textContent.includes("1/3 reviewed · 1 to edit")) {
+            failures.push({ selector: ".suggestion-review-status", reason: "edit-summary-not-updated", text: suggestionsPanel.textContent.slice(0, 220) });
+          }
+          if (!suggestionCards[1]?.classList.contains("edit")) {
+            failures.push({ selector: "#suggestions .suggestion:nth-child(2)", reason: "edit-card-state-missing" });
+          }
+        }
+
+        const viewChangesButton = Array.from(suggestionCards[0]?.querySelectorAll("button") || [])
+          .find((button) => button.textContent.includes("View changes"));
+        if (!viewChangesButton) {
+          failures.push({ selector: "#suggestions button", reason: "view-changes-button-missing" });
+        } else {
+          viewChangesButton.click();
+          await wait(450);
+          const previewPanelAfterSuggestionClick = document.getElementById("preview-panel");
+          if (previewPanelAfterSuggestionClick?.getAttribute("data-preview-mode") !== "diff") {
+            failures.push({
+              selector: "#preview-panel",
+              reason: "suggestion-view-changes-did-not-open-diff",
+              actual: previewPanelAfterSuggestionClick?.getAttribute("data-preview-mode") || "(missing)",
+            });
+          }
+        }
       }
     }
 
