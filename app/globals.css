@@ -7885,6 +7885,63 @@ html[data-theme="dark"] input::file-selector-button {
   left: 0;
 }
 
+.rf-diff-lines .diff-line {
+  position: relative;
+  margin-inline: -8px;
+  padding: 5px 8px 5px 28px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+
+.rf-diff-lines .diff-line::before {
+  position: absolute;
+  top: 5px;
+  left: 9px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.rf-diff-lines .plain-bullet.diff-line {
+  padding-left: 32px;
+}
+
+.rf-diff-lines .plain-bullet.diff-line::before {
+  left: 12px;
+}
+
+.rf-diff-lines .diff-changed {
+  border-color: color-mix(in srgb, var(--brand) 22%, #eadfca);
+  background: color-mix(in srgb, var(--brand) 12%, #fffdf8);
+}
+
+.rf-diff-lines .diff-changed::before {
+  content: "~";
+  color: var(--brand-dark);
+}
+
+.rf-diff-lines .diff-added {
+  border-color: color-mix(in srgb, var(--good) 24%, #dce7d9);
+  background: color-mix(in srgb, var(--good) 12%, #fffdf8);
+}
+
+.rf-diff-lines .diff-added::before {
+  content: "+";
+  color: var(--good);
+}
+
+.rf-diff-lines .diff-removed {
+  border-color: color-mix(in srgb, var(--danger) 22%, #ead8d4);
+  background: color-mix(in srgb, var(--danger) 10%, #fffdf8);
+  color: #5f5a58;
+}
+
+.rf-diff-lines .diff-removed::before {
+  content: "-";
+  color: var(--danger);
+}
+
 .rf-resume-role {
   display: flex;
   justify-content: space-between;
@@ -16099,5 +16156,62 @@ body,
   .settings-billing-head,
   .settings-plan-active-card {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Screenshot repair: browser zoom can turn the landing hero into a cramped
+   two-column composition even on a wide physical display. Collapse the paper
+   stack earlier and clip accidental horizontal drift instead of letting the
+   page pan sideways. */
+html,
+body {
+  max-inline-size: 100%;
+  overflow-x: clip;
+}
+
+@media (max-width: 1420px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+    overflow: clip;
+  }
+
+  .hero-copy {
+    max-inline-size: min(100%, 760px);
+  }
+
+  .hero .h1 {
+    max-inline-size: min(100%, 11.8ch);
+    font-size: clamp(2.75rem, 7vw, 4.4rem);
+  }
+
+  .hero-stage {
+    justify-self: center;
+    inline-size: min(100%, 520px);
+    block-size: clamp(390px, 48vw, 500px);
+  }
+}
+
+@media (max-width: 720px) {
+  .hero-stage {
+    inline-size: min(100%, 430px);
+    block-size: clamp(350px, 92vw, 430px);
+  }
+
+  .hero-stage .resume-card-front {
+    inline-size: clamp(236px, 64vw, 286px);
+    block-size: clamp(340px, 88vw, 404px);
+  }
+
+  .hero-stage .resume-card-back-l {
+    inline-size: clamp(184px, 52vw, 232px);
+    block-size: clamp(276px, 74vw, 344px);
+    transform: rotate(-8deg) translate(clamp(-40px, -9vw, -26px), 20px);
+  }
+
+  .hero-stage .resume-card-back-r {
+    inline-size: clamp(176px, 48vw, 218px);
+    block-size: clamp(266px, 70vw, 326px);
+    transform: rotate(7deg) translate(clamp(28px, 8vw, 42px), 26px);
   }
 }

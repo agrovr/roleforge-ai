@@ -57,11 +57,13 @@ import {
 } from "../lib/history";
 import {
   buildPlainResumePreview,
+  buildPlainResumeComparison,
   buildResumeEntries,
   cleanBulletLine,
   isSourcePreviewSample,
   isBulletLine,
   isStructuredResumeSection,
+  type PlainResumeDiffLine,
   parseResumeText,
   type ParsedResumeSection,
   type PlainResumeLine,
@@ -313,7 +315,7 @@ function PreviewLineList({
   empty,
   cappedDetail,
 }: {
-  lines: PlainResumeLine[];
+  lines: Array<PlainResumeLine | PlainResumeDiffLine>;
   keywords: string[];
   empty: string;
   cappedDetail?: string;
@@ -324,16 +326,18 @@ function PreviewLineList({
     <>
       <div className="rf-diff-lines">
         {lines.map((line, index) => {
-          if (line.kind === "heading") return <h5 key={`diff-line-${index}`}>{line.text}</h5>;
+          const status = "status" in line ? line.status : "same";
+          const className = status === "same" ? undefined : `diff-line diff-${status}`;
+          if (line.kind === "heading") return <h5 className={className} key={`diff-line-${index}`}>{line.text}</h5>;
           if (line.kind === "bullet") {
             return (
-              <p className="plain-bullet" key={`diff-line-${index}`}>
+              <p className={`plain-bullet${className ? ` ${className}` : ""}`} key={`diff-line-${index}`}>
                 <HighlightedText text={line.text} keywords={keywords} />
               </p>
             );
           }
           return (
-            <p key={`diff-line-${index}`}>
+            <p className={className} key={`diff-line-${index}`}>
               <HighlightedText text={line.text} keywords={keywords} />
             </p>
           );
@@ -363,10 +367,8 @@ function DiffResumeDocument({
   characterCount?: number;
   sourcePreviewTruncated?: boolean;
 }) {
-  const beforePreview = buildPlainResumePreview(sourceText);
-  const afterPreview = buildPlainResumePreview(tailoredText);
-  const beforeLines = beforePreview.lines;
-  const afterLines = afterPreview.lines;
+  const comparison = buildPlainResumeComparison(sourceText, tailoredText);
+  const { beforePreview, afterPreview, beforeLines, afterLines, changedLineCount } = comparison;
   const documentName = filename ? filename.replace(/\.(docx|pdf|txt)$/i, "") : "Resume";
   const hasBefore = Boolean(sourceText?.trim());
   const hasAfter = Boolean(tailoredText?.trim());
@@ -410,7 +412,7 @@ function DiffResumeDocument({
         </span>
         <span className={hasBefore && hasAfter ? "" : "waiting"}>
           <strong>Compare</strong>
-          {comparisonStatus}
+          {hasBefore && hasAfter && changedLineCount ? `${changedLineCount} changed lines` : comparisonStatus}
         </span>
       </div>
       <section>

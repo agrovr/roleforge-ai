@@ -2,7 +2,16 @@ export type ParsedResumeSection = { title: string; lines: string[] };
 export type ParsedResume = { name: string; role: string; contact: string; sections: ParsedResumeSection[] };
 export type ParsedResumeEntry = { title: string; meta?: string; date?: string; details: string[]; bullets: string[] };
 export type PlainResumeLine = { text: string; kind: "heading" | "bullet" | "body" };
+export type PlainResumeDiffStatus = "same" | "changed" | "added" | "removed";
+export type PlainResumeDiffLine = PlainResumeLine & { status: PlainResumeDiffStatus };
 export type PlainResumePreview = { lines: PlainResumeLine[]; sourceLineCount: number; renderedLineCount: number; capped: boolean };
+export type PlainResumeComparison = {
+  beforeLines: PlainResumeDiffLine[];
+  afterLines: PlainResumeDiffLine[];
+  beforePreview: PlainResumePreview;
+  afterPreview: PlainResumePreview;
+  changedLineCount: number;
+};
 
 export const PLAIN_RESUME_PREVIEW_LINE_LIMIT = 90;
 
@@ -302,6 +311,90 @@ export function buildPlainResumePreview(text?: string): PlainResumePreview {
 
 export function buildPlainResumeLines(text?: string): PlainResumeLine[] {
   return buildPlainResumePreview(text).lines;
+}
+
+function lineSignature(line?: PlainResumeLine) {
+  return line ? `${line.kind}:${line.text.replace(/\s+/g, " ").trim().toLowerCase()}` : "";
+}
+
+function buildLineMatches(beforeLines: PlainResumeLine[], afterLines: PlainResumeLine[]) {
+  const beforeSignatures = beforeLines.map(lineSignature);
+  const afterSignatures = afterLines.map(lineSignature);
+  const table = Array.from({ length: beforeSignatures.length + 1 }, () =>
+    Array.from({ length: afterSignatures.length + 1 }, () => 0),
+  );
+
+  for (let beforeIndex = beforeSignatures.length - 1; beforeIndex >= 0; beforeIndex -= 1) {
+    for (let afterIndex = afterSignatures.length - 1; afterIndex >= 0; afterIndex -= 1) {
+      table[beforeIndex][afterIndex] =
+        beforeSignatures[beforeIndex] === afterSignatures[afterIndex]
+          ? table[beforeIndex + 1][afterIndex + 1] + 1
+          : Math.max(table[beforeIndex + 1][afterIndex], table[beforeIndex][afterIndex + 1]);
+    }
+  }
+
+  const matches: Array<{ beforeIndex: number; afterIndex: number }> = [];
+  let beforeIndex = 0;
+  let afterIndex = 0;
+
+  while (beforeIndex < beforeSignatures.length && afterIndex < afterSignatures.length) {
+    if (beforeSignatures[beforeIndex] === afterSignatures[afterIndex]) {
+      matches.push({ beforeIndex, afterIndex });
+      beforeIndex += 1;
+      afterIndex += 1;
+    } else if (table[beforeIndex + 1][afterIndex] >= table[beforeIndex][afterIndex + 1]) {
+      beforeIndex += 1;
+    } else {
+      afterIndex += 1;
+    }
+  }
+
+  return matches;
+}
+
+export function buildPlainResumeComparison(beforeText?: string, afterText?: string): PlainResumeComparison {
+  const beforePreview = buildPlainResumePreview(beforeText);
+  const afterPreview = buildPlainResumePreview(afterText);
+  const matches = buildLineMatches(beforePreview.lines, afterPreview.lines);
+  const beforeLines: PlainResumeDiffLine[] = [];
+  const afterLines: PlainResumeDiffLine[] = [];
+  let changedLineCount = 0;
+  let beforeCursor = 0;
+  let afterCursor = 0;
+
+  for (const match of [...matches, { beforeIndex: beforePreview.lines.length, afterIndex: afterPreview.lines.length }]) {
+    const removed = beforePreview.lines.slice(beforeCursor, match.beforeIndex);
+    const added = afterPreview.lines.slice(afterCursor, match.afterIndex);
+    const changedPairs = Math.min(removed.length, added.length);
+
+    for (let index = 0; index < changedPairs; index += 1) {
+      beforeLines.push({ ...removed[index], status: "changed" });
+      afterLines.push({ ...added[index], status: "changed" });
+      changedLineCount += 1;
+    }
+
+    for (const line of removed.slice(changedPairs)) {
+      beforeLines.push({ ...line, status: "removed" });
+      changedLineCount += 1;
+    }
+
+    for (const line of added.slice(changedPairs)) {
+      afterLines.push({ ...line, status: "added" });
+      changedLineCount += 1;
+    }
+
+    const beforeMatch = beforePreview.lines[match.beforeIndex];
+    const afterMatch = afterPreview.lines[match.afterIndex];
+    if (beforeMatch && afterMatch) {
+      beforeLines.push({ ...beforeMatch, status: "same" });
+      afterLines.push({ ...afterMatch, status: "same" });
+    }
+
+    beforeCursor = match.beforeIndex + 1;
+    afterCursor = match.afterIndex + 1;
+  }
+
+  return { beforeLines, afterLines, beforePreview, afterPreview, changedLineCount };
 }
 
 export function isSourcePreviewSample(text?: string, characterCount?: number, previewTruncated?: boolean) {

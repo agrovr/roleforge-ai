@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   buildPlainResumeLines,
+  buildPlainResumeComparison,
   buildPlainResumePreview,
   buildResumeEntries,
   PLAIN_RESUME_PREVIEW_LINE_LIMIT,
@@ -75,6 +76,48 @@ test("keeps original and tailored plain preview lines distinct", () => {
   assert.notDeepEqual(originalLines, tailoredLines);
   assert.equal(originalLines[1].text, "Project Coordinator");
   assert.equal(tailoredLines[1].text, "Product Manager");
+});
+
+test("builds a simple line comparison for the changes preview", () => {
+  const original = [
+    "Jordan Lee",
+    "Project Coordinator",
+    "SUMMARY",
+    "Supported internal planning cadences.",
+    "- Coordinated weekly updates.",
+  ].join("\n");
+  const tailored = [
+    "Jordan Lee",
+    "Product Manager",
+    "SUMMARY",
+    "Owned customer-facing roadmap decisions.",
+    "- Coordinated weekly updates.",
+    "- Added launch scope evidence.",
+  ].join("\n");
+
+  const comparison = buildPlainResumeComparison(original, tailored);
+
+  assert.equal(comparison.changedLineCount, 3);
+  assert.deepEqual(
+    comparison.beforeLines.map((line) => line.status),
+    ["same", "changed", "same", "changed", "same"],
+  );
+  assert.deepEqual(
+    comparison.afterLines.map((line) => line.status),
+    ["same", "changed", "same", "changed", "same", "added"],
+  );
+  assert.equal(comparison.afterLines.at(-1)?.text, "Added launch scope evidence.");
+});
+
+test("marks removed comparison lines without inventing an after-side placeholder", () => {
+  const comparison = buildPlainResumeComparison(
+    ["Jordan Lee", "SUMMARY", "Legacy objective statement"].join("\n"),
+    ["Jordan Lee", "SUMMARY"].join("\n"),
+  );
+
+  assert.equal(comparison.changedLineCount, 1);
+  assert.deepEqual(comparison.beforeLines.map((line) => line.status), ["same", "same", "removed"]);
+  assert.deepEqual(comparison.afterLines.map((line) => line.status), ["same", "same"]);
 });
 
 test("normalizes inline headings and bullet markers for plain preview", () => {
