@@ -12,6 +12,7 @@ const bannedCopyPatterns = [
   /\bcoming soon\b/i,
   /\bnot live yet\b/i,
   /\bwait on Stripe\b/i,
+  /\bNo billing portal yet\b/i,
 ];
 
 function extensionFor(path) {

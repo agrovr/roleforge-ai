@@ -108,8 +108,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const portalActionTitle = portalReady
     ? "Open Stripe billing management"
     : premiumActive
-      ? "Billing management is temporarily unavailable."
-      : "Start Premium before managing billing.";
+      ? "Billing management is unavailable right now."
+      : "Start Premium to open billing management.";
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName = accountDisplayName(user);
   const planFeatures = premiumActive
@@ -338,7 +338,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   </form>
                 ) : (
                   <span className="ghost-button settings-disabled-action" aria-disabled="true" title={portalActionTitle}>
-                    No billing portal yet
+                    Billing opens after checkout
                   </span>
                 )}
               </div>
