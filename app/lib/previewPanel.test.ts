@@ -43,7 +43,7 @@ test("marks uploaded source as original-ready without marking tailored ready", (
 
   assert.equal(state.tabState.original, "Ready");
   assert.equal(state.tabState.tailored, "Waiting");
-  assert.equal(state.tabState.diff, "Waiting");
+  assert.equal(state.tabState.diff, "Partial");
   assert.equal(state.title, "Original resume · before tailoring");
   assert.equal(state.statusItems[0].value, "3 source lines extracted");
 });
@@ -80,10 +80,41 @@ test("marks completed runs ready across tailored, original, and changes", () => 
     original: "Ready",
     diff: "Ready",
   });
-  assert.equal(state.title, "Change notes · before export");
+  assert.equal(state.title, "Change review · ready");
   assert.equal(state.statusItems[0].value, "Original side ready");
   assert.equal(state.statusItems[1].value, "Tailored side ready");
   assert.equal(state.statusItems[2].value, "2 change notes");
+});
+
+test("shows source-only changes as partial while waiting for a tailored draft", () => {
+  const state = derivePreviewPanelState(previewInput({
+    mode: "diff",
+    uploadState: "ready",
+    uploadFilename: "resume.pdf",
+    sourceText: ["Jordan Lee", "Operations associate", "Supported planning work."].join("\n"),
+  }));
+
+  assert.equal(state.tabState.diff, "Partial");
+  assert.equal(state.title, "Change review · waiting for draft");
+  assert.equal(state.statusItems[0].value, "Original side ready");
+  assert.equal(state.statusItems[1].value, "Tailored side waiting");
+  assert.equal(state.statusItems[2].value, "Change notes appear after a run");
+});
+
+test("marks changes as generating while tailoring is running", () => {
+  const state = derivePreviewPanelState(previewInput({
+    mode: "diff",
+    stage: "tailoring",
+    uploadState: "ready",
+    uploadFilename: "resume.pdf",
+    sourceText: "Jordan Lee\nOperations associate",
+  }));
+
+  assert.equal(state.tabState.tailored, "Running");
+  assert.equal(state.tabState.diff, "Running");
+  assert.equal(state.title, "Change review · generating");
+  assert.equal(state.statusItems[1].value, "Tailored side generating");
+  assert.equal(state.statusItems[2].value, "Change notes generating");
 });
 
 test("keeps restored tailored runs partial when original source was not saved", () => {

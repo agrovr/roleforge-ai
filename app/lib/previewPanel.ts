@@ -77,6 +77,15 @@ export function derivePreviewPanelState(input: PreviewPanelInput): PreviewPanelS
     input.sourcePreviewTruncated,
   );
 
+  const diffState =
+    hasSourcePreview && hasTailoredPreview
+      ? "Ready"
+      : input.stage === "tailoring"
+        ? "Running"
+        : hasSourcePreview || hasTailoredPreview
+          ? "Partial"
+          : "Waiting";
+
   const tabState = {
     tailored: hasTailoredPreview ? "Ready" : input.stage === "tailoring" ? "Running" : "Waiting",
     original: hasSourcePreview
@@ -88,12 +97,7 @@ export function derivePreviewPanelState(input: PreviewPanelInput): PreviewPanelS
         : sourcePreviewUnavailable || restoredSourceMissing
           ? "Unavailable"
           : "Waiting",
-    diff:
-      hasSourcePreview && hasTailoredPreview
-        ? "Ready"
-        : hasTailoredPreview
-          ? "Partial"
-          : "Waiting",
+    diff: diffState,
   } satisfies Record<PreviewMode, string>;
 
   const title =
@@ -106,7 +110,15 @@ export function derivePreviewPanelState(input: PreviewPanelInput): PreviewPanelS
           ? "Original resume · source sample"
           : "Original resume · before tailoring"
       : input.mode === "diff"
-        ? "Change notes · before export"
+        ? hasSourcePreview && hasTailoredPreview
+          ? "Change review · ready"
+          : input.stage === "tailoring"
+            ? "Change review · generating"
+            : hasSourcePreview
+              ? "Change review · waiting for draft"
+              : hasTailoredPreview
+                ? "Change review · partial"
+                : "Change review · waiting for run"
         : hasTailoredPreview
           ? "Tailored resume · AI edits applied"
           : "Tailored resume · waiting for run";
@@ -133,9 +145,32 @@ export function derivePreviewPanelState(input: PreviewPanelInput): PreviewPanelS
         ]
       : input.mode === "diff"
         ? [
-            { label: "Original", value: hasSourcePreview ? "Original side ready" : restoredSourceMissing ? "Original side not saved" : "Original side waiting" },
-            { label: "Tailored", value: hasTailoredPreview ? "Tailored side ready" : "Tailored side waiting" },
-            { label: "Notes", value: input.changeLogCount ? plural(input.changeLogCount, "change note") : "Change notes appear after a run" },
+            {
+              label: "Original",
+              value: hasSourcePreview
+                ? sourcePreviewSample
+                  ? "Original side sampled"
+                  : "Original side ready"
+                : restoredSourceMissing
+                  ? "Original side not saved"
+                  : "Original side waiting",
+            },
+            {
+              label: "Tailored",
+              value: hasTailoredPreview
+                ? "Tailored side ready"
+                : input.stage === "tailoring"
+                  ? "Tailored side generating"
+                  : "Tailored side waiting",
+            },
+            {
+              label: "Notes",
+              value: input.changeLogCount
+                ? plural(input.changeLogCount, "change note")
+                : input.stage === "tailoring"
+                  ? "Change notes generating"
+                  : "Change notes appear after a run",
+            },
           ]
         : [
             {
@@ -154,11 +189,11 @@ export function derivePreviewPanelState(input: PreviewPanelInput): PreviewPanelS
             },
             {
               label: "Export",
-              value: input.restoredRunOpen
-                ? `${input.selectedTemplateName} saved run open`
-                : input.downloadReady
+              value: input.downloadReady
                   ? `${input.selectedTemplateName} ${input.selectedDownloadFormat.toUpperCase()} ready`
-                  : `${input.selectedTemplateName} direction selected`,
+                  : input.restoredRunOpen
+                    ? `${input.selectedTemplateName} saved run open`
+                    : `${input.selectedTemplateName} direction selected`,
             },
           ];
 

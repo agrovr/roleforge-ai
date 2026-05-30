@@ -350,12 +350,18 @@ function DiffResumeDocument({
   keywords,
   changeLog,
   filename,
+  stage,
+  characterCount,
+  sourcePreviewTruncated,
 }: {
   sourceText?: string;
   tailoredText?: string;
   keywords: string[];
   changeLog?: string[];
   filename?: string;
+  stage: Stage;
+  characterCount?: number;
+  sourcePreviewTruncated?: boolean;
 }) {
   const beforePreview = buildPlainResumePreview(sourceText);
   const afterPreview = buildPlainResumePreview(tailoredText);
@@ -365,16 +371,22 @@ function DiffResumeDocument({
   const hasBefore = Boolean(sourceText?.trim());
   const hasAfter = Boolean(tailoredText?.trim());
   const missingSavedSource = hasAfter && !hasBefore;
+  const sourceSample = hasBefore && isSourcePreviewSample(sourceText, characterCount, sourcePreviewTruncated);
+  const isGenerating = stage === "tailoring" && !hasAfter;
   const comparisonStatus = hasBefore && hasAfter
     ? "Ready to compare"
-    : hasBefore
+    : isGenerating
+      ? "Draft generating"
+      : hasBefore
       ? "Waiting for tailored draft"
       : missingSavedSource
         ? "Original source not saved"
         : "Waiting for both sides";
   const comparisonHelp = hasBefore && hasAfter
     ? "Review what changed before exporting the finished draft."
-    : hasBefore
+    : isGenerating
+      ? "The original side is ready while the tailored draft and change notes are generating."
+      : hasBefore
       ? "Run Tailor to generate the after side for this comparison."
       : hasAfter
         ? "The tailored draft is ready, but this run does not include saved source text for the before side."
@@ -390,11 +402,11 @@ function DiffResumeDocument({
       <div className="rf-diff-readiness" aria-label="Comparison readiness">
         <span className={hasBefore ? "" : "waiting"}>
           <strong>Original</strong>
-          {hasBefore ? "Ready" : missingSavedSource ? "Not saved" : "Waiting"}
+          {hasBefore ? (sourceSample ? "Sample" : "Ready") : missingSavedSource ? "Not saved" : "Waiting"}
         </span>
         <span className={hasAfter ? "" : "waiting"}>
           <strong>Tailored</strong>
-          {hasAfter ? "Ready" : "Waiting"}
+          {hasAfter ? "Ready" : isGenerating ? "Generating" : "Waiting"}
         </span>
         <span className={hasBefore && hasAfter ? "" : "waiting"}>
           <strong>Compare</strong>
@@ -410,7 +422,7 @@ function DiffResumeDocument({
             ))}
           </ul>
         ) : (
-          <p>Change notes appear here after a completed tailoring run.</p>
+          <p>{isGenerating ? "Change notes are generating with the tailored draft." : "Change notes appear here after a completed tailoring run."}</p>
         )}
       </section>
       <div className="rf-diff-grid" aria-label="Original and tailored resume comparison">
@@ -686,6 +698,9 @@ function MiniResumeDocument({
         keywords={keywords}
         changeLog={changeLog}
         filename={filename}
+        stage={stage}
+        characterCount={characterCount}
+        sourcePreviewTruncated={sourcePreviewTruncated}
       />
     );
   }
