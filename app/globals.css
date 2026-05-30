@@ -14983,3 +14983,293 @@ body,
     grid-template-columns: 1fr;
   }
 }
+
+/* May 30 composition lock: keep the screenshot-prone public mockups,
+   settings actions, and CTA artwork inside their panels at browser zoom widths. */
+.hero,
+.dash-section,
+.dash-mock,
+.cta-section,
+.cta-section .section-inner,
+.cta-band,
+.settings-page-shell,
+.settings-page-main,
+.settings-section,
+.settings-section-panel {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.dash-section,
+.cta-section,
+.settings-page-shell {
+  overflow-x: clip;
+}
+
+.dash-mock {
+  inline-size: min(100%, var(--container));
+  overflow: hidden;
+}
+
+.dash-main,
+.dash-main-head,
+.dash-main-head > div,
+.dash-stat,
+.dash-stat-label,
+.dash-stat-value,
+.dash-stat-delta {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.dash-main-head {
+  grid-template-columns: minmax(0, 1fr) minmax(148px, max-content);
+  gap: clamp(14px, 1.8vw, 22px);
+}
+
+.dash-main-head .btn-sm {
+  inline-size: 100%;
+  max-inline-size: 176px;
+  justify-self: end;
+}
+
+.dash-mock .dash-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 246px), 1fr));
+}
+
+.dash-mock .dash-stat {
+  min-block-size: clamp(136px, 12cqi, 154px);
+  padding: clamp(18px, 2.2cqi, 24px);
+  overflow: clip;
+}
+
+.dash-mock .dash-stat-value {
+  font-size: clamp(1.36rem, 4.6cqi, 1.78rem);
+  line-height: 1.08;
+  overflow-wrap: normal;
+  text-wrap: balance;
+  word-break: normal;
+}
+
+.dash-mock .dash-stat-delta {
+  max-inline-size: 24ch;
+  overflow-wrap: anywhere;
+}
+
+.settings-profile-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 184px), 1fr));
+  inline-size: min(100%, 520px);
+  max-inline-size: 100%;
+  gap: 12px;
+}
+
+.settings-profile-actions form,
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button {
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.settings-billing-head {
+  grid-template-columns: minmax(0, 1fr) minmax(172px, 232px);
+  gap: 14px;
+}
+
+.settings-billing-head form,
+.settings-billing-head .ghost-button {
+  inline-size: 100%;
+  max-inline-size: 232px;
+  justify-self: end;
+}
+
+.settings-plan-active-card {
+  grid-template-columns: minmax(0, 1fr) minmax(148px, max-content);
+  gap: 16px;
+}
+
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button,
+.settings-billing-head .ghost-button,
+.settings-plan-active-card .settings-inline-link,
+.settings-export-actions .btn,
+.price-card .btn {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  min-block-size: 50px;
+  padding-inline: clamp(14px, 1.8cqi, 20px);
+  overflow: hidden;
+  font-size: clamp(0.88rem, 1.45cqi, 0.96rem);
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.settings-plan-active-card .settings-inline-link {
+  inline-size: max-content;
+  min-inline-size: 148px;
+  justify-self: end;
+}
+
+.cta-section {
+  padding-inline: clamp(16px, 2.8vw, 32px);
+}
+
+.cta-section .section-inner {
+  inline-size: 100%;
+  max-inline-size: min(1240px, calc(100vw - clamp(32px, 5.6vw, 64px)));
+  margin-inline: auto;
+}
+
+.cta-band {
+  inline-size: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 1fr) minmax(286px, 390px);
+  gap: clamp(26px, 3.6vw, 48px);
+  padding: clamp(42px, 4.8vw, 62px);
+}
+
+.cta-band > div:first-child,
+.cta-band h2,
+.cta-band p,
+.cta-band .cta-cluster {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.cta-band h2 {
+  font-size: clamp(2.45rem, 3.5vw, 3.65rem);
+  line-height: 1.04;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.cta-visual {
+  justify-self: end;
+  inline-size: min(100%, 390px);
+  max-inline-size: 100%;
+  min-block-size: clamp(320px, 27vw, 372px);
+  overflow: hidden;
+  contain: paint;
+}
+
+.cta-visual .resume-card {
+  inset-inline-end: clamp(14px, 1.8vw, 26px);
+  inset-block-start: 12px;
+  inline-size: clamp(198px, 14.2vw, 232px);
+  block-size: clamp(294px, 21vw, 344px);
+}
+
+.cta-visual .resume-card.back {
+  inset-inline-end: clamp(92px, 8.4vw, 124px);
+  inset-block-start: 42px;
+  inline-size: clamp(170px, 12vw, 202px);
+  block-size: clamp(268px, 19.4vw, 318px);
+}
+
+@media (min-width: 761px) and (max-width: 1440px) {
+  .cta-band {
+    grid-template-columns: 1fr;
+    max-inline-size: 980px;
+    margin-inline: auto;
+  }
+
+  .cta-band h2,
+  .cta-band p,
+  .cta-band > div:first-child {
+    max-inline-size: 100%;
+  }
+
+  .cta-visual {
+    justify-self: center;
+    inline-size: min(100%, 500px);
+    min-block-size: clamp(318px, 40vw, 380px);
+  }
+
+  .cta-visual .resume-card {
+    inset-inline-end: auto;
+    left: 52%;
+    transform: translateX(-16%) rotate(5deg);
+  }
+
+  .cta-visual .resume-card.back {
+    inset-inline-end: auto;
+    left: 52%;
+    transform: translateX(-76%) rotate(-8deg);
+  }
+}
+
+@container dash-main (max-width: 1080px) {
+  .dash-mock .dash-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container dash-main (max-width: 560px) {
+  .dash-main-head,
+  .dash-mock .dash-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-main-head .btn-sm {
+    inline-size: 100%;
+    max-inline-size: none;
+    justify-self: stretch;
+  }
+}
+
+@container settings-section (max-width: 720px) {
+  .settings-billing-head,
+  .settings-plan-active-card {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-billing-head form,
+  .settings-billing-head .ghost-button,
+  .settings-plan-active-card .settings-inline-link {
+    inline-size: 100%;
+    max-inline-size: none;
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 760px) {
+  .cta-section .section-inner {
+    max-inline-size: calc(100vw - 24px);
+  }
+
+  .cta-band {
+    grid-template-columns: 1fr;
+    min-block-size: 0;
+    padding: clamp(30px, 8vw, 42px) clamp(22px, 6vw, 28px);
+  }
+
+  .cta-band > div:first-child,
+  .cta-band h2,
+  .cta-band p,
+  .cta-band .cta-cluster {
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  .cta-band h2 {
+    font-size: clamp(2.35rem, 10.8vw, 3.35rem);
+  }
+
+  .cta-band .cta-cluster {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .cta-band .btn {
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+
+  .cta-visual {
+    display: none;
+  }
+}

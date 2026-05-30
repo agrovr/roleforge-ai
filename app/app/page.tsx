@@ -2813,7 +2813,7 @@ export default function Page() {
                         </button>
                       </div>
                       <form className="studio-account-form" action="/auth/signout" method="post">
-                        <input type="hidden" name="next" value="/app" />
+                        <input type="hidden" name="next" value="/login?account=signed-out" />
                         <button className="ghost-button studio-account-submit" type="submit">
                           Sign out
                         </button>
