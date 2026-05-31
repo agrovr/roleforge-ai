@@ -4,7 +4,8 @@ import { FaqAccordion } from "./components/FaqAccordion";
 import { ResumePreview } from "./components/ResumePreview";
 import { RoleForgeIcon } from "./components/RoleForgeIcons";
 import { ThemeToggle } from "./components/ThemeToggle";
-import { PREMIUM_PRICE } from "./lib/billing/stripe";
+import { billingReadiness } from "./lib/billing/readiness";
+import { getStripeBillingConfig, PREMIUM_PRICE } from "./lib/billing/stripe";
 import { FREE_ENTITLEMENT, loadAccountEntitlement } from "./lib/entitlements";
 import { createRoleForgeServerClient } from "./lib/supabase/server";
 import { monthlyRunAllowanceLabel } from "./lib/usage";
@@ -13,6 +14,7 @@ type LandingLinks = {
   signedIn: boolean;
   premiumActive: boolean;
   premiumEnding: boolean;
+  checkoutReady: boolean;
   studioHref: string;
   premiumHref: string;
 };
@@ -29,13 +31,21 @@ async function getLandingLinks(): Promise<LandingLinks> {
   const signedIn = Boolean(user);
   const entitlement = user && supabase ? await loadAccountEntitlement(supabase, user.id) : FREE_ENTITLEMENT;
   const premiumActive = entitlement.plan === "premium" && ["active", "trialing"].includes(entitlement.billingStatus);
+  const billing = billingReadiness(getStripeBillingConfig(), {
+    hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()),
+    billingStatus: entitlement.billingStatus,
+  });
+  const premiumHref = premiumActive || billing.checkoutReady
+    ? signedIn ? "/settings#billing" : `/login?next=${encodeURIComponent("/settings#billing")}`
+    : signedIn ? "/app" : "/login?next=/app";
 
   return {
     signedIn,
     premiumActive,
     premiumEnding: premiumActive && entitlement.cancelAtPeriodEnd,
+    checkoutReady: billing.checkoutReady,
     studioHref: signedIn ? "/app" : "/login?next=/app",
-    premiumHref: signedIn ? "/settings#billing" : `/login?next=${encodeURIComponent("/settings#billing")}`,
+    premiumHref,
   };
 }
 
@@ -423,10 +433,12 @@ function Pricing({
   signedIn,
   premiumActive,
   premiumEnding,
-}: Pick<LandingLinks, "studioHref" | "premiumHref" | "signedIn" | "premiumActive" | "premiumEnding">) {
+  checkoutReady,
+}: Pick<LandingLinks, "studioHref" | "premiumHref" | "signedIn" | "premiumActive" | "premiumEnding" | "checkoutReady">) {
   const freeStatus = signedIn && !premiumActive ? "Current plan" : "Starter plan";
-  const premiumStatus = premiumActive ? (premiumEnding ? "Active until period end" : "Current plan") : "Upgrade";
-  const premiumCta = premiumActive ? "Manage Premium" : signedIn ? "View plans" : "Sign in to upgrade";
+  const premiumPaused = !premiumActive && !checkoutReady;
+  const premiumStatus = premiumActive ? (premiumEnding ? "Active until period end" : "Current plan") : premiumPaused ? "Paused" : "Upgrade";
+  const premiumCta = premiumActive ? "Manage Premium" : premiumPaused ? "Use free studio" : signedIn ? "View plans" : "Sign in to upgrade";
 
   return (
     <section className="section" id="pricing">
@@ -436,7 +448,7 @@ function Pricing({
             <div className="eyebrow">Pricing</div>
             <h2 className="display h2">Start lean, upgrade when you need more room.</h2>
           </div>
-          <p className="lede">Free covers the core PDF workflow with a monthly run limit. Premium is intentionally priced lower while RoleForge is early.</p>
+          <p className="lede">Free covers the core PDF workflow with a monthly run limit. Premium pricing is listed for early users when billing is open.</p>
         </div>
         <div className="pricing-grid two">
           <article className="price-card">
@@ -464,6 +476,8 @@ function Pricing({
             <div className="price-desc">
               {premiumActive
                 ? "Your account has unlimited runs plus PDF, DOCX, and TXT exports in the studio."
+                : premiumPaused
+                  ? "Premium billing is paused for launch. The free signed-in studio remains open with PDF export."
                 : `$${PREMIUM_YEARLY_PRICE}/year for early users. Premium unlocks unlimited runs plus DOCX and TXT exports.`}
             </div>
             <ul className="price-list">
@@ -479,14 +493,16 @@ function Pricing({
   );
 }
 
-function FAQ() {
+function FAQ({ checkoutReady }: Pick<LandingLinks, "checkoutReady">) {
   const items = [
     ["Does RoleForge replace my judgment?", "No. The app surfaces generated guidance and exports a draft for your review."],
     ["Can I use a job posting URL?", "Yes, if the posting is public and RoleForge can access it. Pasted text is the most reliable target input."],
     ["What file formats can I export?", "The free workflow exports PDF. Premium enables DOCX and TXT exports when your plan is active."],
     ["Can I use templates?", "Yes. Pick a template direction before opening the studio, and RoleForge sends that direction with new exports."],
     ["Is sign-in available?", "Yes. Google and email magic-link sign-in are available. Saved projects sync after sign-in."],
-    ["How much is Premium?", `The launch price is $${PREMIUM_MONTHLY_PRICE}/month or $${PREMIUM_YEARLY_PRICE}/year. Checkout and billing management are handled by Stripe.`],
+    ["How much is Premium?", checkoutReady
+      ? `The launch price is $${PREMIUM_MONTHLY_PRICE}/month or $${PREMIUM_YEARLY_PRICE}/year. Billing management is handled by Stripe.`
+      : `The launch price is $${PREMIUM_MONTHLY_PRICE}/month or $${PREMIUM_YEARLY_PRICE}/year. Premium billing is paused for launch while the free studio stays open.`],
   ] as const;
 
   return (
@@ -547,7 +563,7 @@ function Footer() {
           <h3>Available now</h3>
           <span>Protected studio access</span>
           <span>Saved project history</span>
-          <span>Stripe billing management</span>
+          <span>Settings and account controls</span>
         </div>
       </div>
       <div className="footer-meta">
@@ -576,8 +592,9 @@ export default async function Landing() {
         premiumHref={links.premiumHref}
         premiumActive={links.premiumActive}
         premiumEnding={links.premiumEnding}
+        checkoutReady={links.checkoutReady}
       />
-      <FAQ />
+      <FAQ checkoutReady={links.checkoutReady} />
       <CTABand studioHref={links.studioHref} />
       <Footer />
     </main>

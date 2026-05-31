@@ -538,7 +538,7 @@ async function checkPublicShell(baseUrl) {
 
   requireCondition(/\.pricing-grid\.two\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(min\(100%,\s*360px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "pricing cards can still shrink below comfortable desktop widths");
   requireCondition(/\.price-card\s*\{(?=[^}]*container:\s*price-card\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "pricing cards were missing container overflow safeguards");
-  requireCondition(home.text.includes("Starter plan") && home.text.includes("Upgrade"), "landing pricing is missing plan-aware status labels");
+  requireCondition(home.text.includes("Starter plan") && /Upgrade|Paused/.test(home.text), "landing pricing is missing plan-aware status labels");
   requireCondition(
     /\.price-card-top\s*\{(?=[^}]*display:\s*flex)(?=[^}]*min-inline-size:\s*0)(?=[^}]*justify-content:\s*space-between)[^}]*\}/s.test(stylesheetText) &&
       /\.price-status\s*\{(?=[^}]*max-inline-size:\s*52%)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText),

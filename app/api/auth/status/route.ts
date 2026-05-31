@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 import { accountDisplayName } from "@/app/lib/accountUser";
 import { reconcileUserSubscriptionEntitlement } from "@/app/lib/billing/entitlements";
+import { billingReadiness } from "@/app/lib/billing/readiness";
+import { getStripeBillingConfig } from "@/app/lib/billing/stripe";
 import { FREE_ENTITLEMENT, loadAccountEntitlement } from "@/app/lib/entitlements";
 import { getSupabaseConfig } from "@/app/lib/supabase/config";
 import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
@@ -41,6 +43,10 @@ export async function GET() {
   const usage = user && supabase
     ? await loadAccountUsage(supabase, user.id, entitlement).catch(() => null)
     : null;
+  const billing = billingReadiness(getStripeBillingConfig(), {
+    hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()),
+    billingStatus: entitlement.billingStatus,
+  });
 
   return NextResponse.json({
     configured: true,
@@ -49,6 +55,7 @@ export async function GET() {
     user,
     entitlement,
     usage,
+    billing,
     next: user
       ? usage
         ? "Saved projects sync to your account when a completed run is available."

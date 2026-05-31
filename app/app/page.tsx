@@ -187,6 +187,10 @@ type AccountStatus = {
   user: AccountUser | null;
   entitlement?: AccountEntitlement;
   usage?: AccountUsage | null;
+  billing?: {
+    checkoutReady: boolean;
+    portalReady: boolean;
+  };
   next: string;
 };
 type ExportNotice = { format: ExportFormat; label: string };
@@ -2552,6 +2556,7 @@ export default function Page() {
   const premiumExportSyncing = Boolean(premiumExportRequested && accountPremiumActive);
   const accountPremiumEnding = Boolean(accountPremiumActive && accountStatus?.entitlement?.cancelAtPeriodEnd);
   const accountPremiumEndLabel = formatResetDate(accountStatus?.entitlement?.cancelAt || accountStatus?.entitlement?.currentPeriodEnd || "");
+  const premiumBillingReady = Boolean(accountStatus?.billing?.checkoutReady);
   const railPlanCard = accountPremiumActive
     ? {
         title: accountPremiumEnding ? "Premium ending" : "Premium active",
@@ -2562,12 +2567,19 @@ export default function Page() {
         action: "Manage plan",
       }
     : signedIn
-      ? {
-          title: "Upgrade workspace",
-          detail: "Unlock unlimited tailoring runs plus DOCX and TXT exports.",
-          href: "/settings#billing",
-          action: "View plans",
-        }
+      ? premiumBillingReady
+        ? {
+            title: "Upgrade workspace",
+            detail: "Unlock unlimited tailoring runs plus DOCX and TXT exports.",
+            href: "/settings#billing",
+            action: "View plans",
+          }
+        : {
+            title: "Free workspace",
+            detail: "Premium billing is paused. PDF export and saved projects are available now.",
+            href: "/settings#billing",
+            action: "View settings",
+          }
       : {
           title: "Account required",
           detail: "Sign in to use the studio and keep saved projects with your account.",
@@ -2608,10 +2620,18 @@ export default function Page() {
       label: "Exports",
       detail: accountStatus?.entitlement?.exportFormats.docx
         ? "PDF, DOCX, and TXT exports are available for this account."
-        : "PDF exports are included. DOCX and TXT unlock with Premium.",
+        : premiumBillingReady
+          ? "PDF exports are included. DOCX and TXT unlock with Premium."
+          : "PDF exports are included. Premium exports are paused for launch.",
       href: "/settings#exports",
     },
-    { label: "Billing", detail: "Manage plan changes and invoices from Settings.", href: "/settings#billing" },
+    {
+      label: "Billing",
+      detail: premiumBillingReady || accountPremiumActive
+        ? "Manage plan changes and invoices from Settings."
+        : "Premium billing is paused. Free studio access is available.",
+      href: "/settings#billing",
+    },
   ];
   const localHistoryCount = history.filter((entry) => !isAccountHistoryItem(entry, syncedHistoryIds)).length;
   const syncableLocalHistoryCount = syncableLocalHistoryItems(history, syncedHistoryIds).length;
@@ -3340,11 +3360,13 @@ export default function Page() {
                     <p>
                       {premiumExportSyncing
                         ? "Try again in a moment, or open Settings to refresh your plan state. PDF remains available while your export access catches up."
-                        : "Upgrade to export DOCX and TXT files, or keep using PDF on the free plan."}
+                        : premiumBillingReady
+                          ? "Upgrade to export DOCX and TXT files, or keep using PDF on the free plan."
+                          : "Premium billing is paused for launch. Keep using PDF export on the free plan."}
                     </p>
                     <div className="rf-callout-actions">
                       <Link className="primary-button" href="/settings#billing">
-                        {premiumExportSyncing ? "Open settings" : "View plans"} <RoleForgeIcon name="sparkle" size={14} />
+                        {premiumExportSyncing || !premiumBillingReady ? "Open settings" : "View plans"} <RoleForgeIcon name="sparkle" size={14} />
                       </Link>
                       <button
                         className="ghost-button"

@@ -107,9 +107,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   });
   const portalActionTitle = portalReady
     ? "Open Stripe billing management"
-    : premiumActive
-      ? "Billing management is unavailable right now."
-      : "Premium billing is not accepting payments right now.";
+      : premiumActive
+        ? "Billing management is unavailable right now."
+        : "Premium billing is not accepting payments right now.";
   const inactiveBillingActionLabel = premiumActive ? "Billing unavailable right now" : "Premium billing unavailable";
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName = accountDisplayName(user);
@@ -389,7 +389,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     : "Use Manage billing for subscription changes and invoices."
                   : checkoutReady
                   ? "Checkout opens securely in Stripe. Premium access updates after the subscription syncs."
-                  : "Premium billing is paused while live checkout is prepared. The free signed-in studio remains available."}
+                  : "Premium billing is paused while payments are prepared. The free signed-in studio remains available."}
               </p>
             </div>
           </section>

@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   const billingConfig = getStripeBillingConfig();
   const serviceSupabase = createRoleForgeServiceClient();
 
-  if (!stripe || !billingConfig.secretKey || !serviceSupabase) {
+  if (!stripe || !billingConfig.secretKey || !billingConfig.liveModeReady || !serviceSupabase) {
     return NextResponse.json({ error: "Billing is temporarily unavailable. Try again shortly." }, { status: 503 });
   }
 

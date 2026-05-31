@@ -13,7 +13,7 @@ test("settings billing action distinguishes active portals from inactive billing
   assert.match(settingsPage, /aria-disabled="true"/);
   assert.match(settingsPage, /Billing management is unavailable right now\./);
   assert.match(settingsPage, /Premium billing is not accepting payments right now\./);
-  assert.match(settingsPage, /Premium billing is paused while live checkout is prepared/);
+  assert.match(settingsPage, /Premium billing is paused while payments are prepared/);
   assert.doesNotMatch(settingsPage, /No billing portal yet/);
   assert.doesNotMatch(settingsPage, /type="submit"\s+disabled=\{!portalReady\}/);
 });
