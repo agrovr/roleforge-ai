@@ -158,6 +158,17 @@ Get-Clipboard | npm run set:billing:vercel -- STRIPE_WEBHOOK_SECRET
 
 The setter rejects test keys for `STRIPE_SECRET_KEY`, so production cannot be accidentally pointed back at Stripe sandbox checkout.
 
+To verify live checkout without charging a card, run the live checkout smoke with the Supabase service-role key available in the environment:
+
+```powershell
+$keysJson = (npx supabase projects api-keys --project-ref ijdspodwpkuhwszmvqip --output json) | Out-String
+$env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY = (($keysJson | ConvertFrom-Json) | Where-Object { $_.id -eq "service_role" } | Select-Object -First 1).api_key
+node scripts\smoke_live_checkout.mjs
+Remove-Item Env:\ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY
+```
+
+The smoke creates a temporary confirmed Supabase user, posts to `/api/billing/checkout`, verifies a `cs_live` Stripe Checkout redirect, and deletes the temporary user. It creates Stripe activity but does not complete a payment.
+
 Useful docs:
 
 - `docs/plan-rules.md`

@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "smoke:frontend": "node scripts/smoke_frontend.mjs",
+    "smoke:checkout": "node scripts/smoke_live_checkout.mjs",
     "smoke:layout": "node scripts/smoke_layout.mjs",
     "smoke:readiness": "node scripts/check_smoke_readiness.mjs",
     "check:billing": "node scripts/check_billing_launch_readiness.mjs",

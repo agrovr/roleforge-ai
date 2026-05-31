@@ -64,6 +64,19 @@ Get-Clipboard | npm run set:billing:vercel -- STRIPE_WEBHOOK_SECRET
 
 The setter validates the expected prefix (`sk_live_`, `price_`, or `whsec_`) before replacing the Vercel Production value.
 
+## Live checkout smoke
+
+Use this after billing env changes or before a launch announcement:
+
+```powershell
+$keysJson = (npx supabase projects api-keys --project-ref ijdspodwpkuhwszmvqip --output json) | Out-String
+$env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY = (($keysJson | ConvertFrom-Json) | Where-Object { $_.id -eq "service_role" } | Select-Object -First 1).api_key
+node scripts\smoke_live_checkout.mjs
+Remove-Item Env:\ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY
+```
+
+The smoke creates a temporary confirmed Supabase user, submits the signed-in checkout form, verifies the redirect goes to `checkout.stripe.com` with a `cs_live` session id, and deletes the temporary user. It should appear in Stripe as an incomplete live Checkout Session and should not create a charge.
+
 ## Stripe webhook endpoint
 
 Create a Stripe webhook endpoint for:
