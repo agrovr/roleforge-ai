@@ -565,6 +565,11 @@ function Footer() {
           <span>Saved project history</span>
           <span>Settings and account controls</span>
         </div>
+        <div className="footer-col">
+          <h3>Trust</h3>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+        </div>
       </div>
       <div className="footer-meta">
         <span>RoleForge AI</span>

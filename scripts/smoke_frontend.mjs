@@ -505,6 +505,20 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.footer-tag,\s*\.footer-col\s+a,\s*\.footer-col\s+span,\s*\.footer-meta\s+span\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "footer copy can still overflow narrow columns");
   pass("landing final CTA and footer include overflow-safe layout guards");
 
+  requireCondition(
+    /\.legal-hero\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*330px\),\s*390px\))[^}]*\}/s.test(stylesheetText),
+    "legal hero is missing stable desktop columns",
+  );
+  requireCondition(
+    /@media\s*\(max-width:\s*900px\)[\s\S]*?\.legal-grid\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText),
+    "legal pages are missing tablet stacking",
+  );
+  requireCondition(
+    /\.legal-card\s+p\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*pretty)[^}]*\}/s.test(stylesheetText),
+    "legal page copy can still overflow narrow cards",
+  );
+  pass("public legal pages include overflow-safe layout guards");
+
   const finalCtaGuardIndex = sourceStylesheetText.lastIndexOf("/* Final CTA screenshot fix:");
   requireCondition(finalCtaGuardIndex >= 0, "landing final CTA was missing the cascade-final screenshot guard");
   const finalCtaGuardEndIndex = sourceStylesheetText.indexOf("/* End final CTA screenshot fix. */", finalCtaGuardIndex);
@@ -890,6 +904,8 @@ async function checkCrawlerMetadata(baseUrl, canonicalUrl = baseUrl) {
   requireCondition(sitemap.response.ok, `sitemap.xml returned ${sitemap.response.status}`);
   requireCondition(sitemap.text.includes(`${canonicalUrl}/`) || sitemap.text.includes(`${canonicalUrl}</loc>`), "sitemap.xml did not include the home page");
   requireCondition(sitemap.text.includes(`${canonicalUrl}/templates`), "sitemap.xml did not include templates");
+  requireCondition(sitemap.text.includes(`${canonicalUrl}/privacy`), "sitemap.xml did not include privacy");
+  requireCondition(sitemap.text.includes(`${canonicalUrl}/terms`), "sitemap.xml did not include terms");
   requireCondition(!sitemap.text.includes(`${canonicalUrl}/app`), "sitemap.xml included the protected studio route");
   pass("crawler metadata exposes public pages and excludes protected routes");
 }
