@@ -35,6 +35,7 @@ function generatedCode() {
 function parseArgs(argv) {
   const options = {
     code: "",
+    duration: "forever",
     expiresHours: DEFAULT_EXPIRES_HOURS,
     maxRedemptions: 1,
     productName: DEFAULT_PRODUCT_NAME,
@@ -50,10 +51,14 @@ function parseArgs(argv) {
       options.help = true;
       continue;
     }
-    if (["--code", "--expires-hours", "--max-redemptions", "--product-name"].includes(name)) {
+    if (["--code", "--duration", "--expires-hours", "--max-redemptions", "--product-name"].includes(name)) {
       const value = inlineValue ?? argv[index + 1];
       if (!value || value.startsWith("--")) throw new Error(`${name} requires a value.`);
       if (name === "--code") options.code = value.trim().toUpperCase();
+      if (name === "--duration") {
+        if (value !== "once" && value !== "forever") throw new Error("--duration must be once or forever.");
+        options.duration = value;
+      }
       if (name === "--expires-hours") options.expiresHours = parsePositiveInteger(value, "--expires-hours");
       if (name === "--max-redemptions") options.maxRedemptions = parsePositiveInteger(value, "--max-redemptions");
       if (name === "--product-name") options.productName = value.trim();
@@ -75,11 +80,12 @@ Usage:
 
 Options:
   --code <value>             Promotion code to create. Defaults to ROLEFORGE-FREE-XXXXXX.
+  --duration <once|forever>  Coupon duration. Default: forever.
   --expires-hours <number>   Expiration window. Default: ${DEFAULT_EXPIRES_HOURS}.
   --max-redemptions <number> Maximum redemptions. Default: 1.
   --product-name <name>      Stripe product to restrict the coupon to. Default: ${DEFAULT_PRODUCT_NAME}.
 
-The script requires a live Stripe secret key and creates a 100% off, first-invoice-only
+The script requires a live Stripe secret key and creates a 100% off, one-use
 promotion code for no-charge Premium entitlement testing. It never prints the secret key.`);
 }
 
@@ -90,12 +96,14 @@ async function findLiveProduct(stripe, productName) {
 
 export function validatePromoCodeOptions({
   secretKey,
+  duration = "forever",
   expiresHours = DEFAULT_EXPIRES_HOURS,
   maxRedemptions = 1,
   productName = DEFAULT_PRODUCT_NAME,
 } = {}) {
   const mode = stripeKeyMode(secretKey || "");
   if (mode !== "live") throw new Error("A live Stripe secret key (sk_live_...) is required.");
+  if (duration !== "once" && duration !== "forever") throw new Error("duration must be once or forever.");
   parsePositiveInteger(String(expiresHours), "expiresHours");
   parsePositiveInteger(String(maxRedemptions), "maxRedemptions");
   if (!productName?.trim()) throw new Error("productName is required.");
@@ -105,11 +113,12 @@ export function validatePromoCodeOptions({
 export async function createLivePromotionCode({
   secretKey = firstNonEmptyEnv("STRIPE_SECRET_KEY", "ROLEFORGE_STRIPE_SECRET_KEY"),
   code = generatedCode(),
+  duration = "forever",
   expiresHours = DEFAULT_EXPIRES_HOURS,
   maxRedemptions = 1,
   productName = DEFAULT_PRODUCT_NAME,
 } = {}) {
-  validatePromoCodeOptions({ secretKey, expiresHours, maxRedemptions, productName });
+  validatePromoCodeOptions({ secretKey, duration, expiresHours, maxRedemptions, productName });
 
   const stripe = new Stripe(secretKey, {
     appInfo: {
@@ -123,8 +132,8 @@ export async function createLivePromotionCode({
   const expiresAt = Math.floor(Date.now() / 1000) + expiresHours * 60 * 60;
   const coupon = await stripe.coupons.create({
     percent_off: 100,
-    duration: "once",
-    name: `${productName} no-charge launch test`,
+    duration,
+    name: `${productName} no-charge launch test (${duration})`,
     applies_to: {
       products: [product.id],
     },
@@ -149,6 +158,7 @@ export async function createLivePromotionCode({
     couponId: coupon.id,
     promotionCodeId: promotionCode.id,
     productId: product.id,
+    duration,
     expiresAt,
     maxRedemptions,
   };

@@ -12,4 +12,5 @@ test("promotion code creator requires a live Stripe key", () => {
 test("promotion code creator validates redemption and expiry limits before network calls", () => {
   assert.throws(() => validatePromoCodeOptions({ secretKey: "sk_live_example", expiresHours: 0 }), /expiresHours/);
   assert.throws(() => validatePromoCodeOptions({ secretKey: "sk_live_example", maxRedemptions: 0 }), /maxRedemptions/);
+  assert.throws(() => validatePromoCodeOptions({ secretKey: "sk_live_example", duration: "repeating" }), /duration/);
 });
