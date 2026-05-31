@@ -53,6 +53,17 @@ When Vercel CLI is logged in, check the actual production environment without pr
 npm run check:billing:vercel
 ```
 
+To update one live Stripe value from a copied value without printing it, pipe the value into the guarded setter:
+
+```powershell
+Get-Clipboard | npm run set:billing:vercel -- STRIPE_SECRET_KEY
+Get-Clipboard | npm run set:billing:vercel -- STRIPE_PREMIUM_MONTHLY_PRICE_ID
+Get-Clipboard | npm run set:billing:vercel -- STRIPE_PREMIUM_YEARLY_PRICE_ID
+Get-Clipboard | npm run set:billing:vercel -- STRIPE_WEBHOOK_SECRET
+```
+
+The setter validates the expected prefix (`sk_live_`, `price_`, or `whsec_`) before replacing the Vercel Production value.
+
 ## Stripe webhook endpoint
 
 Create a Stripe webhook endpoint for:

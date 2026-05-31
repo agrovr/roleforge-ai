@@ -147,6 +147,17 @@ If the Vercel CLI is logged in locally, verify the actual production env directl
 npm run check:billing:vercel
 ```
 
+To replace a live Stripe billing variable from the clipboard without printing the value:
+
+```powershell
+Get-Clipboard | npm run set:billing:vercel -- STRIPE_SECRET_KEY
+Get-Clipboard | npm run set:billing:vercel -- STRIPE_PREMIUM_MONTHLY_PRICE_ID
+Get-Clipboard | npm run set:billing:vercel -- STRIPE_PREMIUM_YEARLY_PRICE_ID
+Get-Clipboard | npm run set:billing:vercel -- STRIPE_WEBHOOK_SECRET
+```
+
+The setter rejects test keys for `STRIPE_SECRET_KEY`, so production cannot be accidentally pointed back at Stripe sandbox checkout.
+
 Useful docs:
 
 - `docs/plan-rules.md`
