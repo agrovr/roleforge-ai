@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const landingPage = readFileSync("app/page.tsx", "utf8");
+const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
 const authStatusRoute = readFileSync("app/api/auth/status/route.ts", "utf8");
 const checkoutRoute = readFileSync("app/api/billing/checkout/route.ts", "utf8");
 const portalRoute = readFileSync("app/api/billing/portal/route.ts", "utf8");
@@ -42,6 +43,11 @@ test("direct billing portal navigation redirects to the billing UI instead of re
   assert.match(portalRoute, /export async function GET\(request: Request\)/);
   assert.match(portalRoute, /\/settings#billing/);
   assert.match(portalRoute, /\/login\?next=\/settings&account=signin-required/);
+});
+
+test("settings billing actions submit with POST instead of opening API routes as pages", () => {
+  assert.match(settingsPage, /<form action="\/api\/billing\/checkout" method="post">/);
+  assert.match(settingsPage, /<form action="\/api\/billing\/portal" method="post">/);
 });
 
 test("checkout sessions allow promotion codes for launch testing and controlled discounts", () => {
