@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
-import { evaluateBillingLaunchReadiness } from "./check_billing_launch_readiness.mjs";
+import { evaluateBillingLaunchReadiness, parseEnvFile, safeValueKind } from "./check_billing_launch_readiness.mjs";
 
 const scriptPath = "scripts/check_billing_launch_readiness.mjs";
 
@@ -57,4 +57,27 @@ test("strict billing readiness passes with live production settings", () => {
 
   assert.equal(result.status, 0);
   assert.match(result.stdout, /Premium checkout can be re-enabled/);
+});
+
+test("billing readiness parses pulled env files without exposing values", () => {
+  const env = parseEnvFile([
+    "# Vercel env",
+    "NEXT_PUBLIC_SITE_URL=\"https://roleforgeai.vercel.app\"",
+    "STRIPE_SECRET_KEY='sk_live_secret_value'",
+    "STRIPE_PREMIUM_MONTHLY_PRICE_ID=price_monthly_live",
+    "STRIPE_PREMIUM_YEARLY_PRICE_ID=price_yearly_live",
+    "STRIPE_WEBHOOK_SECRET=whsec_live_secret",
+    "SUPABASE_SERVICE_ROLE_KEY=service_role_secret",
+  ].join("\n"));
+
+  assert.equal(env.STRIPE_SECRET_KEY, "sk_live_secret_value");
+  assert.equal(safeValueKind("STRIPE_SECRET_KEY", env.STRIPE_SECRET_KEY), "live");
+  assert.equal(safeValueKind("STRIPE_PREMIUM_MONTHLY_PRICE_ID", env.STRIPE_PREMIUM_MONTHLY_PRICE_ID), "price");
+  assert.equal(evaluateBillingLaunchReadiness(env).ready, true);
+});
+
+test("safe value kinds never include secret values", () => {
+  assert.equal(safeValueKind("STRIPE_SECRET_KEY", "sk_test_do_not_print"), "test");
+  assert.equal(safeValueKind("STRIPE_WEBHOOK_SECRET", "whsec_do_not_print"), "webhook-secret");
+  assert.equal(safeValueKind("SUPABASE_SERVICE_ROLE_KEY", "service_role_do_not_print"), "present");
 });

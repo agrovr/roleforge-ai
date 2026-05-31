@@ -141,6 +141,12 @@ npm run check:billing -- --strict
 
 The check validates that production has live Stripe mode, live-looking price IDs, a webhook signing secret, Supabase entitlement write access, and a production site URL without printing secrets. If it fails, Premium checkout should remain paused while the signed-in free workflow stays available.
 
+If the Vercel CLI is logged in locally, verify the actual production env directly:
+
+```bash
+npm run check:billing:vercel
+```
+
 Useful docs:
 
 - `docs/plan-rules.md`

@@ -1,8 +1,13 @@
 #!/usr/bin/env node
 
+import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync, rmSync } from "node:fs";
+import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const LIVE_SITE_HOST = "roleforgeai.vercel.app";
+const DEFAULT_VERCEL_TEAM_ID = "team_kEe4HW272D5nYJDD92amj55H";
+const TEMP_VERCEL_ENV_FILE = ".codex-vercel-production.env";
 
 export function stripeKeyMode(secretKey = "") {
   if (secretKey.startsWith("sk_live_")) return "live";
@@ -107,11 +112,72 @@ export function evaluateBillingLaunchReadiness(env = process.env) {
   };
 }
 
+export function parseEnvFile(contents) {
+  const env = {};
+  for (const rawLine of contents.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;
+
+    const equalsIndex = line.indexOf("=");
+    if (equalsIndex < 0) continue;
+
+    const name = line.slice(0, equalsIndex).trim();
+    let value = line.slice(equalsIndex + 1).trim();
+    if (!name) continue;
+
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    env[name] = value;
+  }
+  return env;
+}
+
+export function safeValueKind(name, value = "") {
+  if (!value) return "missing";
+  if (name === "STRIPE_SECRET_KEY") return stripeKeyMode(value);
+  if (name === "STRIPE_WEBHOOK_SECRET") return value.startsWith("whsec_") ? "webhook-secret" : "present";
+  if (name.includes("PRICE_ID")) return value.startsWith("price_") ? "price" : "present";
+  if (name.includes("URL")) return /^https?:\/\//i.test(value) ? "url" : "present";
+  return "present";
+}
+
+function pullVercelProductionEnv({ teamId = DEFAULT_VERCEL_TEAM_ID, cwd = process.cwd(), tempFile = TEMP_VERCEL_ENV_FILE } = {}) {
+  const tempPath = join(cwd, tempFile);
+  if (existsSync(tempPath)) rmSync(tempPath, { force: true });
+  const vercelArgs = ["vercel", "env", "pull", tempFile, "--environment=production", "--scope", teamId];
+  const command = process.platform === "win32" ? "cmd.exe" : "npx";
+  const args = process.platform === "win32" ? ["/d", "/s", "/c", "npx", ...vercelArgs] : vercelArgs;
+
+  try {
+    execFileSync(
+      command,
+      args,
+      { cwd, stdio: ["ignore", "pipe", "pipe"], encoding: "utf8" },
+    );
+    return parseEnvFile(readFileSync(tempPath, "utf8"));
+  } finally {
+    if (existsSync(tempPath)) rmSync(tempPath, { force: true });
+  }
+}
+
 function parseArgs(argv) {
-  const options = { strict: false };
-  for (const arg of argv) {
+  const options = { strict: false, vercelProduction: false, teamId: DEFAULT_VERCEL_TEAM_ID };
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
     if (arg === "--strict") {
       options.strict = true;
+      continue;
+    }
+    if (arg === "--vercel-production") {
+      options.vercelProduction = true;
+      continue;
+    }
+    if (arg === "--team" || arg === "--scope") {
+      const value = argv[index + 1];
+      if (!value || value.startsWith("--")) throw new Error(`${arg} requires a Vercel team id or slug`);
+      options.teamId = value;
+      index += 1;
       continue;
     }
     if (arg === "--help" || arg === "-h") {
@@ -129,6 +195,7 @@ function printHelp() {
 Usage:
   npm run check:billing
   npm run check:billing -- --strict
+  npm run check:billing:vercel
 
 Checks production Stripe/Supabase environment variables without printing secret values.
 Use --strict before switching Premium back on with live Stripe keys.`);
@@ -146,8 +213,23 @@ export function runBillingLaunchReadinessCli(argv = process.argv.slice(2), env =
     return 0;
   }
 
-  const result = evaluateBillingLaunchReadiness(env);
+  const effectiveEnv = options.vercelProduction ? pullVercelProductionEnv({ teamId: options.teamId }) : env;
+  const result = evaluateBillingLaunchReadiness(effectiveEnv);
   console.log("RoleForge AI billing launch readiness");
+  if (options.vercelProduction) {
+    console.log(`Source: Vercel production env (${options.teamId})`);
+    for (const name of [
+      "NEXT_PUBLIC_SITE_URL",
+      "SUPABASE_SERVICE_ROLE_KEY",
+      "STRIPE_SECRET_KEY",
+      "STRIPE_PREMIUM_MONTHLY_PRICE_ID",
+      "STRIPE_PREMIUM_YEARLY_PRICE_ID",
+      "STRIPE_WEBHOOK_SECRET",
+    ]) {
+      console.log(`SAFE ${name}: ${safeValueKind(name, effectiveEnv[name])}`);
+    }
+    console.log("");
+  }
   console.log(`Context: ${result.liveKeyRequired ? "production live key required" : "non-production or custom preview"}; Stripe key mode: ${result.mode}`);
   console.log("");
 

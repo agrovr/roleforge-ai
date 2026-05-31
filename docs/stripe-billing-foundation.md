@@ -47,6 +47,12 @@ npm run check:billing -- --strict
 
 The check never prints secret values. It exits nonzero if production is still pointed at a test Stripe key or if the billing environment is incomplete.
 
+When Vercel CLI is logged in, check the actual production environment without printing secrets:
+
+```bash
+npm run check:billing:vercel
+```
+
 ## Stripe webhook endpoint
 
 Create a Stripe webhook endpoint for:

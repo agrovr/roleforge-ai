@@ -11,6 +11,7 @@
     "smoke:layout": "node scripts/smoke_layout.mjs",
     "smoke:readiness": "node scripts/check_smoke_readiness.mjs",
     "check:billing": "node scripts/check_billing_launch_readiness.mjs",
+    "check:billing:vercel": "node scripts/check_billing_launch_readiness.mjs --vercel-production --strict",
     "typecheck": "tsc --noEmit",
     "wait:vercel": "node scripts/wait_for_vercel_status.mjs",
     "test": "tsx --test app/lib/*.test.ts app/lib/billing/*.test.ts app/lib/supabase/*.test.ts scripts/*.test.mjs",
