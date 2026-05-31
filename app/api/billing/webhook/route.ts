@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 
-import { syncSubscriptionEntitlement, upsertEntitlement } from "@/app/lib/billing/entitlements";
+import {
+  checkoutSessionUserId,
+  subscriptionSupabaseUserId,
+  syncSubscriptionEntitlement,
+  upsertEntitlement,
+} from "@/app/lib/billing/entitlements";
 import { getStripeBillingConfig, getStripeClient } from "@/app/lib/billing/stripe";
 
 export const runtime = "nodejs";
@@ -14,6 +19,17 @@ async function retrieveSubscription(subscriptionId: string) {
   }
 
   return stripe.subscriptions.retrieve(subscriptionId);
+}
+
+async function syncWebhookSubscriptionEntitlement(subscription: Stripe.Subscription, fallbackUserId = "") {
+  const userId = fallbackUserId.trim() || subscriptionSupabaseUserId(subscription);
+
+  if (!userId) {
+    console.warn(`Ignoring Stripe subscription ${subscription.id} because it is missing supabase_user_id metadata.`);
+    return;
+  }
+
+  await syncSubscriptionEntitlement(subscription, { supabaseUserId: userId });
 }
 
 export async function POST(request: Request) {
@@ -45,7 +61,7 @@ export async function POST(request: Request) {
     const subscriptionId = typeof session.subscription === "string" ? session.subscription : session.subscription?.id;
 
     if (subscriptionId) {
-      await syncSubscriptionEntitlement(await retrieveSubscription(subscriptionId));
+      await syncWebhookSubscriptionEntitlement(await retrieveSubscription(subscriptionId), checkoutSessionUserId(session));
     }
   }
 
@@ -54,7 +70,7 @@ export async function POST(request: Request) {
     event.type === "customer.subscription.updated" ||
     event.type === "customer.subscription.deleted"
   ) {
-    await syncSubscriptionEntitlement(event.data.object as Stripe.Subscription);
+    await syncWebhookSubscriptionEntitlement(event.data.object as Stripe.Subscription);
   }
 
   if (event.type === "customer.deleted") {

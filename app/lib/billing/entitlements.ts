@@ -110,8 +110,16 @@ export async function upsertEntitlement(patch: EntitlementPatch) {
   }
 }
 
-export function entitlementPatchFromSubscription(subscription: Stripe.Subscription): EntitlementPatch {
-  const supabaseUserId = subscription.metadata.supabase_user_id;
+export function subscriptionSupabaseUserId(subscription: Stripe.Subscription) {
+  const supabaseUserId = subscription.metadata?.supabase_user_id;
+  return typeof supabaseUserId === "string" ? supabaseUserId.trim() : "";
+}
+
+export function entitlementPatchFromSubscription(
+  subscription: Stripe.Subscription,
+  options: { supabaseUserId?: string | null } = {},
+): EntitlementPatch {
+  const supabaseUserId = options.supabaseUserId?.trim() || subscriptionSupabaseUserId(subscription);
   const customerId = typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id;
 
   if (!supabaseUserId) {
@@ -133,8 +141,11 @@ export function entitlementPatchFromSubscription(subscription: Stripe.Subscripti
   };
 }
 
-export async function syncSubscriptionEntitlement(subscription: Stripe.Subscription) {
-  await upsertEntitlement(entitlementPatchFromSubscription(subscription));
+export async function syncSubscriptionEntitlement(
+  subscription: Stripe.Subscription,
+  options: { supabaseUserId?: string | null } = {},
+) {
+  await upsertEntitlement(entitlementPatchFromSubscription(subscription, options));
 }
 
 export function checkoutSessionUserId(session: Stripe.Checkout.Session) {

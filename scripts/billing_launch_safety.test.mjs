@@ -6,6 +6,7 @@ const landingPage = readFileSync("app/page.tsx", "utf8");
 const authStatusRoute = readFileSync("app/api/auth/status/route.ts", "utf8");
 const checkoutRoute = readFileSync("app/api/billing/checkout/route.ts", "utf8");
 const portalRoute = readFileSync("app/api/billing/portal/route.ts", "utf8");
+const webhookRoute = readFileSync("app/api/billing/webhook/route.ts", "utf8");
 
 test("production billing routes fail closed unless live billing is ready", () => {
   assert.match(checkoutRoute, /billingReadiness\(billingConfig/);
@@ -21,6 +22,13 @@ test("Stripe session creation failures return to Settings instead of API errors"
   assert.match(portalRoute, /Billing portal session creation failed/);
   assert.match(checkoutRoute, /\/settings\?billing=temporarily-unavailable#billing/);
   assert.match(portalRoute, /\/settings\?billing=temporarily-unavailable#billing/);
+});
+
+test("billing webhooks use checkout ownership fallback and ignore unrelated subscription events", () => {
+  assert.match(webhookRoute, /checkoutSessionUserId\(session\)/);
+  assert.match(webhookRoute, /subscriptionSupabaseUserId\(subscription\)/);
+  assert.match(webhookRoute, /Ignoring Stripe subscription/);
+  assert.match(webhookRoute, /syncSubscriptionEntitlement\(subscription,\s*{\s*supabaseUserId:\s*userId\s*}\)/);
 });
 
 test("direct checkout navigation redirects to the billing UI instead of rendering an API error", () => {

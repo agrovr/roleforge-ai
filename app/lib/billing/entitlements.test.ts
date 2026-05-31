@@ -11,6 +11,7 @@ import {
   checkoutSessionUserId,
   entitlementPatchFromSubscription,
   normalizeBillingStatus,
+  subscriptionSupabaseUserId,
 } from "./entitlements";
 
 function subscriptionFixture(overrides: Partial<Stripe.Subscription> = {}) {
@@ -89,6 +90,23 @@ test("does not treat past_due as premium access", () => {
 
   assert.equal(patch.plan, "free");
   assert.equal(patch.billingStatus, "past_due");
+});
+
+test("uses checkout session user metadata as a subscription sync fallback", () => {
+  const patch = entitlementPatchFromSubscription(subscriptionFixture({
+    metadata: {},
+  }), { supabaseUserId: " user_from_checkout " });
+
+  assert.equal(patch.userId, "user_from_checkout");
+  assert.equal(subscriptionSupabaseUserId(subscriptionFixture()), "user_test");
+  assert.equal(subscriptionSupabaseUserId(subscriptionFixture({ metadata: {} })), "");
+});
+
+test("fails subscription patches without RoleForge user ownership", () => {
+  assert.throws(
+    () => entitlementPatchFromSubscription(subscriptionFixture({ metadata: {} })),
+    /missing supabase_user_id metadata/,
+  );
 });
 
 test("exposes shared billing feature payloads for checkout and reconciliation", () => {
