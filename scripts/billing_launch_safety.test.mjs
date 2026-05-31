@@ -19,6 +19,10 @@ test("direct checkout navigation redirects to the billing UI instead of renderin
   assert.match(checkoutRoute, /\/login\?next=\/settings&account=signin-required/);
 });
 
+test("checkout sessions allow promotion codes for launch testing and controlled discounts", () => {
+  assert.match(checkoutRoute, /allow_promotion_codes:\s*true/);
+});
+
 test("public and signed-in shells expose billing readiness before promising upgrades", () => {
   assert.match(authStatusRoute, /billingReadiness\(getStripeBillingConfig\(\)/);
   assert.match(authStatusRoute, /\bbilling,\s*\n/);
