@@ -13,6 +13,12 @@ test("production billing routes fail closed unless live billing is ready", () =>
   assert.match(portalRoute, /!billingConfig\.liveModeReady/);
 });
 
+test("direct checkout navigation redirects to the billing UI instead of rendering an API error", () => {
+  assert.match(checkoutRoute, /export async function GET\(request: Request\)/);
+  assert.match(checkoutRoute, /\/settings#billing/);
+  assert.match(checkoutRoute, /\/login\?next=\/settings&account=signin-required/);
+});
+
 test("public and signed-in shells expose billing readiness before promising upgrades", () => {
   assert.match(authStatusRoute, /billingReadiness\(getStripeBillingConfig\(\)/);
   assert.match(authStatusRoute, /\bbilling,\s*\n/);

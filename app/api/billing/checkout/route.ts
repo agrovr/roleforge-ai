@@ -12,6 +12,23 @@ function normalizeInterval(value: FormDataEntryValue | null): BillingInterval {
   return value === "year" ? "year" : "month";
 }
 
+export async function GET(request: Request) {
+  const supabase = await createRoleForgeServerClient();
+
+  if (!supabase) {
+    return NextResponse.redirect(absoluteUrl(request, "/login?next=/settings&account=signin-required"), 303);
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return NextResponse.redirect(
+    absoluteUrl(request, user ? "/settings#billing" : "/login?next=/settings&account=signin-required"),
+    303,
+  );
+}
+
 export async function POST(request: Request) {
   const supabase = await createRoleForgeServerClient();
 
