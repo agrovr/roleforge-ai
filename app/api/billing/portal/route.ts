@@ -58,10 +58,17 @@ export async function POST(request: Request) {
     return NextResponse.redirect(absoluteUrl(request, "/settings?billing=no-customer#billing"), 303);
   }
 
-  const portalSession = await stripe.billingPortal.sessions.create({
-    customer: portalCustomer.customerId,
-    return_url: absoluteUrl(request, "/settings?billing=portal-return#billing"),
-  });
+  let portalSession;
+
+  try {
+    portalSession = await stripe.billingPortal.sessions.create({
+      customer: portalCustomer.customerId,
+      return_url: absoluteUrl(request, "/settings?billing=portal-return#billing"),
+    });
+  } catch (error) {
+    console.error("Billing portal session creation failed", error);
+    return NextResponse.redirect(absoluteUrl(request, "/settings?billing=temporarily-unavailable#billing"), 303);
+  }
 
   return NextResponse.redirect(portalSession.url, 303);
 }

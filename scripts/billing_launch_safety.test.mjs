@@ -13,6 +13,16 @@ test("production billing routes fail closed unless live billing is ready", () =>
   assert.match(portalRoute, /!billingConfig\.liveModeReady/);
 });
 
+test("Stripe session creation failures return to Settings instead of API errors", () => {
+  assert.match(checkoutRoute, /try\s*{\s*[\s\S]*stripe\.checkout\.sessions\.create/);
+  assert.match(checkoutRoute, /Checkout session creation failed/);
+  assert.match(checkoutRoute, /Checkout session creation returned no URL/);
+  assert.match(portalRoute, /try\s*{\s*[\s\S]*stripe\.billingPortal\.sessions\.create/);
+  assert.match(portalRoute, /Billing portal session creation failed/);
+  assert.match(checkoutRoute, /\/settings\?billing=temporarily-unavailable#billing/);
+  assert.match(portalRoute, /\/settings\?billing=temporarily-unavailable#billing/);
+});
+
 test("direct checkout navigation redirects to the billing UI instead of rendering an API error", () => {
   assert.match(checkoutRoute, /export async function GET\(request: Request\)/);
   assert.match(checkoutRoute, /\/settings#billing/);

@@ -71,32 +71,40 @@ export async function POST(request: Request) {
     return NextResponse.redirect(absoluteUrl(request, "/settings?billing=already-premium#billing"), 303);
   }
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    customer: checkoutCustomer.customerId,
-    allow_promotion_codes: true,
-    line_items: [
-      {
-        price: priceId,
-        quantity: 1,
+  let session;
+
+  try {
+    session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      customer: checkoutCustomer.customerId,
+      allow_promotion_codes: true,
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      success_url: checkoutSuccessUrl(request),
+      cancel_url: absoluteUrl(request, "/settings?billing=checkout-canceled#billing"),
+      subscription_data: {
+        metadata: {
+          supabase_user_id: user.id,
+        },
       },
-    ],
-    success_url: checkoutSuccessUrl(request),
-    cancel_url: absoluteUrl(request, "/settings?billing=checkout-canceled#billing"),
-    subscription_data: {
       metadata: {
         supabase_user_id: user.id,
+        plan: "premium",
+        interval,
       },
-    },
-    metadata: {
-      supabase_user_id: user.id,
-      plan: "premium",
-      interval,
-    },
-  });
+    });
+  } catch (error) {
+    console.error("Checkout session creation failed", error);
+    return NextResponse.redirect(absoluteUrl(request, "/settings?billing=temporarily-unavailable#billing"), 303);
+  }
 
   if (!session.url) {
-    return NextResponse.json({ error: "Stripe did not return a checkout URL." }, { status: 502 });
+    console.error("Checkout session creation returned no URL", { sessionId: session.id });
+    return NextResponse.redirect(absoluteUrl(request, "/settings?billing=temporarily-unavailable#billing"), 303);
   }
 
   return NextResponse.redirect(session.url, 303);
