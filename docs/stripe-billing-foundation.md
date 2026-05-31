@@ -77,6 +77,18 @@ Remove-Item Env:\ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY
 
 The smoke creates a temporary confirmed Supabase user, submits the signed-in checkout form, verifies the redirect goes to `checkout.stripe.com` with a `cs_live` session id, and deletes the temporary user. It should appear in Stripe as an incomplete live Checkout Session and should not create a charge.
 
+## No-charge Premium entitlement test
+
+Stripe test card numbers only work in test mode, so do not use them against live checkout. To test the full live entitlement flow without a charge, create a one-redemption live promotion code:
+
+```powershell
+$env:STRIPE_SECRET_KEY = "<sk_live_...>"
+node scripts\create_live_promo_code.mjs --code ROLEFORGE-FREE-TEST --expires-hours 24 --max-redemptions 1
+Remove-Item Env:\STRIPE_SECRET_KEY
+```
+
+Then sign in with a real or temporary RoleForge account, start Premium from `/settings#billing`, enter the generated code in Stripe Checkout, and complete the no-charge subscription. The webhook should grant Premium after Stripe sends `checkout.session.completed` and subscription lifecycle events.
+
 ## Stripe webhook endpoint
 
 Create a Stripe webhook endpoint for:

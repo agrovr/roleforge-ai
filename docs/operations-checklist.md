@@ -169,6 +169,16 @@ Remove-Item Env:\ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY
 
 The smoke creates a temporary confirmed Supabase user, posts to `/api/billing/checkout`, verifies a `cs_live` Stripe Checkout redirect, and deletes the temporary user. It creates Stripe activity but does not complete a payment.
 
+For a full no-charge Premium entitlement test, create a one-redemption live promotion code, then complete live Checkout with that code:
+
+```powershell
+$env:STRIPE_SECRET_KEY = "<sk_live_...>"
+node scripts\create_live_promo_code.mjs --code ROLEFORGE-FREE-TEST --expires-hours 24 --max-redemptions 1
+Remove-Item Env:\STRIPE_SECRET_KEY
+```
+
+Stripe test card numbers are test-mode only. Use a live promotion code for no-charge live checkout verification.
+
 Useful docs:
 
 - `docs/plan-rules.md`
