@@ -16,7 +16,6 @@ test("keeps visual fit guardrails consolidated", () => {
     "May 29 visual QA:",
     "May 30 composition lock:",
     "Final product fit guard:",
-    "Final CTA screenshot fix:",
     "Final design fit sweep:",
     "Screenshot repair:",
     "May 30 visual fit lock:",

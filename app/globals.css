@@ -11623,7 +11623,16 @@ body,
 .settings-page-shell,
 .login-shell,
 .templates-page-shell {
+  max-width: 100%;
   max-inline-size: 100%;
+  overflow-x: clip;
+}
+
+html,
+body,
+.page-shell,
+.settings-page-shell {
+  max-width: 100%;
   overflow-x: clip;
 }
 
@@ -11812,7 +11821,7 @@ body,
 }
 
 .dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 282px), 1fr));
   align-items: stretch;
 }
 
@@ -11827,11 +11836,13 @@ body,
   padding: clamp(18px, 2.2cqi, 24px);
 }
 
-.dash-mock .dash-stat-value {
-  font-size: clamp(1.28rem, 3.4cqi, 1.62rem);
+.dash-stat-value {
+  font-size: clamp(1.06rem, 4.8cqi, 1.38rem);
   line-height: 1.08;
-  overflow-wrap: anywhere;
+  hyphens: none;
+  overflow-wrap: normal;
   text-wrap: balance;
+  word-break: normal;
 }
 
 .dash-mock .dash-stat-delta {
@@ -12011,37 +12022,60 @@ body,
 
 .settings-profile-actions {
   display: grid;
-  inline-size: min(100%, 560px);
-  grid-template-columns: minmax(218px, max-content) minmax(132px, max-content);
-  justify-content: start;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  width: min(100%, 460px);
+  inline-size: min(100%, 460px);
   gap: 12px;
 }
 
 .settings-profile-actions form,
 .settings-billing-head form,
 .settings-price-card form {
+  display: flex;
+  min-width: 0;
   inline-size: 100%;
   min-inline-size: 0;
   max-inline-size: 100%;
 }
 
 .settings-profile-actions > .primary-button {
-  min-inline-size: 218px;
-}
-
-.settings-profile-actions > form {
-  min-inline-size: 132px;
+  min-inline-size: 0;
 }
 
 .settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(198px, max-content);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 190px), 220px);
   gap: 14px;
+  min-width: 0;
 }
 
 .settings-billing-head form,
+.settings-billing-head .ghost-button,
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  line-height: 1.12;
+  text-wrap: balance;
+  white-space: normal;
+}
+
 .settings-billing-head .ghost-button {
-  min-inline-size: 198px;
-  justify-self: end;
+  width: 100%;
+  min-width: min(100%, 220px);
+  min-height: 50px;
+  line-height: 1.12;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.settings-plan-active-card .settings-inline-link {
+  flex: 0 1 170px;
+  min-width: min(100%, 150px);
+  line-height: 1.12;
+  text-wrap: balance;
+  white-space: normal;
 }
 
 .settings-plan-active-card {
@@ -12128,6 +12162,13 @@ body,
     inset-inline-end: auto;
     left: 52%;
     transform: translateX(-76%) rotate(-8deg);
+  }
+}
+
+@media (min-width: 1181px) and (max-width: 1320px) {
+  .hero {
+    grid-template-columns: minmax(0, 0.98fr) minmax(390px, 0.78fr);
+    gap: clamp(28px, 3vw, 42px);
   }
 }
 
@@ -12371,7 +12412,7 @@ body,
   }
 }
 
-@container dash-main (max-width: 560px) {
+@container dash-main (max-width: 620px) {
   .dash-mock .dash-stats {
     grid-template-columns: 1fr;
   }
@@ -12397,3 +12438,178 @@ body,
     justify-self: stretch;
   }
 }
+
+@container settings-section (max-width: 920px) {
+  .settings-profile-actions,
+  .settings-billing-head {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Final CTA screenshot fix: keep this block at the end of the CTA cascade. */
+.cta-section .section-inner {
+  width: min(100%, 1240px);
+  inline-size: min(100%, 1180px);
+  max-inline-size: calc(100vw - clamp(40px, 6.4vw, 80px));
+  margin-inline: auto;
+  overflow: visible;
+}
+
+.cta-band {
+  container: cta-band / inline-size;
+  width: 100%;
+  inline-size: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-left: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 280px), 360px);
+  gap: clamp(24px, 3.2vw, 42px);
+  min-block-size: auto;
+  overflow: hidden;
+  isolation: isolate;
+  padding: clamp(38px, 4.6vw, 56px);
+}
+
+.cta-band > * {
+  min-width: 0;
+}
+
+.cta-band > div:first-child,
+.cta-band h2,
+.cta-band p,
+.cta-band .cta-cluster {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.cta-band .btn {
+  flex: 1 1 184px;
+  min-width: min(100%, 164px);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding-inline: 14px;
+  font-size: clamp(0.9rem, 4vw, 1rem);
+  line-height: 1.12;
+  white-space: normal;
+  text-wrap: balance;
+}
+
+.cta-visual {
+  justify-self: end;
+  width: min(100%, 430px);
+  inline-size: min(100%, 360px);
+  min-width: 0;
+  max-width: 100%;
+  min-block-size: clamp(324px, 26vw, 382px);
+  overflow: hidden;
+  contain: paint;
+}
+
+@container cta-band (max-width: 980px) {
+  .cta-band {
+    grid-template-columns: 1fr;
+    padding: clamp(28px, 5cqi, 48px);
+  }
+
+  .cta-visual {
+    justify-self: center;
+  }
+
+  .cta-visual .resume-card {
+    left: 50%;
+    transform: translateX(-18%) rotate(5deg);
+  }
+
+  .cta-visual .resume-card.back {
+    left: 50%;
+    transform: translateX(-76%) rotate(-8deg);
+  }
+}
+
+@media (min-width: 1181px) and (max-width: 1580px) {
+  .cta-visual .resume-card {
+    left: 52%;
+    transform: translateX(-18%) rotate(5deg);
+  }
+}
+
+@media (min-width: 981px) and (max-width: 1440px) {
+  .cta-band {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
+    padding: clamp(36px, 5vw, 58px);
+  }
+
+  .cta-visual {
+    justify-self: center;
+    inline-size: min(100%, 430px);
+  }
+
+  .cta-visual .resume-card {
+    left: 52%;
+    transform: translateX(-10%) rotate(5deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .cta-band {
+    width: min(100%, calc(100vw - 32px));
+    margin-left: 0;
+    padding: 44px 28px;
+  }
+}
+
+@media (max-width: 760px) {
+  .cta-band,
+  .cta-band .cta-cluster {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-band,
+  .cta-band > div:first-child,
+  .cta-band h2,
+  .cta-band p,
+  .cta-band .cta-cluster,
+  .cta-band .btn {
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  .cta-band {
+    grid-template-columns: 1fr;
+    min-block-size: 0;
+  }
+
+  .cta-band > div:first-child,
+  .cta-band h2,
+  .cta-band p,
+  .cta-band .cta-cluster {
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  .cta-band .cta-cluster {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .cta-band .btn {
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    min-inline-size: 0;
+  }
+
+  .cta-visual {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .cta-band .cta-cluster {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+}
+/* End final CTA screenshot fix. */
