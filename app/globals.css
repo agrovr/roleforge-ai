@@ -12125,8 +12125,11 @@ body,
 
   .hero-stage {
     justify-self: center;
-    inline-size: min(100%, 540px);
-    block-size: clamp(390px, 36vw, 500px);
+    width: min(100%, 680px);
+    inline-size: min(100%, 680px);
+    height: clamp(500px, 56vw, 560px);
+    block-size: clamp(500px, 56vw, 560px);
+    overflow: hidden;
   }
 }
 
@@ -12205,6 +12208,13 @@ body,
 }
 
 @media (max-width: 900px) {
+  .hero-stage {
+    width: min(100%, 560px);
+    inline-size: min(100%, 560px);
+    height: clamp(460px, 92vw, 520px);
+    block-size: clamp(460px, 92vw, 520px);
+  }
+
   .settings-page-layout {
     grid-template-columns: minmax(0, 1fr);
   }
