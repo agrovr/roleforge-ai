@@ -20,6 +20,7 @@ test("Stripe session creation failures return to Settings instead of API errors"
   assert.match(checkoutRoute, /Checkout session creation failed/);
   assert.match(checkoutRoute, /Checkout session creation returned no URL/);
   assert.doesNotMatch(checkoutRoute, /NextResponse\.json\(\s*{\s*error:\s*"Billing is temporarily unavailable/);
+  assert.doesNotMatch(portalRoute, /NextResponse\.json\(\s*{\s*error:\s*"Billing is temporarily unavailable/);
   assert.match(portalRoute, /try\s*{\s*[\s\S]*stripe\.billingPortal\.sessions\.create/);
   assert.match(portalRoute, /Billing portal session creation failed/);
   assert.match(checkoutRoute, /\/settings\?billing=temporarily-unavailable#billing/);

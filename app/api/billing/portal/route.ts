@@ -44,7 +44,7 @@ export async function POST(request: Request) {
   const serviceSupabase = createRoleForgeServiceClient();
 
   if (!stripe || !billingConfig.secretKey || !billingConfig.liveModeReady || !serviceSupabase) {
-    return NextResponse.json({ error: "Billing is temporarily unavailable. Try again shortly." }, { status: 503 });
+    return NextResponse.redirect(absoluteUrl(request, "/settings?billing=temporarily-unavailable#billing"), 303);
   }
 
   const portalCustomer = await loadBillingPortalCustomer(serviceSupabase, user.id);
