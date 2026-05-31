@@ -53,7 +53,7 @@ export async function POST(request: Request) {
   });
 
   if (!stripe || !billingReady.checkoutReady || !serviceSupabase) {
-    return NextResponse.json({ error: "Billing is temporarily unavailable. Try again shortly." }, { status: 503 });
+    return NextResponse.redirect(absoluteUrl(request, "/settings?billing=temporarily-unavailable#billing"), 303);
   }
 
   const formData = await request.formData();
