@@ -179,6 +179,17 @@ Remove-Item Env:\STRIPE_SECRET_KEY
 
 Stripe test card numbers are test-mode only. Use a live promotion code for no-charge live checkout verification.
 
+After live Checkout completes, verify the Supabase entitlement row:
+
+```powershell
+$keysJson = (npx supabase projects api-keys --project-ref ijdspodwpkuhwszmvqip --output json) | Out-String
+$env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY = (($keysJson | ConvertFrom-Json) | Where-Object { $_.id -eq "service_role" } | Select-Object -First 1).api_key
+node scripts\check_premium_entitlement.mjs --email user@example.com --wait-seconds 60
+Remove-Item Env:\ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY
+```
+
+The check waits for webhook delivery and only passes when the account is Premium with active or trialing billing.
+
 Useful docs:
 
 - `docs/plan-rules.md`

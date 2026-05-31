@@ -89,6 +89,17 @@ Remove-Item Env:\STRIPE_SECRET_KEY
 
 Then sign in with a real or temporary RoleForge account, start Premium from `/settings#billing`, enter the generated code in Stripe Checkout, and complete the no-charge subscription. The webhook should grant Premium after Stripe sends `checkout.session.completed` and subscription lifecycle events.
 
+After Checkout returns, verify the account entitlement:
+
+```powershell
+$keysJson = (npx supabase projects api-keys --project-ref ijdspodwpkuhwszmvqip --output json) | Out-String
+$env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY = (($keysJson | ConvertFrom-Json) | Where-Object { $_.id -eq "service_role" } | Select-Object -First 1).api_key
+node scripts\check_premium_entitlement.mjs --email user@example.com --wait-seconds 60
+Remove-Item Env:\ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY
+```
+
+The entitlement check passes only when `account_entitlements.plan = premium` and `billing_status` is `active` or `trialing`.
+
 ## Stripe webhook endpoint
 
 Create a Stripe webhook endpoint for:

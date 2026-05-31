@@ -13,6 +13,7 @@
     "smoke:readiness": "node scripts/check_smoke_readiness.mjs",
     "check:billing": "node scripts/check_billing_launch_readiness.mjs",
     "check:billing:vercel": "node scripts/check_billing_launch_readiness.mjs --vercel-production --strict",
+    "check:entitlement": "node scripts/check_premium_entitlement.mjs",
     "create:promo": "node scripts/create_live_promo_code.mjs",
     "set:billing:vercel": "node scripts/set_vercel_billing_env.mjs",
     "typecheck": "tsc --noEmit",
