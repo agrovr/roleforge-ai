@@ -11612,1893 +11612,260 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     border-radius: 10px;
   }
 }
-
-/* Responsive guardrails for the editorial UI. These keep big display type,
-   action buttons, and layered resume art from colliding at awkward widths. */
-.btn,
-.primary-button,
-.ghost-button {
-  min-width: 0;
-  max-width: 100%;
-  text-align: center;
-  hyphens: none;
-  overflow-wrap: normal;
-  word-break: keep-all;
-}
-
-.dash-main {
-  overflow: hidden;
-}
-
-.dash-mock {
-  max-width: min(100%, 1240px);
-  overflow: hidden;
-}
-
-.dash-mock-body,
-.dash-main,
-.dash-main-head,
-.dash-stats,
-.dash-stat {
-  min-width: 0;
-}
-
-.dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
-}
-
-.dash-stat {
-  min-inline-size: 0;
-}
-
-.dash-stat-value {
-  font-size: clamp(1.06rem, 4.8cqi, 1.38rem);
-  line-height: 1.08;
-  hyphens: none;
-  overflow-wrap: normal;
-  text-wrap: balance;
-  word-break: normal;
-}
-
-.dash-stat-label,
-.dash-stat-delta {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.cta-section {
-  overflow-x: clip;
-}
-
-.cta-section .section-inner {
-  width: min(100%, 1240px);
-  overflow: visible;
-}
-
-.cta-band {
-  width: min(100%, 1240px);
-  max-width: 100%;
-  margin-inline: auto;
-}
-
-.cta-band h2 {
-  max-width: min(100%, 14ch);
-}
-
-.cta-visual {
-  contain: paint;
-}
-
-.settings-billing-head,
-.settings-profile-actions,
-.settings-plan-active-card,
-.settings-export-actions {
-  min-width: 0;
-}
-
-.settings-billing-head .ghost-button,
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-plan-active-card .settings-inline-link,
-.settings-export-actions .btn,
-.settings-inline-link {
-  min-width: 0;
-  max-width: 100%;
-  hyphens: none;
-  overflow-wrap: normal;
-  word-break: keep-all;
-  white-space: normal;
-}
-
-.settings-profile-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
-  width: min(100%, 520px);
-}
-
-.settings-billing-head {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 220px), auto);
-  min-width: 0;
-}
-
-.settings-billing-head .ghost-button {
-  min-width: min(100%, 220px);
-  width: 100%;
-  min-height: 50px;
-  line-height: 1.12;
-  text-wrap: balance;
-  white-space: normal;
-}
-
-.price-card .btn,
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link {
-  min-height: 50px;
-  line-height: 1.12;
-  text-wrap: balance;
-  word-break: keep-all;
-}
-
-.price-card .btn {
-  width: 100%;
-  justify-content: center;
-  white-space: normal;
-}
-
-.cta-section,
-.cta-section .section-inner,
-.cta-band,
-.cta-band > *,
-.cta-visual {
-  min-width: 0;
-  max-width: 100%;
-}
-
-.cta-section .section-inner {
-  width: min(100%, 1240px);
-  overflow: visible;
-}
-
-.cta-band {
-  width: min(100%, 1240px);
-  margin-inline: auto;
-  grid-template-columns: minmax(0, 0.96fr) minmax(280px, 0.68fr);
-  gap: clamp(24px, 4vw, 48px);
-  padding: clamp(42px, 5vw, 68px) clamp(34px, 4.5vw, 62px);
-}
-
-.cta-band > div:first-child {
-  max-width: min(100%, 600px);
-}
-
-.cta-band h2 {
-  max-width: min(100%, 16ch);
-  font-size: clamp(2.35rem, 3.55vw, 3.82rem);
-  overflow-wrap: normal;
-  word-break: normal;
-}
-
-.cta-band p {
-  max-width: 44ch;
-}
-
-.cta-visual {
-  justify-self: center;
-  width: min(100%, 430px);
-  min-width: 0;
-  max-width: 100%;
-  min-height: clamp(300px, 27vw, 360px);
-  overflow: hidden;
-}
-
-.cta-visual .resume-card {
-  right: clamp(12px, 2vw, 34px);
-  width: clamp(214px, 15vw, 252px);
-  height: clamp(316px, 22vw, 372px);
-}
-
-.cta-visual .resume-card.back {
-  right: clamp(100px, 10vw, 138px);
-  width: clamp(184px, 12.5vw, 218px);
-  height: clamp(286px, 20vw, 350px);
-}
-
-@container dash-main (min-width: 1120px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: repeat(4, minmax(230px, 1fr));
-  }
-}
-
-@container dash-main (max-width: 560px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: 1fr;
-  }
-}
-
-@container dash-stat (max-width: 260px) {
-  .dash-stat-value {
-    font-size: clamp(1rem, 4.8cqi, 1.2rem);
-  }
-}
-
-@container settings-section (max-width: 760px) {
-  .settings-billing-head {
-    grid-template-columns: 1fr;
-  }
-
-  .settings-billing-head form,
-  .settings-billing-head .ghost-button {
-    width: 100%;
-  }
-}
-
-@container settings-section (max-width: 920px) {
-  .settings-profile-actions,
-  .settings-billing-head {
-    grid-template-columns: 1fr;
-  }
-
-  .settings-profile-actions form,
-  .settings-profile-actions .primary-button,
-  .settings-profile-actions .ghost-button,
-  .settings-billing-head form,
-  .settings-billing-head .ghost-button {
-    width: 100%;
-  }
-}
-
-@container cta-band (max-width: 980px) {
-  .cta-band {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    padding: clamp(28px, 5cqi, 48px);
-  }
-
-  .cta-band > div:first-child {
-    max-width: 100%;
-  }
-
-  .cta-band h2 {
-    max-width: 15ch;
-    font-size: clamp(2.65rem, 10cqi, 4.2rem);
-  }
-
-  .cta-visual {
-    justify-self: stretch;
-    width: 100%;
-    min-height: clamp(260px, 48cqi, 360px);
-  }
-
-  .cta-visual .resume-card {
-    right: auto;
-    left: 50%;
-    top: 6px;
-    width: clamp(210px, 42cqi, 270px);
-    height: clamp(304px, 62cqi, 392px);
-    transform: translateX(-18%) rotate(5deg);
-  }
-
-  .cta-visual .resume-card.back {
-    right: auto;
-    left: 50%;
-    top: 34px;
-    width: clamp(178px, 36cqi, 230px);
-    height: clamp(278px, 56cqi, 368px);
-    transform: translateX(-76%) rotate(-8deg);
-  }
-}
-
-@container dash-main (max-width: 720px) {
-  .dash-main {
-    gap: 18px;
-    padding: clamp(18px, 4cqi, 26px);
-  }
-
-  .dash-main-head {
-    align-items: stretch;
-  }
-
-  .dash-main-head .btn-sm {
-    width: 100%;
-  }
-
-  .dash-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@container dash-main (max-width: 500px) {
-  .dash-stats {
-    grid-template-columns: 1fr;
-  }
-}
-
-@container settings-section (max-width: 620px) {
-  .settings-billing-head {
-    grid-template-columns: 1fr;
-  }
-
-  .settings-billing-head form,
-  .settings-billing-head .ghost-button,
-  .settings-plan-active-card .settings-inline-link {
-    width: 100%;
-  }
-
-  .settings-plan-active-card {
-    align-items: stretch;
-  }
-}
-
-@media (max-width: 1180px) {
-  .hero-stage {
-    max-width: calc(100vw - 40px);
-  }
-}
-
-@media (max-width: 720px) {
-  .hero-stage {
-    height: clamp(340px, 86vw, 460px);
-  }
-
-  .resume-card-front {
-    width: min(300px, 76vw);
-    height: min(430px, 110vw);
-  }
-
-  .hero-badge {
-    min-width: 0;
-    max-width: min(220px, 70vw);
-    padding: 10px 12px;
-    font-size: 0.8rem;
-  }
-
-  .hero-badge .b-icon {
-    width: 31px;
-    height: 31px;
-  }
-
-  .b-score {
-    right: 8px;
-  }
-
-  .b-keyword {
-    right: 8px;
-    bottom: 76px;
-  }
-
-  .b-ats {
-    left: 8px;
-    bottom: 18px;
-  }
-
-  .cta-band h2 {
-    max-width: 100%;
-  }
-
-  .cta-visual {
-    min-height: 230px;
-  }
-}
-
-/* Visual QA guardrails: keep editorial display type and layered resume art
-   from pushing controls or copy outside the viewport at awkward zoom widths. */
+/* Visual fit guardrails: the canonical layer for awkward browser zooms,
+   medium desktop widths, and dense authenticated workspace panels. Keep this
+   section last so it wins over earlier component defaults without scattered
+   follow-up overrides. */
 html,
 body,
 .page-shell,
-.settings-page-shell {
-  max-width: 100%;
+.rf-studio-page,
+.settings-page-shell,
+.login-shell,
+.templates-page-shell {
+  max-inline-size: 100%;
   overflow-x: clip;
+}
+
+.page-shell,
+.nav,
+.logos,
+.section,
+.dash-section,
+.templates,
+.cta-section,
+.footer,
+.hero,
+.dash-mock,
+.cta-band,
+.settings-page-main,
+.settings-section,
+.settings-section-panel,
+.studio-card,
+.studio-history-panel {
+  box-sizing: border-box;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.btn,
+.primary-button,
+.ghost-button,
+.icon-button {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  text-align: center;
+  hyphens: none;
+  word-break: normal;
 }
 
 .section-inner,
 .templates-head,
 .footer-inner,
 .footer-meta {
-  max-width: min(var(--container), calc(100vw - 32px));
+  max-inline-size: min(var(--container), calc(100vw - 32px));
 }
 
-.dash-mock .dash-stat {
-  min-block-size: 128px;
-  padding: clamp(14px, 3.2cqi, 18px);
+.hero {
+  inline-size: min(100%, var(--container));
+  max-inline-size: min(var(--container), calc(100vw - clamp(28px, 4.8vw, 84px)));
+  margin-inline: auto;
+  grid-template-columns: minmax(0, 1fr) minmax(380px, 520px);
+  align-items: center;
+  gap: clamp(34px, 4vw, 58px);
+  padding-inline: clamp(24px, 3.4vw, 48px);
+  overflow: clip;
 }
 
-.dash-mock .dash-stat-value {
-  font-size: clamp(1.02rem, 3.6cqi, 1.32rem);
+.hero-copy {
+  position: relative;
+  z-index: 2;
+  inline-size: 100%;
+  max-inline-size: min(100%, 620px);
+  min-inline-size: 0;
+}
+
+.hero .h1 {
+  max-inline-size: min(100%, 11ch);
+  font-size: clamp(2.72rem, 3.8vw, 4.18rem);
   line-height: 1.08;
-  overflow-wrap: anywhere;
   text-wrap: balance;
 }
 
-.dash-mock .dash-stat-delta {
-  font-size: clamp(0.78rem, 2.6cqi, 0.9rem);
+.hero-sub,
+.hero-ctas,
+.hero-actions,
+.hero-meta {
+  min-inline-size: 0;
+  max-inline-size: 100%;
 }
 
-.settings-profile-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  width: min(100%, 500px);
-  gap: 10px;
-}
-
-.settings-profile-actions form {
-  flex: 1 1 144px;
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link {
-  min-height: 46px;
-  padding-inline: 16px;
-  font-size: clamp(0.9rem, 1.45cqi, 0.98rem);
-  line-height: 1.12;
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button {
-  width: 100%;
-}
-
-.settings-billing-head form {
-  justify-self: end;
-  width: min(100%, 190px);
-}
-
-.settings-billing-head .ghost-button {
-  min-width: 0;
-}
-
-.settings-plan-active-card .settings-inline-link {
-  flex: 0 1 160px;
-  min-width: min(100%, 140px);
-}
-
-@media (min-width: 1181px) and (max-width: 1320px) {
-  .hero {
-    grid-template-columns: minmax(0, 0.98fr) minmax(390px, 0.78fr);
-    gap: clamp(28px, 3vw, 42px);
-  }
-
-  .hero .h1 {
-    font-size: clamp(3.25rem, 5.05vw, 4.85rem);
-  }
-
-  .hero-stage {
-    width: min(100%, 540px);
-    height: clamp(500px, 43vw, 560px);
-  }
-
-  .resume-card-front {
-    width: 340px;
-    height: 468px;
-  }
-
-  .resume-card-back-l {
-    width: 278px;
-    height: 402px;
-    transform: rotate(-9deg) translate(-82px, 24px);
-  }
-
-  .resume-card-back-r {
-    width: 258px;
-    height: 386px;
-    transform: rotate(7deg) translate(104px, 34px);
-  }
-
-  .hero-stage:hover .resume-card-back-l {
-    transform: rotate(-10deg) translate(-96px, 26px);
-  }
-
-  .hero-stage:hover .resume-card-back-r {
-    transform: rotate(8deg) translate(118px, 38px);
-  }
-}
-
-@media (min-width: 981px) and (max-width: 1440px) {
-  .cta-section .section-inner {
-    width: min(100%, calc(100vw - 32px));
-    max-width: min(1240px, calc(100vw - 32px));
-  }
-
-  .cta-band {
-    grid-template-columns: minmax(0, 1fr);
-    min-height: auto;
-    padding: clamp(36px, 5vw, 58px);
-  }
-
-  .cta-band > div:first-child {
-    max-width: min(100%, 720px);
-  }
-
-  .cta-band h2 {
-    max-width: min(100%, 18ch);
-  }
-
-  .cta-band p {
-    max-width: min(100%, 52ch);
-  }
-
-  .cta-visual {
-    justify-self: stretch;
-    width: 100%;
-    min-height: clamp(260px, 28vw, 350px);
-  }
-
-  .cta-visual .resume-card {
-    right: auto;
-    left: 52%;
-    top: 4px;
-    width: clamp(218px, 20vw, 276px);
-    height: clamp(320px, 30vw, 402px);
-    transform: translateX(-10%) rotate(5deg);
-  }
-
-  .cta-visual .resume-card.back {
-    right: auto;
-    left: 52%;
-    top: 34px;
-    width: clamp(188px, 17vw, 236px);
-    height: clamp(288px, 27vw, 372px);
-    transform: translateX(-72%) rotate(-8deg);
-  }
-}
-
-@media (max-width: 640px) {
-  .section-inner,
-  .templates-head,
-  .footer-inner,
-  .footer-meta {
-    max-width: calc(100vw - 24px);
-  }
-
-  .settings-profile-actions,
-  .settings-profile-actions form,
-  .settings-billing-head form,
-  .settings-plan-active-card .settings-inline-link {
-    width: 100%;
-  }
-
-  .settings-profile-actions {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-  }
-}
-
-/* Final visual QA pass for the launch surfaces. Keep wide editorial sections
-   centered and keep paired account/billing controls balanced at odd widths. */
-.cta-band {
-  margin-inline: auto;
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 300px), 430px);
-  padding: clamp(44px, 5vw, 64px);
-}
-
-.cta-band::before {
-  right: 0;
-  width: min(360px, 34%);
-}
-
-.cta-band .btn-ghost {
-  border-color: rgba(255, 247, 233, 0.38);
-  background: rgba(255, 253, 248, 0.94);
-  color: var(--ink-1);
-}
-
-.cta-band .btn-ghost:hover,
-.cta-band .btn-ghost:focus-visible {
-  border-color: rgba(255, 247, 233, 0.72);
-  background: #fffdf8;
-  color: var(--ink-0);
-}
-
-.settings-profile-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
-  width: min(100%, 460px);
-}
-
-.settings-profile-actions > .primary-button,
-.settings-profile-actions > .ghost-button,
-.settings-profile-actions > form {
-  width: 100%;
-  min-width: 0;
-}
-
-.settings-profile-actions > form {
-  display: flex;
-}
-
-.settings-billing-head {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 190px), 220px);
-  min-width: 0;
-}
-
-.settings-billing-head form {
-  width: 100%;
-  max-width: 220px;
-}
-
-@container settings-section (max-width: 760px) {
-  .settings-billing-head form {
-    max-width: none;
-    justify-self: stretch;
-  }
-}
-
-@media (max-width: 1120px) {
-  .cta-band {
-    grid-template-columns: 1fr;
-    gap: clamp(22px, 5vw, 34px);
-  }
-
-  .cta-band > div:first-child,
-  .cta-band h2,
-  .cta-band p {
-    max-width: 100%;
-  }
-
-  .cta-visual {
-    justify-self: stretch;
-    width: 100%;
-    min-height: clamp(230px, 36vw, 320px);
-  }
-
-  .cta-visual .resume-card {
-    right: auto;
-    left: 52%;
-    top: 2px;
-    transform: translateX(-16%) rotate(5deg);
-  }
-
-  .cta-visual .resume-card.back {
-    right: auto;
-    left: 52%;
-    transform: translateX(-76%) rotate(-8deg);
-  }
-}
-
-@media (max-width: 620px) {
-  .cta-band {
-    width: 100%;
-    padding: 34px 24px;
-    border-radius: 18px;
-  }
-
-  .cta-band h2 {
-    font-size: clamp(2.55rem, 14vw, 3.6rem);
-    line-height: 1.04;
-  }
-
-  .cta-band p {
-    font-size: 1rem;
-    line-height: 1.55;
-  }
-
-  .cta-band .cta-cluster {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .cta-band .btn {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .cta-visual {
-    display: none;
-  }
-}
-
-/* Landing/CTA responsive polish: keep the editorial resume art inside the
-   composed panel instead of letting rotated paper edges crowd the copy. */
-@media (min-width: 1181px) and (max-width: 1500px) {
-  .hero {
-    grid-template-columns: minmax(0, 0.98fr) minmax(360px, 0.82fr);
-    gap: clamp(28px, 3.2vw, 44px);
-  }
-
-  .hero-stage {
-    width: min(100%, 560px);
-    height: clamp(500px, 42vw, 560px);
-  }
-
-  .resume-card-front {
-    width: clamp(328px, 25vw, 356px);
-    height: clamp(452px, 34vw, 486px);
-  }
-
-  .resume-card-back-l {
-    width: clamp(260px, 20vw, 286px);
-    height: clamp(384px, 30vw, 410px);
-    transform: rotate(-9deg) translate(-88px, 22px);
-  }
-
-  .resume-card-back-r {
-    width: clamp(246px, 19vw, 270px);
-    height: clamp(370px, 29vw, 398px);
-    transform: rotate(7deg) translate(112px, 32px);
-  }
-
-  .cta-band {
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.58fr);
-    gap: clamp(24px, 3.4vw, 42px);
-  }
-
-  .cta-visual {
-    width: min(100%, 390px);
-    min-height: 340px;
-    overflow: visible;
-  }
-
-  .cta-visual .resume-card {
-    right: 6px;
-    top: 0;
-    width: clamp(204px, 16vw, 238px);
-    height: clamp(304px, 23vw, 356px);
-  }
-
-  .cta-visual .resume-card.back {
-    right: clamp(96px, 9vw, 122px);
-    top: 34px;
-    width: clamp(178px, 14vw, 208px);
-    height: clamp(280px, 21vw, 334px);
-  }
-}
-
-@media (min-width: 901px) and (max-width: 1180px) {
-  .cta-band {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
-
-  .cta-band > div:first-child,
-  .cta-band h2,
-  .cta-band p {
-    max-width: 100%;
-  }
-
-  .cta-visual {
-    justify-self: stretch;
-    width: 100%;
-    min-height: clamp(270px, 32vw, 330px);
-    overflow: visible;
-  }
-
-  .cta-visual .resume-card {
-    right: auto;
-    left: 52%;
-    top: 0;
-    width: clamp(205px, 25vw, 252px);
-    height: clamp(304px, 38vw, 372px);
-    transform: translateX(-16%) rotate(5deg);
-  }
-
-  .cta-visual .resume-card.back {
-    right: auto;
-    left: 52%;
-    top: 30px;
-    width: clamp(180px, 21vw, 220px);
-    height: clamp(278px, 35vw, 344px);
-    transform: translateX(-76%) rotate(-8deg);
-  }
-}
-
-/* Final density pass: protect the mock studio, settings controls, and
-   landing paper stack from clipping at the exact widths people screenshot. */
-.dash-main-head p {
-  max-width: min(100%, 46ch);
+.hero-sub {
+  max-inline-size: min(100%, 48ch);
   overflow-wrap: anywhere;
 }
 
-.dash-main-head .btn-sm {
-  flex: 0 0 auto;
-  min-width: min(100%, 160px);
-  white-space: normal;
-}
-
-.dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
-}
-
-.dash-mock .dash-stat {
-  min-block-size: 136px;
-  padding: clamp(16px, 3.2cqi, 20px);
-}
-
-.dash-mock .dash-stat-value {
-  font-size: clamp(1.12rem, 5.4cqi, 1.46rem);
-  line-height: 1.12;
-  overflow-wrap: anywhere;
-}
-
-.settings-profile-actions {
-  width: min(100%, 560px);
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link {
-  font-size: 0.94rem;
-}
-
-.settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(190px, 240px);
-  align-items: center;
-}
-
-.settings-billing-head form {
+.hero-stage {
   justify-self: end;
-  width: 100%;
-  max-width: 240px;
-}
-
-.settings-billing-head .ghost-button {
-  min-width: 0;
-  padding-inline: 18px;
-  white-space: normal;
-}
-
-.settings-plan-active-card .settings-inline-link {
-  min-width: min(100%, 156px);
-  white-space: normal;
-}
-
-@media (min-width: 1181px) and (max-width: 1500px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr) minmax(340px, 0.76fr);
-    gap: clamp(20px, 2.7vw, 38px);
-    padding-inline: clamp(22px, 2.5vw, 34px);
-  }
-
-  .hero-copy {
-    max-width: min(100%, 690px);
-  }
-
-  .hero-stage {
-    justify-self: center;
-    width: min(100%, 492px);
-    height: clamp(430px, 36vw, 500px);
-  }
-
-  .resume-card-front {
-    width: clamp(276px, 20vw, 316px);
-    height: clamp(398px, 29vw, 448px);
-    transform: rotate(-2deg) translateX(18px);
-  }
-
-  .resume-card-back-l {
-    width: clamp(222px, 16.5vw, 252px);
-    height: clamp(332px, 24.5vw, 372px);
-    transform: rotate(-8deg) translate(-56px, 26px);
-  }
-
-  .resume-card-back-r {
-    width: clamp(212px, 16vw, 238px);
-    height: clamp(322px, 24vw, 360px);
-    transform: rotate(6deg) translate(72px, 34px);
-  }
-
-  .hero-stage:hover .resume-card-front {
-    transform: rotate(-1deg) translate(18px, -6px);
-  }
-
-  .hero-stage:hover .resume-card-back-l {
-    transform: rotate(-9deg) translate(-64px, 28px);
-  }
-
-  .hero-stage:hover .resume-card-back-r {
-    transform: rotate(7deg) translate(80px, 38px);
-  }
-
-  .b-score,
-  .b-keyword {
-    right: 10px;
-  }
-
-  .b-ats {
-    left: 10px;
-  }
-}
-
-@container dash-main (min-width: 1120px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-@container dash-main (max-width: 860px) {
-  .dash-main-head {
-    align-items: stretch;
-  }
-
-  .dash-main-head .btn-sm {
-    width: 100%;
-    min-width: 0;
-  }
-}
-
-@container settings-section (max-width: 780px) {
-  .settings-billing-head {
-    grid-template-columns: 1fr;
-  }
-
-  .settings-billing-head form,
-  .settings-billing-head .ghost-button,
-  .settings-plan-active-card .settings-inline-link {
-    width: 100%;
-    max-width: none;
-  }
-}
-
-@media (max-width: 760px) {
-  .settings-profile-actions .primary-button,
-  .settings-profile-actions .ghost-button,
-  .settings-billing-head .ghost-button,
-  .settings-plan-active-card .settings-inline-link {
-    width: 100%;
-    white-space: normal;
-  }
-}
-
-/* Screenshot guardrails: keep the final landing CTA composed at browser zoom
-   widths where the paper stack used to crowd the panel edges. */
-.cta-section .section-inner {
-  max-width: min(1240px, calc(100vw - 40px));
-}
-
-.cta-band {
+  inline-size: min(100%, 520px);
+  block-size: clamp(430px, 35vw, 560px);
+  max-inline-size: 100%;
   overflow: hidden;
-}
-
-.cta-visual {
   contain: paint;
-  overflow: hidden;
 }
 
-@media (min-width: 1181px) and (max-width: 1500px) {
-  .cta-visual {
-    min-height: clamp(350px, 28vw, 390px);
-    overflow: hidden;
-  }
+.hero-stage::before {
+  inset: 10% 8%;
 }
 
-@media (min-width: 901px) and (max-width: 1180px) {
-  .cta-band {
-    padding: clamp(34px, 5vw, 54px);
-  }
-
-  .cta-visual {
-    min-height: clamp(360px, 40vw, 430px);
-    overflow: hidden;
-  }
-
-  .cta-visual .resume-card {
-    left: 52%;
-    top: 18px;
-    width: clamp(210px, 23vw, 252px);
-    height: clamp(310px, 34vw, 374px);
-    transform: translateX(-8%) rotate(5deg);
-  }
-
-  .cta-visual .resume-card.back {
-    left: 52%;
-    top: 48px;
-    width: clamp(182px, 20vw, 222px);
-    height: clamp(286px, 31vw, 350px);
-    transform: translateX(-78%) rotate(-8deg);
-  }
+.hero-stage .resume-card {
+  transform-origin: center;
+  max-inline-size: none;
 }
 
-@media (max-width: 900px) {
-  .cta-section .section-inner {
-    max-width: calc(100vw - 24px);
-  }
-
-  .cta-band {
-    padding: clamp(28px, 7vw, 44px);
-  }
-
-  .cta-band h2 {
-    font-size: clamp(2.45rem, 9vw, 3.6rem);
-  }
-
-  .cta-visual {
-    min-height: clamp(300px, 62vw, 390px);
-  }
-
-  .cta-visual .resume-card {
-    left: 52%;
-    top: 12px;
-    width: clamp(194px, 43vw, 238px);
-    height: clamp(288px, 64vw, 352px);
-    transform: translateX(-10%) rotate(5deg);
-  }
-
-  .cta-visual .resume-card.back {
-    left: 52%;
-    top: 38px;
-    width: clamp(170px, 38vw, 210px);
-    height: clamp(268px, 58vw, 330px);
-    transform: translateX(-78%) rotate(-8deg);
-  }
+.hero-stage .resume-card-front {
+  inline-size: clamp(292px, 22vw, 360px);
+  block-size: clamp(410px, 31vw, 500px);
+  transform: rotate(-2deg) translateX(0);
 }
 
-/* Keep the landing hero paper stack fully composed instead of silently
-   clipping the supporting pages at very wide and phone-sized viewports. */
-@media (min-width: 1501px) {
-  .hero-stage {
-    width: min(100%, 600px);
-  }
-
-  .resume-card-front {
-    width: 360px;
-    height: 492px;
-    transform: rotate(-2deg) translateX(0);
-  }
-
-  .resume-card-back-l {
-    width: 292px;
-    height: 424px;
-    transform: rotate(-8deg) translate(-74px, 22px);
-  }
-
-  .resume-card-back-r {
-    width: 282px;
-    height: 402px;
-    transform: rotate(7deg) translate(88px, 30px);
-  }
-
-  .hero-stage:hover .resume-card-front {
-    transform: rotate(-1deg) translateY(-6px);
-  }
-
-  .hero-stage:hover .resume-card-back-l {
-    transform: rotate(-9deg) translate(-82px, 24px);
-  }
-
-  .hero-stage:hover .resume-card-back-r {
-    transform: rotate(8deg) translate(96px, 34px);
-  }
+.hero-stage .resume-card-back-l {
+  inline-size: clamp(226px, 16vw, 288px);
+  block-size: clamp(336px, 24vw, 430px);
+  transform: rotate(-8deg) translate(clamp(-88px, -5.2vw, -54px), 20px);
 }
 
-@media (max-width: 720px) {
-  .hero-stage {
-    height: clamp(400px, 104vw, 470px);
-  }
-
-  .resume-card-front {
-    width: min(276px, 72vw);
-    height: min(378px, 98vw);
-    transform: rotate(-2deg) translateX(0);
-  }
-
-  .resume-card-back-l {
-    width: min(224px, 59vw);
-    height: min(326px, 86vw);
-    transform: rotate(-8deg) translate(-48px, 18px);
-  }
-
-  .resume-card-back-r {
-    width: min(216px, 57vw);
-    height: min(314px, 82vw);
-    transform: rotate(7deg) translate(56px, 26px);
-  }
-
-  .hero-stage:hover .resume-card-front {
-    transform: rotate(-1deg) translateY(-5px);
-  }
-
-  .hero-stage:hover .resume-card-back-l {
-    transform: rotate(-9deg) translate(-54px, 20px);
-  }
-
-  .hero-stage:hover .resume-card-back-r {
-    transform: rotate(8deg) translate(62px, 28px);
-  }
+.hero-stage .resume-card-back-r {
+  inline-size: clamp(218px, 15.5vw, 274px);
+  block-size: clamp(326px, 23vw, 410px);
+  transform: rotate(7deg) translate(clamp(60px, 5vw, 94px), 28px);
 }
 
-/* Last-pass containment for the surfaces users screenshot most often. Keep it
-   at the end so older responsive overrides cannot reopen clipped states. */
-.hero,
-.dash-mock,
+.hero-stage:hover .resume-card-front {
+  transform: rotate(-1deg) translateY(-5px);
+}
+
+.hero-stage:hover .resume-card-back-l {
+  transform: rotate(-9deg) translate(clamp(-96px, -5.8vw, -62px), 23px);
+}
+
+.hero-stage:hover .resume-card-back-r {
+  transform: rotate(8deg) translate(clamp(68px, 5.8vw, 104px), 32px);
+}
+
+.hero-badge {
+  max-inline-size: min(222px, 58%);
+  min-inline-size: 0;
+  padding: 10px 12px;
+  gap: 10px;
+  font-size: clamp(0.78rem, 1.2vw, 0.88rem);
+  line-height: 1.18;
+}
+
+.hero-badge .b-icon {
+  flex: 0 0 32px;
+  inline-size: 32px;
+  block-size: 32px;
+}
+
+.dash-section,
 .cta-section,
-.settings-section {
-  min-width: 0;
+.settings-page-shell {
   overflow-x: clip;
 }
 
 .dash-mock {
-  width: min(100%, var(--container));
+  inline-size: min(100%, var(--container));
+  overflow: hidden;
 }
 
+.dash-mock-body,
+.dash-main,
 .dash-main-head,
+.dash-main-head > div,
+.dash-stats,
 .dash-stat,
-.dash-resume-actions,
-.settings-profile-actions,
-.settings-billing-head,
-.settings-plan-active-card,
-.cta-band,
-.cta-band > div:first-child,
-.cta-cluster {
-  min-width: 0;
-}
-
-.dash-main-head .btn-sm,
-.dash-resume-actions .btn,
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link,
-.cta-band .btn {
-  max-width: 100%;
+.dash-stat-label,
+.dash-stat-value,
+.dash-stat-delta {
   min-inline-size: 0;
-  overflow-wrap: normal;
-  text-wrap: balance;
-  white-space: normal;
-}
-
-.dash-mock .dash-stat {
-  justify-content: start;
-}
-
-.dash-mock .dash-stat-value {
-  margin-block: 10px 8px;
-}
-
-.hero-line {
-  display: inline-block;
-  max-width: 100%;
-  white-space: nowrap;
-}
-
-@media (min-width: 1181px) {
-  .cta-band {
-    grid-template-columns: minmax(0, 600px) minmax(300px, 430px);
-    justify-content: space-between;
-  }
-
-  .cta-band h2 {
-    max-width: min(100%, 13ch);
-    font-size: clamp(3.15rem, 4vw, 4.35rem);
-  }
-
-  .cta-visual {
-    justify-self: end;
-    overflow: hidden;
-  }
-}
-
-@media (min-width: 1501px) {
-  .hero {
-    grid-template-columns: minmax(0, 640px) minmax(0, 500px);
-    gap: clamp(34px, 3vw, 48px);
-  }
-
-  .hero-stage {
-    width: min(100%, 500px);
-  }
-
-  .hero .h1 {
-    font-size: clamp(3.85rem, 4.55vw, 4.75rem);
-    line-height: 1.06;
-  }
-
-  .cta-band {
-    padding-inline: clamp(56px, 5vw, 72px);
-  }
-}
-
-@media (min-width: 901px) and (max-width: 1180px) {
-  .cta-band h2 {
-    font-size: clamp(2.9rem, 6.8vw, 4.1rem);
-  }
-
-  .cta-visual {
-    overflow: hidden;
-  }
-}
-
-@media (max-width: 900px) {
-  .dash-mock .dash-stat {
-    min-block-size: auto;
-  }
-
-  .cta-band {
-    overflow: hidden;
-  }
-
-  .hero-line {
-    white-space: normal;
-  }
-}
-
-/* Final screenshot repair pass: keep the marketing mockups readable at large
-   browser widths and keep action buttons from crowding their cards. */
-.steps {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 235px), 1fr));
-}
-
-.step {
-  min-block-size: 212px;
-}
-
-.step .step-title,
-.dash-stat-value {
-  overflow-wrap: normal;
-  word-break: normal;
-  hyphens: none;
-}
-
-.dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
-}
-
-.dash-mock .dash-stat {
-  min-block-size: 142px;
-  padding: clamp(18px, 2.2vw, 24px);
-}
-
-.dash-mock .dash-stat-value {
-  max-width: 100%;
-  font-size: clamp(2rem, 2.8vw, 3.25rem);
-  line-height: 0.98;
-  text-wrap: balance;
-}
-
-.dash-mock .dash-stat-delta {
-  max-width: 18ch;
-  font-size: clamp(0.96rem, 1.15vw, 1.08rem);
-  line-height: 1.35;
-  overflow-wrap: normal;
-  text-wrap: balance;
-}
-
-.dash-resume-actions {
-  align-items: stretch;
-}
-
-.dash-resume-actions .btn,
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link {
-  inline-size: fit-content;
   max-inline-size: 100%;
-  min-block-size: 48px;
-  padding-inline: clamp(16px, 2vw, 24px);
+}
+
+.dash-main {
   overflow: hidden;
-  text-align: center;
-}
-
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link {
-  justify-self: end;
-}
-
-.settings-billing-head {
-  gap: 24px;
-}
-
-.cta-section .section-inner {
-  width: min(100%, 1440px);
-  max-width: min(1440px, calc(100vw - 48px));
-}
-
-.cta-band {
-  grid-template-columns: minmax(0, 0.96fr) minmax(300px, 0.72fr);
-  gap: clamp(24px, 3vw, 44px);
-  padding: clamp(54px, 5.4vw, 78px) clamp(42px, 5vw, 70px);
-}
-
-.cta-band > div:first-child {
-  max-width: min(100%, 570px);
-}
-
-.cta-band h2 {
-  max-width: 13ch;
-  font-size: clamp(3rem, 4.1vw, 4.35rem);
-  overflow-wrap: normal;
-}
-
-.cta-band p {
-  max-width: 43ch;
-  font-size: clamp(1.05rem, 1.25vw, 1.18rem);
-}
-
-.cta-visual {
-  width: min(100%, 430px);
-  min-height: clamp(340px, 28vw, 390px);
-}
-
-.cta-visual .resume-card {
-  right: clamp(8px, 2.2vw, 36px);
-  top: 8px;
-  width: clamp(220px, 16vw, 270px);
-  height: clamp(330px, 24vw, 400px);
-}
-
-.cta-visual .resume-card.back {
-  right: clamp(96px, 11vw, 150px);
-  top: 48px;
-  width: clamp(190px, 13.5vw, 235px);
-  height: clamp(306px, 22vw, 368px);
-}
-
-.hero {
-  max-width: min(var(--container), calc(100vw - 48px));
-  padding-inline: clamp(24px, 3.6vw, 48px);
-}
-
-.hero-stage {
-  width: min(100%, 520px);
-}
-
-@media (min-width: 1501px) {
-  .cta-band {
-    grid-template-columns: minmax(0, 590px) minmax(320px, 430px);
-  }
-
-  .hero {
-    grid-template-columns: minmax(0, 600px) minmax(0, 500px);
-  }
-}
-
-@media (max-width: 1180px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .cta-band {
-    grid-template-columns: 1fr;
-  }
-
-  .cta-band h2,
-  .cta-band p,
-  .cta-band > div:first-child {
-    max-width: 100%;
-  }
-
-  .cta-visual {
-    justify-self: center;
-    width: min(100%, 520px);
-  }
-}
-
-@media (max-width: 760px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: 1fr;
-  }
-
-  .dash-mock .dash-stat-value {
-    font-size: clamp(2.2rem, 11vw, 3.2rem);
-  }
-
-  .settings-billing-head .ghost-button,
-  .settings-plan-active-card .settings-inline-link,
-  .settings-profile-actions .primary-button,
-  .settings-profile-actions .ghost-button,
-  .settings-profile-actions form {
-    width: 100%;
-    justify-self: stretch;
-  }
-
-  .cta-section .section-inner {
-    max-width: calc(100vw - 24px);
-  }
-}
-
-@media (min-width: 901px) and (max-width: 1180px) {
-  .hero-stage {
-    width: min(100%, 680px);
-    height: clamp(500px, 56vw, 560px);
-  }
-
-  .resume-card-front {
-    width: clamp(340px, 34vw, 370px);
-    height: clamp(472px, 46vw, 510px);
-    transform: rotate(-2deg) translateX(0);
-  }
-
-  .resume-card-back-l {
-    width: clamp(270px, 28vw, 310px);
-    height: clamp(386px, 40vw, 438px);
-    transform: rotate(-8deg) translate(-84px, 24px);
-  }
-
-  .resume-card-back-r {
-    width: clamp(260px, 27vw, 294px);
-    height: clamp(378px, 38vw, 420px);
-    transform: rotate(7deg) translate(98px, 30px);
-  }
-
-  .hero-stage:hover .resume-card-front {
-    transform: rotate(-1deg) translateY(-6px);
-  }
-
-  .hero-stage:hover .resume-card-back-l {
-    transform: rotate(-9deg) translate(-92px, 26px);
-  }
-
-  .hero-stage:hover .resume-card-back-r {
-    transform: rotate(8deg) translate(106px, 34px);
-  }
-}
-
-/* Production visual hardening: this is intentionally last so the remaining
-   awkward screenshot widths cannot reopen clipped hero art, cramped mock
-   cards, or account/billing buttons. */
-.hero {
-  isolation: isolate;
-}
-
-.hero-copy {
-  z-index: 4;
-}
-
-.hero-stage {
-  z-index: 1;
-  max-inline-size: min(100%, calc(100vw - 48px));
-}
-
-.hero-stage .resume-card {
-  max-inline-size: 78%;
-}
-
-.dash-mock .dash-stat {
-  min-block-size: clamp(128px, 11vw, 150px);
-  align-content: start;
-}
-
-.dash-mock .dash-stat-value {
-  font-size: clamp(1.08rem, 4.6cqi, 1.52rem);
-  line-height: 1.1;
-}
-
-.dash-mock .dash-stat-delta {
-  max-width: 20ch;
-}
-
-.settings-page-hero,
-.settings-section {
-  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1fr);
-}
-
-.settings-section-copy h2,
-.settings-section-copy p,
-.settings-billing-note,
-.settings-plan-active-card p {
-  overflow-wrap: anywhere;
-  text-wrap: pretty;
-}
-
-.settings-profile-actions,
-.settings-billing-head,
-.settings-plan-active-card,
-.settings-export-actions {
-  container-type: inline-size;
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link,
-.settings-export-actions .btn,
-.price-card .btn {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-  overflow: visible;
-  font-size: clamp(0.9rem, 1.6cqi, 1rem);
-  line-height: 1.12;
-  white-space: normal;
-  text-wrap: balance;
-}
-
-@media (min-width: 1501px) {
-  .hero {
-    grid-template-columns: minmax(0, 620px) minmax(0, 460px);
-    gap: clamp(42px, 3vw, 58px);
-  }
-
-  .hero-stage {
-    width: min(100%, 460px);
-    height: clamp(440px, 31vw, 520px);
-  }
-
-  .resume-card-front {
-    width: 326px;
-    height: 456px;
-    transform: rotate(-2deg) translateX(12px);
-  }
-
-  .resume-card-back-l {
-    width: 258px;
-    height: 382px;
-    transform: rotate(-8deg) translate(-54px, 24px);
-  }
-
-  .resume-card-back-r {
-    width: 246px;
-    height: 368px;
-    transform: rotate(7deg) translate(76px, 32px);
-  }
-
-  .hero-stage:hover .resume-card-front {
-    transform: rotate(-1deg) translate(12px, -6px);
-  }
-
-  .hero-stage:hover .resume-card-back-l {
-    transform: rotate(-9deg) translate(-62px, 26px);
-  }
-
-  .hero-stage:hover .resume-card-back-r {
-    transform: rotate(8deg) translate(84px, 36px);
-  }
-}
-
-@media (min-width: 1181px) and (max-width: 1500px) {
-  .hero {
-    grid-template-columns: minmax(0, 1.04fr) minmax(320px, 0.68fr);
-    gap: clamp(30px, 3.6vw, 52px);
-  }
-
-  .hero-stage {
-    width: min(100%, 440px);
-    height: clamp(420px, 35vw, 490px);
-  }
-
-  .hero-badge {
-    max-width: min(230px, 54%);
-  }
-}
-
-@media (max-width: 1100px) {
-  .settings-page-hero,
-  .settings-section {
-    grid-template-columns: 1fr;
-  }
-
-  .settings-hero-status,
-  .settings-plan-includes {
-    justify-items: stretch;
-    justify-content: flex-start;
-  }
-}
-
-@container (max-width: 380px) {
-  .settings-profile-actions,
-  .settings-billing-head,
-  .settings-plan-active-card,
-  .settings-export-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .settings-profile-actions .primary-button,
-  .settings-profile-actions .ghost-button,
-  .settings-profile-actions form,
-  .settings-billing-head form,
-  .settings-billing-head .ghost-button,
-  .settings-plan-active-card .settings-inline-link,
-  .settings-export-actions .btn {
-    width: 100%;
-    justify-self: stretch;
-  }
-}
-
-/* Composition repair: one final source of truth for the screenshot-prone
-   marketing and settings surfaces after the earlier responsive guardrails. */
-.hero {
-  grid-template-columns: minmax(0, 0.98fr) minmax(0, 0.82fr);
-  gap: clamp(28px, 4vw, 58px);
-  overflow: hidden;
-}
-
-.hero-copy {
-  max-inline-size: min(100%, 680px);
-}
-
-.hero .h1 {
-  max-inline-size: 100%;
-  font-size: clamp(3.15rem, 5.25vw, 5rem);
-  line-height: 1.07;
-  overflow-wrap: normal;
-}
-
-.hero-stage {
-  justify-self: center;
-  inline-size: min(100%, 520px);
-  block-size: clamp(440px, 38vw, 560px);
-  max-inline-size: 100%;
-  overflow: hidden;
-}
-
-.hero-stage .resume-card {
-  max-inline-size: none;
-}
-
-.resume-card-front {
-  inline-size: clamp(292px, 23vw, 360px);
-  block-size: clamp(410px, 32vw, 492px);
-}
-
-.resume-card-back-l {
-  inline-size: clamp(236px, 18vw, 292px);
-  block-size: clamp(350px, 27vw, 424px);
-  transform: rotate(-8deg) translate(clamp(-76px, -5vw, -46px), 24px);
-}
-
-.resume-card-back-r {
-  inline-size: clamp(224px, 17vw, 278px);
-  block-size: clamp(336px, 26vw, 402px);
-  transform: rotate(7deg) translate(clamp(56px, 5.2vw, 88px), 32px);
-}
-
-.hero-stage:hover .resume-card-back-l {
-  transform: rotate(-9deg) translate(clamp(-84px, -5.4vw, -54px), 26px);
-}
-
-.hero-stage:hover .resume-card-back-r {
-  transform: rotate(8deg) translate(clamp(64px, 5.6vw, 98px), 36px);
-}
-
-.hero-badge {
-  max-inline-size: min(236px, 52%);
-  min-inline-size: 0;
-}
-
-.hero-badge > div:last-child {
-  min-inline-size: 0;
-}
-
-.hero-badge,
-.hero-badge .b-meta {
-  overflow-wrap: anywhere;
-  text-wrap: balance;
 }
 
 .dash-main-head {
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(148px, max-content);
+  align-items: start;
+  gap: clamp(14px, 1.8vw, 22px);
 }
 
 .dash-main-head .btn-sm {
-  flex: 0 1 190px;
-  inline-size: max-content;
-  max-inline-size: 100%;
-}
-
-.dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
-}
-
-.dash-mock .dash-stat {
-  min-block-size: 132px;
-  padding: clamp(16px, 2.2cqi, 22px);
-}
-
-.dash-mock .dash-stat-value {
-  font-size: clamp(1.45rem, 8.5cqi, 2.08rem);
-  line-height: 1.05;
-  overflow-wrap: normal;
-  text-wrap: balance;
-}
-
-.dash-mock .dash-stat-delta {
-  max-inline-size: 22ch;
-  font-size: clamp(0.84rem, 3.4cqi, 0.98rem);
-  line-height: 1.35;
-}
-
-.settings-profile-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 228px), 1fr));
-  inline-size: min(100%, 560px);
-  gap: 10px;
-}
-
-.settings-profile-actions form,
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button {
   inline-size: 100%;
-  max-inline-size: 100%;
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link,
-.settings-export-actions .btn,
-.price-card .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-block-size: 48px;
-  padding-inline: clamp(14px, 2cqi, 22px);
-  font-size: clamp(0.9rem, 2.4cqi, 0.98rem);
-  line-height: 1.12;
-  overflow-wrap: normal;
-  text-align: center;
-  text-wrap: balance;
+  max-inline-size: 176px;
+  min-block-size: 44px;
+  justify-self: end;
   white-space: normal;
 }
 
-.settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(184px, 232px);
-  gap: 12px;
-}
-
-.settings-billing-head form {
-  justify-self: end;
-  inline-size: 100%;
-  max-inline-size: 232px;
-}
-
-.settings-plan-active-card {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(156px, max-content);
-  align-items: center;
-}
-
-.settings-plan-active-card .settings-inline-link {
-  justify-self: end;
-  inline-size: max-content;
-  min-inline-size: 156px;
-}
-
-@media (max-width: 1180px) {
-  .hero {
-    grid-template-columns: 1fr;
-    padding-block: 54px 72px;
-  }
-
-  .hero-copy {
-    max-inline-size: 760px;
-  }
-
-  .hero-stage {
-    justify-self: stretch;
-    inline-size: min(100%, 620px);
-    margin-inline: auto;
-  }
-}
-
-@media (max-width: 760px) {
-  .hero .h1 {
-    font-size: clamp(2.9rem, 14vw, 4.5rem);
-  }
-
-  .hero-stage {
-    block-size: clamp(390px, 104vw, 470px);
-  }
-
-  .hero-badge {
-    max-inline-size: min(226px, 74vw);
-  }
-
-  .dash-main-head .btn-sm,
-  .settings-billing-head form,
-  .settings-plan-active-card .settings-inline-link {
-    inline-size: 100%;
-    max-inline-size: none;
-    justify-self: stretch;
-  }
-
-  .settings-billing-head,
-  .settings-plan-active-card {
-    grid-template-columns: 1fr;
-  }
-}
-
-@container settings-section (max-width: 620px) {
-  .settings-billing-head,
-  .settings-plan-active-card {
-    grid-template-columns: 1fr;
-  }
-
-  .settings-billing-head form,
-  .settings-plan-active-card .settings-inline-link {
-    inline-size: 100%;
-    max-inline-size: none;
-    justify-self: stretch;
-  }
-}
-
-/* Visual QA guardrails: keep the public marketing mockups and settings
-   controls composed at the odd viewport and zoom widths users screenshot. */
 .dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  align-items: stretch;
 }
 
 .dash-mock .dash-stat {
-  min-block-size: clamp(130px, 11cqi, 152px);
+  container: dash-stat / inline-size;
+  display: flex;
+  min-block-size: 142px;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 10px;
   overflow: clip;
+  padding: clamp(18px, 2.2cqi, 24px);
 }
 
 .dash-mock .dash-stat-value {
-  font-size: clamp(1.06rem, 4.8cqi, 1.38rem);
+  font-size: clamp(1.28rem, 3.4cqi, 1.62rem);
   line-height: 1.08;
-  max-inline-size: 100%;
-  hyphens: none;
-  overflow-wrap: normal;
+  overflow-wrap: anywhere;
   text-wrap: balance;
-  word-break: normal;
 }
 
-.dash-mock .dash-stat-label,
 .dash-mock .dash-stat-delta {
-  max-inline-size: 100%;
+  font-size: clamp(0.82rem, 1.5cqi, 0.94rem);
+  line-height: 1.35;
   overflow-wrap: anywhere;
 }
 
-.settings-profile-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  inline-size: 100%;
-  max-inline-size: 560px;
-}
-
-.settings-profile-actions form {
-  flex: 1 1 138px;
-  min-inline-size: min(100%, 138px);
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button {
-  flex: 1 1 178px;
-  min-inline-size: min(100%, 138px);
-  inline-size: auto;
-}
-
-.settings-profile-actions .primary-button {
-  flex-basis: 210px;
-}
-
-.settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(0, max-content);
-}
-
-.settings-billing-head form {
-  inline-size: auto;
-  max-inline-size: 100%;
-}
-
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link {
-  inline-size: auto;
-  min-inline-size: 0;
-  max-inline-size: 100%;
-  padding-inline: clamp(14px, 1.7vw, 20px);
-  font-size: clamp(0.88rem, 1.4vw, 0.96rem);
-}
-
 .cta-section {
-  overflow: clip;
+  padding-inline: clamp(20px, 3.2vw, 40px);
 }
 
 .cta-section .section-inner {
-  width: min(100%, 1260px);
-  max-inline-size: calc(100vw - 56px);
+  inline-size: min(100%, 1180px);
+  max-inline-size: calc(100vw - clamp(40px, 6.4vw, 80px));
+  margin-inline: auto;
+  overflow: visible;
 }
 
 .cta-band {
-  grid-template-columns: minmax(0, 0.95fr) minmax(280px, 0.68fr);
-  gap: clamp(28px, 3.5vw, 46px);
-  padding: clamp(48px, 5vw, 72px) clamp(34px, 4.8vw, 62px);
+  inline-size: 100%;
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 280px), 360px);
+  gap: clamp(24px, 3.2vw, 42px);
+  min-block-size: auto;
+  overflow: hidden;
+  padding: clamp(38px, 4.6vw, 56px);
+}
+
+.cta-band > div:first-child,
+.cta-band h2,
+.cta-band p,
+.cta-band .cta-cluster {
+  min-inline-size: 0;
+  max-inline-size: 100%;
 }
 
 .cta-band > div:first-child {
@@ -13506,909 +11873,19 @@ body,
 }
 
 .cta-band h2 {
-  max-inline-size: 12.6ch;
-  font-size: clamp(2.75rem, 4.15vw, 4rem);
-  overflow-wrap: normal;
-}
-
-.cta-band p {
-  max-inline-size: 42ch;
-}
-
-.cta-visual {
-  justify-self: end;
-  inline-size: min(100%, 380px);
-  min-block-size: clamp(330px, 27vw, 380px);
-  contain: paint;
-}
-
-.cta-visual .resume-card {
-  inset-inline-end: clamp(6px, 2vw, 22px);
-  inset-block-start: 4px;
-  inline-size: clamp(204px, 15.2vw, 244px);
-  block-size: clamp(306px, 22.6vw, 366px);
-}
-
-.cta-visual .resume-card.back {
-  inset-inline-end: clamp(84px, 8.4vw, 118px);
-  inset-block-start: 36px;
-  inline-size: clamp(176px, 13.2vw, 210px);
-  block-size: clamp(280px, 21vw, 334px);
-}
-
-@container dash-main (max-width: 980px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@container dash-main (max-width: 520px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: 1fr;
-  }
-}
-
-@container settings-section (max-width: 620px) {
-  .settings-billing-head {
-    grid-template-columns: 1fr;
-  }
-
-  .settings-billing-head form,
-  .settings-billing-head .ghost-button,
-  .settings-plan-active-card .settings-inline-link {
-    inline-size: 100%;
-    justify-self: stretch;
-  }
-}
-
-@media (max-width: 1180px) {
-  .cta-band {
-    grid-template-columns: 1fr;
-  }
-
-  .cta-band h2,
-  .cta-band p,
-  .cta-band > div:first-child {
-    max-inline-size: 100%;
-  }
-
-  .cta-visual {
-    justify-self: center;
-    inline-size: min(100%, 500px);
-    min-block-size: clamp(300px, 38vw, 400px);
-  }
-}
-
-@media (max-width: 760px) {
-  .cta-section .section-inner {
-    max-inline-size: calc(100vw - 24px);
-  }
-
-  .cta-band {
-    padding: 34px 24px;
-  }
-
-  .cta-band h2 {
-    font-size: clamp(2.4rem, 12vw, 3.4rem);
-  }
-
-  .cta-visual {
-    display: none;
-  }
-}
-
-/* May 30 CTA clip guard: keep the final landing callout centered and
-   readable when browser zoom or screenshots squeeze the composition. */
-.cta-section {
-  overflow-x: clip;
-}
-
-.cta-section .section-inner {
-  width: min(100%, 1240px);
-  max-inline-size: calc(100vw - 32px);
-  overflow: visible;
-}
-
-.cta-band {
-  container: cta-band / inline-size;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  margin-left: 0;
-  margin-inline: auto;
-  isolation: isolate;
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 430px);
-  align-items: center;
-  gap: clamp(24px, 3vw, 44px);
-  min-height: auto;
-  padding: clamp(40px, 4.8vw, 60px);
-}
-
-.cta-band > * {
-  min-width: 0;
-}
-
-.cta-band > div:first-child {
-  min-inline-size: 0;
-  max-inline-size: min(100%, 580px);
-}
-
-.cta-band h2,
-.cta-band p,
-.cta-band .cta-cluster {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-
-.cta-band h2 {
-  max-inline-size: 13ch;
-  font-size: clamp(2.4rem, 4vw, 4.15rem);
-  line-height: 1.03;
-  overflow-wrap: normal;
-  word-break: normal;
-}
-
-.cta-band p {
-  max-inline-size: 46ch;
-}
-
-.cta-band .cta-cluster {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  max-inline-size: min(100%, 460px);
-}
-
-.cta-band .btn {
-  flex: 1 1 184px;
-  min-width: min(100%, 164px);
-  max-inline-size: 100%;
-  min-inline-size: 0;
-  padding-inline: 14px;
-  font-size: clamp(0.9rem, 4vw, 1rem);
-  line-height: 1.12;
-  text-wrap: balance;
-  white-space: normal;
-}
-
-.cta-visual {
-  justify-self: end;
-  width: min(100%, 430px);
-  min-width: 0;
-  max-width: 100%;
-  min-height: clamp(300px, 27vw, 362px);
-  overflow: hidden;
-  contain: paint;
-}
-
-.cta-visual .resume-card {
-  inset-inline-end: clamp(12px, 1.8vw, 22px);
-  inset-block-start: 12px;
-  width: clamp(196px, 14vw, 226px);
-  height: clamp(292px, 20vw, 336px);
-}
-
-.cta-visual .resume-card.back {
-  inset-inline-end: clamp(86px, 7.6vw, 116px);
-  inset-block-start: 42px;
-  width: clamp(168px, 11.6vw, 196px);
-  height: clamp(264px, 18.4vw, 306px);
-}
-
-@container cta-band (max-width: 980px) {
-  .cta-band {
-    grid-template-columns: 1fr;
-    padding: clamp(28px, 5cqi, 48px);
-  }
-
-  .cta-band > div:first-child {
-    max-inline-size: 100%;
-  }
-
-  .cta-visual {
-    justify-self: center;
-  }
-
-  .cta-visual .resume-card {
-    inset-inline-end: auto;
-    left: 50%;
-    transform: translateX(-18%) rotate(5deg);
-  }
-
-  .cta-visual .resume-card.back {
-    inset-inline-end: auto;
-    left: 50%;
-    transform: translateX(-76%) rotate(-8deg);
-  }
-}
-
-@media (min-width: 981px) and (max-width: 1440px) {
-  .cta-band {
-    grid-template-columns: minmax(0, 1fr);
-    min-height: auto;
-    padding: clamp(36px, 5vw, 58px);
-  }
-
-  .cta-band > div:first-child {
-    max-inline-size: 100%;
-  }
-
-  .cta-visual {
-    justify-self: center;
-    width: min(100%, 500px);
-  }
-
-  .cta-visual .resume-card {
-    inset-inline-end: auto;
-    left: 52%;
-    transform: translateX(-10%) rotate(5deg);
-  }
-
-  .cta-visual .resume-card.back {
-    inset-inline-end: auto;
-    left: 52%;
-    transform: translateX(-76%) rotate(-8deg);
-  }
-}
-
-@media (max-width: 900px) {
-  .cta-band {
-    width: min(100%, calc(100vw - 32px));
-    margin-left: 0;
-    padding: 44px 28px;
-  }
-}
-
-@media (max-width: 620px) {
-  .cta-band .cta-cluster {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 760px) {
-  .cta-band,
-  .cta-band .cta-cluster {
-    grid-template-columns: 1fr;
-  }
-
-  .cta-band {
-    min-block-size: 0;
-  }
-
-  .cta-band,
-  .cta-band > div:first-child,
-  .cta-band h2,
-  .cta-band p,
-  .cta-band .cta-cluster,
-  .cta-band .btn {
-    box-sizing: border-box;
-    inline-size: 100%;
-    max-inline-size: 100%;
-  }
-
-  .cta-band h2 {
-    font-size: clamp(2.2rem, 10.4vw, 3.15rem);
-  }
-
-  .cta-band .btn {
-    min-inline-size: 0;
-  }
-
-  .cta-visual {
-    display: none;
-  }
-}
-
-/* True final visual clamp. This file has several historical responsive passes;
-   these rules intentionally sit at EOF so the public CTA and settings controls
-   cannot regress at desktop zoom widths. */
-@media (min-width: 761px) {
-  .cta-section,
-  .cta-section .section-inner,
-  .cta-band {
-    overflow: hidden;
-  }
-
-  .cta-section .section-inner {
-    width: min(100%, 1260px);
-    max-inline-size: min(1260px, calc(100vw - 48px));
-  }
-
-  .cta-band {
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 410px);
-    align-items: center;
-    gap: clamp(28px, 4vw, 54px);
-    padding: clamp(44px, 5vw, 66px);
-  }
-
-  .cta-band > div:first-child {
-    max-inline-size: min(100%, 620px);
-  }
-
-  .cta-band h2 {
-    max-inline-size: min(100%, 15ch);
-    font-size: clamp(2.45rem, 3.65vw, 3.76rem);
-    line-height: 1.04;
-  }
-
-  .cta-cluster .btn {
-    flex: 1 1 190px;
-    min-inline-size: min(100%, 180px);
-    justify-content: center;
-  }
-
-  .cta-visual {
-    display: block;
-    justify-self: end;
-    inline-size: min(100%, 410px);
-    min-block-size: clamp(338px, 28vw, 390px);
-    overflow: hidden;
-    contain: paint;
-  }
-
-  .cta-visual .resume-card {
-    inset-inline-end: clamp(16px, 2vw, 28px);
-    inset-block-start: 14px;
-    inline-size: clamp(204px, 15vw, 240px);
-    block-size: clamp(300px, 22vw, 356px);
-  }
-
-  .cta-visual .resume-card.back {
-    inset-inline-end: clamp(100px, 9.2vw, 132px);
-    inset-block-start: 42px;
-    inline-size: clamp(176px, 12.6vw, 208px);
-    block-size: clamp(276px, 20vw, 326px);
-  }
-}
-
-@media (min-width: 761px) and (max-width: 1180px) {
-  .cta-band {
-    grid-template-columns: 1fr;
-  }
-
-  .cta-band > div:first-child,
-  .cta-band h2,
-  .cta-band p {
-    max-inline-size: 100%;
-  }
-
-  .cta-visual {
-    justify-self: center;
-    inline-size: min(100%, 500px);
-    min-block-size: clamp(334px, 44vw, 390px);
-  }
-
-  .cta-visual .resume-card {
-    inset-inline-end: auto;
-    left: 52%;
-    transform: translateX(-18%) rotate(5deg);
-  }
-
-  .cta-visual .resume-card.back {
-    inset-inline-end: auto;
-    left: 52%;
-    transform: translateX(-78%) rotate(-8deg);
-  }
-}
-
-.settings-profile-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(170px, 1fr));
-  inline-size: min(100%, 520px);
-  gap: 12px;
-}
-
-.settings-profile-actions form,
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button {
-  inline-size: 100%;
-  min-inline-size: 0;
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link {
-  justify-content: center;
-  min-block-size: 48px;
-  max-inline-size: 100%;
-  font-size: clamp(0.9rem, 1.5cqi, 0.98rem);
-  line-height: 1.12;
-  text-align: center;
-  text-wrap: balance;
-  white-space: normal;
-}
-
-.settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(170px, 220px);
-  gap: 12px;
-}
-
-.settings-billing-head form,
-.settings-billing-head .ghost-button {
-  inline-size: 100%;
-  max-inline-size: 220px;
-  justify-self: end;
-}
-
-.settings-plan-active-card {
-  grid-template-columns: minmax(0, 1fr) minmax(150px, max-content);
-  gap: 14px;
-}
-
-.settings-plan-active-card .settings-inline-link {
-  justify-self: end;
-  min-inline-size: 150px;
-}
-
-@container settings-section (max-width: 700px) {
-  .settings-profile-actions,
-  .settings-billing-head,
-  .settings-plan-active-card {
-    grid-template-columns: 1fr;
-  }
-
-  .settings-billing-head form,
-  .settings-billing-head .ghost-button,
-  .settings-plan-active-card .settings-inline-link {
-    inline-size: 100%;
-    max-inline-size: none;
-    justify-self: stretch;
-  }
-}
-
-/* Screenshot-width layout audit: keep the public CTA, studio mock stats, and
-   settings actions composed when browser zoom reduces the effective viewport. */
-.dash-main-head,
-.dash-mock .dash-stat,
-.settings-profile-actions,
-.settings-billing-head,
-.settings-plan-active-card,
-.cta-section,
-.cta-section .section-inner,
-.cta-band,
-.cta-band > div:first-child,
-.cta-visual {
-  min-inline-size: 0;
-}
-
-.dash-main-head {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(160px, max-content);
-  align-items: start;
-}
-
-.dash-main-head .btn-sm {
-  inline-size: 100%;
-  max-inline-size: 190px;
-  justify-self: end;
-}
-
-.dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 245px), 1fr));
-  gap: clamp(12px, 1.6cqi, 18px);
-}
-
-.dash-mock .dash-stat {
-  min-block-size: clamp(136px, 12cqi, 156px);
-  padding: clamp(18px, 2.8cqi, 24px);
-}
-
-.dash-mock .dash-stat-value {
-  font-size: clamp(1.18rem, 4.2cqi, 1.54rem);
-  line-height: 1.08;
-  overflow-wrap: normal;
-  word-break: normal;
-}
-
-.dash-mock .dash-stat-delta {
-  max-inline-size: 24ch;
-  overflow-wrap: anywhere;
-}
-
-.settings-profile-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(180px, 1fr));
-  inline-size: min(100%, 560px);
-}
-
-.settings-profile-actions form,
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button {
-  inline-size: 100%;
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link,
-.settings-export-actions .btn,
-.price-card .btn,
-.cta-band .btn {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-  min-block-size: 50px;
-  padding-inline: clamp(14px, 2cqi, 22px);
-  line-height: 1.12;
-  overflow-wrap: anywhere;
-  text-align: center;
-  text-wrap: balance;
-  white-space: normal;
-}
-
-.settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(178px, 220px);
-}
-
-.settings-plan-active-card {
-  grid-template-columns: minmax(0, 1fr) minmax(154px, max-content);
-}
-
-.cta-section {
-  padding-inline: clamp(16px, 2.6vw, 28px);
-  overflow: hidden;
-}
-
-.cta-section .section-inner {
-  inline-size: 100%;
-  max-inline-size: min(1260px, calc(100vw - clamp(32px, 5.2vw, 56px)));
-}
-
-.cta-band {
-  inline-size: 100%;
-  margin-inline: auto;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.cta-band h2 {
-  max-inline-size: 14ch;
-  overflow-wrap: normal;
-  word-break: normal;
-}
-
-.cta-band p {
-  max-inline-size: 44ch;
-}
-
-.cta-visual {
-  max-inline-size: 100%;
-}
-
-@media (min-width: 1441px) {
-  .cta-band {
-    grid-template-columns: minmax(0, 0.96fr) minmax(320px, 410px);
-  }
-}
-
-@media (min-width: 761px) and (max-width: 1440px) {
-  .cta-band {
-    max-inline-size: 980px;
-    grid-template-columns: 1fr;
-    gap: clamp(26px, 4vw, 42px);
-  }
-
-  .cta-band > div:first-child,
-  .cta-band h2,
-  .cta-band p {
-    max-inline-size: 100%;
-  }
-
-  .cta-band .cta-cluster {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    max-inline-size: 560px;
-  }
-
-  .cta-band .btn {
-    inline-size: 100%;
-  }
-
-  .cta-visual {
-    justify-self: center;
-    inline-size: min(100%, 520px);
-    min-block-size: clamp(344px, 42vw, 398px);
-  }
-}
-
-@media (max-width: 760px) {
-  .dash-main-head,
-  .settings-profile-actions,
-  .settings-billing-head,
-  .settings-plan-active-card,
-  .cta-band,
-  .cta-band .cta-cluster {
-    grid-template-columns: 1fr;
-  }
-
-  .dash-main-head .btn-sm,
-  .settings-billing-head form,
-  .settings-billing-head .ghost-button,
-  .settings-plan-active-card .settings-inline-link {
-    inline-size: 100%;
-    max-inline-size: none;
-    justify-self: stretch;
-  }
-}
-
-/* Visual repair layer: keep marketing mockups and account controls composed at
-   browser zoom widths where large labels previously crowded or clipped. */
-.dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 282px), 1fr));
-  align-items: stretch;
-}
-
-.dash-mock .dash-stat {
-  min-block-size: clamp(146px, 13cqi, 166px);
-  justify-content: start;
-  gap: clamp(12px, 2.2cqi, 16px);
-  padding: clamp(20px, 2.4cqi, 26px);
-}
-
-.dash-mock .dash-stat-value {
-  font-size: clamp(1.78rem, 6.8cqi, 2.28rem);
-  line-height: 1.02;
-  max-inline-size: 100%;
-  overflow-wrap: anywhere;
-  text-wrap: balance;
-}
-
-@container dash-main (max-width: 1180px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@container dash-main (max-width: 620px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: 1fr;
-  }
-}
-
-.settings-profile-actions {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 214px), 1fr));
-  max-inline-size: 620px;
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link,
-.settings-export-actions .btn,
-.price-card .btn,
-.cta-band .btn {
-  min-block-size: 52px;
-  padding-inline: clamp(18px, 2.6cqi, 28px);
-  overflow-wrap: normal;
-}
-
-.settings-profile-actions .primary-button {
-  min-inline-size: min(100%, 224px);
-}
-
-.settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 238px), 268px);
-  align-items: center;
-}
-
-.settings-billing-head form,
-.settings-billing-head .ghost-button {
-  inline-size: 100%;
-  max-inline-size: 268px;
-}
-
-.settings-plan-active-card {
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 176px), max-content);
-}
-
-.settings-plan-active-card .settings-inline-link {
-  min-inline-size: min(100%, 176px);
-}
-
-@container settings-section (max-width: 820px) {
-  .settings-billing-head,
-  .settings-plan-active-card {
-    grid-template-columns: 1fr;
-  }
-
-  .settings-billing-head form,
-  .settings-billing-head .ghost-button,
-  .settings-plan-active-card .settings-inline-link {
-    inline-size: 100%;
-    max-inline-size: none;
-    justify-self: stretch;
-  }
-}
-
-.cta-section {
-  padding-inline: clamp(16px, 3vw, 32px);
-  overflow: hidden;
-}
-
-.cta-section .section-inner {
-  inline-size: 100%;
-  max-inline-size: min(1260px, calc(100vw - clamp(32px, 6vw, 64px)));
-  margin-inline: auto;
-  overflow: visible;
-}
-
-.cta-band {
-  inline-size: 100%;
-  max-inline-size: 100%;
-  margin-inline: auto;
-  box-sizing: border-box;
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 320px), 390px);
-  gap: clamp(28px, 4vw, 54px);
-  padding: clamp(44px, 5vw, 68px);
-  overflow: hidden;
-}
-
-.cta-band > div:first-child {
-  min-inline-size: 0;
-  max-inline-size: 620px;
-}
-
-.cta-band h2 {
-  max-inline-size: min(100%, 14.5ch);
-  font-size: clamp(2.35rem, 3.45vw, 3.72rem);
+  max-inline-size: min(100%, 13ch);
+  font-size: clamp(2.25rem, 3.2vw, 3.4rem);
   line-height: 1.04;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .cta-band p {
-  max-inline-size: min(100%, 46ch);
+  max-inline-size: min(100%, 42ch);
 }
 
 .cta-band .cta-cluster {
-  max-inline-size: min(100%, 580px);
-}
-
-.cta-visual {
-  inline-size: min(100%, 390px);
-  min-block-size: clamp(342px, 29vw, 398px);
-  justify-self: end;
-}
-
-@media (min-width: 761px) and (max-width: 1440px) {
-  .cta-section .section-inner {
-    max-inline-size: min(980px, calc(100vw - 40px));
-  }
-
-  .cta-band {
-    grid-template-columns: 1fr;
-  }
-
-  .cta-band > div:first-child,
-  .cta-band h2,
-  .cta-band p,
-  .cta-band .cta-cluster {
-    max-inline-size: 100%;
-  }
-
-  .cta-visual {
-    justify-self: center;
-    inline-size: min(100%, 500px);
-    min-block-size: clamp(352px, 44vw, 408px);
-  }
-}
-
-@media (max-width: 760px) {
-  .settings-profile-actions,
-  .settings-billing-head,
-  .settings-plan-active-card,
-  .cta-band,
-  .cta-band .cta-cluster {
-    grid-template-columns: 1fr;
-  }
-
-  .settings-profile-actions .primary-button,
-  .settings-profile-actions .ghost-button,
-  .settings-profile-actions form,
-  .settings-billing-head form,
-  .settings-billing-head .ghost-button,
-  .settings-plan-active-card .settings-inline-link {
-    inline-size: 100%;
-    max-inline-size: none;
-    justify-self: stretch;
-  }
-
-  .cta-section .section-inner {
-    max-inline-size: calc(100vw - 24px);
-  }
-
-  .cta-band {
-    padding: 34px 24px;
-  }
-
-  .cta-band,
-  .cta-band > div:first-child,
-  .cta-band h2,
-  .cta-band p,
-  .cta-band .cta-cluster,
-  .cta-band .btn {
-    box-sizing: border-box;
-    inline-size: 100%;
-    max-inline-size: 100%;
-  }
-
-  .cta-band h2 {
-    font-size: clamp(2rem, 10.8vw, 2.78rem);
-    overflow-wrap: anywhere;
-  }
-
-  .cta-band .btn {
-    min-inline-size: 0;
-    padding-inline: 14px;
-    font-size: clamp(0.9rem, 4vw, 1rem);
-  }
-}
-
-/* Current visual QA repair: keep the public mockups composed at browser zoom
-   widths, where the effective CSS viewport can be much smaller than the
-   screenshot canvas. */
-.dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 282px), 1fr));
-}
-
-.dash-mock .dash-stat {
-  min-block-size: clamp(136px, 12cqi, 156px);
-  padding: clamp(18px, 2.4cqi, 24px);
-  overflow: hidden;
-}
-
-.dash-mock .dash-stat-value {
-  font-size: clamp(1.24rem, 4.1cqi, 1.68rem);
-  line-height: 1.06;
-  max-inline-size: 100%;
-  overflow-wrap: anywhere;
-  text-wrap: balance;
-  white-space: normal;
-}
-
-@container dash-main (max-width: 1280px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@container dash-main (max-width: 620px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: 1fr;
-  }
-}
-
-.cta-section {
-  padding-inline: clamp(18px, 3vw, 32px);
-  overflow: hidden;
-}
-
-.cta-section .section-inner {
-  inline-size: min(100%, 1240px);
-  max-inline-size: calc(100vw - clamp(36px, 6vw, 72px));
-  margin-inline: auto;
-  overflow: visible;
-}
-
-.cta-band {
-  inline-size: 100%;
-  max-inline-size: 100%;
-  margin-inline: 0;
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 300px), 390px);
-  gap: clamp(26px, 3.4vw, 48px);
-}
-
-.cta-band > div:first-child,
-.cta-band h2,
-.cta-band p,
-.cta-band .cta-cluster {
-  min-inline-size: 0;
-}
-
-.cta-band h2 {
-  max-inline-size: min(100%, 15ch);
-  font-size: clamp(2.32rem, 3.3vw, 3.56rem);
+  max-inline-size: min(100%, 500px);
 }
 
 .cta-band .btn {
@@ -14418,343 +11895,58 @@ body,
 }
 
 .cta-visual {
-  min-inline-size: 0;
-  max-inline-size: 100%;
+  inline-size: min(100%, 360px);
+  min-block-size: clamp(324px, 26vw, 382px);
+  justify-self: end;
   overflow: hidden;
+  contain: paint;
 }
 
-@media (min-width: 981px) and (max-width: 1440px) {
-  .cta-section .section-inner {
-    max-inline-size: min(980px, calc(100vw - 40px));
-  }
-
-  .cta-band {
-    grid-template-columns: minmax(0, 1fr);
-    min-height: auto;
-    padding: clamp(36px, 5vw, 58px);
-  }
-
-  .cta-band > div:first-child,
-  .cta-band h2,
-  .cta-band p,
-  .cta-band .cta-cluster {
-    max-inline-size: 100%;
-  }
-
-  .cta-visual {
-    justify-self: center;
-    inline-size: min(100%, 500px);
-    min-block-size: clamp(320px, 42vw, 390px);
-  }
-
-  .cta-visual .resume-card {
-    left: 52%;
-    transform: translateX(-10%) rotate(5deg);
-  }
-
-  .cta-visual .resume-card.back {
-    left: 52%;
-    transform: translateX(-78%) rotate(-8deg);
-  }
+.cta-visual .resume-card {
+  inset-inline-end: clamp(12px, 1.8vw, 20px);
+  inset-block-start: 14px;
+  inline-size: clamp(188px, 13vw, 218px);
+  block-size: clamp(282px, 19.4vw, 326px);
 }
 
-@media (max-width: 980px) {
-  .cta-section .section-inner {
-    max-inline-size: calc(100vw - 32px);
-  }
-
-  .cta-band {
-    grid-template-columns: 1fr;
-    padding: clamp(34px, 6vw, 50px) clamp(22px, 5vw, 34px);
-  }
-
-  .cta-band > div:first-child,
-  .cta-band h2,
-  .cta-band p,
-  .cta-band .cta-cluster,
-  .cta-band .btn {
-    inline-size: 100%;
-    max-inline-size: 100%;
-  }
-
-  .cta-band h2 {
-    font-size: clamp(2rem, 9vw, 3rem);
-    overflow-wrap: anywhere;
-  }
-
-  .cta-band .cta-cluster {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .cta-visual {
-    display: none;
-  }
-}
-
-@media (max-width: 620px) {
-  .cta-section .section-inner {
-    max-inline-size: calc(100vw - 24px);
-  }
-
-  .cta-band {
-    padding: 32px 22px;
-  }
-
-  .cta-band .cta-cluster {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Mobile surface repair: the protected login and template library pages use
-   oversized editorial type, so keep their copy and previews inside the phone
-   viewport instead of relying on horizontal clipping. */
-.login-shell,
-.templates-page-shell {
-  max-inline-size: 100vw;
-  overflow-x: hidden;
-}
-
-.login-panel,
-.login-copy,
-.login-card,
-.templates-page-hero,
-.templates-selection-status,
-.templates-page-grid,
-.templates-page-card {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-
-.login-copy h1,
-.login-copy p,
-.login-benefits span,
-.login-card-head h2,
-.login-card-head p,
-.templates-page-hero h1,
-.templates-page-hero p,
-.templates-page-card-copy p {
-  overflow-wrap: anywhere;
-  text-wrap: balance;
-}
-
-.templates-page-card .template-thumb {
-  display: grid;
-  place-items: start center;
-}
-
-.templates-page-card .template-thumb .r-doc,
-.templates-page-card .template-thumb .r-doc * {
-  max-inline-size: 100%;
-}
-
-.templates-page-card .template-thumb .r-doc {
-  inline-size: 100%;
-  min-inline-size: 0;
-  overflow: hidden;
-}
-
-.templates-page-card .template-thumb .r-contact,
-.templates-page-card .template-thumb .r-copy,
-.templates-page-card .template-thumb .r-bullet {
-  overflow-wrap: anywhere;
-}
-
-.templates-page-card .template-thumb .r-doc.modern {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-}
-
-.templates-page-card .template-thumb .r-side,
-.templates-page-card .template-thumb .r-main {
-  min-inline-size: 0;
-}
-
-@media (max-width: 760px) {
-  .login-shell,
-  .templates-page-shell {
-    inline-size: 100%;
-    padding-inline: 16px;
-  }
-
-  .login-panel {
-    inline-size: 100%;
-    grid-template-columns: minmax(0, 1fr);
-    overflow: visible;
-  }
-
-  .login-copy h1 {
-    font-size: clamp(2.42rem, 12vw, 3rem);
-    line-height: 0.98;
-  }
-
-  .login-copy p {
-    font-size: clamp(0.98rem, 4.7vw, 1.08rem);
-    line-height: 1.48;
-  }
-
-  .login-benefits {
-    gap: 12px;
-  }
-
-  .login-benefits span {
-    align-items: flex-start;
-    line-height: 1.28;
-  }
-
-  .login-studio-preview,
-  .login-card {
-    inline-size: 100%;
-    border-radius: 18px;
-  }
-
-  .login-card {
-    padding: 18px;
-  }
-
-  .login-card-head h2 {
-    font-size: clamp(1.82rem, 9.6vw, 2.32rem);
-  }
-
-  .login-status {
-    width: 100%;
-    justify-content: flex-start;
-    border-radius: 18px;
-  }
-
-  .templates-page-shell {
-    padding-block-end: 48px;
-  }
-
-  .templates-page-hero,
-  .templates-selection-status,
-  .templates-page-grid {
-    inline-size: min(100%, calc(100vw - 32px));
-    width: min(100%, calc(100vw - 32px));
-    margin-inline: auto;
-  }
-
-  .templates-page-hero {
-    padding: 22px;
-  }
-
-  .templates-page-hero h1 {
-    font-size: clamp(2.48rem, 13vw, 3.45rem);
-    line-height: 1.02;
-  }
-
-  .templates-page-hero p {
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-
-  .templates-page-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .templates-page-card .template-thumb {
-    block-size: clamp(314px, 92vw, 352px);
-    padding-inline: 10px;
-  }
-
-  .templates-page-card .template-thumb .r-doc {
-    block-size: 112%;
-    font-size: 5.8px;
-    inline-size: 112%;
-    padding: 16px;
-    transform: scale(0.88);
-    transform-origin: top center;
-  }
-
-  .templates-page-card .template-thumb .r-doc.modern {
-    block-size: 116%;
-    font-size: 5.4px;
-    inline-size: 116%;
-    transform: scale(0.86);
-  }
-
-  .templates-page-card .template-thumb .r-doc.modern .r-side {
-    padding: 16px 10px;
-  }
-
-  .templates-page-card .template-thumb .r-doc.modern .r-main {
-    padding: 16px 10px 16px 0;
-  }
-
-  .template-title-row,
-  .template-card-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .template-tag {
-    text-align: left;
-  }
-}
-
-@media (max-width: 420px) {
-  .login-shell,
-  .templates-page-shell {
-    padding-inline: 14px;
-  }
-
-  .login-copy h1 {
-    font-size: clamp(2.28rem, 11.6vw, 2.82rem);
-  }
-
-  .templates-page-hero {
-    padding: 20px;
-  }
-
-  .templates-page-hero h1 {
-    font-size: clamp(2.34rem, 12.4vw, 3.1rem);
-  }
-
-  .templates-page-hero,
-  .templates-selection-status,
-  .templates-page-grid {
-    inline-size: min(100%, calc(100vw - 28px));
-    width: min(100%, calc(100vw - 28px));
-  }
-}
-
-/* Signed-in workspace repair: keep the studio, History, and Settings surfaces
-   composed when browser zoom or medium-width screens reduce the useful canvas. */
-.rf-studio-page,
-.settings-page-shell {
-  max-inline-size: 100vw;
-  overflow-x: clip;
+.cta-visual .resume-card.back {
+  inset-inline-end: clamp(84px, 7.4vw, 110px);
+  inset-block-start: 44px;
+  inline-size: clamp(160px, 11vw, 188px);
+  block-size: clamp(252px, 17.4vw, 296px);
 }
 
 .rf-studio-topbar,
 .rf-studio-layout,
 .rf-studio-main,
 .rf-studio-main > *,
-.studio-card,
-.studio-history-panel,
 .history-content-grid,
 .history-project-list,
 .history-detail-panel,
-.settings-page-layout,
-.settings-page-main,
-.settings-page-hero,
-.settings-section,
-.settings-section-panel {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-
-.rf-studio-top-actions,
 .history-title-row,
 .history-detail-heading,
 .history-export-upgrade,
 .settings-page-topbar,
+.settings-page-layout,
+.settings-page-main,
+.settings-page-hero,
+.settings-section,
+.settings-section-panel,
 .settings-billing-head,
-.settings-plan-active-card {
+.settings-plan-active-card,
+.settings-profile-actions,
+.settings-export-actions,
+.templates-page-hero,
+.templates-page-actions,
+.templates-selection-status {
   min-inline-size: 0;
   max-inline-size: 100%;
 }
 
 .rf-studio-top-actions {
   flex-wrap: wrap;
+  min-inline-size: 0;
+  max-inline-size: 100%;
 }
 
 .history-title-row strong,
@@ -14766,7 +11958,9 @@ body,
 .history-version-formats,
 .settings-page-hero h1,
 .settings-section-copy h2,
-.settings-billing-note {
+.settings-billing-note,
+.templates-page-hero h1,
+.templates-page-hero p {
   overflow-wrap: anywhere;
   text-wrap: balance;
 }
@@ -14784,11 +11978,22 @@ body,
 .history-export-actions .btn,
 .history-download-panel .btn,
 .history-version-list .btn,
-.history-version-more {
+.history-version-more,
+.settings-profile-actions .primary-button,
+.settings-profile-actions .ghost-button,
+.settings-billing-head .ghost-button,
+.settings-plan-active-card .settings-inline-link,
+.settings-export-actions .btn,
+.price-card .btn,
+.templates-page-actions .primary-button,
+.templates-page-actions .ghost-button,
+.templates-selection-status .btn {
   min-inline-size: 0;
   max-inline-size: 100%;
-  min-block-size: 40px;
+  min-block-size: 46px;
   justify-content: center;
+  padding-inline: clamp(12px, 1.2vw, 18px);
+  font-size: clamp(0.84rem, 1vw, 0.95rem);
   line-height: 1.12;
   overflow-wrap: anywhere;
   text-align: center;
@@ -14804,16 +12009,126 @@ body,
   justify-content: stretch;
 }
 
-.history-version-list article > div {
+.settings-profile-actions {
+  display: grid;
+  inline-size: min(100%, 560px);
+  grid-template-columns: minmax(218px, max-content) minmax(132px, max-content);
+  justify-content: start;
+  gap: 12px;
+}
+
+.settings-profile-actions form,
+.settings-billing-head form,
+.settings-price-card form {
+  inline-size: 100%;
   min-inline-size: 0;
   max-inline-size: 100%;
 }
 
+.settings-profile-actions > .primary-button {
+  min-inline-size: 218px;
+}
+
+.settings-profile-actions > form {
+  min-inline-size: 132px;
+}
+
+.settings-billing-head {
+  grid-template-columns: minmax(0, 1fr) minmax(198px, max-content);
+  gap: 14px;
+}
+
 .settings-billing-head form,
-.settings-price-card form,
-.settings-profile-actions form {
+.settings-billing-head .ghost-button {
+  min-inline-size: 198px;
+  justify-self: end;
+}
+
+.settings-plan-active-card {
+  grid-template-columns: minmax(0, 1fr) minmax(164px, max-content);
+  gap: 16px;
+}
+
+.settings-plan-active-card .settings-inline-link {
+  inline-size: 100%;
+  min-inline-size: 164px;
+  justify-self: stretch;
+}
+
+.login-copy,
+.login-benefits,
+.login-benefits span,
+.login-benefit-copy,
+.login-panel,
+.login-card,
+.templates-page-grid,
+.templates-page-card {
   min-inline-size: 0;
   max-inline-size: 100%;
+}
+
+.login-benefits span {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.login-benefit-copy,
+.templates-page-card-copy p {
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+@media (max-width: 1180px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    max-inline-size: min(1120px, calc(100vw - clamp(32px, 5vw, 72px)));
+    justify-items: start;
+  }
+
+  .hero-copy {
+    max-inline-size: min(100%, 760px);
+  }
+
+  .hero-stage {
+    justify-self: center;
+    inline-size: min(100%, 540px);
+    block-size: clamp(390px, 36vw, 500px);
+  }
+}
+
+@media (min-width: 1181px) and (max-width: 1580px) {
+  .cta-section .section-inner {
+    max-inline-size: min(980px, calc(100vw - 48px));
+  }
+
+  .cta-band {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cta-band > div:first-child,
+  .cta-band h2,
+  .cta-band p,
+  .cta-band .cta-cluster {
+    max-inline-size: 100%;
+  }
+
+  .cta-visual {
+    justify-self: center;
+    inline-size: min(100%, 500px);
+    min-block-size: clamp(320px, 36vw, 390px);
+  }
+
+  .cta-visual .resume-card {
+    inset-inline-end: auto;
+    left: 52%;
+    transform: translateX(-18%) rotate(5deg);
+  }
+
+  .cta-visual .resume-card.back {
+    inset-inline-end: auto;
+    left: 52%;
+    transform: translateX(-76%) rotate(-8deg);
+  }
 }
 
 @media (max-width: 1180px) {
@@ -14870,6 +12185,106 @@ body,
   }
 }
 
+@media (max-width: 820px) {
+  .dash-main-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dash-main-head .btn-sm {
+    inline-size: 100%;
+    max-inline-size: none;
+    justify-self: stretch;
+  }
+
+  .settings-profile-actions,
+  .settings-billing-head,
+  .settings-plan-active-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-profile-actions > .primary-button,
+  .settings-profile-actions > form,
+  .settings-billing-head form,
+  .settings-billing-head .ghost-button,
+  .settings-plan-active-card .settings-inline-link {
+    inline-size: 100%;
+    min-inline-size: 0;
+    max-inline-size: none;
+    justify-self: stretch;
+  }
+}
+
+@media (max-width: 760px) {
+  .hero {
+    max-inline-size: calc(100vw - 24px);
+    padding-inline: clamp(18px, 5vw, 26px);
+  }
+
+  .hero .h1 {
+    font-size: clamp(2.45rem, 11vw, 3.45rem);
+  }
+
+  .hero-stage {
+    inline-size: min(100%, 430px);
+    block-size: clamp(350px, 92vw, 430px);
+  }
+
+  .hero-stage .resume-card-front {
+    inline-size: clamp(236px, 64vw, 286px);
+    block-size: clamp(340px, 88vw, 404px);
+  }
+
+  .hero-stage .resume-card-back-l {
+    inline-size: clamp(184px, 52vw, 232px);
+    block-size: clamp(276px, 74vw, 344px);
+    transform: rotate(-8deg) translate(clamp(-40px, -9vw, -26px), 20px);
+  }
+
+  .hero-stage .resume-card-back-r {
+    inline-size: clamp(176px, 48vw, 218px);
+    block-size: clamp(266px, 70vw, 326px);
+    transform: rotate(7deg) translate(clamp(28px, 8vw, 42px), 26px);
+  }
+
+  .cta-section .section-inner {
+    max-inline-size: calc(100vw - 24px);
+  }
+
+  .cta-band {
+    grid-template-columns: 1fr;
+    min-block-size: 0;
+    padding: 32px 22px;
+  }
+
+  .cta-band,
+  .cta-band > div:first-child,
+  .cta-band h2,
+  .cta-band p,
+  .cta-band .cta-cluster,
+  .cta-band .btn {
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  .cta-band h2 {
+    font-size: clamp(2.2rem, 10vw, 3rem);
+  }
+
+  .cta-band .cta-cluster {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .cta-band .btn {
+    padding-inline: 16px;
+  }
+
+  .cta-visual {
+    display: none;
+  }
+}
+
 @media (max-width: 560px) {
   .settings-page-shell {
     padding-inline: 14px;
@@ -14897,790 +12312,10 @@ body,
   .settings-profile-actions,
   .settings-billing-head,
   .settings-price-grid,
-  .settings-plan-active-card {
+  .settings-plan-active-card,
+  .templates-page-actions {
     grid-template-columns: minmax(0, 1fr);
   }
-}
-
-/* Layout fit repair: this final layer keeps oversized editorial labels from
-   crowding narrow cards and keeps the landing paper stack composed at zoom. */
-.hero {
-  max-inline-size: min(var(--container), calc(100vw - clamp(28px, 4.8vw, 72px)));
-  grid-template-columns: minmax(0, 0.98fr) minmax(min(100%, 320px), 0.72fr);
-  gap: clamp(26px, 3.2vw, 48px);
-  padding-inline: clamp(20px, 3vw, 42px);
-}
-
-.hero-copy,
-.hero-stage {
-  min-inline-size: 0;
-}
-
-.hero-stage {
-  inline-size: min(100%, 500px);
-  block-size: clamp(400px, 32vw, 510px);
-}
-
-.hero-stage::before {
-  inset: 10% 8%;
-}
-
-.resume-card-front {
-  inline-size: clamp(264px, 19vw, 326px);
-  block-size: clamp(382px, 28vw, 456px);
-  transform: rotate(-2deg) translateX(4px);
-}
-
-.resume-card-back-l {
-  inline-size: clamp(218px, 16vw, 258px);
-  block-size: clamp(324px, 23vw, 382px);
-  transform: rotate(-8deg) translate(clamp(-58px, -4vw, -36px), 22px);
-}
-
-.resume-card-back-r {
-  inline-size: clamp(206px, 15vw, 246px);
-  block-size: clamp(312px, 22vw, 368px);
-  transform: rotate(7deg) translate(clamp(44px, 4vw, 70px), 30px);
-}
-
-.hero-stage:hover .resume-card-front {
-  transform: rotate(-1deg) translate(4px, -6px);
-}
-
-.hero-stage:hover .resume-card-back-l {
-  transform: rotate(-9deg) translate(clamp(-66px, -4.4vw, -44px), 24px);
-}
-
-.hero-stage:hover .resume-card-back-r {
-  transform: rotate(8deg) translate(clamp(52px, 4.4vw, 80px), 34px);
-}
-
-.hero-badge {
-  max-inline-size: min(222px, 58%);
-  padding: 10px 12px;
-  gap: 10px;
-  font-size: clamp(0.78rem, 1.2vw, 0.88rem);
-  line-height: 1.18;
-}
-
-.hero-badge .b-icon {
-  flex: 0 0 32px;
-  inline-size: 32px;
-  block-size: 32px;
-}
-
-.dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-}
-
-.dash-mock .dash-stat {
-  min-block-size: 126px;
-  overflow: visible;
-  gap: 10px;
-  padding: clamp(16px, 2.1cqi, 22px);
-}
-
-.dash-mock .dash-stat-value {
-  margin-block: 2px;
-  font-size: clamp(1.08rem, 3.4cqi, 1.42rem);
-  line-height: 1.04;
-  overflow-wrap: anywhere;
-  text-wrap: balance;
-}
-
-.dash-mock .dash-stat-delta {
-  max-inline-size: 100%;
-  font-size: clamp(0.8rem, 1.7cqi, 0.92rem);
-}
-
-.dash-main-head {
-  grid-template-columns: minmax(0, 1fr) minmax(150px, 184px);
-}
-
-.dash-main-head .btn-sm {
-  max-inline-size: 184px;
-  min-block-size: 44px;
-}
-
-.settings-profile-actions,
-.settings-billing-head,
-.settings-plan-active-card,
-.settings-export-actions {
-  gap: 12px;
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link,
-.settings-export-actions .btn,
-.price-card .btn {
-  min-block-size: 48px;
-  padding-inline: clamp(14px, 1.7cqi, 20px);
-  font-size: clamp(0.88rem, 1.65cqi, 0.98rem);
-  line-height: 1.1;
-}
-
-.settings-profile-actions .primary-button {
-  min-inline-size: 0;
-}
-
-.settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(210px, 248px);
-}
-
-.settings-billing-head form,
-.settings-billing-head .ghost-button {
-  max-inline-size: 248px;
-}
-
-.settings-plan-active-card {
-  grid-template-columns: minmax(0, 1fr) minmax(146px, 176px);
-}
-
-.settings-plan-active-card .settings-inline-link {
-  inline-size: 100%;
-  min-inline-size: 0;
-}
-
-@container dash-main (max-width: 980px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@container dash-main (max-width: 560px) {
-  .dash-main-head,
-  .dash-mock .dash-stats {
-    grid-template-columns: 1fr;
-  }
-
-  .dash-main-head .btn-sm {
-    inline-size: 100%;
-    max-inline-size: none;
-    justify-self: stretch;
-  }
-}
-
-@media (min-width: 1181px) and (max-width: 1480px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.64fr);
-  }
-
-  .hero-stage {
-    inline-size: min(100%, 450px);
-  }
-}
-
-@media (max-width: 1180px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr);
-    max-inline-size: min(var(--container), calc(100vw - 32px));
-  }
-
-  .hero-stage {
-    inline-size: min(100%, 560px);
-    margin-inline: auto;
-  }
-}
-
-@container settings-section (max-width: 840px) {
-  .settings-billing-head,
-  .settings-plan-active-card {
-    grid-template-columns: 1fr;
-  }
-
-  .settings-billing-head form,
-  .settings-billing-head .ghost-button,
-  .settings-plan-active-card .settings-inline-link {
-    inline-size: 100%;
-    max-inline-size: none;
-    justify-self: stretch;
-  }
-}
-
-/* May 29 visual QA: keep the public marketing and settings surfaces composed
-   when the browser is zoomed or captured at awkward screenshot widths. */
-html,
-body,
-.page-shell,
-.shell {
-  max-inline-size: 100%;
-  overflow-x: hidden;
-}
-
-.hero {
-  inline-size: min(100%, var(--container));
-  max-inline-size: calc(100% - clamp(24px, 4.2vw, 64px));
-  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.78fr);
-  align-items: center;
-  overflow: hidden;
-}
-
-.hero-copy {
-  max-inline-size: min(100%, 720px);
-}
-
-.hero .h1 {
-  max-inline-size: 100%;
-  text-wrap: balance;
-}
-
-.hero-stage {
-  justify-self: end;
-  inline-size: min(100%, 460px);
-  block-size: 500px;
-  contain: paint;
-}
-
-.hero-stage .resume-card {
-  transform-origin: center;
-}
-
-.resume-card-front {
-  inline-size: 318px;
-  block-size: 446px;
-  transform: rotate(-2deg) translateX(0);
-}
-
-.resume-card-back-l {
-  inline-size: 254px;
-  block-size: 374px;
-  transform: rotate(-8deg) translate(-54px, 24px);
-}
-
-.resume-card-back-r {
-  inline-size: 240px;
-  block-size: 356px;
-  transform: rotate(7deg) translate(58px, 32px);
-}
-
-.hero-stage:hover .resume-card-front {
-  transform: rotate(-1deg) translate(0, -6px);
-}
-
-.hero-stage:hover .resume-card-back-l {
-  transform: rotate(-9deg) translate(-62px, 26px);
-}
-
-.hero-stage:hover .resume-card-back-r {
-  transform: rotate(8deg) translate(66px, 36px);
-}
-
-.dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 282px), 1fr));
-  align-items: stretch;
-}
-
-.dash-mock .dash-stat {
-  min-block-size: clamp(118px, 14cqi, 138px);
-  overflow: hidden;
-}
-
-.dash-mock .dash-stat-value {
-  font-size: clamp(1.42rem, 4.2cqi, 1.92rem);
-  line-height: 1.04;
-  overflow-wrap: anywhere;
-  word-break: normal;
-  hyphens: none;
-}
-
-.dash-mock .dash-stat-delta {
-  max-inline-size: 100%;
-  overflow-wrap: anywhere;
-}
-
-.dash-main-head {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) max-content;
-  align-items: start;
-}
-
-.dash-main-head .btn-sm {
-  inline-size: max-content;
-  max-inline-size: min(100%, 188px);
-  justify-self: end;
-  white-space: nowrap;
-}
-
-.settings-profile-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 164px), max-content));
-  justify-content: start;
-  align-items: stretch;
-  gap: 14px;
-}
-
-.settings-profile-actions form,
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button {
-  inline-size: 100%;
-  min-inline-size: 0;
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link {
-  max-inline-size: 100%;
-  padding-inline: 18px;
-  white-space: normal;
-  text-wrap: balance;
-}
-
-.settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 220px);
-  align-items: start;
-}
-
-.settings-billing-head form,
-.settings-billing-head .ghost-button {
-  inline-size: 100%;
-  max-inline-size: 220px;
-}
-
-.settings-plan-active-card {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 160px);
-}
-
-.settings-plan-active-card .settings-inline-link {
-  inline-size: 100%;
-}
-
-@media (min-width: 1181px) and (max-width: 1480px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.68fr);
-  }
-
-  .hero-stage {
-    inline-size: min(100%, 420px);
-    block-size: 470px;
-  }
-
-  .resume-card-front {
-    inline-size: 294px;
-    block-size: 414px;
-  }
-
-  .resume-card-back-l {
-    inline-size: 232px;
-    block-size: 346px;
-    transform: rotate(-8deg) translate(-44px, 22px);
-  }
-
-  .resume-card-back-r {
-    inline-size: 220px;
-    block-size: 332px;
-    transform: rotate(7deg) translate(48px, 30px);
-  }
-}
-
-@media (max-width: 1180px) {
-  .hero {
-    grid-template-columns: 1fr;
-    max-inline-size: calc(100% - 32px);
-  }
-
-  .hero-copy {
-    max-inline-size: min(100%, 760px);
-  }
-
-  .hero-stage {
-    justify-self: center;
-    inline-size: min(100%, 500px);
-    block-size: 430px;
-  }
-
-  .resume-card-front {
-    inline-size: 286px;
-    block-size: 402px;
-  }
-
-  .resume-card-back-l {
-    inline-size: 230px;
-    block-size: 338px;
-    transform: rotate(-8deg) translate(-48px, 20px);
-  }
-
-  .resume-card-back-r {
-    inline-size: 218px;
-    block-size: 324px;
-    transform: rotate(7deg) translate(52px, 26px);
-  }
-}
-
-@container dash-main (max-width: 760px) {
-  .dash-main-head {
-    grid-template-columns: 1fr;
-  }
-
-  .dash-main-head .btn-sm {
-    inline-size: 100%;
-    max-inline-size: none;
-    justify-self: stretch;
-    white-space: normal;
-  }
-}
-
-@container dash-main (max-width: 1260px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@container dash-main (max-width: 620px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: 1fr;
-  }
-}
-
-@container settings-section (max-width: 920px) {
-  .settings-billing-head,
-  .settings-plan-active-card {
-    grid-template-columns: 1fr;
-  }
-
-  .settings-billing-head form,
-  .settings-billing-head .ghost-button,
-  .settings-plan-active-card .settings-inline-link {
-    inline-size: 100%;
-    max-inline-size: none;
-    justify-self: stretch;
-  }
-}
-
-@container settings-section (max-width: 430px) {
-  .settings-profile-actions {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* May 30 composition lock: keep the screenshot-prone public mockups,
-   settings actions, and CTA artwork inside their panels at browser zoom widths. */
-.hero,
-.dash-section,
-.dash-mock,
-.cta-section,
-.cta-section .section-inner,
-.cta-band,
-.settings-page-shell,
-.settings-page-main,
-.settings-section,
-.settings-section-panel {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-
-.dash-section,
-.cta-section,
-.settings-page-shell {
-  overflow-x: clip;
-}
-
-.dash-mock {
-  inline-size: min(100%, var(--container));
-  overflow: hidden;
-}
-
-.dash-main,
-.dash-main-head,
-.dash-main-head > div,
-.dash-stat,
-.dash-stat-label,
-.dash-stat-value,
-.dash-stat-delta {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-
-.dash-main-head {
-  grid-template-columns: minmax(0, 1fr) minmax(148px, max-content);
-  gap: clamp(14px, 1.8vw, 22px);
-}
-
-.dash-main-head .btn-sm {
-  inline-size: 100%;
-  max-inline-size: 176px;
-  justify-self: end;
-}
-
-.dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 246px), 1fr));
-}
-
-.dash-mock .dash-stat {
-  min-block-size: clamp(136px, 12cqi, 154px);
-  padding: clamp(18px, 2.2cqi, 24px);
-  overflow: clip;
-}
-
-.dash-mock .dash-stat-value {
-  font-size: clamp(1.36rem, 4.6cqi, 1.78rem);
-  line-height: 1.08;
-  overflow-wrap: normal;
-  text-wrap: balance;
-  word-break: normal;
-}
-
-.dash-mock .dash-stat-delta {
-  max-inline-size: 24ch;
-  overflow-wrap: anywhere;
-}
-
-.settings-profile-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 184px), 1fr));
-  inline-size: min(100%, 520px);
-  max-inline-size: 100%;
-  gap: 12px;
-}
-
-.settings-profile-actions form,
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button {
-  inline-size: 100%;
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-
-.settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(172px, 232px);
-  gap: 14px;
-}
-
-.settings-billing-head form,
-.settings-billing-head .ghost-button {
-  inline-size: 100%;
-  max-inline-size: 232px;
-  justify-self: end;
-}
-
-.settings-plan-active-card {
-  grid-template-columns: minmax(0, 1fr) minmax(148px, max-content);
-  gap: 16px;
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link,
-.settings-export-actions .btn,
-.price-card .btn {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-  min-block-size: 50px;
-  padding-inline: clamp(14px, 1.8cqi, 20px);
-  overflow: hidden;
-  font-size: clamp(0.88rem, 1.45cqi, 0.96rem);
-  line-height: 1.12;
-  text-align: center;
-  text-wrap: balance;
-  white-space: normal;
-}
-
-.settings-plan-active-card .settings-inline-link {
-  inline-size: max-content;
-  min-inline-size: 148px;
-  justify-self: end;
-}
-
-.cta-section {
-  padding-inline: clamp(16px, 2.8vw, 32px);
-}
-
-.cta-section .section-inner {
-  inline-size: 100%;
-  max-inline-size: min(1240px, calc(100vw - clamp(32px, 5.6vw, 64px)));
-  margin-inline: auto;
-}
-
-.cta-band {
-  inline-size: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
-  grid-template-columns: minmax(0, 1fr) minmax(286px, 390px);
-  gap: clamp(26px, 3.6vw, 48px);
-  padding: clamp(42px, 4.8vw, 62px);
-}
-
-.cta-band > div:first-child,
-.cta-band h2,
-.cta-band p,
-.cta-band .cta-cluster {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-
-.cta-band h2 {
-  font-size: clamp(2.45rem, 3.5vw, 3.65rem);
-  line-height: 1.04;
-  overflow-wrap: normal;
-  word-break: normal;
-}
-
-.cta-visual {
-  justify-self: end;
-  inline-size: min(100%, 390px);
-  max-inline-size: 100%;
-  min-block-size: clamp(320px, 27vw, 372px);
-  overflow: hidden;
-  contain: paint;
-}
-
-.cta-visual .resume-card {
-  inset-inline-end: clamp(14px, 1.8vw, 26px);
-  inset-block-start: 12px;
-  inline-size: clamp(198px, 14.2vw, 232px);
-  block-size: clamp(294px, 21vw, 344px);
-}
-
-.cta-visual .resume-card.back {
-  inset-inline-end: clamp(92px, 8.4vw, 124px);
-  inset-block-start: 42px;
-  inline-size: clamp(170px, 12vw, 202px);
-  block-size: clamp(268px, 19.4vw, 318px);
-}
-
-@media (min-width: 761px) and (max-width: 1440px) {
-  .cta-band {
-    grid-template-columns: 1fr;
-    max-inline-size: 980px;
-    margin-inline: auto;
-  }
-
-  .cta-band h2,
-  .cta-band p,
-  .cta-band > div:first-child {
-    max-inline-size: 100%;
-  }
-
-  .cta-visual {
-    justify-self: center;
-    inline-size: min(100%, 500px);
-    min-block-size: clamp(318px, 40vw, 380px);
-  }
-
-  .cta-visual .resume-card {
-    inset-inline-end: auto;
-    left: 52%;
-    transform: translateX(-16%) rotate(5deg);
-  }
-
-  .cta-visual .resume-card.back {
-    inset-inline-end: auto;
-    left: 52%;
-    transform: translateX(-76%) rotate(-8deg);
-  }
-}
-
-@container dash-main (max-width: 1080px) {
-  .dash-mock .dash-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@container dash-main (max-width: 560px) {
-  .dash-main-head,
-  .dash-mock .dash-stats {
-    grid-template-columns: 1fr;
-  }
-
-  .dash-main-head .btn-sm {
-    inline-size: 100%;
-    max-inline-size: none;
-    justify-self: stretch;
-  }
-}
-
-@container settings-section (max-width: 720px) {
-  .settings-billing-head,
-  .settings-plan-active-card {
-    grid-template-columns: 1fr;
-  }
-
-  .settings-billing-head form,
-  .settings-billing-head .ghost-button,
-  .settings-plan-active-card .settings-inline-link {
-    inline-size: 100%;
-    max-inline-size: none;
-    justify-self: stretch;
-  }
-}
-
-@media (max-width: 760px) {
-  .cta-section .section-inner {
-    max-inline-size: calc(100vw - 24px);
-  }
-
-  .cta-band {
-    grid-template-columns: 1fr;
-    min-block-size: 0;
-    padding: clamp(30px, 8vw, 42px) clamp(22px, 6vw, 28px);
-  }
-
-  .cta-band > div:first-child,
-  .cta-band h2,
-  .cta-band p,
-  .cta-band .cta-cluster {
-    inline-size: 100%;
-    max-inline-size: 100%;
-  }
-
-  .cta-band h2 {
-    font-size: clamp(2.35rem, 10.8vw, 3.35rem);
-  }
-
-  .cta-band .cta-cluster {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .cta-band .btn {
-    inline-size: 100%;
-    min-inline-size: 0;
-  }
-
-  .cta-visual {
-    display: none;
-  }
-}
-
-/* Narrow viewport visibility guard: headless screenshots and desktop browsers
-   can run at phone-sized widths without mobile emulation, so prevent hidden
-   overflow from clipping public copy at the right edge. */
-.hero,
-.login-shell,
-.login-panel,
-.templates-page-shell,
-.templates-page-hero {
-  box-sizing: border-box;
-}
-
-.hero-copy,
-.hero-sub,
-.hero-ctas,
-.hero-actions,
-.hero-meta,
-.login-copy,
-.login-benefits,
-.login-benefits span,
-.login-benefit-copy,
-.templates-page-hero,
-.templates-page-actions {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-
-.hero-sub,
-.login-benefit-copy,
-.templates-page-hero p {
-  overflow-wrap: anywhere;
-  text-wrap: pretty;
-}
-
-.login-benefits span {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
 }
 
 @media (max-width: 520px) {
@@ -15693,27 +12328,21 @@ body,
   }
 
   .hero {
-    width: calc(100vw - 28px);
+    inline-size: calc(100vw - 28px);
     padding-inline: 0;
   }
 
-  .hero-copy,
-  .hero-sub,
   .hero-ctas,
   .hero-actions,
-  .hero-meta {
-    inline-size: 100%;
-    max-inline-size: 100%;
-  }
-
-  .hero-ctas,
-  .hero-actions {
+  .templates-page-actions {
     display: grid;
     grid-template-columns: 1fr;
   }
 
   .hero-ctas .btn,
-  .hero-actions .btn {
+  .hero-actions .btn,
+  .templates-page-actions .primary-button,
+  .templates-page-actions .ghost-button {
     inline-size: 100%;
     min-inline-size: 0;
   }
@@ -15728,113 +12357,24 @@ body,
   .templates-selection-status,
   .templates-page-grid {
     inline-size: 100%;
-    width: 100%;
     max-inline-size: 100%;
   }
 
   .login-benefits span {
     align-items: start;
   }
+}
 
-  .templates-page-actions {
-    display: grid;
+@container dash-main (max-width: 1080px) {
+  .dash-mock .dash-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container dash-main (max-width: 560px) {
+  .dash-mock .dash-stats {
     grid-template-columns: 1fr;
   }
-
-  .templates-page-actions .primary-button,
-  .templates-page-actions .ghost-button {
-    inline-size: 100%;
-    min-inline-size: 0;
-  }
-}
-
-/* Final product fit guard: keep dense marketing and account panels from
-   reopening text clipping at awkward browser zoom widths. */
-.hero {
-  grid-template-columns: minmax(0, 0.96fr) minmax(300px, 0.64fr);
-  gap: clamp(28px, 3.6vw, 54px);
-  overflow: clip;
-}
-
-.hero-copy {
-  position: relative;
-  z-index: 2;
-  min-inline-size: 0;
-}
-
-.hero .h1 {
-  max-inline-size: min(100%, 11.8ch);
-  font-size: clamp(44px, 5.7vw, 76px);
-  line-height: 1.04;
-}
-
-.hero-stage {
-  justify-self: end;
-  inline-size: min(100%, 420px);
-  block-size: clamp(390px, 30vw, 470px);
-  max-inline-size: 100%;
-  overflow: hidden;
-  contain: paint;
-}
-
-.resume-card-front {
-  inline-size: clamp(258px, 17vw, 294px);
-  block-size: clamp(366px, 24vw, 414px);
-  transform: rotate(-2deg) translateX(0);
-}
-
-.resume-card-back-l {
-  inline-size: clamp(208px, 13.8vw, 232px);
-  block-size: clamp(310px, 20.6vw, 346px);
-  transform: rotate(-8deg) translate(clamp(-44px, -3.2vw, -34px), 22px);
-}
-
-.resume-card-back-r {
-  inline-size: clamp(198px, 13.2vw, 220px);
-  block-size: clamp(298px, 19.8vw, 332px);
-  transform: rotate(7deg) translate(clamp(38px, 3vw, 48px), 30px);
-}
-
-.hero-stage:hover .resume-card-front {
-  transform: rotate(-1deg) translate(0, -5px);
-}
-
-.hero-stage:hover .resume-card-back-l {
-  transform: rotate(-9deg) translate(clamp(-52px, -3.8vw, -42px), 24px);
-}
-
-.hero-stage:hover .resume-card-back-r {
-  transform: rotate(8deg) translate(clamp(44px, 3.6vw, 56px), 32px);
-}
-
-.dash-mock .dash-stat {
-  container: dash-stat / inline-size;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 12px;
-  min-block-size: clamp(142px, 13cqi, 168px);
-  overflow: clip;
-}
-
-.dash-stat-label,
-.dash-stat-value,
-.dash-stat-delta {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-
-.dash-mock .dash-stat-value {
-  font-size: clamp(1.22rem, 2.6cqi, 1.5rem);
-  line-height: 1.08;
-  overflow-wrap: normal;
-  text-wrap: balance;
-}
-
-.dash-mock .dash-stat-delta {
-  font-size: clamp(0.84rem, 1.4cqi, 0.94rem);
-  line-height: 1.35;
-  max-inline-size: 22ch;
 }
 
 @container dash-stat (max-width: 230px) {
@@ -15843,822 +12383,16 @@ body,
   }
 }
 
-.settings-profile-actions,
-.settings-billing-head,
-.settings-plan-active-card,
-.settings-export-actions,
-.templates-page-actions,
-.templates-selection-status {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-
-.settings-profile-actions {
-  inline-size: min(100%, 500px);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 158px), 1fr));
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link,
-.settings-export-actions .btn,
-.templates-page-actions .primary-button,
-.templates-page-actions .ghost-button,
-.templates-selection-status .btn {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-  min-block-size: 48px;
-  padding-inline: clamp(14px, 1.5vw, 20px);
-  font-size: clamp(0.88rem, 1.15vw, 0.98rem);
-  line-height: 1.12;
-  text-align: center;
-  text-wrap: balance;
-  white-space: normal;
-}
-
-.settings-profile-actions form,
-.settings-billing-head form {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-
-.settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 184px), 220px);
-}
-
-.settings-billing-head .ghost-button {
-  inline-size: 100%;
-}
-
-.settings-plan-active-card {
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 136px), 160px);
-}
-
-@media (max-width: 1180px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .hero .h1 {
-    max-inline-size: min(100%, 12.5ch);
-    font-size: clamp(42px, 7vw, 70px);
-  }
-
-  .hero-stage {
-    justify-self: center;
-    inline-size: min(100%, 500px);
-    block-size: clamp(400px, 54vw, 470px);
-  }
-}
-
-@media (max-width: 760px) {
-  .hero .h1 {
-    font-size: clamp(40px, 13vw, 58px);
-  }
-
-  .hero-stage {
-    inline-size: min(100%, 420px);
-    block-size: clamp(390px, 92vw, 440px);
-  }
-
-  .resume-card-front {
-    inline-size: clamp(224px, 60vw, 258px);
-    block-size: clamp(316px, 86vw, 360px);
-  }
-
-  .resume-card-back-l {
-    inline-size: clamp(180px, 48vw, 206px);
-    block-size: clamp(268px, 72vw, 306px);
-    transform: rotate(-8deg) translate(-30px, 18px);
-  }
-
-  .resume-card-back-r {
-    inline-size: clamp(172px, 46vw, 198px);
-    block-size: clamp(258px, 70vw, 294px);
-    transform: rotate(7deg) translate(32px, 24px);
-  }
-
-  .settings-profile-actions,
-  .settings-billing-head,
-  .settings-plan-active-card,
-  .settings-export-actions,
-  .templates-page-actions {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-/* Final CTA screenshot fix: this must stay last because older visual repair
-   layers above also target the same marketing callout. */
-.cta-section {
-  padding-inline: clamp(20px, 3.2vw, 40px);
-  overflow-x: clip;
-}
-
-.cta-section .section-inner {
-  inline-size: min(100%, 1180px);
-  max-inline-size: calc(100vw - clamp(40px, 6.4vw, 80px));
-  margin-inline: auto;
-  overflow: visible;
-}
-
-.cta-band {
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 280px), 360px);
-  gap: clamp(24px, 3.2vw, 42px);
-  min-height: auto;
-  padding: clamp(38px, 4.6vw, 56px);
-}
-
-.cta-band > div:first-child {
-  max-inline-size: min(100%, 560px);
-}
-
-.cta-band h2 {
-  max-inline-size: min(100%, 13ch);
-  font-size: clamp(2.25rem, 3.2vw, 3.4rem);
-}
-
-.cta-band p {
-  max-inline-size: min(100%, 42ch);
-}
-
-.cta-band .cta-cluster {
-  max-inline-size: min(100%, 500px);
-}
-
-.cta-visual {
-  inline-size: min(100%, 360px);
-  min-block-size: clamp(324px, 26vw, 382px);
-  justify-self: end;
-}
-
-.cta-visual .resume-card {
-  inset-inline-end: clamp(12px, 1.8vw, 20px);
-  inset-block-start: 14px;
-  inline-size: clamp(188px, 13vw, 218px);
-  block-size: clamp(282px, 19.4vw, 326px);
-}
-
-.cta-visual .resume-card.back {
-  inset-inline-end: clamp(84px, 7.4vw, 110px);
-  inset-block-start: 44px;
-  inline-size: clamp(160px, 11vw, 188px);
-  block-size: clamp(252px, 17.4vw, 296px);
-}
-
-@media (min-width: 1181px) and (max-width: 1580px) {
-  .cta-section .section-inner {
-    max-inline-size: min(980px, calc(100vw - 48px));
-  }
-
-  .cta-band {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .cta-band > div:first-child,
-  .cta-band h2,
-  .cta-band p,
-  .cta-band .cta-cluster {
-    max-inline-size: 100%;
-  }
-
-  .cta-visual {
-    justify-self: center;
-    inline-size: min(100%, 500px);
-    min-block-size: clamp(320px, 36vw, 390px);
-  }
-
-  .cta-visual .resume-card {
-    inset-inline-end: auto;
-    left: 52%;
-    transform: translateX(-18%) rotate(5deg);
-  }
-
-  .cta-visual .resume-card.back {
-    inset-inline-end: auto;
-    left: 52%;
-    transform: translateX(-76%) rotate(-8deg);
-  }
-}
-
-@media (max-width: 760px) {
-  .cta-section .section-inner {
-    max-inline-size: calc(100vw - 24px);
-  }
-
-  .cta-band {
-    grid-template-columns: 1fr;
-    min-block-size: 0;
-    padding: 32px 22px;
-  }
-
-  .cta-band,
-  .cta-band > div:first-child,
-  .cta-band h2,
-  .cta-band p,
-  .cta-band .cta-cluster,
-  .cta-band .btn {
-    box-sizing: border-box;
-    inline-size: 100%;
-    max-inline-size: 100%;
-  }
-
-  .cta-band h2 {
-    font-size: clamp(2.2rem, 10vw, 3rem);
-    overflow-wrap: normal;
-    word-break: normal;
-  }
-
-  .cta-band .cta-cluster {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .cta-band .btn {
-    min-inline-size: 0;
-    padding-inline: 16px;
-  }
-
-  .cta-visual {
-    display: none;
-  }
-}
-
-/* End final CTA screenshot fix. */
-
-/* Final design fit sweep: keep marketing mockups and account controls calm at
-   awkward browser zooms without changing the product flow. */
-.hero {
-  max-inline-size: min(var(--container), calc(100vw - clamp(36px, 5vw, 76px)));
-  grid-template-columns: minmax(0, 0.96fr) minmax(0, 0.72fr);
-  gap: clamp(28px, 3.2vw, 48px);
-  padding-inline: clamp(20px, 2.6vw, 34px);
-}
-
-.hero-copy {
-  inline-size: 100%;
-  max-inline-size: min(100%, 640px);
-}
-
-.hero .h1 {
-  max-inline-size: min(100%, 11.6ch);
-  font-size: clamp(3rem, 4.8vw, 4.65rem);
-  line-height: 1.08;
-}
-
-.hero-stage {
-  inline-size: min(100%, 450px);
-  block-size: clamp(410px, 34vw, 500px);
-}
-
-.hero-stage .resume-card {
-  max-inline-size: none;
-}
-
-.hero-stage .resume-card-front {
-  inline-size: clamp(270px, 21vw, 330px);
-  block-size: clamp(386px, 29vw, 464px);
-}
-
-.hero-stage .resume-card-back-l {
-  inline-size: clamp(218px, 16.2vw, 270px);
-  block-size: clamp(326px, 24.2vw, 398px);
-  transform: rotate(-8deg) translate(clamp(-58px, -4.2vw, -42px), 22px);
-}
-
-.hero-stage .resume-card-back-r {
-  inline-size: clamp(210px, 15.4vw, 256px);
-  block-size: clamp(316px, 23.4vw, 382px);
-  transform: rotate(7deg) translate(clamp(46px, 3.8vw, 66px), 28px);
-}
-
-.hero-stage:hover .resume-card-front {
-  transform: rotate(-1deg) translateY(-5px);
-}
-
-.hero-stage:hover .resume-card-back-l {
-  transform: rotate(-9deg) translate(clamp(-66px, -4.6vw, -50px), 24px);
-}
-
-.hero-stage:hover .resume-card-back-r {
-  transform: rotate(8deg) translate(clamp(54px, 4.2vw, 76px), 32px);
-}
-
-.dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-}
-
-.dash-mock .dash-stat {
-  justify-content: start;
-  min-block-size: 144px;
-  padding: clamp(20px, 2cqi, 24px);
-}
-
-.dash-stat-label,
-.dash-stat-value,
-.dash-stat-delta {
-  inline-size: 100%;
-}
-
-.dash-mock .dash-stat-value {
-  font-size: clamp(1.14rem, 2.1cqi, 1.36rem);
-  line-height: 1.1;
-  overflow-wrap: anywhere;
-  text-wrap: balance;
-}
-
-.dash-mock .dash-stat-delta {
-  max-inline-size: 100%;
-}
-
-.settings-profile-actions {
-  inline-size: min(100%, 540px);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 168px), 1fr));
-}
-
-.settings-profile-actions form,
-.settings-billing-head form {
-  inline-size: 100%;
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link,
-.settings-export-actions .btn,
-.price-card .btn {
-  min-inline-size: 0;
-  max-inline-size: 100%;
-  min-block-size: 46px;
-  padding-inline: clamp(12px, 1.2vw, 18px);
-  font-size: clamp(0.84rem, 1vw, 0.95rem);
-  line-height: 1.12;
-  overflow: visible;
-  overflow-wrap: anywhere;
-  white-space: normal;
-}
-
-.settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 172px), 210px);
-}
-
-.settings-billing-head .ghost-button {
-  inline-size: 100%;
-}
-
-.settings-plan-active-card {
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 132px), 156px);
-}
-
-.settings-plan-active-card .settings-inline-link {
-  inline-size: 100%;
-  justify-self: stretch;
-}
-
-@media (max-width: 1180px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .hero-copy {
-    max-inline-size: min(100%, 720px);
-  }
-
-  .hero .h1 {
-    font-size: clamp(2.7rem, 7vw, 4.25rem);
-  }
-
-  .hero-stage {
-    inline-size: min(100%, 480px);
-    block-size: clamp(390px, 54vw, 460px);
-  }
-}
-
-@media (max-width: 820px) {
-  .dash-main-head {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .dash-main-head .btn-sm {
-    inline-size: 100%;
-    max-inline-size: none;
-    justify-self: stretch;
-  }
-}
-
-@media (max-width: 760px) {
-  .hero {
-    max-inline-size: calc(100vw - 28px);
-  }
-
-  .hero .h1 {
-    font-size: clamp(2.45rem, 11vw, 3.45rem);
-  }
-
+@container settings-section (max-width: 720px) {
   .settings-billing-head,
   .settings-plan-active-card {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-/* Screenshot repair: browser zoom can turn the landing hero into a cramped
-   two-column composition even on a wide physical display. Collapse the paper
-   stack earlier and clip accidental horizontal drift instead of letting the
-   page pan sideways. */
-html,
-body {
-  max-inline-size: 100%;
-  overflow-x: clip;
-}
-
-@media (max-width: 1420px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr);
-    justify-items: start;
-    overflow: clip;
+    grid-template-columns: 1fr;
   }
 
-  .hero-copy {
-    max-inline-size: min(100%, 760px);
-  }
-
-  .hero .h1 {
-    max-inline-size: min(100%, 11.8ch);
-    font-size: clamp(2.75rem, 7vw, 4.4rem);
-  }
-
-  .hero-stage {
-    justify-self: center;
-    inline-size: min(100%, 520px);
-    block-size: clamp(390px, 48vw, 500px);
-  }
-}
-
-@media (max-width: 720px) {
-  .hero-stage {
-    inline-size: min(100%, 430px);
-    block-size: clamp(350px, 92vw, 430px);
-  }
-
-  .hero-stage .resume-card-front {
-    inline-size: clamp(236px, 64vw, 286px);
-    block-size: clamp(340px, 88vw, 404px);
-  }
-
-  .hero-stage .resume-card-back-l {
-    inline-size: clamp(184px, 52vw, 232px);
-    block-size: clamp(276px, 74vw, 344px);
-    transform: rotate(-8deg) translate(clamp(-40px, -9vw, -26px), 20px);
-  }
-
-  .hero-stage .resume-card-back-r {
-    inline-size: clamp(176px, 48vw, 218px);
-    block-size: clamp(266px, 70vw, 326px);
-    transform: rotate(7deg) translate(clamp(28px, 8vw, 42px), 26px);
-  }
-}
-
-/* May 30 visual fit lock: the public pages are often checked in wide browser
-   windows with zoom enabled, where older overrides could still make the hero
-   art, studio preview cards, and settings actions crowd each other. */
-.hero {
-  box-sizing: border-box;
-  inline-size: min(100%, var(--container));
-  max-inline-size: min(var(--container), calc(100vw - clamp(28px, 4.8vw, 84px)));
-  margin-inline: auto;
-  grid-template-columns: minmax(0, 0.98fr) minmax(340px, 0.62fr);
-  gap: clamp(30px, 3.6vw, 54px);
-  padding-inline: clamp(24px, 3.4vw, 48px);
-  overflow: clip;
-}
-
-.hero-copy {
-  max-inline-size: min(100%, 690px);
-}
-
-.hero .h1 {
-  max-inline-size: min(100%, 12ch);
-  font-size: clamp(2.85rem, 4.35vw, 4.45rem);
-  line-height: 1.08;
-}
-
-.hero-stage {
-  justify-self: end;
-  inline-size: min(100%, 410px);
-  block-size: clamp(390px, 30vw, 470px);
-}
-
-.hero-stage .resume-card-front {
-  inline-size: clamp(258px, 19vw, 306px);
-  block-size: clamp(370px, 27vw, 432px);
-}
-
-.hero-stage .resume-card-back-l {
-  inline-size: clamp(206px, 15vw, 244px);
-  block-size: clamp(306px, 22.5vw, 362px);
-  transform: rotate(-8deg) translate(clamp(-46px, -3vw, -30px), 22px);
-}
-
-.hero-stage .resume-card-back-r {
-  inline-size: clamp(198px, 14.4vw, 236px);
-  block-size: clamp(298px, 21.8vw, 352px);
-  transform: rotate(7deg) translate(clamp(34px, 3vw, 52px), 28px);
-}
-
-.hero-stage:hover .resume-card-front {
-  transform: rotate(-1deg) translateY(-5px);
-}
-
-.hero-stage:hover .resume-card-back-l {
-  transform: rotate(-9deg) translate(clamp(-54px, -3.6vw, -38px), 24px);
-}
-
-.hero-stage:hover .resume-card-back-r {
-  transform: rotate(8deg) translate(clamp(42px, 3.6vw, 62px), 32px);
-}
-
-.dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
-}
-
-.dash-mock .dash-stat {
-  min-inline-size: 0;
-  min-block-size: 136px;
-  overflow: clip;
-}
-
-.dash-mock .dash-stat-value {
-  font-size: clamp(1.55rem, 2.4cqi, 2rem);
-  line-height: 1.04;
-  max-inline-size: 100%;
-  overflow-wrap: anywhere;
-  text-wrap: balance;
-}
-
-.settings-profile-actions {
-  inline-size: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-  gap: 12px;
-}
-
-.settings-profile-actions > .primary-button {
-  flex: 0 1 230px;
-}
-
-.settings-profile-actions > form {
-  flex: 0 1 150px;
-  inline-size: auto;
-}
-
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link,
-.settings-export-actions .btn,
-.price-card .btn {
-  min-block-size: 48px;
-  padding-inline: clamp(16px, 1.4vw, 22px);
-  font-size: clamp(0.92rem, 1vw, 1rem);
-  line-height: 1.12;
-  overflow-wrap: normal;
-  text-wrap: balance;
-  white-space: normal;
-}
-
-.settings-profile-actions .ghost-button {
-  inline-size: 100%;
-}
-
-.settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(224px, max-content);
-}
-
-.settings-billing-head form {
-  justify-self: end;
-  inline-size: auto;
-  max-inline-size: none;
-}
-
-.settings-billing-head .ghost-button {
-  inline-size: auto;
-  min-inline-size: 224px;
-}
-
-.settings-plan-active-card {
-  grid-template-columns: minmax(0, 1fr) minmax(176px, max-content);
-}
-
-.settings-plan-active-card .settings-inline-link {
-  inline-size: auto;
-  min-inline-size: 176px;
-  justify-self: end;
-}
-
-@media (max-width: 1620px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.54fr);
-  }
-
-  .hero-stage {
-    inline-size: min(100%, 380px);
-    block-size: clamp(360px, 30vw, 440px);
-  }
-}
-
-@media (max-width: 1360px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr);
-    justify-items: start;
-  }
-
-  .hero-stage {
-    justify-self: center;
-    inline-size: min(100%, 500px);
-    block-size: clamp(370px, 45vw, 470px);
-  }
-}
-
-@media (max-width: 760px) {
-  .hero {
-    max-inline-size: calc(100vw - 24px);
-    padding-inline: clamp(18px, 5vw, 26px);
-  }
-
-  .settings-profile-actions,
-  .settings-profile-actions > .primary-button,
-  .settings-profile-actions > form,
   .settings-billing-head form,
   .settings-billing-head .ghost-button,
   .settings-plan-active-card .settings-inline-link {
     inline-size: 100%;
-    max-inline-size: none;
-    min-inline-size: 0;
-    justify-self: stretch;
-  }
-
-  .settings-billing-head,
-  .settings-plan-active-card {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-/* May 30 follow-up: remove the remaining wide-viewport drift seen in review
-   screenshots and keep compact dashboard/settings labels inside their cards. */
-.page-shell {
-  inline-size: 100%;
-  max-inline-size: 100vw;
-  overflow-x: hidden;
-}
-
-.nav,
-.logos,
-.section,
-.dash-section,
-.templates,
-.footer,
-.hero {
-  box-sizing: border-box;
-  max-inline-size: 100vw;
-}
-
-.hero {
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
-  align-items: center;
-  gap: clamp(28px, 3vw, 46px);
-}
-
-.hero .h1 {
-  max-inline-size: min(100%, 11ch);
-  font-size: clamp(2.72rem, 3.8vw, 4.18rem);
-}
-
-.hero-sub {
-  max-inline-size: min(100%, 48ch);
-}
-
-.hero-stage {
-  inline-size: min(100%, 360px);
-  block-size: clamp(350px, 28vw, 430px);
-}
-
-.hero-stage .resume-card-front {
-  inline-size: clamp(236px, 17vw, 286px);
-  block-size: clamp(338px, 25vw, 406px);
-}
-
-.hero-stage .resume-card-back-l {
-  inline-size: clamp(190px, 13.2vw, 224px);
-  block-size: clamp(282px, 20vw, 334px);
-  transform: rotate(-8deg) translate(clamp(-42px, -2.8vw, -26px), 18px);
-}
-
-.hero-stage .resume-card-back-r {
-  inline-size: clamp(182px, 12.6vw, 214px);
-  block-size: clamp(274px, 19vw, 322px);
-  transform: rotate(7deg) translate(clamp(28px, 2.8vw, 46px), 24px);
-}
-
-.hero-stage:hover .resume-card-front {
-  transform: rotate(-1deg) translateY(-5px);
-}
-
-.hero-stage:hover .resume-card-back-l {
-  transform: rotate(-9deg) translate(clamp(-48px, -3.2vw, -32px), 21px);
-}
-
-.hero-stage:hover .resume-card-back-r {
-  transform: rotate(8deg) translate(clamp(34px, 3.2vw, 54px), 28px);
-}
-
-@media (max-width: 1760px) {
-  .hero {
-    grid-template-columns: minmax(0, 1fr);
-    max-inline-size: min(1120px, calc(100vw - clamp(32px, 5vw, 72px)));
-    justify-items: start;
-  }
-
-  .hero-copy {
-    max-inline-size: min(100%, 760px);
-  }
-
-  .hero-stage {
-    justify-self: center;
-    inline-size: min(100%, 540px);
-    block-size: clamp(390px, 36vw, 500px);
-  }
-}
-
-.dash-mock .dash-stats {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-}
-
-.dash-mock .dash-stat {
-  min-block-size: 142px;
-}
-
-.dash-mock .dash-stat-value {
-  font-size: clamp(1.28rem, 3.4cqi, 1.62rem);
-  line-height: 1.08;
-  overflow-wrap: anywhere;
-}
-
-.dash-main-head .btn-sm,
-.settings-profile-actions .primary-button,
-.settings-profile-actions .ghost-button,
-.settings-billing-head .ghost-button,
-.settings-plan-active-card .settings-inline-link,
-.price-card .btn {
-  gap: 8px;
-  text-wrap: balance;
-}
-
-.settings-profile-actions {
-  inline-size: min(100%, 560px);
-  grid-template-columns: minmax(218px, max-content) minmax(132px, max-content);
-  justify-content: start;
-}
-
-.settings-profile-actions > .primary-button {
-  min-inline-size: 218px;
-}
-
-.settings-profile-actions > form {
-  min-inline-size: 132px;
-}
-
-.settings-billing-head {
-  grid-template-columns: minmax(0, 1fr) minmax(198px, max-content);
-}
-
-.settings-billing-head form,
-.settings-billing-head .ghost-button {
-  min-inline-size: 198px;
-}
-
-.settings-plan-active-card {
-  grid-template-columns: minmax(0, 1fr) minmax(164px, max-content);
-}
-
-.settings-plan-active-card .settings-inline-link {
-  min-inline-size: 164px;
-}
-
-@media (max-width: 820px) {
-  .settings-profile-actions,
-  .settings-billing-head,
-  .settings-plan-active-card {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .settings-profile-actions > .primary-button,
-  .settings-profile-actions > form,
-  .settings-billing-head form,
-  .settings-billing-head .ghost-button,
-  .settings-plan-active-card .settings-inline-link {
-    inline-size: 100%;
-    min-inline-size: 0;
     max-inline-size: none;
     justify-self: stretch;
   }
