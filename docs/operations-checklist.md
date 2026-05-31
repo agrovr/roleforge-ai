@@ -132,6 +132,15 @@ Check these when checkout, portal, or plan state breaks:
 - Stripe webhook events include checkout completion and subscription lifecycle events documented in `docs/stripe-billing-foundation.md`.
 - Supabase `account_entitlements` row for the signed-in user.
 
+Before switching Premium back on with live Stripe values:
+
+```bash
+cd C:\Users\ashmi\Downloads\Project_v1\resume-tailor-ui-github
+npm run check:billing -- --strict
+```
+
+The check validates that production has live Stripe mode, live-looking price IDs, a webhook signing secret, Supabase entitlement write access, and a production site URL without printing secrets. If it fails, Premium checkout should remain paused while the signed-in free workflow stays available.
+
 Useful docs:
 
 - `docs/plan-rules.md`

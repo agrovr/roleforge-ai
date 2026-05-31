@@ -22,6 +22,31 @@ Configured in Vercel production:
 
 Production checkout and customer portal access only enable when `STRIPE_SECRET_KEY` is a live key (`sk_live_...`). If production is still configured with a test key, the app fails closed and keeps the free signed-in workflow available without sending visitors to Stripe sandbox checkout.
 
+## Turning Premium back on with live Stripe
+
+Premium is ready to be re-enabled when the production Vercel environment uses live-mode Stripe values from the same Stripe account:
+
+1. In Stripe, switch to live mode.
+2. Create or confirm the live RoleForge AI Premium product.
+3. Create live monthly and yearly recurring Prices for `$9/month` and `$72/year`.
+4. Create a live webhook endpoint for `https://roleforgeai.vercel.app/api/billing/webhook` with the events listed below.
+5. In Vercel Production, set:
+   - `STRIPE_SECRET_KEY=sk_live_...`
+   - `STRIPE_WEBHOOK_SECRET=whsec_...`
+   - `STRIPE_PREMIUM_MONTHLY_PRICE_ID=price_...`
+   - `STRIPE_PREMIUM_YEARLY_PRICE_ID=price_...`
+   - `SUPABASE_SERVICE_ROLE_KEY=<existing production service role key>`
+   - `NEXT_PUBLIC_SITE_URL=https://roleforgeai.vercel.app`
+6. Redeploy the frontend from `main`.
+7. Run the launch check:
+
+```bash
+cd C:\Users\ashmi\Downloads\Project_v1\resume-tailor-ui-github
+npm run check:billing -- --strict
+```
+
+The check never prints secret values. It exits nonzero if production is still pointed at a test Stripe key or if the billing environment is incomplete.
+
 ## Stripe webhook endpoint
 
 Create a Stripe webhook endpoint for:
