@@ -19,6 +19,12 @@ test("direct checkout navigation redirects to the billing UI instead of renderin
   assert.match(checkoutRoute, /\/login\?next=\/settings&account=signin-required/);
 });
 
+test("direct billing portal navigation redirects to the billing UI instead of rendering an API error", () => {
+  assert.match(portalRoute, /export async function GET\(request: Request\)/);
+  assert.match(portalRoute, /\/settings#billing/);
+  assert.match(portalRoute, /\/login\?next=\/settings&account=signin-required/);
+});
+
 test("checkout sessions allow promotion codes for launch testing and controlled discounts", () => {
   assert.match(checkoutRoute, /allow_promotion_codes:\s*true/);
 });
