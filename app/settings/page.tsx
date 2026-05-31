@@ -109,8 +109,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     ? "Open Stripe billing management"
     : premiumActive
       ? "Billing management is unavailable right now."
-      : "Start Premium to open billing management.";
-  const inactiveBillingActionLabel = premiumActive ? "Billing unavailable right now" : "Billing opens after checkout";
+      : "Premium billing is not accepting payments right now.";
+  const inactiveBillingActionLabel = premiumActive ? "Billing unavailable right now" : "Premium billing unavailable";
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName = accountDisplayName(user);
   const planFeatures = premiumActive
@@ -366,7 +366,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     </div>
                     <form action="/api/billing/checkout" method="post">
                       <input type="hidden" name="interval" value="month" />
-                      <button className="primary-button" type="submit" disabled={!checkoutReady}>Start monthly</button>
+                      <button className="primary-button" type="submit" disabled={!checkoutReady}>{checkoutReady ? "Start monthly" : "Unavailable"}</button>
                     </form>
                   </article>
                   <article className="settings-price-card featured">
@@ -377,7 +377,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     </div>
                     <form action="/api/billing/checkout" method="post">
                       <input type="hidden" name="interval" value="year" />
-                      <button className="primary-button" type="submit" disabled={!checkoutReady}>Start yearly</button>
+                      <button className="primary-button" type="submit" disabled={!checkoutReady}>{checkoutReady ? "Start yearly" : "Unavailable"}</button>
                     </form>
                   </article>
                 </div>
@@ -389,7 +389,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     : "Use Manage billing for subscription changes and invoices."
                   : checkoutReady
                   ? "Checkout opens securely in Stripe. Premium access updates after the subscription syncs."
-                  : "Premium checkout is temporarily unavailable. Please try again later."}
+                  : "Premium billing is paused while live checkout is prepared. The free signed-in studio remains available."}
               </p>
             </div>
           </section>

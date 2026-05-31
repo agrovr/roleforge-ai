@@ -8,11 +8,12 @@ const stylesheet = readFileSync("app/globals.css", "utf8");
 test("settings billing action distinguishes active portals from inactive billing state", () => {
   assert.match(settingsPage, /portalReady\s*\?\s*\(/);
   assert.match(settingsPage, /action="\/api\/billing\/portal"/);
-  assert.match(settingsPage, /inactiveBillingActionLabel\s*=\s*premiumActive\s*\?\s*"Billing unavailable right now"\s*:\s*"Billing opens after checkout"/);
+  assert.match(settingsPage, /inactiveBillingActionLabel\s*=\s*premiumActive\s*\?\s*"Billing unavailable right now"\s*:\s*"Premium billing unavailable"/);
   assert.match(settingsPage, /\{inactiveBillingActionLabel\}/);
   assert.match(settingsPage, /aria-disabled="true"/);
   assert.match(settingsPage, /Billing management is unavailable right now\./);
-  assert.match(settingsPage, /Start Premium to open billing management\./);
+  assert.match(settingsPage, /Premium billing is not accepting payments right now\./);
+  assert.match(settingsPage, /Premium billing is paused while live checkout is prepared/);
   assert.doesNotMatch(settingsPage, /No billing portal yet/);
   assert.doesNotMatch(settingsPage, /type="submit"\s+disabled=\{!portalReady\}/);
 });

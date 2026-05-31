@@ -3,13 +3,14 @@ import type { BillingStatus } from "../entitlements";
 type BillingConfigForReadiness = {
   secretKey: string;
   checkoutConfigured: boolean;
+  liveModeReady?: boolean;
 };
 
 export function billingReadiness(
   config: BillingConfigForReadiness,
   options: { hasServiceRole: boolean; billingStatus: BillingStatus },
 ) {
-  const billingServiceReady = Boolean(config.secretKey && options.hasServiceRole);
+  const billingServiceReady = Boolean(config.secretKey && options.hasServiceRole && config.liveModeReady !== false);
 
   return {
     checkoutReady: Boolean(config.checkoutConfigured && billingServiceReady),

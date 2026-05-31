@@ -10,19 +10,39 @@ export const PREMIUM_PRICE = {
 
 export const CHECKOUT_SESSION_ID_TEMPLATE = "{CHECKOUT_SESSION_ID}";
 
+export type StripeKeyMode = "live" | "test" | "unknown";
+
+export function stripeKeyMode(secretKey: string): StripeKeyMode {
+  if (secretKey.startsWith("sk_live_")) return "live";
+  if (secretKey.startsWith("sk_test_")) return "test";
+  return secretKey ? "unknown" : "unknown";
+}
+
+export function productionRequiresLiveStripeKey() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim().toLowerCase() ?? "";
+  const productionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim().toLowerCase() ?? "";
+  return process.env.VERCEL_ENV === "production" || siteUrl.includes("roleforgeai.vercel.app") || productionUrl.includes("roleforgeai.vercel.app");
+}
+
 export function getStripeBillingConfig() {
   const secretKey = process.env.STRIPE_SECRET_KEY?.trim() ?? "";
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET?.trim() ?? "";
   const monthlyPriceId = process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID?.trim() ?? "";
   const yearlyPriceId = process.env.STRIPE_PREMIUM_YEARLY_PRICE_ID?.trim() ?? "";
+  const keyMode = stripeKeyMode(secretKey);
+  const liveKeyRequired = productionRequiresLiveStripeKey();
+  const liveModeReady = !liveKeyRequired || keyMode === "live";
 
   return {
     secretKey,
     webhookSecret,
     monthlyPriceId,
     yearlyPriceId,
-    checkoutConfigured: Boolean(secretKey && monthlyPriceId && yearlyPriceId),
-    webhookConfigured: Boolean(secretKey && webhookSecret),
+    keyMode,
+    liveKeyRequired,
+    liveModeReady,
+    checkoutConfigured: Boolean(secretKey && monthlyPriceId && yearlyPriceId && liveModeReady),
+    webhookConfigured: Boolean(secretKey && webhookSecret && liveModeReady),
   };
 }
 

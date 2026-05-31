@@ -20,6 +20,8 @@ Configured in Vercel production:
 - `STRIPE_PREMIUM_MONTHLY_PRICE_ID`
 - `STRIPE_PREMIUM_YEARLY_PRICE_ID`
 
+Production checkout and customer portal access only enable when `STRIPE_SECRET_KEY` is a live key (`sk_live_...`). If production is still configured with a test key, the app fails closed and keeps the free signed-in workflow available without sending visitors to Stripe sandbox checkout.
+
 ## Stripe webhook endpoint
 
 Create a Stripe webhook endpoint for:

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { prepareCheckoutCustomer } from "@/app/lib/billing/customer";
+import { billingReadiness } from "@/app/lib/billing/readiness";
 import { absoluteUrl, checkoutSuccessUrl, getStripeBillingConfig, getStripeClient, priceIdForInterval, type BillingInterval } from "@/app/lib/billing/stripe";
 import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
 import { createRoleForgeServiceClient } from "@/app/lib/supabase/service";
@@ -29,8 +30,12 @@ export async function POST(request: Request) {
   const stripe = getStripeClient();
   const billingConfig = getStripeBillingConfig();
   const serviceSupabase = createRoleForgeServiceClient();
+  const billingReady = billingReadiness(billingConfig, {
+    hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()),
+    billingStatus: "none",
+  });
 
-  if (!stripe || !billingConfig.checkoutConfigured || !serviceSupabase) {
+  if (!stripe || !billingReady.checkoutReady || !serviceSupabase) {
     return NextResponse.json({ error: "Billing is temporarily unavailable. Try again shortly." }, { status: 503 });
   }
 

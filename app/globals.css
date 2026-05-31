@@ -11837,10 +11837,10 @@ body,
 }
 
 .dash-stat-value {
-  font-size: clamp(1.06rem, 4.8cqi, 1.38rem);
-  line-height: 1.08;
+  font-size: clamp(1rem, 4.1cqi, 1.24rem);
+  line-height: 1.12;
   hyphens: none;
-  overflow-wrap: normal;
+  overflow-wrap: anywhere;
   text-wrap: balance;
   word-break: normal;
 }
@@ -12056,6 +12056,7 @@ body,
   width: 100%;
   min-width: 0;
   min-height: 48px;
+  font-size: clamp(0.84rem, 1.7cqi, 0.96rem);
   line-height: 1.12;
   text-wrap: balance;
   white-space: normal;
@@ -12066,6 +12067,7 @@ body,
   min-width: min(100%, 220px);
   min-height: 50px;
   line-height: 1.12;
+  font-size: clamp(0.82rem, 2cqi, 0.95rem);
   text-wrap: balance;
   white-space: normal;
 }
@@ -12073,6 +12075,7 @@ body,
 .settings-plan-active-card .settings-inline-link {
   flex: 0 1 170px;
   min-width: min(100%, 150px);
+  font-size: clamp(0.82rem, 2cqi, 0.95rem);
   line-height: 1.12;
   text-wrap: balance;
   white-space: normal;
@@ -12453,6 +12456,19 @@ body,
   .settings-profile-actions,
   .settings-billing-head {
     grid-template-columns: 1fr;
+  }
+}
+
+@container settings-section (max-width: 1060px) {
+  .settings-billing-head {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-billing-head form,
+  .settings-billing-head .ghost-button {
+    inline-size: 100%;
+    max-inline-size: none;
+    justify-self: stretch;
   }
 }
 
