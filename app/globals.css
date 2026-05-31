@@ -12820,5 +12820,101 @@ body,
     display: grid;
     grid-template-columns: 1fr;
   }
+
+  .hero-badge {
+    display: none;
+  }
 }
 /* End final CTA screenshot fix. */
+
+/* Final mobile landing guardrail: keep the public hero inside the viewport after
+   the later screenshot-fit overrides above have all applied. */
+@media (max-width: 520px) {
+  .nav,
+  .hero,
+  .logos,
+  .section,
+  .dash-section,
+  .templates,
+  .cta-section,
+  .footer {
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  .hero {
+    margin-inline: 0;
+    padding: 46px 16px 56px;
+    gap: 30px;
+    overflow: hidden;
+  }
+
+  .hero-copy,
+  .hero-copy > *,
+  .hero-sub,
+  .hero-ctas,
+  .hero-actions,
+  .hero-meta,
+  .hero-stage {
+    min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+
+  .hero-trust {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding-inline: 8px 12px;
+  }
+
+  .hero-trust span:not(.badge) {
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .hero .h1 {
+    max-inline-size: 100%;
+    font-size: clamp(2rem, 9.2vw, 2.35rem);
+    line-height: 1.08;
+    overflow-wrap: normal;
+    text-wrap: balance;
+  }
+
+  .hero-line {
+    white-space: normal;
+  }
+
+  .hero-sub {
+    max-inline-size: 34ch;
+    font-size: 1.05rem;
+    line-height: 1.55;
+    overflow-wrap: break-word;
+  }
+
+  .hero-ctas,
+  .hero-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .hero-ctas .btn,
+  .hero-actions .btn {
+    inline-size: 100%;
+    min-inline-size: 0;
+    padding-inline: 16px;
+    white-space: normal;
+  }
+
+  .hero-stage {
+    inline-size: 100%;
+    block-size: clamp(390px, 112vw, 460px);
+    justify-self: center;
+  }
+
+  .hero-badge {
+    display: none;
+  }
+}
