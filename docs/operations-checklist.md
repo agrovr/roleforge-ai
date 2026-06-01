@@ -164,7 +164,7 @@ For a one-shot live proof after rotating `STRIPE_SECRET_KEY`, copy the live secr
 .\scripts\live_billing_one_time_proof.ps1
 ```
 
-The runner clears any `sk_live_...` clipboard value immediately and again during cleanup, updates Vercel Production, redeploys, creates a one-use 100% off live promo code, opens Stripe Checkout for a temporary proof user, verifies Premium activation in Supabase, and cleans up the proof user/subscription. Use `-PromptForSecret` to paste the Stripe key into a hidden prompt without using the clipboard, `-PromptForSupabaseServiceRole` if Supabase CLI is not logged in, `-SkipVercelUpdate`, `-SkipRedeploy`, or `-CopyPromoCode` for those specific variants.
+The runner clears any `sk_live_...` clipboard value immediately and again during cleanup, updates Vercel Production, redeploys, creates a one-use 100% off live promo code, opens Stripe Checkout for a temporary proof user, verifies Premium activation in Supabase, and cleans up the proof user/subscription. Use `-PromptForSecret` to paste the Stripe key into a hidden prompt without using the clipboard, `-PromptForSupabaseServiceRole` if Supabase CLI is not logged in, `-SkipVercelUpdate`, `-SkipRedeploy`, `-CopyPromoCode`, or `-AutoPoll` for those specific variants.
 
 To verify live checkout without charging a card, run the live checkout smoke with the Supabase service-role key available in the environment:
 

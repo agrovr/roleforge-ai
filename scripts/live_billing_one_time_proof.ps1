@@ -11,6 +11,7 @@ param(
   [switch]$SkipRedeploy,
   [switch]$KeepProofUser,
   [switch]$CopyPromoCode,
+  [switch]$AutoPoll,
   [switch]$PromptForSecret,
   [switch]$PromptForSupabaseServiceRole
 )
@@ -190,7 +191,11 @@ try {
   Write-Host "Checkout URL: $($proof.checkoutUrl)"
   Write-Host "Use the promo code above in Stripe Checkout, complete checkout, then return here."
   Start-Process $proof.checkoutUrl
-  Read-Host "Press Enter after Stripe Checkout returns to RoleForge"
+  if ($AutoPoll) {
+    Write-Host "Waiting up to $WaitSeconds seconds for Stripe webhook Premium activation."
+  } else {
+    Read-Host "Press Enter after Stripe Checkout returns to RoleForge"
+  }
 
   $check = Invoke-NodeJson @("scripts\check_premium_entitlement.mjs", "--user-id", $proofUserId, "--wait-seconds", "$WaitSeconds")
   if (-not $check.ok) {
