@@ -47,6 +47,11 @@ test("groups settings saved projects by project with a restore link", () => {
       accountRunId: "run-latest",
       createdAt: "2026-05-15T20:00:00.000Z",
       score: 86,
+      downloadUrl: "/api/workflow/download/latest.pdf",
+      downloads: {
+        pdf: "/api/workflow/download/latest.pdf",
+        docx: "/api/workflow/download/latest.docx",
+      },
       snapshot: {
         result: {
           tailored_text: "Latest tailored draft",
@@ -67,9 +72,34 @@ test("groups settings saved projects by project with a restore link", () => {
   assert.match(summaries[0].detail, /Engineer/);
   assert.equal(summaries[0].href, "/app?historyRun=run-latest&historyAction=restore#history");
   assert.equal(summaries[0].projectId, "project-1");
+  assert.deepEqual(summaries[0].downloads, [{ format: "pdf", label: "PDF", url: "/api/workflow/download/latest.pdf" }]);
   assert.equal(summaries[0].actionLabel, "Restore");
   assert.equal(summaries[0].stageStatus, "exported");
   assert.equal(summaries[0].stageLabel, "Ready");
+});
+
+test("settings saved project downloads respect premium export entitlement", () => {
+  const summaries = settingsProjectSummaries([
+    savedRun({
+      downloads: {
+        pdf: "/api/workflow/download/latest.pdf",
+        docx: "/api/workflow/download/latest.docx",
+        txt: "/api/workflow/download/latest.txt",
+      },
+    }),
+  ], {
+    plan: "premium",
+    exportFormats: {
+      pdf: true,
+      docx: true,
+      txt: true,
+    },
+  });
+
+  assert.deepEqual(
+    summaries[0].downloads.map((download) => download.label),
+    ["PDF", "DOCX", "TXT"],
+  );
 });
 
 test("uses project status when a settings project cannot be restored", () => {

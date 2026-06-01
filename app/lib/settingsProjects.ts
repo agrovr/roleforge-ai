@@ -1,6 +1,12 @@
 import type { ExportEntitlement } from "./exportFormats";
 import { applicationStatusCopy, type ApplicationStatus } from "./applicationStatus";
-import { groupHistoryItems, historyGeneratedAssetSummary, historyGroupStatus, type HistoryItem } from "./history";
+import {
+  groupHistoryItems,
+  historyDownloadEntries,
+  historyGeneratedAssetSummary,
+  historyGroupStatus,
+  type HistoryItem,
+} from "./history";
 import { getResumeTemplate, isResumeTemplateSlug } from "./resumeTemplates";
 import { savedRunHistoryHref } from "./savedRunLinks";
 import type { SavedHistoryItem } from "./supabase/savedProjects";
@@ -11,6 +17,11 @@ export type SettingsProjectSummary = {
   detail: string;
   href: string;
   projectId: string;
+  downloads: Array<{
+    format: string;
+    label: string;
+    url: string;
+  }>;
   actionLabel: string;
   actionDetail: string;
   stageStatus: ApplicationStatus;
@@ -57,6 +68,12 @@ export function settingsProjectSummaries(
     const templateName = savedRunTemplateName(group.latest);
     const assetSummary = historyGeneratedAssetSummary(group.latest);
     const stage = applicationStatusCopy(group.accountItem?.applicationStatus ?? group.latest.applicationStatus);
+    const downloadRun = group.items.find((item) => historyDownloadEntries(item, entitlement).length) ?? group.latest;
+    const downloads = historyDownloadEntries(downloadRun, entitlement).map((download) => ({
+      format: download.format,
+      label: download.format.toUpperCase(),
+      url: download.url,
+    }));
     const versionLabel = `${group.items.length} ${group.items.length === 1 ? "version" : "versions"}`;
     const detail = [
       group.target,
@@ -73,6 +90,7 @@ export function settingsProjectSummaries(
       detail,
       href: savedRunHistoryHref(linkRun, { restore: Boolean(restoreRun) }),
       projectId: group.accountItem?.projectId ?? group.latest.projectId ?? "",
+      downloads,
       actionLabel: restoreRun ? "Restore" : status.label,
       actionDetail: status.detail,
       stageStatus: stage.status,

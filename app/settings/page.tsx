@@ -697,6 +697,20 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                           </div>
                         </form>
                       ) : null}
+                      {project.downloads.length ? (
+                        <div className="settings-project-downloads" aria-label={`Downloads for ${project.title}`}>
+                          {project.downloads.map((download) => (
+                            <a
+                              className="btn btn-soft btn-sm"
+                              href={download.url}
+                              key={`${project.key}-${download.format}`}
+                            >
+                              <RoleForgeIcon name="download" size={12} />
+                              {download.label}
+                            </a>
+                          ))}
+                        </div>
+                      ) : null}
                     </article>
                   ))}
                 </div>

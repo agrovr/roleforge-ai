@@ -14,6 +14,8 @@ test("settings saved projects expose account-owned stage updates", () => {
   assert.match(settingsPage, /APPLICATION_STATUS_OPTIONS\.map/);
   assert.match(settingsPage, /name="projectId"/);
   assert.match(settingsPage, /name="status"/);
+  assert.match(settingsPage, /project\.downloads\.map/);
+  assert.match(settingsPage, /settings-project-downloads/);
   assert.match(settingsPage, /account=project-stage-saved#projects/);
 });
 
@@ -28,4 +30,6 @@ test("settings saved project stage controls are compact and overflow-safe", () =
   assert.match(stylesheet, /\.settings-project-stage-form\s*\{(?=[^}]*flex:\s*1\s+1\s+100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-stage-controls\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*92px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-stage-controls\s+button\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-downloads\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*92px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-downloads\s+\.btn\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
 });
