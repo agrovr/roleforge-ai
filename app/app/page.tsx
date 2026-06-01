@@ -3,7 +3,7 @@
 import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Brand } from "../components/Brand";
-import { RoleForgeIcon } from "../components/RoleForgeIcons";
+import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { writeClipboardText } from "../lib/clipboard";
 import { downloadStatusFromHead } from "../lib/downloadStatus";
@@ -2586,11 +2586,40 @@ export default function Page() {
           href: "/login?next=%2Fapp&account=signin-required",
           action: "Sign in",
         };
-  const accountItems = [
+  const accountUsageValue = accountStatus?.usage
+    ? accountStatus.usage.monthlyRunLimit === null
+      ? "Unlimited"
+      : `${accountStatus.usage.remainingRuns}`
+    : accountStatus?.entitlement?.monthlyRunLimit === null
+      ? "Unlimited"
+      : "Syncing";
+  const accountUsageCaption = accountStatus?.usage
+    ? accountStatus.usage.monthlyRunLimit === null
+      ? `${accountStatus.usage.monthlyRuns} ${runWord(accountStatus.usage.monthlyRuns)} this month`
+      : `${runWord(accountStatus.usage.remainingRuns)} left this month`
+    : signedIn
+      ? "Usage is refreshing"
+      : "Sign in to view usage";
+  const accountExportValue = accountStatus?.entitlement?.exportFormats.docx ? "PDF DOCX TXT" : "PDF";
+  const accountExportCaption = accountStatus?.entitlement?.exportFormats.docx
+    ? "Premium exports active"
+    : premiumBillingReady
+      ? "Premium adds DOCX and TXT"
+      : "Premium exports paused";
+  const accountPlanValue = accountPremiumEnding ? "Ending" : accountPremiumActive ? "Premium" : signedIn ? "Free" : "Guest";
+  const accountPlanCaption = signedIn
+    ? accountPremiumEnding && accountPremiumEndLabel
+      ? `Access until ${accountPremiumEndLabel}`
+      : accountPremiumActive
+        ? "Unlimited workspace"
+        : "PDF export included"
+    : "Sign in required";
+  const accountItems: Array<{ label: string; detail: string; href: string; icon: RoleForgeIconName }> = [
     {
       label: "Saved projects",
       detail: signedIn ? "Completed runs save to History and reopen in the studio." : "Sign in first, then completed runs can follow you across browsers.",
       href: "/app#history",
+      icon: "chart",
     },
     {
       label: "Usage",
@@ -2604,6 +2633,7 @@ export default function Page() {
             ? "Usage is refreshing."
             : "Sign in to see run usage.",
       href: "/settings#usage",
+      icon: "sparkle",
     },
     {
       label: "Plan",
@@ -2615,6 +2645,7 @@ export default function Page() {
             : "Free workspace. PDF export is included."
         : "Sign in to connect plan and saved project state.",
       href: "/settings#billing",
+      icon: "lock",
     },
     {
       label: "Exports",
@@ -2624,6 +2655,7 @@ export default function Page() {
           ? "PDF exports are included. DOCX and TXT unlock with Premium."
           : "PDF exports are included. Premium exports are paused for launch.",
       href: "/settings#exports",
+      icon: "download",
     },
     {
       label: "Billing",
@@ -2631,6 +2663,7 @@ export default function Page() {
         ? "Manage plan changes and invoices from Settings."
         : "Premium billing is paused. Free studio access is available.",
       href: "/settings#billing",
+      icon: "settings",
     },
   ];
   const localHistoryCount = history.filter((entry) => !isAccountHistoryItem(entry, syncedHistoryIds)).length;
@@ -2847,10 +2880,35 @@ export default function Page() {
                   {accountNotice ? <div className="studio-account-notice">{accountNotice}</div> : null}
                   {signedIn ? (
                     <>
-                      <strong className="studio-account-email" title={accountUser?.email || "Signed in"}>{accountUser?.email || "Signed in"}</strong>
-                      <p>You are signed in and ready. Completed runs save to your project history.</p>
+                      <div className="studio-account-identity">
+                        <div className="studio-account-avatar" aria-hidden="true">{accountButtonLabel}</div>
+                        <div>
+                          <strong className="studio-account-email" title={accountUser?.email || "Signed in"}>{accountUser?.email || "Signed in"}</strong>
+                          <span>{accountPlanValue} workspace</span>
+                        </div>
+                      </div>
+                      <div className="studio-account-insights" aria-label="Account status summary">
+                        <Link href="/settings#billing" onClick={() => setAccountPanelOpen(false)}>
+                          <strong>{accountPlanValue}</strong>
+                          <span>{accountPlanCaption}</span>
+                        </Link>
+                        <Link href="/settings#usage" onClick={() => setAccountPanelOpen(false)}>
+                          <strong>{accountUsageValue}</strong>
+                          <span>{accountUsageCaption}</span>
+                        </Link>
+                        <Link href="/settings#exports" onClick={() => setAccountPanelOpen(false)}>
+                          <strong>{accountExportValue}</strong>
+                          <span>{accountExportCaption}</span>
+                        </Link>
+                      </div>
                       <small className={`studio-account-sync ${historySyncState}`}>{historySyncMessage}</small>
                       <div className="studio-account-shortcuts">
+                        <Link href="/app" onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="plus" size={14} /> Studio
+                        </Link>
+                        <Link href="/templates" onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="layers" size={14} /> Templates
+                        </Link>
                         <Link href="/settings" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="settings" size={14} /> Settings
                         </Link>
@@ -2861,7 +2919,7 @@ export default function Page() {
                             openHistoryPanel();
                           }}
                         >
-                          <RoleForgeIcon name="chart" size={14} /> History
+                          <RoleForgeIcon name="chart" size={14} /> Saved projects
                         </button>
                       </div>
                       <form className="studio-account-form" action="/auth/signout" method="post">
@@ -2904,7 +2962,7 @@ export default function Page() {
                         key={item.label}
                         onClick={(event) => openAccountSummaryLink(event, item.href)}
                       >
-                        <span>{item.label}</span>
+                        <span><RoleForgeIcon name={item.icon} size={14} /> {item.label}</span>
                         <small>{item.detail}</small>
                       </Link>
                     ))}
