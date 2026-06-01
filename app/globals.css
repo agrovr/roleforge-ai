@@ -7133,6 +7133,45 @@ html[data-theme="dark"] input::file-selector-button {
   flex: 0 0 auto;
 }
 
+.settings-account-menu {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.settings-account-menu summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.settings-account-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-topbar-avatar {
+  width: 42px;
+  height: 42px;
+  font-size: 0.78rem;
+}
+
+.settings-account-popover {
+  top: calc(100% + 10px);
+  width: min(430px, calc(100vw - 36px));
+}
+
+.settings-account-popover .studio-account-list {
+  margin-top: 10px;
+}
+
+.settings-account-shortcuts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 0;
+}
+
+.settings-account-popover .studio-account-form {
+  margin-bottom: 0;
+}
+
 .settings-page-layout {
   width: min(1200px, 100%);
   display: grid;
@@ -12911,12 +12950,28 @@ body,
 
   .settings-page-actions {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     justify-content: stretch;
+    width: 100%;
   }
 
   .settings-page-actions .btn {
     inline-size: 100%;
+  }
+
+  .settings-account-menu {
+    justify-self: end;
+  }
+
+  .settings-account-popover {
+    right: 0;
+    left: auto;
+    width: min(340px, calc(100vw - 44px));
+  }
+
+  .settings-account-popover::before {
+    right: 18px;
+    left: auto;
   }
 
   .history-actions,

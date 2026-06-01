@@ -117,6 +117,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const inactiveBillingActionLabel = premiumActive ? "Billing unavailable right now" : "Premium billing unavailable";
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName = accountDisplayName(user);
+  const accountInitials = (displayName || user.email || "RF").slice(0, 2).toUpperCase();
   const planFeatures = premiumActive
     ? ["Unlimited runs", "DOCX and TXT exports", premiumEnding && premiumEndLabel ? `Access until ${premiumEndLabel}` : "PDF export included"]
     : [monthlyRunAllowanceLabel(usage.monthlyRunLimit), "PDF export", "Saved project sync"];
@@ -143,6 +144,17 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const projectCountLabel = projectCount === 1 ? "Project" : "Projects";
   const runCountLabel = runCount === 1 ? "Run" : "Runs";
   const recentProjectSummaries = settingsProjectSummaries(recentSavedRuns, entitlement);
+  const settingsAccountPlanCaption = premiumEnding && premiumEndLabel
+    ? `Access until ${premiumEndLabel}`
+    : premiumActive
+      ? "Unlimited workspace"
+      : "PDF export included";
+  const settingsAccountUsageValue = usage.monthlyRunLimit === null ? "Unlimited" : `${usage.remainingRuns}`;
+  const settingsAccountUsageCaption = usage.monthlyRunLimit === null
+    ? `${usage.monthlyRuns} ${usedRunWord} this month`
+    : `${usage.remainingRuns} ${remainingRunWord} left this month`;
+  const settingsAccountExportValue = entitlement.exportFormats.docx ? "PDF DOCX TXT" : "PDF";
+  const settingsAccountExportCaption = entitlement.exportFormats.docx ? "Premium exports active" : "DOCX and TXT need Premium";
 
   return (
     <main className="settings-page-shell">
@@ -151,6 +163,61 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
         <div className="settings-page-actions">
           <Link className="btn btn-soft btn-sm" href="/app">Studio</Link>
           <ThemeToggle />
+          <details className="settings-account-menu">
+            <summary className="studio-account-button settings-topbar-avatar" aria-label="Open account menu">
+              {accountInitials}
+            </summary>
+            <div className="studio-account-popover settings-account-popover" role="group" aria-label="Account menu">
+              <div className="studio-account-popover-head">
+                <span>Account</span>
+              </div>
+              <div className="studio-account-identity">
+                <div className="studio-account-avatar" aria-hidden="true">{accountInitials}</div>
+                <div>
+                  <strong className="studio-account-email" title={user.email || "Signed in"}>{user.email || "Signed in"}</strong>
+                  <span>{displayPlanLabel}</span>
+                </div>
+              </div>
+              <div className="studio-account-insights" aria-label="Account status summary">
+                <a href="#billing">
+                  <strong>{premiumEnding ? "Ending" : planLabel}</strong>
+                  <span>{settingsAccountPlanCaption}</span>
+                </a>
+                <a href="#usage">
+                  <strong>{settingsAccountUsageValue}</strong>
+                  <span>{settingsAccountUsageCaption}</span>
+                </a>
+                <a href="#exports">
+                  <strong>{settingsAccountExportValue}</strong>
+                  <span>{settingsAccountExportCaption}</span>
+                </a>
+              </div>
+              <div className="studio-account-shortcuts settings-account-shortcuts">
+                <Link href="/app"><RoleForgeIcon name="file" size={14} /> Studio</Link>
+                <Link href="/app#history"><RoleForgeIcon name="chart" size={14} /> Saved projects</Link>
+                <Link href="/templates"><RoleForgeIcon name="layers" size={14} /> Templates</Link>
+                <a href="#billing"><RoleForgeIcon name="lock" size={14} /> Billing</a>
+              </div>
+              <div className="studio-account-list">
+                <a className="studio-account-summary" href="#projects">
+                  <span><RoleForgeIcon name="chart" size={14} /> Saved projects</span>
+                  <small>{projectCount} {projectCountLabel.toLowerCase()} and {runCount} {runCountLabel.toLowerCase()} saved to this account.</small>
+                </a>
+                <a className="studio-account-summary" href="#usage">
+                  <span><RoleForgeIcon name="sparkle" size={14} /> Usage</span>
+                  <small>{usageUsedLabel}; {usageHelperLabel.toLowerCase()}.</small>
+                </a>
+                <a className="studio-account-summary" href="#billing">
+                  <span><RoleForgeIcon name="settings" size={14} /> Billing</span>
+                  <small>{billingDetail}</small>
+                </a>
+              </div>
+              <form className="studio-account-form" action="/auth/signout" method="post">
+                <input type="hidden" name="next" value="/login?account=signed-out" />
+                <button className="ghost-button studio-account-submit" type="submit">Sign out</button>
+              </form>
+            </div>
+          </details>
         </div>
       </header>
 
@@ -189,7 +256,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
             <div className="settings-section-panel">
               <div className="settings-profile-row">
                 <div className="studio-account-button settings-profile-avatar" aria-hidden="true">
-                  {(displayName || user.email || "RF").slice(0, 2).toUpperCase()}
+                  {accountInitials}
                 </div>
                 <div>
                   <strong>{displayName || "RoleForge user"}</strong>
