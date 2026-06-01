@@ -6,6 +6,7 @@ import { AccountAvatar } from "../components/AccountAvatar";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { validateAccountEmail } from "../lib/accountEmail";
 import { loadAccountProfile, saveAccountProfile } from "../lib/accountProfile";
 import { accountAvatarUrl, accountDisplayName } from "../lib/accountUser";
 import { billingStateDetail, billingStateLabel, billingStatusTone } from "../lib/billing/display";
@@ -16,6 +17,7 @@ import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
 import { RESUME_TEMPLATE_COOKIE, getResumeTemplate } from "../lib/resumeTemplates";
 import { settingsProjectSummaries } from "../lib/settingsProjects";
+import { getConfiguredSiteOrigin } from "../lib/siteUrl";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 import { loadSavedRuns } from "../lib/supabase/savedProjects";
 import {
@@ -56,6 +58,12 @@ function accountNotice(value: string | undefined) {
       return { tone: "warn" as const, text: "Use a display name of 80 characters or fewer." };
     case "profile-unavailable":
       return { tone: "warn" as const, text: "Profile changes are temporarily unavailable." };
+    case "email-change-sent":
+      return { tone: "success" as const, text: "Check your inbox to finish the email change if confirmation is required." };
+    case "email-invalid":
+      return { tone: "warn" as const, text: "Enter a different valid email address." };
+    case "email-unavailable":
+      return { tone: "warn" as const, text: "Email changes are temporarily unavailable." };
     case "delete-invalid":
       return { tone: "warn" as const, text: "Type DELETE to confirm account deletion." };
     case "delete-billing-active":
@@ -105,6 +113,40 @@ async function updateAccountProfileAction(formData: FormData) {
   }
 
   redirect("/settings?account=profile-saved#account");
+}
+
+async function updateAccountEmailAction(formData: FormData) {
+  "use server";
+
+  const supabase = await createRoleForgeServerClient();
+  if (!supabase) {
+    redirect("/login?next=/settings&account=signin-required");
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?next=/settings&account=signin-required");
+  }
+
+  const parsedEmail = validateAccountEmail(formData.get("email"), user.email);
+  if (!parsedEmail.ok) {
+    redirect("/settings?account=email-invalid#account-email");
+  }
+
+  const emailRedirectTo = `${getConfiguredSiteOrigin()}/auth/callback?next=${encodeURIComponent("/settings?account=email-change-sent#account")}`;
+  const { error } = await supabase.auth.updateUser(
+    { email: parsedEmail.email },
+    { emailRedirectTo },
+  );
+
+  if (error) {
+    redirect("/settings?account=email-unavailable#account-email");
+  }
+
+  redirect("/settings?account=email-change-sent#account-email");
 }
 
 export default async function SettingsPage({ searchParams }: { searchParams: SettingsSearchParams }) {
@@ -342,6 +384,24 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   </button>
                 </div>
                 <small>Shown in your account menu and saved-project profile.</small>
+              </form>
+              <form className="settings-profile-form" id="account-email" action={updateAccountEmailAction}>
+                <label htmlFor="settings-account-email">Email address</label>
+                <div className="settings-profile-edit-row">
+                  <input
+                    id="settings-account-email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    defaultValue={user.email ?? ""}
+                    placeholder="you@example.com"
+                    required
+                  />
+                  <button className="primary-button" type="submit">
+                    Update email
+                  </button>
+                </div>
+                <small>Supabase may send confirmation links to your current and new email before the change applies.</small>
               </form>
               <div className="settings-metric-row">
                 <div className="settings-metric">

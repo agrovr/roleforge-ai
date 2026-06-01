@@ -44,6 +44,18 @@ test("settings account panel includes an editable profile display name", () => {
   assert.match(stylesheet, /\.settings-profile-edit-row\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*minmax\(min\(100%,\s*138px\),\s*auto\)[^}]*\}/s);
 });
 
+test("settings account panel supports authenticated email changes", () => {
+  assert.match(settingsPage, /updateAccountEmailAction/);
+  assert.match(settingsPage, /validateAccountEmail\(formData\.get\("email"\),\s*user\.email\)/);
+  assert.match(settingsPage, /supabase\.auth\.updateUser/);
+  assert.match(settingsPage, /emailRedirectTo/);
+  assert.match(settingsPage, /id="account-email"/);
+  assert.match(settingsPage, /name="email"/);
+  assert.match(settingsPage, /Update email/);
+  assert.match(settingsPage, /confirmation links to your current and new email/);
+  assert.match(settingsPage, /email-change-sent/);
+});
+
 test("settings account panel exposes guarded account deletion", () => {
   assert.match(settingsPage, /id="account-danger"/);
   assert.match(settingsPage, /action="\/api\/account\/delete"/);
