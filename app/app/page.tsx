@@ -2958,6 +2958,19 @@ export default function Page() {
                         </Link>
                       </div>
                       <small className={`studio-account-sync ${historySyncState}`}>{historySyncMessage}</small>
+                      {syncableLocalHistoryCount ? (
+                        <div className="studio-account-sync-actions">
+                          <button
+                            type="button"
+                            onClick={() => void syncLocalHistoryToAccount()}
+                            disabled={historySyncState === "saving"}
+                          >
+                            <RoleForgeIcon name="upload" size={14} />
+                            Save browser {syncableLocalHistoryCount === 1 ? "run" : "runs"}
+                            <span>{syncableLocalHistoryCount}</span>
+                          </button>
+                        </div>
+                      ) : null}
                       <div className="studio-account-shortcuts">
                         <Link href="/app" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="plus" size={14} /> Studio

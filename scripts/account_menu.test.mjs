@@ -20,6 +20,10 @@ test("studio account menu acts as a workspace command center", () => {
   assert.match(studioPage, /studio-account-recent/);
   assert.match(studioPage, /Recent projects/);
   assert.match(studioPage, /savedRunHistoryHref/);
+  assert.match(studioPage, /studio-account-sync-actions/);
+  assert.match(studioPage, /syncableLocalHistoryCount\s*\?/);
+  assert.match(studioPage, /void syncLocalHistoryToAccount\(\)/);
+  assert.match(studioPage, /Save browser/);
 });
 
 test("account menu layout has responsive status cards", () => {
@@ -31,6 +35,8 @@ test("account menu layout has responsive status cards", () => {
   assert.match(globalsCss, /\.studio-account-recent\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(globalsCss, /\.studio-account-recent-link\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(globalsCss, /\.studio-account-recent-link\s+strong\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
+  assert.match(globalsCss, /\.studio-account-sync-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(globalsCss, /\.studio-account-sync-actions\s+button\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
 });
 
 test("settings topbar exposes account, project, usage, and billing controls", () => {

@@ -5848,6 +5848,64 @@ html[data-theme="dark"] input::file-selector-button {
   color: #9a392e;
 }
 
+.studio-account-sync-actions {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: -4px 0 12px;
+}
+
+.studio-account-sync-actions button {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--brand) 34%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--brand-soft) 52%, var(--surface));
+  color: var(--ink-0);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 950;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
+  transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.studio-account-sync-actions button:hover,
+.studio-account-sync-actions button:focus-visible {
+  border-color: color-mix(in srgb, var(--brand-dark) 42%, var(--line));
+  box-shadow: 0 14px 28px -24px var(--shadow);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.studio-account-sync-actions button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
+.studio-account-sync-actions button span {
+  display: inline-grid;
+  min-width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--brand-dark);
+  color: #fffaf0;
+  font-size: 0.68rem;
+  line-height: 1;
+}
+
 .studio-account-notice {
   margin-bottom: 12px;
   padding: 10px 12px;
@@ -12125,6 +12183,23 @@ html[data-theme="dark"] .studio-account-sync.error {
   background: rgba(214, 107, 88, 0.16);
   border-color: rgba(214, 107, 88, 0.38);
   color: #ffb4a8;
+}
+
+html[data-theme="dark"] .studio-account-sync-actions button {
+  border-color: rgba(231, 188, 111, 0.3);
+  background: rgba(231, 188, 111, 0.12);
+  color: var(--ink-0);
+}
+
+html[data-theme="dark"] .studio-account-sync-actions button:hover,
+html[data-theme="dark"] .studio-account-sync-actions button:focus-visible {
+  border-color: rgba(231, 188, 111, 0.42);
+  background: rgba(231, 188, 111, 0.17);
+}
+
+html[data-theme="dark"] .studio-account-sync-actions button span {
+  background: #efb863;
+  color: #101625;
 }
 
 html[data-theme="dark"] .studio-account-notice {
