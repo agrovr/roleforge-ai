@@ -7822,6 +7822,74 @@ html[data-theme="dark"] input::file-selector-button {
   text-wrap: pretty;
 }
 
+.settings-workspace-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 178px), 1fr));
+  gap: 10px;
+  min-width: 0;
+}
+
+.settings-workspace-action {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  grid-template-areas:
+    "icon title"
+    "icon detail";
+  gap: 2px 10px;
+  min-width: 0;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 88%, var(--surface-2));
+  color: var(--ink-0);
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.settings-workspace-action:hover,
+.settings-workspace-action:focus-visible {
+  border-color: color-mix(in srgb, var(--brand) 40%, var(--line));
+  box-shadow: 0 14px 28px -24px var(--shadow);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.settings-workspace-action > span {
+  grid-area: icon;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--brand-soft) 48%, var(--surface));
+  color: var(--brand-dark);
+}
+
+.settings-workspace-action strong {
+  grid-area: title;
+  min-width: 0;
+  color: var(--ink-0);
+  font-size: 0.9rem;
+  font-weight: 950;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.settings-workspace-action small {
+  grid-area: detail;
+  min-width: 0;
+  color: var(--ink-3);
+  font-size: 0.74rem;
+  font-weight: 760;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
 .settings-section {
   scroll-margin-top: 28px;
 }
@@ -11754,6 +11822,7 @@ html[data-theme="dark"] .settings-card-head small {
 
 html[data-theme="dark"] .settings-status-pill,
 html[data-theme="dark"] .settings-card,
+html[data-theme="dark"] .settings-workspace-action,
 html[data-theme="dark"] .settings-metric,
 html[data-theme="dark"] .settings-project-item,
 html[data-theme="dark"] .settings-project-empty,
@@ -11789,8 +11858,21 @@ html[data-theme="dark"] .settings-status-pill.muted {
   color: var(--ink-3);
 }
 
+html[data-theme="dark"] .settings-workspace-action:hover,
+html[data-theme="dark"] .settings-workspace-action:focus-visible {
+  border-color: rgba(231, 188, 111, 0.36);
+  background: rgba(231, 188, 111, 0.1);
+}
+
+html[data-theme="dark"] .settings-workspace-action > span {
+  border-color: rgba(222, 162, 79, 0.28);
+  background: rgba(222, 162, 79, 0.16);
+  color: #f3c16d;
+}
+
 html[data-theme="dark"] .settings-card-head span,
 html[data-theme="dark"] .settings-account-email,
+html[data-theme="dark"] .settings-workspace-action strong,
 html[data-theme="dark"] .settings-metric strong,
 html[data-theme="dark"] .settings-project-item strong,
 html[data-theme="dark"] .settings-project-empty strong,
@@ -11800,6 +11882,7 @@ html[data-theme="dark"] .settings-export-item span {
 }
 
 html[data-theme="dark"] .settings-metric span,
+html[data-theme="dark"] .settings-workspace-action small,
 html[data-theme="dark"] .settings-project-item small,
 html[data-theme="dark"] .settings-template-card-copy p,
 html[data-theme="dark"] .settings-export-item.disabled span,

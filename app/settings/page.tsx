@@ -551,6 +551,29 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
             </div>
           ) : null}
 
+          <nav className="settings-workspace-actions" aria-label="Workspace quick actions">
+            <Link className="settings-workspace-action" href="/app">
+              <span><RoleForgeIcon name="file" size={16} /></span>
+              <strong>Start a resume</strong>
+              <small>Open the studio with your current template.</small>
+            </Link>
+            <a className="settings-workspace-action" href="#projects">
+              <span><RoleForgeIcon name="chart" size={16} /></span>
+              <strong>Review projects</strong>
+              <small>{projectCount} {projectCountLabel.toLowerCase()} and {runCount} {runCountLabel.toLowerCase()} saved.</small>
+            </a>
+            <a className="settings-workspace-action" href="/api/account/export">
+              <span><RoleForgeIcon name="download" size={16} /></span>
+              <strong>Export account</strong>
+              <small>Download a private account summary.</small>
+            </a>
+            <a className="settings-workspace-action" href="#billing">
+              <span><RoleForgeIcon name="settings" size={16} /></span>
+              <strong>Plan and billing</strong>
+              <small>{premiumActive ? billingLabel : checkoutReady ? "Premium checkout available" : "Free studio available"}</small>
+            </a>
+          </nav>
+
           <section className="settings-section" id="account">
             <div className="settings-section-copy">
               <h2>Account</h2>
