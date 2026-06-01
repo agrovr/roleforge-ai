@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { PointerEffects } from "./components/PointerEffects";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -82,6 +83,7 @@ export default function RootLayout({
           }}
         />
         {children}
+        <PointerEffects />
         <Analytics />
       </body>
     </html>
