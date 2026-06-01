@@ -7574,6 +7574,86 @@ html[data-theme="dark"] input::file-selector-button {
   width: 100%;
 }
 
+.settings-template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 238px), 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.settings-template-card {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 88%, white);
+  overflow: hidden;
+}
+
+.settings-template-card.selected {
+  border-color: color-mix(in srgb, var(--brand) 42%, var(--line));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--brand) 10%, transparent), transparent 58%),
+    color-mix(in srgb, var(--surface) 92%, white);
+}
+
+.settings-template-thumb {
+  min-width: 0;
+  height: 188px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--brand);
+  border-radius: 10px;
+  background: #f8f3ea;
+  overflow: hidden;
+}
+
+.settings-template-thumb .r-doc {
+  transform: scale(0.7);
+  transform-origin: top left;
+  width: 142%;
+  min-height: 260px;
+}
+
+.settings-template-card-copy {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.settings-template-card-copy p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  line-height: 1.42;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.settings-template-form {
+  display: flex;
+  min-width: 0;
+  margin: 0;
+}
+
+.settings-template-button {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  justify-content: center;
+  line-height: 1.12;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.settings-template-button.selected {
+  border-color: color-mix(in srgb, var(--brand) 42%, var(--line));
+  background: color-mix(in srgb, var(--brand) 13%, var(--surface));
+  color: var(--ink-0);
+}
+
 .settings-danger-zone {
   display: grid;
   gap: 12px;
@@ -11216,6 +11296,7 @@ html[data-theme="dark"] .settings-card,
 html[data-theme="dark"] .settings-metric,
 html[data-theme="dark"] .settings-project-item,
 html[data-theme="dark"] .settings-project-empty,
+html[data-theme="dark"] .settings-template-card,
 html[data-theme="dark"] .settings-export-item {
   background:
     linear-gradient(180deg, rgba(255, 247, 233, 0.045), rgba(255, 247, 233, 0.02)),
@@ -11252,15 +11333,35 @@ html[data-theme="dark"] .settings-account-email,
 html[data-theme="dark"] .settings-metric strong,
 html[data-theme="dark"] .settings-project-item strong,
 html[data-theme="dark"] .settings-project-empty strong,
+html[data-theme="dark"] .settings-template-card .template-name,
 html[data-theme="dark"] .settings-export-item span {
   color: var(--ink-0);
 }
 
 html[data-theme="dark"] .settings-metric span,
 html[data-theme="dark"] .settings-project-item small,
+html[data-theme="dark"] .settings-template-card-copy p,
 html[data-theme="dark"] .settings-export-item.disabled span,
 html[data-theme="dark"] .settings-export-item.disabled small {
   color: var(--ink-3);
+}
+
+html[data-theme="dark"] .settings-template-card.selected {
+  border-color: rgba(222, 162, 79, 0.42);
+  background:
+    linear-gradient(180deg, rgba(222, 162, 79, 0.14), rgba(255, 247, 233, 0.02)),
+    rgba(12, 17, 31, 0.82);
+}
+
+html[data-theme="dark"] .settings-template-thumb {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: #f8f3ea;
+}
+
+html[data-theme="dark"] .settings-template-button.selected {
+  border-color: rgba(222, 162, 79, 0.38);
+  background: rgba(222, 162, 79, 0.16);
+  color: var(--ink-0);
 }
 
 html[data-theme="dark"] .settings-project-item small {

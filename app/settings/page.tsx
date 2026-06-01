@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { AccountAvatar } from "../components/AccountAvatar";
 import { Brand } from "../components/Brand";
+import { ResumePreview } from "../components/ResumePreview";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { validateAccountEmail } from "../lib/accountEmail";
@@ -21,7 +22,13 @@ import { billingNotice } from "../lib/billing/notices";
 import { billingReadiness } from "../lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
-import { RESUME_TEMPLATE_COOKIE, getResumeTemplate } from "../lib/resumeTemplates";
+import {
+  RESUME_TEMPLATE_COOKIE,
+  RESUME_TEMPLATES,
+  getResumeTemplate,
+  isResumeTemplateSlug,
+  resumeTemplateStudioHref,
+} from "../lib/resumeTemplates";
 import { settingsProjectSummaries } from "../lib/settingsProjects";
 import { getConfiguredSiteOrigin } from "../lib/siteUrl";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
@@ -70,6 +77,10 @@ function accountNotice(value: string | undefined) {
       return { tone: "warn" as const, text: "Enter a different valid email address." };
     case "email-unavailable":
       return { tone: "warn" as const, text: "Email changes are temporarily unavailable." };
+    case "template-saved":
+      return { tone: "success" as const, text: "Resume direction saved." };
+    case "template-invalid":
+      return { tone: "warn" as const, text: "Choose a supported resume direction." };
     case "delete-invalid":
       return { tone: "warn" as const, text: "Type DELETE to confirm account deletion." };
     case "delete-billing-active":
@@ -153,6 +164,37 @@ async function updateAccountEmailAction(formData: FormData) {
   }
 
   redirect("/settings?account=email-change-sent#account-email");
+}
+
+async function updateTemplatePreferenceAction(formData: FormData) {
+  "use server";
+
+  const supabase = await createRoleForgeServerClient();
+  if (!supabase) {
+    redirect("/login?next=/settings&account=signin-required");
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?next=/settings&account=signin-required");
+  }
+
+  const template = formData.get("template");
+  if (typeof template !== "string" || !isResumeTemplateSlug(template)) {
+    redirect("/settings?account=template-invalid#preferences");
+  }
+
+  const cookieStore = await cookies();
+  cookieStore.set(RESUME_TEMPLATE_COOKIE, template, {
+    maxAge: 60 * 60 * 24 * 365,
+    path: "/",
+    sameSite: "lax",
+  });
+
+  redirect("/settings?account=template-saved#preferences");
 }
 
 export default async function SettingsPage({ searchParams }: { searchParams: SettingsSearchParams }) {
@@ -302,6 +344,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               <div className="studio-account-shortcuts settings-account-shortcuts">
                 <Link href="/app"><RoleForgeIcon name="file" size={14} /> Studio</Link>
                 <a href="#security"><RoleForgeIcon name="lock" size={14} /> Security</a>
+                <a href="#preferences"><RoleForgeIcon name="layers" size={14} /> Preferences</a>
                 <Link href="/app#history"><RoleForgeIcon name="chart" size={14} /> Saved projects</Link>
                 <Link href="/templates"><RoleForgeIcon name="layers" size={14} /> Templates</Link>
                 <a href="#billing"><RoleForgeIcon name="lock" size={14} /> Billing</a>
@@ -508,6 +551,54 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <input type="hidden" name="next" value="/login?account=signed-out" />
                   <button className="ghost-button" type="submit">Sign out</button>
                 </form>
+              </div>
+            </div>
+          </section>
+
+          <section className="settings-section" id="preferences">
+            <div className="settings-section-copy">
+              <h2>Preferences</h2>
+              <p>Set the default resume direction RoleForge sends with new exports.</p>
+            </div>
+            <div className="settings-section-panel">
+              <div className="settings-template-grid" aria-label="Default resume direction">
+                {RESUME_TEMPLATES.map((template) => {
+                  const selected = template.slug === selectedTemplate.slug;
+                  return (
+                    <article className={`settings-template-card${selected ? " selected" : ""}`} key={template.slug}>
+                      <div className="settings-template-thumb" style={{ borderTopColor: template.color }}>
+                        <ResumePreview
+                          variant={template.variant}
+                          name={template.previewName}
+                          role={template.tag.replace(/ resumes| drafts| roles/i, "")}
+                          highlight={selected}
+                        />
+                      </div>
+                      <div className="settings-template-card-copy">
+                        <div className="template-title-row">
+                          <span className="template-name">{template.name}</span>
+                          <span className="template-tag">{template.tag}</span>
+                        </div>
+                        <p>{template.detail}</p>
+                        <form className="settings-template-form" action={updateTemplatePreferenceAction}>
+                          <input type="hidden" name="template" value={template.slug} />
+                          <button
+                            className={`btn btn-soft btn-sm settings-template-button${selected ? " selected" : ""}`}
+                            type="submit"
+                            aria-pressed={selected}
+                          >
+                            {selected ? "Selected" : "Set default"}
+                            <RoleForgeIcon name={selected ? "check" : "layers"} size={12} />
+                          </button>
+                        </form>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+              <div className="settings-export-actions">
+                <span>{selectedTemplate.name} is selected for new exports and studio runs.</span>
+                <Link className="btn btn-soft btn-sm settings-inline-link" href={resumeTemplateStudioHref(selectedTemplate.slug)}>Open in studio</Link>
               </div>
             </div>
           </section>
