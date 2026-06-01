@@ -78,6 +78,7 @@ export async function POST(request: Request) {
       mode: "subscription",
       customer: checkoutCustomer.customerId,
       allow_promotion_codes: true,
+      payment_method_collection: "if_required",
       line_items: [
         {
           price: priceId,

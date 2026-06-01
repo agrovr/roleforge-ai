@@ -53,6 +53,7 @@ test("settings billing actions submit with POST instead of opening API routes as
 
 test("checkout sessions allow promotion codes for launch testing and controlled discounts", () => {
   assert.match(checkoutRoute, /allow_promotion_codes:\s*true/);
+  assert.match(checkoutRoute, /payment_method_collection:\s*"if_required"/);
 });
 
 test("public and signed-in shells expose billing readiness before promising upgrades", () => {
