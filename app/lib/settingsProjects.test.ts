@@ -66,7 +66,9 @@ test("groups settings saved projects by project with a restore link", () => {
   assert.match(summaries[0].detail, /1 interview question/);
   assert.match(summaries[0].detail, /Engineer/);
   assert.equal(summaries[0].href, "/app?historyRun=run-latest&historyAction=restore#history");
+  assert.equal(summaries[0].projectId, "project-1");
   assert.equal(summaries[0].actionLabel, "Restore");
+  assert.equal(summaries[0].stageStatus, "exported");
   assert.equal(summaries[0].stageLabel, "Ready");
 });
 

@@ -16,6 +16,7 @@ import {
   accountSecurityDateLabel,
   accountSignInMethodLabel,
 } from "../lib/accountUser";
+import { APPLICATION_STATUS_OPTIONS, isApplicationStatus } from "../lib/applicationStatus";
 import { billingStateDetail, billingStateLabel, billingStatusTone } from "../lib/billing/display";
 import { reconcileUserSubscriptionEntitlement, syncCheckoutSessionEntitlement } from "../lib/billing/entitlements";
 import { billingNotice } from "../lib/billing/notices";
@@ -32,7 +33,7 @@ import {
 import { settingsProjectSummaries } from "../lib/settingsProjects";
 import { getConfiguredSiteOrigin } from "../lib/siteUrl";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
-import { loadSavedRuns } from "../lib/supabase/savedProjects";
+import { loadSavedRuns, updateSavedProjectStatus } from "../lib/supabase/savedProjects";
 import {
   loadAccountUsage,
   monthlyRunAllowanceLabel,
@@ -81,6 +82,12 @@ function accountNotice(value: string | undefined) {
       return { tone: "success" as const, text: "Resume direction saved." };
     case "template-invalid":
       return { tone: "warn" as const, text: "Choose a supported resume direction." };
+    case "project-stage-saved":
+      return { tone: "success" as const, text: "Saved project stage updated." };
+    case "project-stage-invalid":
+      return { tone: "warn" as const, text: "Choose an available project stage." };
+    case "project-stage-unavailable":
+      return { tone: "warn" as const, text: "Saved project stage could not be updated." };
     case "delete-invalid":
       return { tone: "warn" as const, text: "Type DELETE to confirm account deletion." };
     case "delete-billing-active":
@@ -195,6 +202,37 @@ async function updateTemplatePreferenceAction(formData: FormData) {
   });
 
   redirect("/settings?account=template-saved#preferences");
+}
+
+async function updateSettingsProjectStatusAction(formData: FormData) {
+  "use server";
+
+  const supabase = await createRoleForgeServerClient();
+  if (!supabase) {
+    redirect("/login?next=/settings&account=signin-required");
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?next=/settings&account=signin-required");
+  }
+
+  const projectId = typeof formData.get("projectId") === "string" ? String(formData.get("projectId")).trim() : "";
+  const status = formData.get("status");
+  if (!projectId || projectId.length > 120 || !isApplicationStatus(status)) {
+    redirect("/settings?account=project-stage-invalid#projects");
+  }
+
+  try {
+    await updateSavedProjectStatus(supabase, projectId, status, user.id);
+  } catch {
+    redirect("/settings?account=project-stage-unavailable#projects");
+  }
+
+  redirect("/settings?account=project-stage-saved#projects");
 }
 
 export default async function SettingsPage({ searchParams }: { searchParams: SettingsSearchParams }) {
@@ -622,20 +660,44 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               {recentProjectSummaries.length ? (
                 <div className="settings-project-list" aria-label="Recent saved projects">
                   {recentProjectSummaries.map((project) => (
-                    <Link
+                    <article
                       className="settings-project-item"
-                      href={project.href}
                       key={project.key}
-                      aria-label={`Open ${project.title} in History`}
                     >
                       <div>
-                        <strong>{project.title}</strong>
+                        <Link href={project.href} aria-label={`Open ${project.title} in History`}>
+                          <strong>{project.title}</strong>
+                        </Link>
                         <span>{project.detail}</span>
                       </div>
                       <small title={`${project.stageDetail} ${project.actionDetail}`}>
                         {project.stageLabel} · {project.actionLabel}
                       </small>
-                    </Link>
+                      {project.projectId ? (
+                        <form className="settings-project-stage-form" action={updateSettingsProjectStatusAction}>
+                          <input type="hidden" name="projectId" value={project.projectId} />
+                          <div className="settings-project-stage-controls" role="group" aria-label={`Set project stage for ${project.title}`}>
+                            {APPLICATION_STATUS_OPTIONS.map((option) => {
+                              const selected = project.stageStatus === option.status;
+                              return (
+                                <button
+                                  className={selected ? "active" : ""}
+                                  disabled={selected}
+                                  key={`${project.projectId}-${option.status}`}
+                                  name="status"
+                                  type="submit"
+                                  value={option.status}
+                                  title={option.detail}
+                                  aria-pressed={selected}
+                                >
+                                  {option.label}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </form>
+                      ) : null}
+                    </article>
                   ))}
                 </div>
               ) : (

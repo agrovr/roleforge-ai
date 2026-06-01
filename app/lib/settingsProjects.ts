@@ -1,5 +1,5 @@
 import type { ExportEntitlement } from "./exportFormats";
-import { applicationStatusCopy } from "./applicationStatus";
+import { applicationStatusCopy, type ApplicationStatus } from "./applicationStatus";
 import { groupHistoryItems, historyGeneratedAssetSummary, historyGroupStatus, type HistoryItem } from "./history";
 import { getResumeTemplate, isResumeTemplateSlug } from "./resumeTemplates";
 import { savedRunHistoryHref } from "./savedRunLinks";
@@ -10,8 +10,10 @@ export type SettingsProjectSummary = {
   title: string;
   detail: string;
   href: string;
+  projectId: string;
   actionLabel: string;
   actionDetail: string;
+  stageStatus: ApplicationStatus;
   stageLabel: string;
   stageDetail: string;
 };
@@ -70,8 +72,10 @@ export function settingsProjectSummaries(
       title: group.title,
       detail,
       href: savedRunHistoryHref(linkRun, { restore: Boolean(restoreRun) }),
+      projectId: group.accountItem?.projectId ?? group.latest.projectId ?? "",
       actionLabel: restoreRun ? "Restore" : status.label,
       actionDetail: status.detail,
+      stageStatus: stage.status,
       stageLabel: stage.label,
       stageDetail: stage.detail,
     };
