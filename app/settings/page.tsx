@@ -33,7 +33,7 @@ import {
 import { settingsProjectSummaries } from "../lib/settingsProjects";
 import { getConfiguredSiteOrigin } from "../lib/siteUrl";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
-import { deleteSavedProject, loadSavedRuns, updateSavedProjectStatus } from "../lib/supabase/savedProjects";
+import { deleteSavedProject, loadSavedRuns, renameSavedProject, updateSavedProjectStatus } from "../lib/supabase/savedProjects";
 import {
   loadAccountUsage,
   monthlyRunAllowanceLabel,
@@ -88,6 +88,12 @@ function accountNotice(value: string | undefined) {
       return { tone: "warn" as const, text: "Choose an available project stage." };
     case "project-stage-unavailable":
       return { tone: "warn" as const, text: "Saved project stage could not be updated." };
+    case "project-renamed":
+      return { tone: "success" as const, text: "Saved project renamed." };
+    case "project-rename-invalid":
+      return { tone: "warn" as const, text: "Use a project name of 120 characters or fewer." };
+    case "project-rename-unavailable":
+      return { tone: "warn" as const, text: "Saved project name could not be updated." };
     case "project-deleted":
       return { tone: "success" as const, text: "Saved project removed." };
     case "project-delete-invalid":
@@ -239,6 +245,37 @@ async function updateSettingsProjectStatusAction(formData: FormData) {
   }
 
   redirect("/settings?account=project-stage-saved#projects");
+}
+
+async function renameSettingsProjectAction(formData: FormData) {
+  "use server";
+
+  const supabase = await createRoleForgeServerClient();
+  if (!supabase) {
+    redirect("/login?next=/settings&account=signin-required");
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?next=/settings&account=signin-required");
+  }
+
+  const projectId = typeof formData.get("projectId") === "string" ? String(formData.get("projectId")).trim() : "";
+  const title = typeof formData.get("title") === "string" ? String(formData.get("title")).replace(/\s+/g, " ").trim() : "";
+  if (!projectId || projectId.length > 120 || !title || title.length > 120) {
+    redirect("/settings?account=project-rename-invalid#projects");
+  }
+
+  try {
+    await renameSavedProject(supabase, projectId, title, user.id);
+  } catch {
+    redirect("/settings?account=project-rename-unavailable#projects");
+  }
+
+  redirect("/settings?account=project-renamed#projects");
 }
 
 async function deleteSettingsProjectAction(formData: FormData) {
@@ -732,6 +769,24 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                               );
                             })}
                           </div>
+                        </form>
+                      ) : null}
+                      {project.projectId ? (
+                        <form className="settings-project-rename" action={renameSettingsProjectAction}>
+                          <input type="hidden" name="projectId" value={project.projectId} />
+                          <label>
+                            <span>Project name</span>
+                            <div className="settings-project-rename-row">
+                              <input
+                                name="title"
+                                defaultValue={project.title}
+                                maxLength={120}
+                                aria-label={`Rename ${project.title}`}
+                                autoComplete="off"
+                              />
+                              <button type="submit">Save name</button>
+                            </div>
+                          </label>
                         </form>
                       ) : null}
                       {project.downloads.length ? (

@@ -16,6 +16,11 @@ test("settings saved projects expose account-owned stage updates", () => {
   assert.match(settingsPage, /name="status"/);
   assert.match(settingsPage, /project\.downloads\.map/);
   assert.match(settingsPage, /settings-project-downloads/);
+  assert.match(settingsPage, /renameSettingsProjectAction/);
+  assert.match(settingsPage, /renameSavedProject\(supabase,\s*projectId,\s*title,\s*user\.id\)/);
+  assert.match(settingsPage, /settings-project-rename/);
+  assert.match(settingsPage, /name="title"/);
+  assert.match(settingsPage, /project-renamed/);
   assert.match(settingsPage, /deleteSettingsProjectAction/);
   assert.match(settingsPage, /settings-project-delete/);
   assert.match(settingsPage, /name="confirmDelete"/);
@@ -34,6 +39,9 @@ test("settings saved project stage controls are compact and overflow-safe", () =
   assert.match(stylesheet, /\.settings-project-stage-form\s*\{(?=[^}]*flex:\s*1\s+1\s+100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-stage-controls\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*92px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-stage-controls\s+button\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-rename\s*\{(?=[^}]*flex:\s*1\s+1\s+100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-rename-row\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*112px\),\s*auto\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-rename-row\s+button\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-downloads\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*92px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-downloads\s+\.btn\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-delete\s*\{(?=[^}]*flex:\s*1\s+1\s+100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);
