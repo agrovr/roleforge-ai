@@ -3,11 +3,16 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
+const billingSubmitButton = readFileSync("app/settings/BillingSubmitButton.tsx", "utf8");
 const stylesheet = readFileSync("app/globals.css", "utf8");
 
 test("settings billing action distinguishes active portals from inactive billing state", () => {
   assert.match(settingsPage, /portalReady\s*\?\s*\(/);
+  assert.match(settingsPage, /showCheckoutHeaderAction\s*=\s*!premiumActive\s*&&\s*checkoutReady/);
   assert.match(settingsPage, /action="\/api\/billing\/portal"/);
+  assert.match(settingsPage, /action="\/api\/billing\/checkout"/);
+  assert.match(settingsPage, /readyLabel="Manage billing"/);
+  assert.match(settingsPage, /readyLabel="Start Premium"/);
   assert.match(settingsPage, /inactiveBillingActionLabel\s*=\s*premiumActive\s*\?\s*"Billing unavailable right now"\s*:\s*"Premium billing unavailable"/);
   assert.match(settingsPage, /\{inactiveBillingActionLabel\}/);
   assert.match(settingsPage, /aria-disabled="true"/);
@@ -16,6 +21,14 @@ test("settings billing action distinguishes active portals from inactive billing
   assert.match(settingsPage, /Premium billing is paused while payments are prepared/);
   assert.doesNotMatch(settingsPage, /No billing portal yet/);
   assert.doesNotMatch(settingsPage, /type="submit"\s+disabled=\{!portalReady\}/);
+});
+
+test("settings billing submit buttons show progress while Stripe opens", () => {
+  assert.match(billingSubmitButton, /useFormStatus/);
+  assert.match(billingSubmitButton, /aria-busy=\{pending \? "true" : undefined\}/);
+  assert.match(billingSubmitButton, /disabled=\{disabled\}/);
+  assert.match(settingsPage, /pendingLabel="Opening checkout\.\.\."/);
+  assert.match(settingsPage, /pendingLabel="Opening billing\.\.\."/);
 });
 
 test("inactive settings billing action does not animate like a clickable control", () => {

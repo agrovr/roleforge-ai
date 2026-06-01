@@ -23,6 +23,7 @@ import {
   runWord,
   usageProgressPercent,
 } from "../lib/usage";
+import { BillingSubmitButton } from "./BillingSubmitButton";
 import { SettingsSectionNav } from "./SettingsSectionNav";
 
 type CountResult = { count: number | null; error: unknown };
@@ -105,8 +106,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()),
     billingStatus: entitlement.billingStatus,
   });
+  const showCheckoutHeaderAction = !premiumActive && checkoutReady;
   const portalActionTitle = portalReady
     ? "Open Stripe billing management"
+    : showCheckoutHeaderAction
+      ? "Open secure Stripe checkout"
       : premiumActive
         ? "Billing management is unavailable right now."
         : "Premium billing is not accepting payments right now.";
@@ -333,9 +337,24 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 </span>
                 {portalReady ? (
                   <form action="/api/billing/portal" method="post">
-                    <button className="ghost-button" type="submit" title={portalActionTitle}>
-                      Manage billing
-                    </button>
+                    <BillingSubmitButton
+                      className="ghost-button"
+                      pendingLabel="Opening billing..."
+                      ready
+                      readyLabel="Manage billing"
+                      title={portalActionTitle}
+                    />
+                  </form>
+                ) : showCheckoutHeaderAction ? (
+                  <form action="/api/billing/checkout" method="post">
+                    <input type="hidden" name="interval" value="month" />
+                    <BillingSubmitButton
+                      className="ghost-button"
+                      pendingLabel="Opening checkout..."
+                      ready
+                      readyLabel="Start Premium"
+                      title={portalActionTitle}
+                    />
                   </form>
                 ) : (
                   <span className="ghost-button settings-disabled-action" aria-disabled="true" title={portalActionTitle}>
@@ -366,7 +385,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     </div>
                     <form action="/api/billing/checkout" method="post">
                       <input type="hidden" name="interval" value="month" />
-                      <button className="primary-button" type="submit" disabled={!checkoutReady}>{checkoutReady ? "Start monthly" : "Unavailable"}</button>
+                      <BillingSubmitButton
+                        className="primary-button"
+                        pendingLabel="Opening checkout..."
+                        ready={checkoutReady}
+                        readyLabel="Start monthly"
+                      />
                     </form>
                   </article>
                   <article className="settings-price-card featured">
@@ -377,7 +401,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     </div>
                     <form action="/api/billing/checkout" method="post">
                       <input type="hidden" name="interval" value="year" />
-                      <button className="primary-button" type="submit" disabled={!checkoutReady}>{checkoutReady ? "Start yearly" : "Unavailable"}</button>
+                      <BillingSubmitButton
+                        className="primary-button"
+                        pendingLabel="Opening checkout..."
+                        ready={checkoutReady}
+                        readyLabel="Start yearly"
+                      />
                     </form>
                   </article>
                 </div>
