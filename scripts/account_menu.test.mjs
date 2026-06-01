@@ -31,6 +31,7 @@ test("settings topbar exposes account, project, usage, and billing controls", ()
   assert.match(settingsPage, /accountAvatarUrl\(user\)/);
   assert.match(settingsPage, /settings-account-menu/);
   assert.match(settingsPage, /aria-label="Open account menu"/);
+  assert.match(settingsPage, /href="#security"/);
   assert.match(settingsPage, /href="#projects"/);
   assert.match(settingsPage, /href="#usage"/);
   assert.match(settingsPage, /href="#billing"/);

@@ -8,7 +8,13 @@ import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { validateAccountEmail } from "../lib/accountEmail";
 import { loadAccountProfile, saveAccountProfile } from "../lib/accountProfile";
-import { accountAvatarUrl, accountDisplayName } from "../lib/accountUser";
+import {
+  accountAvatarUrl,
+  accountDisplayName,
+  accountEmailVerificationLabel,
+  accountSecurityDateLabel,
+  accountSignInMethodLabel,
+} from "../lib/accountUser";
 import { billingStateDetail, billingStateLabel, billingStatusTone } from "../lib/billing/display";
 import { reconcileUserSubscriptionEntitlement, syncCheckoutSessionEntitlement } from "../lib/billing/entitlements";
 import { billingNotice } from "../lib/billing/notices";
@@ -212,6 +218,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const displayName = accountDisplayName(user, accountProfile?.displayName);
   const accountInitials = (displayName || user.email || "RF").slice(0, 2).toUpperCase();
   const accountImageUrl = accountAvatarUrl(user);
+  const signInMethodLabel = accountSignInMethodLabel(user);
+  const emailVerificationLabel = accountEmailVerificationLabel(user);
+  const lastSignInLabel = accountSecurityDateLabel(user.last_sign_in_at);
+  const accountCreatedLabel = accountSecurityDateLabel(user.created_at);
   const profileNotice = accountNotice(accountParam);
   const planFeatures = premiumActive
     ? ["Unlimited runs", "DOCX and TXT exports", premiumEnding && premiumEndLabel ? `Access until ${premiumEndLabel}` : "PDF export included"]
@@ -291,6 +301,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               </div>
               <div className="studio-account-shortcuts settings-account-shortcuts">
                 <Link href="/app"><RoleForgeIcon name="file" size={14} /> Studio</Link>
+                <a href="#security"><RoleForgeIcon name="lock" size={14} /> Security</a>
                 <Link href="/app#history"><RoleForgeIcon name="chart" size={14} /> Saved projects</Link>
                 <Link href="/templates"><RoleForgeIcon name="layers" size={14} /> Templates</Link>
                 <a href="#billing"><RoleForgeIcon name="lock" size={14} /> Billing</a>
@@ -303,6 +314,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 <a className="studio-account-summary" href="#usage">
                   <span><RoleForgeIcon name="sparkle" size={14} /> Usage</span>
                   <small>{usageUsedLabel}; {usageHelperLabel.toLowerCase()}.</small>
+                </a>
+                <a className="studio-account-summary" href="#security">
+                  <span><RoleForgeIcon name="lock" size={14} /> Security</span>
+                  <small>{signInMethodLabel}; last sign-in {lastSignInLabel.toLowerCase()}.</small>
                 </a>
                 <a className="studio-account-summary" href="#billing">
                   <span><RoleForgeIcon name="settings" size={14} /> Billing</span>
@@ -453,6 +468,45 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                       Delete account
                     </button>
                   </div>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <section className="settings-section" id="security">
+            <div className="settings-section-copy">
+              <h2>Security</h2>
+              <p>Review how this account signs in and when it was last used.</p>
+            </div>
+            <div className="settings-section-panel">
+              <div className="settings-metric-row">
+                <div className="settings-metric">
+                  <strong>{signInMethodLabel}</strong>
+                  <span>Sign-in method</span>
+                </div>
+                <div className="settings-metric">
+                  <strong>{emailVerificationLabel}</strong>
+                  <span>Email status</span>
+                </div>
+                <div className="settings-metric">
+                  <strong>{lastSignInLabel}</strong>
+                  <span>Last sign-in</span>
+                </div>
+                <div className="settings-metric">
+                  <strong>{accountCreatedLabel}</strong>
+                  <span>Account created</span>
+                </div>
+              </div>
+              <p className="settings-billing-note">
+                RoleForge uses Supabase Auth for secure email and provider sign-in. Password, passkey, or 2FA controls appear here only after those account methods are enabled.
+              </p>
+              <div className="settings-profile-actions">
+                <a className="ghost-button" href="#account-email">
+                  <RoleForgeIcon name="settings" size={14} /> Update email
+                </a>
+                <form action="/auth/signout" method="post">
+                  <input type="hidden" name="next" value="/login?account=signed-out" />
+                  <button className="ghost-button" type="submit">Sign out</button>
                 </form>
               </div>
             </div>

@@ -5,6 +5,7 @@ import { RoleForgeIcon } from "../components/RoleForgeIcons";
 
 const settingsSections = [
   { id: "account", label: "Account", icon: "settings" },
+  { id: "security", label: "Security", icon: "lock" },
   { id: "projects", label: "Saved projects", icon: "chart" },
   { id: "usage", label: "Usage", icon: "sparkle" },
   { id: "exports", label: "Exports", icon: "download" },

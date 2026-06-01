@@ -56,6 +56,19 @@ test("settings account panel supports authenticated email changes", () => {
   assert.match(settingsPage, /email-change-sent/);
 });
 
+test("settings security panel uses real Supabase account metadata", () => {
+  assert.match(settingsPage, /accountSignInMethodLabel\(user\)/);
+  assert.match(settingsPage, /accountEmailVerificationLabel\(user\)/);
+  assert.match(settingsPage, /accountSecurityDateLabel\(user\.last_sign_in_at\)/);
+  assert.match(settingsPage, /accountSecurityDateLabel\(user\.created_at\)/);
+  assert.match(settingsPage, /id="security"/);
+  assert.match(settingsPage, /Sign-in method/);
+  assert.match(settingsPage, /Email status/);
+  assert.match(settingsPage, /Last sign-in/);
+  assert.match(settingsPage, /Account created/);
+  assert.match(settingsPage, /Password, passkey, or 2FA controls appear here only after those account methods are enabled/);
+});
+
 test("settings account panel exposes guarded account deletion", () => {
   assert.match(settingsPage, /id="account-danger"/);
   assert.match(settingsPage, /action="\/api\/account\/delete"/);

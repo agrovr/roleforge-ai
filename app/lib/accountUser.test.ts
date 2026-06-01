@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { accountAvatarUrl, accountDisplayName } from "./accountUser";
+import {
+  accountAvatarUrl,
+  accountDisplayName,
+  accountEmailVerificationLabel,
+  accountSecurityDateLabel,
+  accountSignInMethodLabel,
+} from "./accountUser";
 
 test("uses explicit account names before provider full names", () => {
   assert.equal(
@@ -65,4 +71,24 @@ test("rejects unsafe provider avatar urls", () => {
   assert.equal(accountAvatarUrl({ user_metadata: { avatar_url: "http://example.com/profile.png" } }), "");
   assert.equal(accountAvatarUrl({ user_metadata: { avatar_url: "javascript:alert(1)" } }), "");
   assert.equal(accountAvatarUrl({ user_metadata: { avatar_url: "not a url" } }), "");
+});
+
+test("labels account sign-in methods from trusted app metadata", () => {
+  assert.equal(accountSignInMethodLabel({ app_metadata: { provider: "google", providers: ["google", "email"] } }), "Google + Email");
+  assert.equal(accountSignInMethodLabel({ app_metadata: { provider: "github" } }), "GitHub");
+  assert.equal(accountSignInMethodLabel({ email: "person@example.com" }), "Email");
+  assert.equal(accountSignInMethodLabel({}), "Not recorded");
+});
+
+test("summarizes account email verification state", () => {
+  assert.equal(accountEmailVerificationLabel({ email: "person@example.com", email_confirmed_at: "2026-01-02T00:00:00Z" }), "Confirmed");
+  assert.equal(accountEmailVerificationLabel({ email: "person@example.com", confirmed_at: "2026-01-02T00:00:00Z" }), "Confirmed");
+  assert.equal(accountEmailVerificationLabel({ email: "person@example.com" }), "Pending confirmation");
+  assert.equal(accountEmailVerificationLabel({}), "No email");
+});
+
+test("formats account security dates defensively", () => {
+  assert.match(accountSecurityDateLabel("2026-01-02T03:04:05Z"), /2026/);
+  assert.equal(accountSecurityDateLabel("not a date"), "Not recorded");
+  assert.equal(accountSecurityDateLabel(null), "Not recorded");
 });
