@@ -24,6 +24,9 @@ test("studio account menu acts as a workspace command center", () => {
   assert.match(studioPage, /syncableLocalHistoryCount\s*\?/);
   assert.match(studioPage, /void syncLocalHistoryToAccount\(\)/);
   assert.match(studioPage, /Save browser/);
+  assert.match(studioPage, /studio-account-utilities/);
+  assert.match(studioPage, /href="\/api\/account\/export"/);
+  assert.match(studioPage, /Download summary/);
 });
 
 test("account menu layout has responsive status cards", () => {
@@ -37,6 +40,9 @@ test("account menu layout has responsive status cards", () => {
   assert.match(globalsCss, /\.studio-account-recent-link\s+strong\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
   assert.match(globalsCss, /\.studio-account-sync-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(globalsCss, /\.studio-account-sync-actions\s+button\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
+  assert.match(globalsCss, /\.studio-account-utilities\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(globalsCss, /\.studio-account-utilities\s+a\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
+  assert.match(globalsCss, /html\[data-theme="dark"\] \.studio-account-utilities a/);
 });
 
 test("settings topbar exposes account, project, usage, and billing controls", () => {
@@ -49,6 +55,9 @@ test("settings topbar exposes account, project, usage, and billing controls", ()
   assert.match(settingsPage, /Recent projects/);
   assert.match(settingsPage, /recentProjectSummaries\.map/);
   assert.match(settingsPage, /href=\{project\.href\}/);
+  assert.match(settingsPage, /settings-account-utilities/);
+  assert.match(settingsPage, /href="\/api\/account\/export"/);
+  assert.match(settingsPage, /Download summary/);
   assert.match(settingsPage, /href="#security"/);
   assert.match(settingsPage, /href="#preferences"/);
   assert.match(settingsPage, /href="#projects"/);

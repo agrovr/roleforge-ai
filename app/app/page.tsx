@@ -3025,6 +3025,14 @@ export default function Page() {
                           ))}
                         </div>
                       ) : null}
+                      <div className="studio-account-utilities" aria-label="Account utilities">
+                        <Link href="/api/account/export" onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="download" size={14} /> Download summary
+                        </Link>
+                        <Link href="/settings#security" onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="lock" size={14} /> Security
+                        </Link>
+                      </div>
                       <form className="studio-account-form" action="/auth/signout" method="post">
                         <input type="hidden" name="next" value="/login?account=signed-out" />
                         <button className="ghost-button studio-account-submit" type="submit">

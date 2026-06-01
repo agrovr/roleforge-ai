@@ -6179,6 +6179,50 @@ html[data-theme="dark"] input::file-selector-button {
   text-wrap: balance;
 }
 
+.studio-account-utilities {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+  margin: 12px 0;
+}
+
+.studio-account-utilities a {
+  min-width: 0;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 10px;
+  border: 1px solid color-mix(in srgb, var(--line) 88%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 86%, var(--surface-2));
+  color: var(--ink-1);
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-decoration: none;
+  text-wrap: balance;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  white-space: normal;
+}
+
+.studio-account-utilities a:hover,
+.studio-account-utilities a:focus-visible {
+  border-color: color-mix(in srgb, var(--brand) 40%, var(--line));
+  box-shadow: 0 14px 28px -24px var(--shadow);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.studio-account-utilities svg {
+  flex: 0 0 auto;
+  color: var(--brand-dark);
+}
+
 .studio-account-list {
   display: grid;
   gap: 8px;
@@ -11650,13 +11694,15 @@ html[data-theme="dark"] .studio-account-insights a,
 html[data-theme="dark"] .studio-account-shortcuts a,
 html[data-theme="dark"] .studio-account-shortcuts button,
 html[data-theme="dark"] .studio-account-recent,
+html[data-theme="dark"] .studio-account-utilities a,
 html[data-theme="dark"] .studio-account-summary {
   background: rgba(255, 247, 233, 0.06);
   border-color: rgba(255, 247, 233, 0.16);
 }
 
 html[data-theme="dark"] .studio-account-shortcuts a,
-html[data-theme="dark"] .studio-account-shortcuts button {
+html[data-theme="dark"] .studio-account-shortcuts button,
+html[data-theme="dark"] .studio-account-utilities a {
   color: var(--ink-0);
 }
 
@@ -11677,6 +11723,8 @@ html[data-theme="dark"] .studio-account-shortcuts a:hover,
 html[data-theme="dark"] .studio-account-shortcuts a:focus-visible,
 html[data-theme="dark"] .studio-account-shortcuts button:hover,
 html[data-theme="dark"] .studio-account-shortcuts button:focus-visible,
+html[data-theme="dark"] .studio-account-utilities a:hover,
+html[data-theme="dark"] .studio-account-utilities a:focus-visible,
 html[data-theme="dark"] .studio-account-recent-link:hover,
 html[data-theme="dark"] .studio-account-recent-link:focus-visible {
   border-color: rgba(231, 188, 111, 0.36);

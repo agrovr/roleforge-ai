@@ -482,6 +482,14 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   ))}
                 </div>
               ) : null}
+              <div className="studio-account-utilities settings-account-utilities" aria-label="Account utilities">
+                <a href="/api/account/export">
+                  <RoleForgeIcon name="download" size={14} /> Download summary
+                </a>
+                <a href="#security">
+                  <RoleForgeIcon name="lock" size={14} /> Security
+                </a>
+              </div>
               <div className="studio-account-list">
                 <a className="studio-account-summary" href="#projects">
                   <span><RoleForgeIcon name="chart" size={14} /> Saved projects</span>
