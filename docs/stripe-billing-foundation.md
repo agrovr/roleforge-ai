@@ -70,7 +70,7 @@ If you only want the live Stripe secret key on the clipboard for a few seconds, 
 .\scripts\live_billing_one_time_proof.ps1
 ```
 
-Use `-PromptForSecret` to paste the key into a hidden PowerShell prompt instead of the clipboard, `-SkipVercelUpdate` if Vercel already has the rotated key, `-SkipRedeploy` if you are redeploying through GitHub instead, or `-CopyPromoCode` if you want the generated promo code copied after the secret has been cleared.
+Use `-PromptForSecret` to paste the key into a hidden PowerShell prompt instead of the clipboard, `-PromptForSupabaseServiceRole` if Supabase CLI is not logged in, `-SkipVercelUpdate` if Vercel already has the rotated key, `-SkipRedeploy` if you are redeploying through GitHub instead, or `-CopyPromoCode` if you want the generated promo code copied after the secret has been cleared.
 
 ## Live checkout smoke
 

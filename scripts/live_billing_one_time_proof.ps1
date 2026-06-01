@@ -11,7 +11,8 @@ param(
   [switch]$SkipRedeploy,
   [switch]$KeepProofUser,
   [switch]$CopyPromoCode,
-  [switch]$PromptForSecret
+  [switch]$PromptForSecret,
+  [switch]$PromptForSupabaseServiceRole
 )
 
 Set-StrictMode -Version Latest
@@ -77,22 +78,68 @@ function ConvertFrom-SecureStringForProcess {
   }
 }
 
+$SecretCameFromClipboard = $false
+
+function Get-ClipboardTextSafe {
+  try {
+    $value = Get-Clipboard -Raw
+    if ($null -eq $value) {
+      return ""
+    }
+    return "$value"
+  } catch {
+    return ""
+  }
+}
+
+function Clear-SecretClipboard {
+  param(
+    [string]$Text = ""
+  )
+
+  if ($Text -match "^sk_(live|test)_[A-Za-z0-9_\-]+$" -or $SecretCameFromClipboard) {
+    Set-Clipboard -Value ""
+  }
+}
+
+function Read-SupabaseServiceRole {
+  if ($env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY -or $env:SUPABASE_SERVICE_ROLE_KEY) {
+    return
+  }
+
+  if (-not $PromptForSupabaseServiceRole) {
+    return
+  }
+
+  $secure = Read-Host "Paste the Supabase service-role key" -AsSecureString
+  $prompted = ConvertFrom-SecureStringForProcess $secure
+  $trimmed = $prompted.Trim()
+  if ($trimmed -match "^(sb_secret_|eyJ)[A-Za-z0-9_\-.]+$") {
+    $env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY = $trimmed
+    return
+  }
+
+  throw "Supabase service-role key did not look valid. Secret value was not printed."
+}
+
 function Read-LiveStripeSecret {
-  $envSecret = @($env:ROLEFORGE_STRIPE_SECRET_KEY, $env:STRIPE_SECRET_KEY) | Where-Object { $_ -and $_.Trim() -match "^sk_live_[A-Za-z0-9_]+$" } | Select-Object -First 1
+  $envSecret = @($env:ROLEFORGE_STRIPE_SECRET_KEY, $env:STRIPE_SECRET_KEY) | Where-Object { $_ -and $_.Trim() -match "^sk_live_[A-Za-z0-9_\-]+$" } | Select-Object -First 1
   if ($envSecret) {
     return $envSecret.Trim()
   }
 
-  $clipboard = (Get-Clipboard -Raw).Trim()
-  if ($clipboard -match "^sk_live_[A-Za-z0-9_]+$") {
-    Set-Clipboard -Value ""
+  $clipboard = (Get-ClipboardTextSafe).Trim()
+  if ($clipboard -match "^sk_live_[A-Za-z0-9_\-]+$") {
+    $script:SecretCameFromClipboard = $true
+    Clear-SecretClipboard $clipboard
     return $clipboard
   }
+  Clear-SecretClipboard $clipboard
 
   if ($PromptForSecret) {
     $secure = Read-Host "Paste the live Stripe secret key" -AsSecureString
     $prompted = ConvertFrom-SecureStringForProcess $secure
-    if ($prompted -match "^sk_live_[A-Za-z0-9_]+$") {
+    if ($prompted -match "^sk_live_[A-Za-z0-9_\-]+$") {
       return $prompted.Trim()
     }
   }
@@ -121,7 +168,14 @@ try {
     Invoke-Vercel @("deploy", "--prod", "--scope", "team_kEe4HW272D5nYJDD92amj55H", "--yes")
   }
 
-  Set-ServiceRoleFromSupabaseCli
+  try {
+    Set-ServiceRoleFromSupabaseCli
+  } catch {
+    Read-SupabaseServiceRole
+    if (-not $env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY -and -not $env:SUPABASE_SERVICE_ROLE_KEY) {
+      throw $_
+    }
+  }
 
   $promo = Invoke-NodeJson @("scripts\create_live_promo_code.mjs", "--expires-hours", "24", "--max-redemptions", "1")
   Write-Host "Created one-use live promo code: $($promo.code)"
@@ -163,6 +217,7 @@ try {
   if (-not $env:SUPABASE_SERVICE_ROLE_KEY) {
     Remove-Item Env:\ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY -ErrorAction SilentlyContinue
   }
+  Clear-SecretClipboard
   $secret = ""
   Pop-Location
 }
