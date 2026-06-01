@@ -352,6 +352,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 <Link className="primary-button" href="/app">
                   <RoleForgeIcon name="file" size={14} /> Open studio
                 </Link>
+                <a className="ghost-button" href="/api/account/export">
+                  <RoleForgeIcon name="download" size={14} /> Download summary
+                </a>
                 <form action="/auth/signout" method="post">
                   <input type="hidden" name="next" value="/login?account=signed-out" />
                   <button className="ghost-button" type="submit">Sign out</button>
