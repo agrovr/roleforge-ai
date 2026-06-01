@@ -4898,6 +4898,42 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
   justify-content: center;
 }
 
+.history-application-kit {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--mint) 34%, var(--line));
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--mint) 11%, transparent), rgba(255, 255, 255, 0.42)),
+    color-mix(in srgb, var(--surface) 76%, var(--bg-alt));
+}
+
+.history-application-kit strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-0);
+  font-size: 0.98rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.history-application-kit > div:last-child {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.history-application-kit .btn {
+  min-width: 150px;
+  justify-content: center;
+}
+
 .history-export-panel {
   grid-column: 1 / -1;
   display: grid;
@@ -11246,6 +11282,7 @@ html[data-theme="dark"] .history-item .ghost-button[aria-pressed="true"] {
 
 html[data-theme="dark"] .history-rename-field input,
 html[data-theme="dark"] .history-detail-panel,
+html[data-theme="dark"] .history-application-kit,
 html[data-theme="dark"] .history-export-panel,
 html[data-theme="dark"] .history-download-panel,
 html[data-theme="dark"] .history-version-list article {
@@ -11269,6 +11306,7 @@ html[data-theme="dark"] .history-version-list span {
 
 html[data-theme="dark"] .history-detail-panel dd,
 html[data-theme="dark"] .history-detail-panel h3,
+html[data-theme="dark"] .history-application-kit strong,
 html[data-theme="dark"] .history-export-panel strong,
 html[data-theme="dark"] .history-version-list strong {
   color: var(--ink-0);
@@ -11645,6 +11683,7 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   .history-detail-panel,
   .history-content-grid.has-detail,
   .history-detail-panel dl,
+  .history-application-kit,
   .history-export-panel,
   .history-download-panel {
     grid-template-columns: 1fr;
@@ -11734,6 +11773,7 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
   .history-panel-actions,
   .history-actions,
+  .history-application-kit > div:last-child,
   .history-download-panel > div,
   .history-version-list article > div {
     width: 100%;
@@ -12533,6 +12573,7 @@ body,
 .history-content-grid,
 .history-project-list,
 .history-detail-panel,
+.history-application-kit,
 .history-title-row,
 .history-detail-heading,
 .history-export-upgrade,
@@ -12563,6 +12604,7 @@ body,
 .history-detail-panel h3,
 .history-detail-heading,
 .history-detail-badges span,
+.history-application-kit strong,
 .history-export-panel strong,
 .history-export-upgrade,
 .history-version-formats,

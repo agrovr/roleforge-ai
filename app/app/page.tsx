@@ -44,6 +44,8 @@ import {
   hasRestorableSnapshot,
   historyDownloadEntries,
   historyDownloads,
+  historyGeneratedAssetCounts,
+  historyGeneratedAssetSummary,
   historyGroupSummary,
   historyGroupStatus,
   historyProjectTitle,
@@ -1997,6 +1999,11 @@ export default function Page() {
     openPreviewMode("tailored");
   }, [accountStatus?.entitlement, openPreviewMode, syncedHistoryIds]);
 
+  function restoreHistoryGeneratedAsset(entry: HistoryItem, asset: "cover" | "interview") {
+    restoreHistoryItem(entry);
+    window.setTimeout(() => openGeneratedAsset(asset, { behavior: "auto" }), 80);
+  }
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const historyRunId = params.get("historyRun")?.trim();
@@ -2778,6 +2785,8 @@ export default function Page() {
     selectedHistoryPrimaryDownload?.format.toUpperCase() ?? visibleSelectedHistoryItem?.downloadFormat?.toUpperCase() ?? "PDF";
   const selectedHistoryTemplateName = visibleSelectedHistoryItem ? historyTemplateNameFor(visibleSelectedHistoryItem) : "";
   const selectedHistoryStatus = visibleSelectedHistoryItem ? historyRunStatus(visibleSelectedHistoryItem, accountStatus?.entitlement) : null;
+  const selectedHistoryAssetCounts = visibleSelectedHistoryItem ? historyGeneratedAssetCounts(visibleSelectedHistoryItem) : { coverLetterWords: 0, interviewQuestions: 0 };
+  const selectedHistoryAssetSummary = visibleSelectedHistoryItem ? historyGeneratedAssetSummary(visibleSelectedHistoryItem) : "";
   const selectedHistoryActionCopy = visibleSelectedHistoryItem
     ? historyRunActionCopy(visibleSelectedHistoryItem, selectedHistoryPrimaryDownloadLabel, accountStatus?.entitlement)
     : null;
@@ -3591,6 +3600,7 @@ export default function Page() {
                       const active = group.items.some((item) => restoredHistoryId === item.id);
                       const latestDownloadLabel = primaryDownload?.format.toUpperCase() ?? entry.downloadFormat?.toUpperCase() ?? "PDF";
                       const entryTemplateName = historyTemplateNameFor(entry);
+                      const entryAssetSummary = historyGeneratedAssetSummary(entry);
                       return (
                         <article className={`history-item${active ? " active" : ""}${selected ? " selected" : ""}`} key={group.key}>
                           <div className="history-item-main">
@@ -3638,6 +3648,7 @@ export default function Page() {
                             <div className="history-project-meta" aria-label="Project run summary">
                               <span>{historyGroupSummary(group, accountStatus?.entitlement)}</span>
                               <span>{entryStatus.detail}</span>
+                              {entryAssetSummary ? <span>Application kit: {entryAssetSummary}</span> : null}
                               <span>{entry.mode} mode</span>
                               {entryTemplateName ? <span>{entryTemplateName} direction</span> : null}
                             </div>
@@ -3742,6 +3753,7 @@ export default function Page() {
                           <span>{historyStorageLabel(selectedHistoryGroup)}</span>
                           <span>{selectedHistoryVersionLabel}</span>
                           {selectedHistoryStatus ? <span>{selectedHistoryStatus.label}</span> : null}
+                          {selectedHistoryAssetSummary ? <span>Application kit ready</span> : null}
                           {selectedHistoryTemplateName ? <span>{selectedHistoryTemplateName} direction</span> : null}
                         </div>
                       </div>
@@ -3761,6 +3773,10 @@ export default function Page() {
                       <div>
                         <dt>Export</dt>
                         <dd>{selectedHistoryStatus?.detail ?? (selectedHistoryDownloadCount ? `${selectedHistoryDownloadCount} file${selectedHistoryDownloadCount === 1 ? "" : "s"} ready` : "Needs re-export")}</dd>
+                      </div>
+                      <div>
+                        <dt>Application kit</dt>
+                        <dd>{selectedHistoryAssetSummary || "Restore-ready runs will show cover letter and interview prep here."}</dd>
                       </div>
                     </dl>
                     <div className="history-selected-run">
@@ -3788,6 +3804,38 @@ export default function Page() {
                         </button>
                       )}
                     </div>
+                    {selectedHistoryAssetSummary ? (
+                      <div className="history-application-kit" aria-label="Saved application kit">
+                        <div>
+                          <span className="eyebrow">Application kit</span>
+                          <strong>{selectedHistoryAssetSummary}</strong>
+                        </div>
+                        <div>
+                          {selectedHistoryAssetCounts.coverLetterWords ? (
+                            <button
+                              className="btn btn-soft btn-sm"
+                              type="button"
+                              onClick={() => restoreHistoryGeneratedAsset(visibleSelectedHistoryItem, "cover")}
+                              disabled={!selectedHistoryRestorable}
+                              title={selectedHistoryRestorable ? "Restore and open the saved cover letter" : "Restore data is not available for this run"}
+                            >
+                              Open cover letter <RoleForgeIcon name="mail" size={12} />
+                            </button>
+                          ) : null}
+                          {selectedHistoryAssetCounts.interviewQuestions ? (
+                            <button
+                              className="btn btn-soft btn-sm"
+                              type="button"
+                              onClick={() => restoreHistoryGeneratedAsset(visibleSelectedHistoryItem, "interview")}
+                              disabled={!selectedHistoryRestorable}
+                              title={selectedHistoryRestorable ? "Restore and open saved interview prep" : "Restore data is not available for this run"}
+                            >
+                              Open interview prep <RoleForgeIcon name="briefcase" size={12} />
+                            </button>
+                          ) : null}
+                        </div>
+                      </div>
+                    ) : null}
                     <div className="history-export-panel">
                       <div>
                         <span className="eyebrow">Export this run</span>

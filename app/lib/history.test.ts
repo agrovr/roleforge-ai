@@ -3,6 +3,8 @@ import test from "node:test";
 
 import {
   groupHistoryItems,
+  historyGeneratedAssetCounts,
+  historyGeneratedAssetSummary,
   historyDownloadEntries,
   historyDownloads,
   historyGroupSummary,
@@ -73,6 +75,25 @@ test("normalizes ready history downloads and filters placeholder URLs", () => {
     docx: "https://downloads.example/old.docx",
     txt: "https://downloads.example/current.txt",
   });
+});
+
+test("summarizes saved cover letter and interview prep assets", () => {
+  const item = historyItem({
+    snapshot: {
+      result: {
+        tailored_text: "Saved tailored draft",
+        cover_letter: "Dear team, this is a focused cover letter.",
+        interview_prep: [{ question: "Why this role?" }, { question: "Tell me about impact." }],
+      },
+    },
+  });
+
+  assert.deepEqual(historyGeneratedAssetCounts(item), {
+    coverLetterWords: 8,
+    interviewQuestions: 2,
+  });
+  assert.equal(historyGeneratedAssetSummary(item), "cover letter 8 words · 2 interview questions");
+  assert.equal(historyGeneratedAssetSummary(historyItem({ snapshot: { result: { tailored_text: "Draft" } } })), "");
 });
 
 test("filters premium history downloads for free accounts", () => {

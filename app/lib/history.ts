@@ -5,6 +5,8 @@ export type HistoryDownloads = Partial<Record<ExportFormat, string>>;
 export type HistorySnapshot = {
   result?: {
     tailored_text?: string;
+    cover_letter?: string;
+    interview_prep?: unknown[];
   } | null;
   downloadUrl?: string;
   downloadFormat?: ExportFormat;
@@ -60,6 +62,27 @@ export const EXPORT_FORMAT_ORDER: ExportFormat[] = ["pdf", "docx", "txt"];
 
 export function hasRestorableSnapshot(item: HistoryItem) {
   return Boolean(item.snapshot?.result?.tailored_text?.trim());
+}
+
+export function historyGeneratedAssetCounts(item: HistoryItem) {
+  const coverLetterWords = item.snapshot?.result?.cover_letter?.trim()
+    ? item.snapshot.result.cover_letter.trim().split(/\s+/).filter(Boolean).length
+    : 0;
+  const interviewQuestions = Array.isArray(item.snapshot?.result?.interview_prep)
+    ? item.snapshot.result.interview_prep.length
+    : 0;
+
+  return { coverLetterWords, interviewQuestions };
+}
+
+export function historyGeneratedAssetSummary(item: HistoryItem) {
+  const { coverLetterWords, interviewQuestions } = historyGeneratedAssetCounts(item);
+  const parts = [
+    coverLetterWords ? `cover letter ${coverLetterWords} words` : "",
+    interviewQuestions ? `${interviewQuestions} interview question${interviewQuestions === 1 ? "" : "s"}` : "",
+  ].filter(Boolean);
+
+  return parts.length ? parts.join(" · ") : "";
 }
 
 export function validHistoryDownloadUrl(url?: string | null) {

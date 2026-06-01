@@ -1,5 +1,5 @@
 import type { ExportEntitlement } from "./exportFormats";
-import { groupHistoryItems, historyGroupStatus, type HistoryItem } from "./history";
+import { groupHistoryItems, historyGeneratedAssetSummary, historyGroupStatus, type HistoryItem } from "./history";
 import { getResumeTemplate, isResumeTemplateSlug } from "./resumeTemplates";
 import { savedRunHistoryHref } from "./savedRunLinks";
 import type { SavedHistoryItem } from "./supabase/savedProjects";
@@ -50,11 +50,13 @@ export function settingsProjectSummaries(
     const linkRun = restoreRun ?? group.latest;
     const status = historyGroupStatus(group, entitlement);
     const templateName = savedRunTemplateName(group.latest);
+    const assetSummary = historyGeneratedAssetSummary(group.latest);
     const versionLabel = `${group.items.length} ${group.items.length === 1 ? "version" : "versions"}`;
     const detail = [
       group.target,
       versionLabel,
       `best ${group.bestScore}/100`,
+      assetSummary,
       `latest ${formatSettingsSavedRunDate(group.latest.createdAt)}`,
       templateName,
     ].filter(Boolean).join(" · ");

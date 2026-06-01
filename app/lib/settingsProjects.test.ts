@@ -47,7 +47,14 @@ test("groups settings saved projects by project with a restore link", () => {
       accountRunId: "run-latest",
       createdAt: "2026-05-15T20:00:00.000Z",
       score: 86,
-      snapshot: { result: { tailored_text: "Latest tailored draft" }, templateSlug: "engineer" },
+      snapshot: {
+        result: {
+          tailored_text: "Latest tailored draft",
+          cover_letter: "Dear team, focused letter.",
+          interview_prep: [{ question: "Why this role?" }],
+        },
+        templateSlug: "engineer",
+      },
     }),
   ], freeEntitlement);
 
@@ -55,6 +62,8 @@ test("groups settings saved projects by project with a restore link", () => {
   assert.equal(summaries[0].title, "Senior PM application");
   assert.match(summaries[0].detail, /2 versions/);
   assert.match(summaries[0].detail, /best 86\/100/);
+  assert.match(summaries[0].detail, /cover letter 4 words/);
+  assert.match(summaries[0].detail, /1 interview question/);
   assert.match(summaries[0].detail, /Engineer/);
   assert.equal(summaries[0].href, "/app?historyRun=run-latest&historyAction=restore#history");
   assert.equal(summaries[0].actionLabel, "Restore");
