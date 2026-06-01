@@ -112,13 +112,14 @@ export function validatePromoCodeOptions({
 
 export async function createLivePromotionCode({
   secretKey = firstNonEmptyEnv("STRIPE_SECRET_KEY", "ROLEFORGE_STRIPE_SECRET_KEY"),
-  code = generatedCode(),
+  code,
   duration = "forever",
   expiresHours = DEFAULT_EXPIRES_HOURS,
   maxRedemptions = 1,
   productName = DEFAULT_PRODUCT_NAME,
 } = {}) {
   validatePromoCodeOptions({ secretKey, duration, expiresHours, maxRedemptions, productName });
+  const promotionCodeValue = code?.trim() ? code.trim().toUpperCase() : generatedCode();
 
   const stripe = new Stripe(secretKey, {
     appInfo: {
@@ -133,7 +134,7 @@ export async function createLivePromotionCode({
   const coupon = await stripe.coupons.create({
     percent_off: 100,
     duration,
-    name: `${productName} no-charge launch test (${duration})`,
+    name: `RoleForge proof (${duration})`,
     applies_to: {
       products: [product.id],
     },
@@ -143,8 +144,11 @@ export async function createLivePromotionCode({
     },
   });
   const promotionCode = await stripe.promotionCodes.create({
-    coupon: coupon.id,
-    code,
+    promotion: {
+      type: "coupon",
+      coupon: coupon.id,
+    },
+    code: promotionCodeValue,
     expires_at: expiresAt,
     max_redemptions: maxRedemptions,
     metadata: {
