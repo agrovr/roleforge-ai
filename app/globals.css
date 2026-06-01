@@ -1977,6 +1977,16 @@ html.rf-custom-pointer [contenteditable=""] {
   text-wrap: balance;
 }
 
+.templates-account-menu {
+  position: relative;
+  display: inline-flex;
+}
+
+.templates-account-popover {
+  right: 0;
+  width: min(420px, calc(100vw - 36px));
+}
+
 .templates-selection-status {
   width: min(1200px, 100%);
   min-width: 0;
@@ -12619,6 +12629,16 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   .templates-page-actions {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .templates-account-menu {
+    width: 100%;
+  }
+
+  .templates-account-popover {
+    right: auto;
+    left: 0;
+    width: min(420px, calc(100vw - 36px));
   }
 
   .templates-page-card .template-thumb {

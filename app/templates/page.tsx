@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 
+import { AccountAvatar } from "../components/AccountAvatar";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
-import { RESUME_TEMPLATE_COOKIE, getResumeTemplate } from "../lib/resumeTemplates";
+import { accountAvatarUrl, accountDisplayName } from "../lib/accountUser";
+import { RESUME_TEMPLATE_COOKIE, getResumeTemplate, resumeTemplateStudioHref } from "../lib/resumeTemplates";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 import { TemplateLibrary } from "./TemplateLibrary";
@@ -16,8 +18,14 @@ async function getTemplateLinks() {
   const signedIn = Boolean(user);
   const templateCookie = (await cookies()).get(RESUME_TEMPLATE_COOKIE)?.value;
   const initialTemplateSlug = getResumeTemplate(templateCookie).slug;
+  const displayName = accountDisplayName(user);
+  const accountInitials = (displayName || user?.email || "RF").slice(0, 2).toUpperCase();
 
   return {
+    accountImageUrl: accountAvatarUrl(user),
+    accountInitials,
+    accountName: displayName || user?.email || "RoleForge user",
+    email: user?.email ?? "",
     signedIn,
     initialTemplateSlug,
     studioHref: signedIn ? "/app" : "/login?next=/app",
@@ -26,7 +34,8 @@ async function getTemplateLinks() {
 }
 
 export default async function TemplatesPage() {
-  const { signedIn, initialTemplateSlug, studioHref, settingsHref } = await getTemplateLinks();
+  const { accountImageUrl, accountInitials, accountName, email, signedIn, initialTemplateSlug, studioHref, settingsHref } = await getTemplateLinks();
+  const selectedTemplate = getResumeTemplate(initialTemplateSlug);
 
   return (
     <main className="templates-page-shell">
@@ -35,6 +44,59 @@ export default async function TemplatesPage() {
         <div className="settings-page-actions">
           <Link className="btn btn-soft btn-sm" href={studioHref}>Studio</Link>
           <ThemeToggle />
+          {signedIn ? (
+            <details className="settings-account-menu templates-account-menu">
+              <summary className="studio-account-button templates-topbar-avatar" aria-label="Open account menu">
+                <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
+              </summary>
+              <div className="studio-account-popover settings-account-popover templates-account-popover" role="group" aria-label="Account menu">
+                <div className="studio-account-popover-head">
+                  <span>Account</span>
+                </div>
+                <div className="studio-account-identity">
+                  <div className="studio-account-avatar" aria-hidden="true">
+                    <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
+                  </div>
+                  <div>
+                    <strong className="studio-account-email" title={email}>{accountName}</strong>
+                    <span>{selectedTemplate.name} direction</span>
+                  </div>
+                </div>
+                <div className="studio-account-insights" aria-label="Template account summary">
+                  <Link href={resumeTemplateStudioHref(initialTemplateSlug)}>
+                    <strong>{selectedTemplate.name}</strong>
+                    <span>Selected direction</span>
+                  </Link>
+                  <Link href="/settings#exports">
+                    <strong>Exports</strong>
+                    <span>Format access</span>
+                  </Link>
+                  <Link href="/settings#billing">
+                    <strong>Billing</strong>
+                    <span>Plan controls</span>
+                  </Link>
+                </div>
+                <div className="studio-account-shortcuts settings-account-shortcuts">
+                  <Link href="/app"><RoleForgeIcon name="file" size={14} /> Studio</Link>
+                  <Link href="/settings"><RoleForgeIcon name="settings" size={14} /> Settings</Link>
+                  <Link href="/settings#billing"><RoleForgeIcon name="lock" size={14} /> Billing</Link>
+                  <Link href="/settings#security"><RoleForgeIcon name="lock" size={14} /> Security</Link>
+                </div>
+                <div className="studio-account-utilities settings-account-utilities" aria-label="Account utilities">
+                  <a href="/api/account/export">
+                    <RoleForgeIcon name="download" size={14} /> Download summary
+                  </a>
+                  <Link href="/settings#preferences">
+                    <RoleForgeIcon name="layers" size={14} /> Preferences
+                  </Link>
+                </div>
+                <form className="studio-account-form" action="/auth/signout" method="post">
+                  <input type="hidden" name="next" value="/login?account=signed-out" />
+                  <button className="ghost-button studio-account-submit" type="submit">Sign out</button>
+                </form>
+              </div>
+            </details>
+          ) : null}
         </div>
       </header>
 
