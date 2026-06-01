@@ -13,6 +13,19 @@ test("uses explicit account names before provider full names", () => {
   );
 });
 
+test("uses saved profile display names before provider metadata", () => {
+  assert.equal(
+    accountDisplayName(
+      {
+        email: "person@example.com",
+        user_metadata: { name: "Avery Stone", full_name: "Avery Google" },
+      },
+      "  Saved   Account  ",
+    ),
+    "Saved Account",
+  );
+});
+
 test("falls back to Google full_name metadata", () => {
   assert.equal(
     accountDisplayName({
@@ -36,4 +49,3 @@ test("returns an empty name when metadata is missing", () => {
   assert.equal(accountDisplayName({ email: "person@example.com" }), "");
   assert.equal(accountDisplayName(null), "");
 });
-

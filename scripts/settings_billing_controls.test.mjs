@@ -31,6 +31,17 @@ test("settings billing submit buttons show progress while Stripe opens", () => {
   assert.match(settingsPage, /pendingLabel="Opening billing\.\.\."/);
 });
 
+test("settings account panel includes an editable profile display name", () => {
+  assert.match(settingsPage, /updateAccountProfileAction/);
+  assert.match(settingsPage, /saveAccountProfile\(supabase,\s*user/);
+  assert.match(settingsPage, /name="displayName"/);
+  assert.match(settingsPage, /maxLength=\{80\}/);
+  assert.match(settingsPage, /defaultValue=\{displayName\}/);
+  assert.match(settingsPage, /Save name/);
+  assert.match(stylesheet, /\.settings-profile-form\s*\{[^}]*max-width:\s*min\(100%,\s*560px\)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-profile-edit-row\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*minmax\(min\(100%,\s*138px\),\s*auto\)[^}]*\}/s);
+});
+
 test("inactive settings billing action does not animate like a clickable control", () => {
   assert.match(stylesheet, /\.settings-disabled-action\s*\{[^}]*cursor:\s*default[^}]*opacity:\s*0\.78[^}]*\}/s);
   assert.match(stylesheet, /\.settings-disabled-action:hover\s*\{[^}]*transform:\s*none[^}]*\}/s);

@@ -7455,6 +7455,65 @@ html[data-theme="dark"] input::file-selector-button {
   overflow-wrap: anywhere;
 }
 
+.settings-profile-form {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  max-width: min(100%, 560px);
+  margin: 2px 0 0;
+}
+
+.settings-profile-form label {
+  color: var(--ink-3);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.settings-profile-edit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 138px), auto);
+  gap: 10px;
+  min-width: 0;
+}
+
+.settings-profile-edit-row input {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink-0);
+  font: inherit;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.settings-profile-edit-row input:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 4px rgba(188, 113, 47, 0.14);
+  outline: none;
+}
+
+.settings-profile-edit-row .primary-button {
+  min-width: 0;
+  min-height: 48px;
+  justify-content: center;
+  padding-inline: 16px;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.settings-profile-form small {
+  color: var(--ink-3);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
 .settings-inline-link {
   width: fit-content;
   max-width: 100%;
@@ -7739,12 +7798,14 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 @container (max-width: 430px) {
+  .settings-profile-edit-row,
   .settings-profile-actions,
   .settings-billing-head,
   .settings-export-actions {
     grid-template-columns: 1fr;
   }
 
+  .settings-profile-edit-row .primary-button,
   .settings-billing-head form,
   .settings-billing-head .ghost-button,
   .settings-inline-link {
@@ -11189,6 +11250,16 @@ html[data-theme="dark"] .settings-billing-alert.success {
     rgba(15, 20, 35, 0.9);
   border-color: rgba(146, 191, 160, 0.34);
   color: #eff8ed;
+}
+
+html[data-theme="dark"] .settings-profile-edit-row input {
+  background: rgba(255, 247, 233, 0.06);
+  border-color: rgba(255, 247, 233, 0.18);
+  color: #fff8ea;
+}
+
+html[data-theme="dark"] .settings-profile-edit-row input::placeholder {
+  color: rgba(231, 226, 214, 0.48);
 }
 
 html[data-theme="dark"] .settings-plan-includes span {

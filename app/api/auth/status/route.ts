@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { loadAccountProfile } from "@/app/lib/accountProfile";
 import { accountDisplayName } from "@/app/lib/accountUser";
 import { reconcileUserSubscriptionEntitlement } from "@/app/lib/billing/entitlements";
 import { billingReadiness } from "@/app/lib/billing/readiness";
@@ -27,11 +28,14 @@ export async function GET() {
   const { data, error } = supabase
     ? await supabase.auth.getUser()
     : { data: { user: null }, error: null };
+  const profile = !error && data.user && supabase
+    ? await loadAccountProfile(supabase, data.user.id).catch(() => null)
+    : null;
   const user = !error && data.user
     ? {
         id: data.user.id,
         email: data.user.email ?? "",
-        name: accountDisplayName(data.user),
+        name: accountDisplayName(data.user, profile?.displayName),
       }
     : null;
 

@@ -10,8 +10,13 @@ function cleanMetadataString(value: unknown) {
   return typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
 }
 
-export function accountDisplayName(user: AccountIdentitySource | null | undefined) {
-  if (!user) return "";
-  return cleanMetadataString(user.user_metadata?.name) || cleanMetadataString(user.user_metadata?.full_name);
+export function accountDisplayName(
+  user: AccountIdentitySource | null | undefined,
+  profileDisplayName?: string | null,
+) {
+  return (
+    cleanMetadataString(profileDisplayName) ||
+    cleanMetadataString(user?.user_metadata?.name) ||
+    cleanMetadataString(user?.user_metadata?.full_name)
+  );
 }
-

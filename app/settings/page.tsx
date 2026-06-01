@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { loadAccountProfile, saveAccountProfile } from "../lib/accountProfile";
 import { accountDisplayName } from "../lib/accountUser";
 import { billingStateDetail, billingStateLabel, billingStatusTone } from "../lib/billing/display";
 import { reconcileUserSubscriptionEntitlement, syncCheckoutSessionEntitlement } from "../lib/billing/entitlements";
@@ -46,6 +47,19 @@ function formatPlanDate(value: string | null) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
+function accountNotice(value: string | undefined) {
+  switch (value) {
+    case "profile-saved":
+      return { tone: "success" as const, text: "Display name saved." };
+    case "profile-invalid":
+      return { tone: "warn" as const, text: "Use a display name of 80 characters or fewer." };
+    case "profile-unavailable":
+      return { tone: "warn" as const, text: "Profile changes are temporarily unavailable." };
+    default:
+      return null;
+  }
+}
+
 async function countRows(
   supabase: NonNullable<Awaited<ReturnType<typeof createRoleForgeServerClient>>>,
   table: "resume_projects" | "tailor_runs",
@@ -58,8 +72,37 @@ async function countRows(
   return error ? 0 : count ?? 0;
 }
 
+async function updateAccountProfileAction(formData: FormData) {
+  "use server";
+
+  const supabase = await createRoleForgeServerClient();
+  if (!supabase) {
+    redirect("/login?next=/settings&account=signin-required");
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?next=/settings&account=signin-required");
+  }
+
+  try {
+    await saveAccountProfile(supabase, user, {
+      displayName: formData.get("displayName"),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    redirect(`/settings?account=${message.includes("80 characters") ? "profile-invalid" : "profile-unavailable"}#account`);
+  }
+
+  redirect("/settings?account=profile-saved#account");
+}
+
 export default async function SettingsPage({ searchParams }: { searchParams: SettingsSearchParams }) {
   const params = await searchParams;
+  const accountParam = getParam(params.account);
   const billingParam = getParam(params.billing);
   const checkoutSessionId = getParam(params.session_id);
   const supabase = await createRoleForgeServerClient();
@@ -82,10 +125,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     redirect(`/settings?billing=${syncedCheckout ? "checkout-success" : "checkout-syncing"}#billing`);
   }
 
-  const [projectCount, runCount, recentSavedRuns] = await Promise.all([
+  const [projectCount, runCount, recentSavedRuns, accountProfile] = await Promise.all([
     countRows(supabase, "resume_projects", user.id),
     countRows(supabase, "tailor_runs", user.id),
     loadSavedRuns(supabase, user.id).catch(() => []),
+    loadAccountProfile(supabase, user.id).catch(() => null),
     reconcileUserSubscriptionEntitlement(user.id).catch(() => false),
   ]);
   const entitlement = await loadAccountEntitlement(supabase, user.id);
@@ -116,8 +160,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
         : "Premium billing is not accepting payments right now.";
   const inactiveBillingActionLabel = premiumActive ? "Billing unavailable right now" : "Premium billing unavailable";
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
-  const displayName = accountDisplayName(user);
+  const displayName = accountDisplayName(user, accountProfile?.displayName);
   const accountInitials = (displayName || user.email || "RF").slice(0, 2).toUpperCase();
+  const profileNotice = accountNotice(accountParam);
   const planFeatures = premiumActive
     ? ["Unlimited runs", "DOCX and TXT exports", premiumEnding && premiumEndLabel ? `Access until ${premiumEndLabel}` : "PDF export included"]
     : [monthlyRunAllowanceLabel(usage.monthlyRunLimit), "PDF export", "Saved project sync"];
@@ -248,6 +293,13 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
             </div>
           ) : null}
 
+          {profileNotice ? (
+            <div className={`settings-billing-alert ${profileNotice.tone}`} role="status">
+              <RoleForgeIcon name={profileNotice.tone === "success" ? "check" : "settings"} size={16} />
+              <span>{profileNotice.text}</span>
+            </div>
+          ) : null}
+
           <section className="settings-section" id="account">
             <div className="settings-section-copy">
               <h2>Account</h2>
@@ -263,6 +315,24 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <span>{user.email}</span>
                 </div>
               </div>
+              <form className="settings-profile-form" action={updateAccountProfileAction}>
+                <label htmlFor="settings-display-name">Display name</label>
+                <div className="settings-profile-edit-row">
+                  <input
+                    id="settings-display-name"
+                    name="displayName"
+                    type="text"
+                    autoComplete="name"
+                    maxLength={80}
+                    defaultValue={displayName}
+                    placeholder="Add a display name"
+                  />
+                  <button className="primary-button" type="submit">
+                    Save name
+                  </button>
+                </div>
+                <small>Shown in your account menu and saved-project profile.</small>
+              </form>
               <div className="settings-metric-row">
                 <div className="settings-metric">
                   <strong>{premiumEnding ? "Ending" : planLabel}</strong>
