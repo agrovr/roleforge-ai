@@ -319,7 +319,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                         <strong>{project.title}</strong>
                         <span>{project.detail}</span>
                       </div>
-                      <small title={project.actionDetail}>{project.actionLabel}</small>
+                      <small title={`${project.stageDetail} ${project.actionDetail}`}>
+                        {project.stageLabel} · {project.actionLabel}
+                      </small>
                     </Link>
                   ))}
                 </div>

@@ -1,4 +1,5 @@
 import type { CompletedRunSaveInput, SavedHistoryItem } from "./savedProjects";
+import type { ApplicationStatus } from "../applicationStatus";
 
 type SavedRunResponse = {
   runId: string;
@@ -57,6 +58,22 @@ export async function renameSavedProject(projectId: string, title: string) {
 
   const payload = (await response.json()) as { title: string };
   return payload.title;
+}
+
+export async function updateSavedProjectStatus(projectId: string, status: ApplicationStatus) {
+  const response = await fetch(`/api/saved-runs/${encodeURIComponent(projectId)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "same-origin",
+    body: JSON.stringify({ status }),
+  });
+
+  if (!response.ok) {
+    throw new Error(await readSavedProjectError(response, "Project stage could not be saved."));
+  }
+
+  const payload = (await response.json()) as { status: ApplicationStatus };
+  return payload.status;
 }
 
 export async function deleteSavedProject(projectId: string) {

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseCompletedRunSaveInput, parseSavedProjectId, parseSavedProjectRenameInput } from "./savedProjectInput";
+import { parseCompletedRunSaveInput, parseSavedProjectId, parseSavedProjectRenameInput, parseSavedProjectStatusInput } from "./savedProjectInput";
 
 const validSavedRun = {
   id: "history-1",
@@ -88,5 +88,20 @@ test("normalizes and validates saved project rename input", () => {
   assert.deepEqual(parseSavedProjectRenameInput({ title: "x".repeat(121) }), {
     ok: false,
     error: "Project name must be 120 characters or fewer.",
+  });
+});
+
+test("normalizes and validates saved project status input", () => {
+  assert.deepEqual(parseSavedProjectStatusInput({ status: "active" }), {
+    ok: true,
+    status: "active",
+  });
+  assert.deepEqual(parseSavedProjectStatusInput({ status: "applied" }), {
+    ok: false,
+    error: "Project stage is not available.",
+  });
+  assert.deepEqual(parseSavedProjectStatusInput(null), {
+    ok: false,
+    error: "Project stage is required.",
   });
 });

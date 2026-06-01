@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 
 import { withAccountDatabase } from "@/app/lib/supabase/accountDatabase";
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
-import { parseSavedProjectId, parseSavedProjectRenameInput } from "@/app/lib/supabase/savedProjectInput";
-import { deleteSavedProject, renameSavedProject } from "@/app/lib/supabase/savedProjects";
+import { parseSavedProjectId, parseSavedProjectRenameInput, parseSavedProjectStatusInput } from "@/app/lib/supabase/savedProjectInput";
+import { deleteSavedProject, renameSavedProject, updateSavedProjectStatus } from "@/app/lib/supabase/savedProjects";
 
 type RouteContext = {
   params: Promise<{ projectId: string }>;
@@ -53,6 +53,30 @@ export async function PATCH(request: Request, context: RouteContext) {
   } catch {
     return withSupabaseCookies(
       NextResponse.json({ error: "Project name is required." }, { status: 400 }),
+      account.routeClient.cookiesToSet,
+    );
+  }
+
+  const parsedStatusInput = parseSavedProjectStatusInput(payload);
+  if (parsedStatusInput.ok) {
+    try {
+      const status = await withAccountDatabase(
+        account.routeClient.supabase,
+        (dbClient) => updateSavedProjectStatus(dbClient, projectIdParam.projectId, parsedStatusInput.status, account.user.id),
+        { label: "Saved project status database operation" },
+      );
+      return withSupabaseCookies(NextResponse.json({ status }), account.routeClient.cookiesToSet);
+    } catch (error) {
+      console.error("Saved project status update failed", error);
+      return withSupabaseCookies(
+        NextResponse.json({ error: "Project stage could not be saved." }, { status: 500 }),
+        account.routeClient.cookiesToSet,
+      );
+    }
+  }
+  if (payload && typeof payload === "object" && "status" in payload) {
+    return withSupabaseCookies(
+      NextResponse.json({ error: parsedStatusInput.error }, { status: 400 }),
       account.routeClient.cookiesToSet,
     );
   }

@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { accountDisplayName } from "../accountUser";
+import { normalizeApplicationStatus, type ApplicationStatus } from "../applicationStatus";
 import { parseWorkflowDownloadUrl } from "../downloadUrls";
 import { getResumeTemplate, isResumeTemplateSlug, type ResumeTemplateSlug } from "../resumeTemplates";
 
@@ -20,6 +21,7 @@ export type SavedHistoryItem = {
   downloadFormat?: ExportFormat;
   downloads?: SavedDownloadMap;
   roleHint: string;
+  applicationStatus?: ApplicationStatus;
   saved?: boolean;
   source?: "account" | "local";
   snapshot?: Record<string, unknown>;
@@ -63,6 +65,7 @@ type TailorRunRow = {
 type ResumeProjectRow = {
   id: string;
   title: string | null;
+  status?: string | null;
 };
 
 function titleFromTarget(value: string | undefined) {
@@ -180,11 +183,12 @@ export async function loadSavedRuns(client: SupabaseClient, userId: string): Pro
   const visibleRuns = runs.filter(hasSavedProjectSurface);
   const projectIds = Array.from(new Set(visibleRuns.map((run) => run.project_id).filter(Boolean)));
   const projectTitles = new Map<string, string>();
+  const projectStatuses = new Map<string, ApplicationStatus>();
 
   if (projectIds.length) {
     const { data: projects, error: projectError } = await client
       .from("resume_projects")
-      .select("id, title")
+      .select("id, title, status")
       .eq("user_id", userId)
       .in("id", projectIds);
 
@@ -192,6 +196,7 @@ export async function loadSavedRuns(client: SupabaseClient, userId: string): Pro
 
     ((projects ?? []) as ResumeProjectRow[]).forEach((project) => {
       if (project.title) projectTitles.set(project.id, project.title);
+      projectStatuses.set(project.id, normalizeApplicationStatus(project.status));
     });
   }
 
@@ -217,11 +222,31 @@ export async function loadSavedRuns(client: SupabaseClient, userId: string): Pro
       downloadFormat,
       downloads,
       roleHint: titleFromTarget(run.job_target ?? undefined),
+      applicationStatus: projectStatuses.get(run.project_id) ?? "exported",
       saved: true,
       source: "account",
       snapshot,
     };
   });
+}
+
+export async function updateSavedProjectStatus(
+  client: SupabaseClient,
+  projectId: string,
+  status: ApplicationStatus,
+  userId: string,
+) {
+  const { error } = await client
+    .from("resume_projects")
+    .update({
+      status,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", projectId)
+    .eq("user_id", userId);
+
+  if (error) throw error;
+  return status;
 }
 
 export async function renameSavedProject(client: SupabaseClient, projectId: string, title: string, userId: string) {

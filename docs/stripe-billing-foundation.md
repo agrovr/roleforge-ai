@@ -64,6 +64,14 @@ Get-Clipboard | npm run set:billing:vercel -- STRIPE_WEBHOOK_SECRET
 
 The setter validates the expected prefix (`sk_live_`, `price_`, or `whsec_`) before replacing the Vercel Production value.
 
+If you only want the live Stripe secret key on the clipboard for a few seconds, use the one-shot proof runner. It reads exactly one `sk_live_...` value from the clipboard, clears the clipboard immediately, updates Vercel Production, redeploys so the rotated key applies to a new deployment, creates a one-use 100% off live promo code, opens Stripe Checkout for a temporary Supabase proof user, verifies Premium entitlement, then cancels/deletes the proof resources:
+
+```powershell
+.\scripts\live_billing_one_time_proof.ps1
+```
+
+Use `-PromptForSecret` to paste the key into a hidden PowerShell prompt instead of the clipboard, `-SkipVercelUpdate` if Vercel already has the rotated key, `-SkipRedeploy` if you are redeploying through GitHub instead, or `-CopyPromoCode` if you want the generated promo code copied after the secret has been cleared.
+
 ## Live checkout smoke
 
 Use this after billing env changes or before a launch announcement:

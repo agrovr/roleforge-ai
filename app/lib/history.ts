@@ -1,4 +1,5 @@
 import { exportFormatAllowed, type ExportEntitlement, type ExportFormat } from "./exportFormats";
+import type { ApplicationStatus } from "./applicationStatus";
 
 export type HistoryDownloads = Partial<Record<ExportFormat, string>>;
 
@@ -26,6 +27,7 @@ export type HistoryItem<TSnapshot extends HistorySnapshot = HistorySnapshot> = {
   downloadFormat?: ExportFormat;
   downloads?: HistoryDownloads;
   roleHint: string;
+  applicationStatus?: ApplicationStatus;
   saved?: boolean;
   source?: "local" | "account";
   snapshot?: TSnapshot;
@@ -421,6 +423,7 @@ export function mergeHistory<TSnapshot extends HistorySnapshot>(
             accountRunId: existing.accountRunId ?? item.accountRunId,
             projectId: existing.projectId ?? item.projectId,
             projectTitle: existing.projectTitle ?? item.projectTitle,
+            applicationStatus: existing.applicationStatus ?? item.applicationStatus,
             saved: Boolean(existing.saved || item.saved),
             source: existing.source === "account" || item.source === "account" ? "account" : "local",
             downloadUrl: validHistoryDownloadUrl(existing.downloadUrl) ? existing.downloadUrl : item.downloadUrl,

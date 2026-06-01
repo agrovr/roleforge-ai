@@ -3,7 +3,7 @@ import test from "node:test";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { loadSavedRuns, saveCompletedRun } from "./savedProjects";
+import { loadSavedRuns, saveCompletedRun, updateSavedProjectStatus } from "./savedProjects";
 
 test("loads saved runs with project titles without embedded relationship names", async () => {
   const calls: string[] = [];
@@ -75,7 +75,7 @@ test("loads saved runs with project titles without embedded relationship names",
       if (table === "resume_projects") {
         return {
           select(query: string) {
-            assert.equal(query, "id, title");
+            assert.equal(query, "id, title, status");
             return {
               eq(column: string, value: string) {
                 assert.equal(column, "user_id");
@@ -85,7 +85,7 @@ test("loads saved runs with project titles without embedded relationship names",
                     assert.equal(columnName, "id");
                     assert.deepEqual(values, ["project-1"]);
                     return {
-                      data: [{ id: "project-1", title: "Senior backend role" }],
+                      data: [{ id: "project-1", title: "Senior backend role", status: "active" }],
                       error: null,
                     };
                   },
@@ -105,9 +105,39 @@ test("loads saved runs with project titles without embedded relationship names",
   assert.deepEqual(calls, ["tailor_runs", "resume_projects"]);
   assert.equal(runs.length, 1);
   assert.equal(runs[0].projectTitle, "Senior backend role");
+  assert.equal(runs[0].applicationStatus, "active");
   assert.equal(runs[0].source, "account");
   assert.equal(runs[0].snapshot?.templateSlug, "engineer");
   assert.equal(runs[0].snapshot?.templateName, "Engineer");
+});
+
+test("updates saved project application status", async () => {
+  const client = {
+    from(table: string) {
+      assert.equal(table, "resume_projects");
+      return {
+        update(payload: Record<string, unknown>) {
+          assert.equal(payload.status, "archived");
+          assert.match(String(payload.updated_at), /^\d{4}-\d{2}-\d{2}T/);
+          return {
+            eq(column: string, value: string) {
+              assert.equal(column, "id");
+              assert.equal(value, "project-1");
+              return {
+                async eq(nextColumn: string, nextValue: string) {
+                  assert.equal(nextColumn, "user_id");
+                  assert.equal(nextValue, "user-123");
+                  return { error: null };
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  } as unknown as SupabaseClient;
+
+  assert.equal(await updateSavedProjectStatus(client, "project-1", "archived", "user-123"), "archived");
 });
 
 test("loads saved runs when the export template column is not in the schema cache yet", async () => {

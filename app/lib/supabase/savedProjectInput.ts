@@ -1,4 +1,5 @@
 import type { CompletedRunSaveInput } from "./savedProjects";
+import { isApplicationStatus, type ApplicationStatus } from "../applicationStatus";
 import { parseWorkflowDownloadUrl } from "../downloadUrls";
 
 const SAVE_MODES = new Set(["conservative", "balanced", "aggressive"]);
@@ -93,4 +94,19 @@ export function parseSavedProjectRenameInput(value: unknown):
   }
 
   return { ok: true, title };
+}
+
+export function parseSavedProjectStatusInput(value: unknown):
+  | { ok: true; status: ApplicationStatus }
+  | { ok: false; error: string } {
+  if (!isRecord(value)) {
+    return { ok: false, error: "Project stage is required." };
+  }
+
+  const status = stringValue(value.status);
+  if (!isApplicationStatus(status)) {
+    return { ok: false, error: "Project stage is not available." };
+  }
+
+  return { ok: true, status };
 }

@@ -158,6 +158,14 @@ Get-Clipboard | npm run set:billing:vercel -- STRIPE_WEBHOOK_SECRET
 
 The setter rejects test keys for `STRIPE_SECRET_KEY`, so production cannot be accidentally pointed back at Stripe sandbox checkout.
 
+For a one-shot live proof after rotating `STRIPE_SECRET_KEY`, copy the live secret key once and run:
+
+```powershell
+.\scripts\live_billing_one_time_proof.ps1
+```
+
+The runner clears the clipboard immediately, updates Vercel Production, redeploys, creates a one-use 100% off live promo code, opens Stripe Checkout for a temporary proof user, verifies Premium activation in Supabase, and cleans up the proof user/subscription. Use `-PromptForSecret`, `-SkipVercelUpdate`, `-SkipRedeploy`, or `-CopyPromoCode` for those specific variants.
+
 To verify live checkout without charging a card, run the live checkout smoke with the Supabase service-role key available in the environment:
 
 ```powershell

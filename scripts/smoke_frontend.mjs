@@ -750,6 +750,8 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.history-filter-bar\s+button\s*\{(?=[^}]*line-height:\s*1\.08)(?=[^}]*text-align:\s*center)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "history filter labels can still render cramped");
   requireCondition(/\.history-sync-badge\s*\{(?=[^}]*justify-content:\s*center)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText), "history badges can still force narrow row overflow");
   requireCondition(/\.history-sync-badge\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-align:\s*center)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "history badge labels can still render cramped");
+  requireCondition(/\.history-stage-controls\s*\{(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText), "history project stage controls can still force panel overflow");
+  requireCondition(/\.history-stage-controls\s+button\s*\{(?=[^}]*line-height:\s*1\.08)(?=[^}]*text-align:\s*center)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "history project stage buttons can still render cramped labels");
   requireCondition(/\.history-actions\s+\.ghost-button\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*min-height:\s*40px)(?=[^}]*padding:\s*8px\s+12px)(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "history action buttons can still render cramped labels");
   requireCondition(/\.history-action-download\s*\{(?=[^}]*min-width:\s*min\(100%,\s*132px\))[^}]*\}/s.test(stylesheetText), "history download action can still force row overflow");
   requireCondition(

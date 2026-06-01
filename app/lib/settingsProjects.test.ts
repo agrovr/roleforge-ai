@@ -67,6 +67,7 @@ test("groups settings saved projects by project with a restore link", () => {
   assert.match(summaries[0].detail, /Engineer/);
   assert.equal(summaries[0].href, "/app?historyRun=run-latest&historyAction=restore#history");
   assert.equal(summaries[0].actionLabel, "Restore");
+  assert.equal(summaries[0].stageLabel, "Ready");
 });
 
 test("uses project status when a settings project cannot be restored", () => {

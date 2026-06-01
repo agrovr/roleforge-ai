@@ -6,6 +6,7 @@ import { Brand } from "../components/Brand";
 import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { writeClipboardText } from "../lib/clipboard";
+import { APPLICATION_STATUS_OPTIONS, applicationStatusCopy, type ApplicationStatus } from "../lib/applicationStatus";
 import { downloadStatusFromHead } from "../lib/downloadStatus";
 import { normalizeWorkflowDownloadUrl, workflowDownloadUrl } from "../lib/downloadUrls";
 import { FREE_ENTITLEMENT, type AccountEntitlement } from "../lib/entitlements";
@@ -76,7 +77,7 @@ import {
   type PlainResumeLine,
 } from "../lib/previewResume";
 import { createRoleForgeBrowserClient } from "../lib/supabase/client";
-import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun } from "../lib/supabase/savedProjectClient";
+import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun, updateSavedProjectStatus } from "../lib/supabase/savedProjectClient";
 import { tailorActionState } from "../lib/tailorAction";
 import { accountUsageSummary, monthlyRunAllowanceSentence, runWord } from "../lib/usage";
 import {
@@ -1729,7 +1730,7 @@ export default function Page() {
       setHistory((current) => {
         const next = current.map((entry) =>
           entry.id === item.id
-            ? { ...entry, accountRunId: savedRun.runId, projectId: savedRun.projectId, projectTitle: item.roleHint, saved: true, source: "account" as const }
+            ? { ...entry, accountRunId: savedRun.runId, projectId: savedRun.projectId, projectTitle: item.roleHint, applicationStatus: "exported" as const, saved: true, source: "account" as const }
             : entry,
         );
         saveHistory(next);
@@ -2153,6 +2154,31 @@ export default function Page() {
       setHistorySyncMessage("Saved project renamed");
     } catch {
       setProjectActionMessage("Project name could not be saved. Try again.");
+    } finally {
+      setProjectActionId(null);
+    }
+  }
+
+  async function changeSavedProjectStatus(entry: HistoryItem, status: ApplicationStatus) {
+    if (!accountReady || !entry.projectId) return;
+
+    setProjectActionId(entry.id);
+    setProjectActionMessage("");
+
+    try {
+      const savedStatus = await updateSavedProjectStatus(entry.projectId, status);
+      const statusCopy = applicationStatusCopy(savedStatus);
+      setHistory((current) => {
+        const next = current.map((item) =>
+          item.projectId === entry.projectId ? { ...item, applicationStatus: savedStatus } : item,
+        );
+        saveHistory(next);
+        return next;
+      });
+      setHistorySyncState("synced");
+      setHistorySyncMessage(`Project moved to ${statusCopy.label}`);
+    } catch {
+      setProjectActionMessage("Project stage could not be saved. Try again.");
     } finally {
       setProjectActionId(null);
     }
@@ -2785,6 +2811,9 @@ export default function Page() {
     selectedHistoryPrimaryDownload?.format.toUpperCase() ?? visibleSelectedHistoryItem?.downloadFormat?.toUpperCase() ?? "PDF";
   const selectedHistoryTemplateName = visibleSelectedHistoryItem ? historyTemplateNameFor(visibleSelectedHistoryItem) : "";
   const selectedHistoryStatus = visibleSelectedHistoryItem ? historyRunStatus(visibleSelectedHistoryItem, accountStatus?.entitlement) : null;
+  const selectedApplicationStage = selectedHistoryGroup?.accountItem
+    ? applicationStatusCopy(selectedHistoryGroup.accountItem?.applicationStatus ?? selectedHistoryGroup.latest.applicationStatus)
+    : null;
   const selectedHistoryAssetCounts = visibleSelectedHistoryItem ? historyGeneratedAssetCounts(visibleSelectedHistoryItem) : { coverLetterWords: 0, interviewQuestions: 0 };
   const selectedHistoryAssetSummary = visibleSelectedHistoryItem ? historyGeneratedAssetSummary(visibleSelectedHistoryItem) : "";
   const selectedHistoryActionCopy = visibleSelectedHistoryItem
@@ -3601,6 +3630,7 @@ export default function Page() {
                       const latestDownloadLabel = primaryDownload?.format.toUpperCase() ?? entry.downloadFormat?.toUpperCase() ?? "PDF";
                       const entryTemplateName = historyTemplateNameFor(entry);
                       const entryAssetSummary = historyGeneratedAssetSummary(entry);
+                      const applicationStage = applicationStatusCopy(manageEntry.applicationStatus ?? entry.applicationStatus);
                       return (
                         <article className={`history-item${active ? " active" : ""}${selected ? " selected" : ""}`} key={group.key}>
                           <div className="history-item-main">
@@ -3628,6 +3658,11 @@ export default function Page() {
                               <small className={`history-sync-badge ${groupStatus.tone}`} title={groupStatus.detail}>
                                 {groupStatus.label}
                               </small>
+                              {canManageProject ? (
+                                <small className={`history-sync-badge ${applicationStage.tone}`} title={applicationStage.detail}>
+                                  {applicationStage.label}
+                                </small>
+                              ) : null}
                               {active ? <small className="history-sync-badge open">Open now</small> : null}
                             </div>
                             <p>{group.target}</p>
@@ -3666,6 +3701,24 @@ export default function Page() {
                               </>
                             ) : canManageProject ? (
                               <>
+                                <div className="history-stage-controls" role="group" aria-label={`Project stage for ${group.title}`}>
+                                  {APPLICATION_STATUS_OPTIONS.map((option) => {
+                                    const stageSelected = applicationStage.status === option.status;
+                                    return (
+                                      <button
+                                        className={stageSelected ? "active" : ""}
+                                        type="button"
+                                        key={`${manageEntry.projectId}-${option.status}`}
+                                        onClick={() => void changeSavedProjectStatus(manageEntry, option.status)}
+                                        disabled={actionBusy || stageSelected}
+                                        title={option.detail}
+                                        aria-pressed={stageSelected}
+                                      >
+                                        {option.label}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
                                 <button className="ghost-button history-action-manage" type="button" onClick={() => startRenameProject(manageEntry)} disabled={actionBusy}>
                                   Rename <RoleForgeIcon name="edit" size={14} />
                                 </button>
@@ -3752,6 +3805,7 @@ export default function Page() {
                         <div className="history-detail-badges" aria-label="Selected project state">
                           <span>{historyStorageLabel(selectedHistoryGroup)}</span>
                           <span>{selectedHistoryVersionLabel}</span>
+                          {selectedApplicationStage ? <span>{selectedApplicationStage.label}</span> : null}
                           {selectedHistoryStatus ? <span>{selectedHistoryStatus.label}</span> : null}
                           {selectedHistoryAssetSummary ? <span>Application kit ready</span> : null}
                           {selectedHistoryTemplateName ? <span>{selectedHistoryTemplateName} direction</span> : null}
@@ -3773,6 +3827,10 @@ export default function Page() {
                       <div>
                         <dt>Export</dt>
                         <dd>{selectedHistoryStatus?.detail ?? (selectedHistoryDownloadCount ? `${selectedHistoryDownloadCount} file${selectedHistoryDownloadCount === 1 ? "" : "s"} ready` : "Needs re-export")}</dd>
+                      </div>
+                      <div>
+                        <dt>Stage</dt>
+                        <dd>{selectedApplicationStage ? `${selectedApplicationStage.label}: ${selectedApplicationStage.detail}` : "Saved project"}</dd>
                       </div>
                       <div>
                         <dt>Application kit</dt>

@@ -1,4 +1,5 @@
 import type { ExportEntitlement } from "./exportFormats";
+import { applicationStatusCopy } from "./applicationStatus";
 import { groupHistoryItems, historyGeneratedAssetSummary, historyGroupStatus, type HistoryItem } from "./history";
 import { getResumeTemplate, isResumeTemplateSlug } from "./resumeTemplates";
 import { savedRunHistoryHref } from "./savedRunLinks";
@@ -11,6 +12,8 @@ export type SettingsProjectSummary = {
   href: string;
   actionLabel: string;
   actionDetail: string;
+  stageLabel: string;
+  stageDetail: string;
 };
 
 export function formatSettingsSavedRunDate(value: string) {
@@ -51,6 +54,7 @@ export function settingsProjectSummaries(
     const status = historyGroupStatus(group, entitlement);
     const templateName = savedRunTemplateName(group.latest);
     const assetSummary = historyGeneratedAssetSummary(group.latest);
+    const stage = applicationStatusCopy(group.accountItem?.applicationStatus ?? group.latest.applicationStatus);
     const versionLabel = `${group.items.length} ${group.items.length === 1 ? "version" : "versions"}`;
     const detail = [
       group.target,
@@ -68,6 +72,8 @@ export function settingsProjectSummaries(
       href: savedRunHistoryHref(linkRun, { restore: Boolean(restoreRun) }),
       actionLabel: restoreRun ? "Restore" : status.label,
       actionDetail: status.detail,
+      stageLabel: stage.label,
+      stageDetail: stage.detail,
     };
   });
 }
