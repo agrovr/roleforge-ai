@@ -574,6 +574,49 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
             </a>
           </nav>
 
+          <div className="settings-overview-frame">
+            <section className="settings-account-overview" aria-label="Account overview">
+              <div className="settings-overview-identity">
+                <div className="studio-account-button settings-overview-avatar" aria-hidden="true">
+                  <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
+                </div>
+                <div>
+                  <span className="settings-overview-kicker">Signed in as</span>
+                  <strong>{displayName || "RoleForge user"}</strong>
+                  <small>{user.email}</small>
+                </div>
+              </div>
+              <div className="settings-overview-status" aria-label="Workspace status">
+                <a href="#billing">
+                  <span>Plan</span>
+                  <strong>{displayPlanLabel}</strong>
+                  <small>{settingsAccountPlanCaption}</small>
+                </a>
+                <a href="#usage">
+                  <span>Usage</span>
+                  <strong>{settingsAccountUsageValue}</strong>
+                  <small>{settingsAccountUsageCaption}</small>
+                </a>
+                <a href="#projects">
+                  <span>Projects</span>
+                  <strong>{projectCount}</strong>
+                  <small>{runCount} {runCountLabel.toLowerCase()} saved</small>
+                </a>
+                <a href="#exports">
+                  <span>Exports</span>
+                  <strong>{settingsAccountExportValue}</strong>
+                  <small>{settingsAccountExportCaption}</small>
+                </a>
+              </div>
+              <div className="settings-overview-actions" aria-label="Account overview actions">
+                <a href="#account"><RoleForgeIcon name="settings" size={14} /> Edit profile</a>
+                <a href="#billing"><RoleForgeIcon name="lock" size={14} /> Billing</a>
+                <a href="#projects"><RoleForgeIcon name="chart" size={14} /> Projects</a>
+                <Link href={resumeTemplateStudioHref(selectedTemplate.slug)}><RoleForgeIcon name="file" size={14} /> Studio</Link>
+              </div>
+            </section>
+          </div>
+
           <section className="settings-section" id="account">
             <div className="settings-section-copy">
               <h2>Account</h2>
