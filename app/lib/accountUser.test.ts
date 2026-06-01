@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { accountDisplayName } from "./accountUser";
+import { accountAvatarUrl, accountDisplayName } from "./accountUser";
 
 test("uses explicit account names before provider full names", () => {
   assert.equal(
@@ -48,4 +48,21 @@ test("trims noisy provider display names", () => {
 test("returns an empty name when metadata is missing", () => {
   assert.equal(accountDisplayName({ email: "person@example.com" }), "");
   assert.equal(accountDisplayName(null), "");
+});
+
+test("reads safe provider avatar urls from account metadata", () => {
+  assert.equal(
+    accountAvatarUrl({ user_metadata: { avatar_url: "https://lh3.googleusercontent.com/avatar" } }),
+    "https://lh3.googleusercontent.com/avatar",
+  );
+  assert.equal(
+    accountAvatarUrl({ user_metadata: { picture: "https://example.com/profile.png" } }),
+    "https://example.com/profile.png",
+  );
+});
+
+test("rejects unsafe provider avatar urls", () => {
+  assert.equal(accountAvatarUrl({ user_metadata: { avatar_url: "http://example.com/profile.png" } }), "");
+  assert.equal(accountAvatarUrl({ user_metadata: { avatar_url: "javascript:alert(1)" } }), "");
+  assert.equal(accountAvatarUrl({ user_metadata: { avatar_url: "not a url" } }), "");
 });

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { AccountAvatar } from "../components/AccountAvatar";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
@@ -174,7 +175,7 @@ type SavedRunSnapshot = {
   templateName?: string;
 };
 type HistoryItem = BaseHistoryItem<SavedRunSnapshot>;
-type AccountUser = { id: string; email?: string; name?: string };
+type AccountUser = { id: string; email?: string; name?: string; imageUrl?: string };
 type AccountUsage = {
   currentPeriodStart: string;
   currentPeriodEnd: string;
@@ -2582,6 +2583,7 @@ export default function Page() {
     },
   ];
   const accountButtonLabel = signedIn ? accountInitials(accountUser) : "IN";
+  const accountImageUrl = signedIn ? accountUser?.imageUrl || "" : "";
   const accountPremiumActive = Boolean(
     accountStatus?.entitlement?.plan === "premium" &&
       ["active", "trialing"].includes(accountStatus.entitlement.billingStatus),
@@ -2905,7 +2907,7 @@ export default function Page() {
                 aria-controls="studio-account-popover"
                 onClick={() => setAccountPanelOpen((open) => !open)}
               >
-                {accountButtonLabel}
+                <AccountAvatar initials={accountButtonLabel} imageUrl={accountImageUrl} />
               </button>
               {accountPanelOpen ? (
                 <div className="studio-account-popover" id="studio-account-popover" role="dialog" aria-label="Account options">
@@ -2919,7 +2921,9 @@ export default function Page() {
                   {signedIn ? (
                     <>
                       <div className="studio-account-identity">
-                        <div className="studio-account-avatar" aria-hidden="true">{accountButtonLabel}</div>
+                        <div className="studio-account-avatar" aria-hidden="true">
+                          <AccountAvatar initials={accountButtonLabel} imageUrl={accountImageUrl} />
+                        </div>
                         <div>
                           <strong className="studio-account-email" title={accountUser?.email || "Signed in"}>{accountUser?.email || "Signed in"}</strong>
                           <span>{accountPlanValue} workspace</span>

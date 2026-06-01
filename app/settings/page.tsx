@@ -2,11 +2,12 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { AccountAvatar } from "../components/AccountAvatar";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { loadAccountProfile, saveAccountProfile } from "../lib/accountProfile";
-import { accountDisplayName } from "../lib/accountUser";
+import { accountAvatarUrl, accountDisplayName } from "../lib/accountUser";
 import { billingStateDetail, billingStateLabel, billingStatusTone } from "../lib/billing/display";
 import { reconcileUserSubscriptionEntitlement, syncCheckoutSessionEntitlement } from "../lib/billing/entitlements";
 import { billingNotice } from "../lib/billing/notices";
@@ -168,6 +169,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName = accountDisplayName(user, accountProfile?.displayName);
   const accountInitials = (displayName || user.email || "RF").slice(0, 2).toUpperCase();
+  const accountImageUrl = accountAvatarUrl(user);
   const profileNotice = accountNotice(accountParam);
   const planFeatures = premiumActive
     ? ["Unlimited runs", "DOCX and TXT exports", premiumEnding && premiumEndLabel ? `Access until ${premiumEndLabel}` : "PDF export included"]
@@ -216,14 +218,16 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
           <ThemeToggle />
           <details className="settings-account-menu">
             <summary className="studio-account-button settings-topbar-avatar" aria-label="Open account menu">
-              {accountInitials}
+              <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
             </summary>
             <div className="studio-account-popover settings-account-popover" role="group" aria-label="Account menu">
               <div className="studio-account-popover-head">
                 <span>Account</span>
               </div>
               <div className="studio-account-identity">
-                <div className="studio-account-avatar" aria-hidden="true">{accountInitials}</div>
+                <div className="studio-account-avatar" aria-hidden="true">
+                  <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
+                </div>
                 <div>
                   <strong className="studio-account-email" title={user.email || "Signed in"}>{user.email || "Signed in"}</strong>
                   <span>{displayPlanLabel}</span>
@@ -314,7 +318,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
             <div className="settings-section-panel">
               <div className="settings-profile-row">
                 <div className="studio-account-button settings-profile-avatar" aria-hidden="true">
-                  {accountInitials}
+                  <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
                 </div>
                 <div>
                   <strong>{displayName || "RoleForge user"}</strong>

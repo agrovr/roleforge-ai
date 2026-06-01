@@ -5591,6 +5591,7 @@ html[data-theme="dark"] input::file-selector-button {
   height: 48px;
   display: inline-grid;
   place-items: center;
+  overflow: hidden;
   border: 0;
   border-radius: 50%;
   background: var(--brand-dark);
@@ -5599,6 +5600,24 @@ html[data-theme="dark"] input::file-selector-button {
   font-weight: 950;
   letter-spacing: 0.04em;
   box-shadow: 0 14px 28px -20px rgba(14, 20, 48, 0.55);
+}
+
+.account-avatar-photo,
+.account-avatar-initials {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.account-avatar-photo {
+  background-position: center;
+  background-size: cover;
+}
+
+.account-avatar-initials {
+  line-height: 1;
 }
 
 .studio-account-button:hover,
@@ -5710,6 +5729,7 @@ html[data-theme="dark"] input::file-selector-button {
   height: 44px;
   display: grid;
   place-items: center;
+  overflow: hidden;
   border-radius: 50%;
   background: var(--brand-dark);
   color: #fffaf0;

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { loadAccountProfile } from "@/app/lib/accountProfile";
-import { accountDisplayName } from "@/app/lib/accountUser";
+import { accountAvatarUrl, accountDisplayName } from "@/app/lib/accountUser";
 import { reconcileUserSubscriptionEntitlement } from "@/app/lib/billing/entitlements";
 import { billingReadiness } from "@/app/lib/billing/readiness";
 import { getStripeBillingConfig } from "@/app/lib/billing/stripe";
@@ -36,6 +36,7 @@ export async function GET() {
         id: data.user.id,
         email: data.user.email ?? "",
         name: accountDisplayName(data.user, profile?.displayName),
+        imageUrl: accountAvatarUrl(data.user),
       }
     : null;
 
