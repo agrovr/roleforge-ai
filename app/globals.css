@@ -6161,6 +6161,24 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--brand-dark);
 }
 
+.settings-account-recent {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  margin: 12px 0 2px;
+}
+
+.settings-account-recent-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-width: 0;
+}
+
+.settings-account-recent-link strong {
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
 .studio-account-list {
   display: grid;
   gap: 8px;

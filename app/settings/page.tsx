@@ -461,6 +461,27 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 <Link href="/templates"><RoleForgeIcon name="layers" size={14} /> Templates</Link>
                 <a href="#billing"><RoleForgeIcon name="lock" size={14} /> Billing</a>
               </div>
+              {recentProjectSummaries.length ? (
+                <div className="studio-account-recent settings-account-recent" aria-label="Recent saved projects">
+                  <div className="studio-account-recent-head settings-account-recent-head">
+                    <span>Recent projects</span>
+                    <a href="#projects">Manage</a>
+                  </div>
+                  {recentProjectSummaries.map((project) => (
+                    <Link
+                      className="studio-account-recent-link settings-account-recent-link"
+                      href={project.href}
+                      key={project.key}
+                    >
+                      <span>
+                        <strong>{project.title}</strong>
+                        <small>{project.detail}</small>
+                      </span>
+                      <RoleForgeIcon name={project.downloads.length ? "download" : "chart"} size={14} />
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
               <div className="studio-account-list">
                 <a className="studio-account-summary" href="#projects">
                   <span><RoleForgeIcon name="chart" size={14} /> Saved projects</span>

@@ -44,6 +44,11 @@ test("settings topbar exposes account, project, usage, and billing controls", ()
   assert.match(settingsPage, /accountAvatarUrl\(user\)/);
   assert.match(settingsPage, /settings-account-menu/);
   assert.match(settingsPage, /aria-label="Open account menu"/);
+  assert.match(settingsPage, /recentProjectSummaries/);
+  assert.match(settingsPage, /settings-account-recent/);
+  assert.match(settingsPage, /Recent projects/);
+  assert.match(settingsPage, /recentProjectSummaries\.map/);
+  assert.match(settingsPage, /href=\{project\.href\}/);
   assert.match(settingsPage, /href="#security"/);
   assert.match(settingsPage, /href="#preferences"/);
   assert.match(settingsPage, /href="#projects"/);
@@ -51,4 +56,10 @@ test("settings topbar exposes account, project, usage, and billing controls", ()
   assert.match(settingsPage, /href="#billing"/);
   assert.match(settingsPage, /href="\/app#history"/);
   assert.match(settingsPage, /action="\/auth\/signout"/);
+});
+
+test("settings account recent projects inherit overflow-safe menu layout", () => {
+  assert.match(globalsCss, /\.settings-account-recent\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(globalsCss, /\.settings-account-recent-link\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(globalsCss, /\.settings-account-recent-link\s+strong\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
 });
