@@ -6009,6 +6009,100 @@ html[data-theme="dark"] input::file-selector-button {
   transform: translateY(-1px);
 }
 
+.studio-account-recent {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  margin: 12px 0 2px;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--line) 86%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-2) 74%, white);
+}
+
+.studio-account-recent-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.studio-account-recent-head span {
+  color: var(--brand-dark);
+  font-size: 0.7rem;
+  font-weight: 950;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.studio-account-recent-head a {
+  flex: 0 0 auto;
+  color: var(--ink-3);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.studio-account-recent-head a:hover,
+.studio-account-recent-head a:focus-visible {
+  color: var(--ink-0);
+  outline: none;
+}
+
+.studio-account-recent-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  min-width: 0;
+  align-items: center;
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--ink-0);
+  text-decoration: none;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.studio-account-recent-link:hover,
+.studio-account-recent-link:focus-visible {
+  border-color: color-mix(in srgb, var(--brand) 36%, var(--line));
+  background: color-mix(in srgb, var(--surface) 84%, white);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.studio-account-recent-link span,
+.studio-account-recent-link strong,
+.studio-account-recent-link small {
+  min-width: 0;
+}
+
+.studio-account-recent-link strong {
+  display: block;
+  color: var(--ink-0);
+  font-size: 0.84rem;
+  font-weight: 950;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.studio-account-recent-link small {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink-3);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.studio-account-recent-link svg {
+  color: var(--brand-dark);
+}
+
 .studio-account-list {
   display: grid;
   gap: 8px;
@@ -11479,6 +11573,7 @@ html[data-theme="dark"] .studio-account-popover-head button,
 html[data-theme="dark"] .studio-account-insights a,
 html[data-theme="dark"] .studio-account-shortcuts a,
 html[data-theme="dark"] .studio-account-shortcuts button,
+html[data-theme="dark"] .studio-account-recent,
 html[data-theme="dark"] .studio-account-summary {
   background: rgba(255, 247, 233, 0.06);
   border-color: rgba(255, 247, 233, 0.16);
@@ -11495,7 +11590,8 @@ html[data-theme="dark"] .studio-account-avatar {
 }
 
 html[data-theme="dark"] .studio-account-identity span,
-html[data-theme="dark"] .studio-account-insights span {
+html[data-theme="dark"] .studio-account-insights span,
+html[data-theme="dark"] .studio-account-recent-link small {
   color: var(--ink-2);
 }
 
@@ -11504,7 +11600,9 @@ html[data-theme="dark"] .studio-account-insights a:focus-visible,
 html[data-theme="dark"] .studio-account-shortcuts a:hover,
 html[data-theme="dark"] .studio-account-shortcuts a:focus-visible,
 html[data-theme="dark"] .studio-account-shortcuts button:hover,
-html[data-theme="dark"] .studio-account-shortcuts button:focus-visible {
+html[data-theme="dark"] .studio-account-shortcuts button:focus-visible,
+html[data-theme="dark"] .studio-account-recent-link:hover,
+html[data-theme="dark"] .studio-account-recent-link:focus-visible {
   border-color: rgba(231, 188, 111, 0.36);
   background: rgba(231, 188, 111, 0.1);
 }

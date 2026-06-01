@@ -16,6 +16,10 @@ test("studio account menu acts as a workspace command center", () => {
   assert.match(studioPage, /href="\/settings#billing"/);
   assert.match(studioPage, /Saved projects/);
   assert.match(studioPage, /DOCX and TXT/);
+  assert.match(studioPage, /recentAccountProjects/);
+  assert.match(studioPage, /studio-account-recent/);
+  assert.match(studioPage, /Recent projects/);
+  assert.match(studioPage, /savedRunHistoryHref/);
 });
 
 test("account menu layout has responsive status cards", () => {
@@ -24,6 +28,9 @@ test("account menu layout has responsive status cards", () => {
   assert.match(globalsCss, /\.studio-account-insights\s*\{/);
   assert.match(globalsCss, /@container studio-account-popover \(max-width: 360px\)/);
   assert.match(globalsCss, /html\[data-theme="dark"\] \.studio-account-insights a/);
+  assert.match(globalsCss, /\.studio-account-recent\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(globalsCss, /\.studio-account-recent-link\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(globalsCss, /\.studio-account-recent-link\s+strong\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
 });
 
 test("settings topbar exposes account, project, usage, and billing controls", () => {

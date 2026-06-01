@@ -33,6 +33,7 @@ import {
   isResumeTemplateSlug,
   type ResumeTemplateSlug,
 } from "../lib/resumeTemplates";
+import { savedRunHistoryHref } from "../lib/savedRunLinks";
 import {
   buildReviewSuggestionCards,
   reviewSuggestionWorkspaceKey,
@@ -2707,6 +2708,19 @@ export default function Page() {
   const historyGroups = groupHistoryItems(history, syncedHistoryIds);
   const accountHistoryGroups = historyGroups.filter((group) => group.accountCount > 0);
   const localHistoryGroups = historyGroups.filter((group) => group.localCount > 0);
+  const recentAccountProjects = accountHistoryGroups.slice(0, 3).map((group) => {
+    const restoreEntry = group.items.find(hasRestorableSnapshot);
+    const entry = restoreEntry ?? group.accountItem ?? group.latest;
+    const status = applicationStatusCopy(group.accountItem?.applicationStatus ?? entry.applicationStatus);
+    return {
+      key: group.key,
+      title: group.title,
+      detail: `${group.items.length} ${group.items.length === 1 ? "version" : "versions"} · ${status.label}`,
+      href: savedRunHistoryHref(entry, { restore: Boolean(restoreEntry) }),
+      entry,
+      restore: Boolean(restoreEntry),
+    };
+  });
   const showHistoryFilter = accountHistoryGroups.length > 0 && localHistoryGroups.length > 0;
   const activeHistoryFilter = showHistoryFilter ? historyFilter : "all";
   const visibleHistoryGroups =
@@ -2964,6 +2978,40 @@ export default function Page() {
                           <RoleForgeIcon name="chart" size={14} /> Saved projects
                         </button>
                       </div>
+                      {recentAccountProjects.length ? (
+                        <div className="studio-account-recent" aria-label="Recent saved projects">
+                          <div className="studio-account-recent-head">
+                            <span>Recent projects</span>
+                            <Link href="/settings#projects" onClick={() => setAccountPanelOpen(false)}>Manage</Link>
+                          </div>
+                          {recentAccountProjects.map((project) => (
+                            <Link
+                              className="studio-account-recent-link"
+                              href={project.href}
+                              key={project.key}
+                              onClick={(event) => {
+                                event.preventDefault();
+                                setAccountPanelOpen(false);
+                                setHistoryFilter("all");
+                                setExpandedHistoryGroupKey(project.key);
+                                setSelectedHistoryId(project.entry.id);
+                                if (project.restore) {
+                                  restoreHistoryItem(project.entry);
+                                  return;
+                                }
+                                openHistoryPanel();
+                                window.setTimeout(() => scrollToHistoryDetails("auto"), 180);
+                              }}
+                            >
+                              <span>
+                                <strong>{project.title}</strong>
+                                <small>{project.detail}</small>
+                              </span>
+                              <RoleForgeIcon name={project.restore ? "sparkle" : "chart"} size={14} />
+                            </Link>
+                          ))}
+                        </div>
+                      ) : null}
                       <form className="studio-account-form" action="/auth/signout" method="post">
                         <input type="hidden" name="next" value="/login?account=signed-out" />
                         <button className="ghost-button studio-account-submit" type="submit">
