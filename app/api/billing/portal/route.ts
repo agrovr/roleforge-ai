@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     return NextResponse.redirect(absoluteUrl(request, "/settings?billing=temporarily-unavailable#billing"), 303);
   }
 
-  const portalCustomer = await loadBillingPortalCustomer(serviceSupabase, user.id);
+  const portalCustomer = await loadBillingPortalCustomer(serviceSupabase, stripe, user);
 
   if (portalCustomer.status === "temporarily-unavailable") {
     console.error(`Billing portal ${portalCustomer.reason}`, portalCustomer.error);

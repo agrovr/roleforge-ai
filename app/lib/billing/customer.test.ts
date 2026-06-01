@@ -43,10 +43,24 @@ function fakeService({ lookup, upsert = { error: null } }: FakeServiceOptions) {
   };
 }
 
-function fakeStripe(customerId = "cus_new") {
+function fakeStripe(customerId = "cus_new", options: { retrieve?: "active" | "deleted" | "missing" | "error" } = {}) {
   const createCalls: unknown[] = [];
+  const retrieveCalls: string[] = [];
   const stripe = {
     customers: {
+      async retrieve(id: string) {
+        retrieveCalls.push(id);
+        if (options.retrieve === "missing") {
+          throw Object.assign(new Error("No such customer"), { code: "resource_missing" });
+        }
+        if (options.retrieve === "error") {
+          throw new Error("Stripe unavailable");
+        }
+        if (options.retrieve === "deleted") {
+          return { id, deleted: true };
+        }
+        return { id, deleted: false };
+      },
       async create(payload: unknown) {
         createCalls.push(payload);
         return { id: customerId };
@@ -54,7 +68,7 @@ function fakeStripe(customerId = "cus_new") {
     },
   } as unknown as Stripe;
 
-  return { stripe, createCalls };
+  return { stripe, createCalls, retrieveCalls };
 }
 
 const user = {
@@ -75,8 +89,30 @@ test("reuses an existing Stripe customer for checkout", async () => {
   const result = await prepareCheckoutCustomer(service.client as never, stripe.stripe, user as never);
 
   assert.deepEqual(result, { status: "ready", customerId: "cus_existing" });
+  assert.deepEqual(stripe.retrieveCalls, ["cus_existing"]);
   assert.equal(stripe.createCalls.length, 0);
   assert.equal(service.calls.some((call) => call.type === "upsert"), false);
+});
+
+test("replaces stale Stripe customers before checkout", async () => {
+  const service = fakeService({
+    lookup: {
+      data: { stripe_customer_id: "cus_deleted", plan: "free", billing_status: "canceled" },
+      error: null,
+    },
+  });
+  const stripe = fakeStripe("cus_replacement", { retrieve: "deleted" });
+
+  const result = await prepareCheckoutCustomer(service.client as never, stripe.stripe, user as never);
+
+  assert.deepEqual(stripe.retrieveCalls, ["cus_deleted"]);
+  assert.equal(stripe.createCalls.length, 1);
+  assert.deepEqual(result, { status: "ready", customerId: "cus_replacement" });
+  const upsertCall = service.calls.find((call) => call.type === "upsert");
+  const upsertPayload = upsertCall?.payload as Record<string, unknown>;
+  assert.equal(upsertPayload.stripe_customer_id, "cus_replacement");
+  assert.equal(upsertPayload.billing_status, "none");
+  assert.equal(upsertPayload.stripe_subscription_id, null);
 });
 
 test("does not start checkout when premium is already active", async () => {
@@ -136,6 +172,11 @@ test("fails closed when a newly-created customer cannot be saved", async () => {
     plan: "free",
     billing_status: "none",
     stripe_customer_id: "cus_created",
+    stripe_subscription_id: null,
+    current_period_end: null,
+    cancel_at_period_end: false,
+    cancel_at: null,
+    canceled_at: null,
     features: FREE_FEATURES,
     updated_at: "normalized",
   });
@@ -146,24 +187,42 @@ test("loads portal customer ids and fails closed on lookup errors", async () => 
   const readyService = fakeService({
     lookup: { data: { stripe_customer_id: "cus_portal" }, error: null },
   });
-  assert.deepEqual(await loadBillingPortalCustomer(readyService.client as never, "user_123"), {
+  const readyStripe = fakeStripe();
+  assert.deepEqual(await loadBillingPortalCustomer(readyService.client as never, readyStripe.stripe, user as never), {
     status: "ready",
     customerId: "cus_portal",
   });
+  assert.deepEqual(readyStripe.retrieveCalls, ["cus_portal"]);
 
   const missingService = fakeService({
     lookup: { data: { stripe_customer_id: null }, error: null },
   });
-  assert.deepEqual(await loadBillingPortalCustomer(missingService.client as never, "user_123"), {
-    status: "no-customer",
+  const missingStripe = fakeStripe("cus_portal_created");
+  assert.deepEqual(await loadBillingPortalCustomer(missingService.client as never, missingStripe.stripe, user as never), {
+    status: "ready",
+    customerId: "cus_portal_created",
   });
+  assert.equal(missingStripe.createCalls.length, 1);
 
   const lookupError = new Error("read failed");
   const errorService = fakeService({ lookup: { data: null, error: lookupError } });
-  const result = await loadBillingPortalCustomer(errorService.client as never, "user_123");
+  const result = await loadBillingPortalCustomer(errorService.client as never, fakeStripe().stripe, user as never);
   assert.equal(result.status, "temporarily-unavailable");
   if (result.status === "temporarily-unavailable") {
     assert.equal(result.reason, "entitlement_lookup_failed");
     assert.equal(result.error, lookupError);
   }
+});
+
+test("replaces stale Stripe customers before opening the billing portal", async () => {
+  const service = fakeService({
+    lookup: { data: { stripe_customer_id: "cus_stale" }, error: null },
+  });
+  const stripe = fakeStripe("cus_new_portal", { retrieve: "missing" });
+
+  const result = await loadBillingPortalCustomer(service.client as never, stripe.stripe, user as never);
+
+  assert.deepEqual(stripe.retrieveCalls, ["cus_stale"]);
+  assert.equal(stripe.createCalls.length, 1);
+  assert.deepEqual(result, { status: "ready", customerId: "cus_new_portal" });
 });
