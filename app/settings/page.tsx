@@ -33,7 +33,7 @@ import {
 import { settingsProjectSummaries } from "../lib/settingsProjects";
 import { getConfiguredSiteOrigin } from "../lib/siteUrl";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
-import { loadSavedRuns, updateSavedProjectStatus } from "../lib/supabase/savedProjects";
+import { deleteSavedProject, loadSavedRuns, updateSavedProjectStatus } from "../lib/supabase/savedProjects";
 import {
   loadAccountUsage,
   monthlyRunAllowanceLabel,
@@ -88,6 +88,12 @@ function accountNotice(value: string | undefined) {
       return { tone: "warn" as const, text: "Choose an available project stage." };
     case "project-stage-unavailable":
       return { tone: "warn" as const, text: "Saved project stage could not be updated." };
+    case "project-deleted":
+      return { tone: "success" as const, text: "Saved project removed." };
+    case "project-delete-invalid":
+      return { tone: "warn" as const, text: "Type DELETE to remove a saved project." };
+    case "project-delete-unavailable":
+      return { tone: "warn" as const, text: "Saved project could not be removed." };
     case "delete-invalid":
       return { tone: "warn" as const, text: "Type DELETE to confirm account deletion." };
     case "delete-billing-active":
@@ -233,6 +239,37 @@ async function updateSettingsProjectStatusAction(formData: FormData) {
   }
 
   redirect("/settings?account=project-stage-saved#projects");
+}
+
+async function deleteSettingsProjectAction(formData: FormData) {
+  "use server";
+
+  const supabase = await createRoleForgeServerClient();
+  if (!supabase) {
+    redirect("/login?next=/settings&account=signin-required");
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?next=/settings&account=signin-required");
+  }
+
+  const projectId = typeof formData.get("projectId") === "string" ? String(formData.get("projectId")).trim() : "";
+  const confirmDelete = typeof formData.get("confirmDelete") === "string" ? String(formData.get("confirmDelete")).trim() : "";
+  if (!projectId || projectId.length > 120 || confirmDelete !== "DELETE") {
+    redirect("/settings?account=project-delete-invalid#projects");
+  }
+
+  try {
+    await deleteSavedProject(supabase, projectId, user.id);
+  } catch {
+    redirect("/settings?account=project-delete-unavailable#projects");
+  }
+
+  redirect("/settings?account=project-deleted#projects");
 }
 
 export default async function SettingsPage({ searchParams }: { searchParams: SettingsSearchParams }) {
@@ -710,6 +747,26 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                             </a>
                           ))}
                         </div>
+                      ) : null}
+                      {project.projectId ? (
+                        <details className="settings-project-delete">
+                          <summary>Remove project</summary>
+                          <form action={deleteSettingsProjectAction}>
+                            <input type="hidden" name="projectId" value={project.projectId} />
+                            <label>
+                              <span>Type DELETE to remove this saved project and its runs.</span>
+                              <div className="settings-project-delete-row">
+                                <input
+                                  name="confirmDelete"
+                                  aria-label={`Type DELETE to remove ${project.title}`}
+                                  autoComplete="off"
+                                  placeholder="DELETE"
+                                />
+                                <button type="submit">Remove</button>
+                              </div>
+                            </label>
+                          </form>
+                        </details>
                       ) : null}
                     </article>
                   ))}
