@@ -43,6 +43,7 @@ const sections = [
     title: "Sharing and retention",
     body: [
       "RoleForge does not sell personal resume data. Data is shared with service providers only as needed to provide auth, storage, AI processing, exports, billing, security, and hosting.",
+      "You can download an account summary from Settings. You can delete a signed-in account from Settings after canceling any active Premium subscription.",
       "Account and saved project data may remain while your account is active or as needed for security, billing, operations, and legal obligations.",
     ],
   },

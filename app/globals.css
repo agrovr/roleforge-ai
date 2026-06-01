@@ -7554,6 +7554,93 @@ html[data-theme="dark"] input::file-selector-button {
   width: 100%;
 }
 
+.settings-danger-zone {
+  display: grid;
+  gap: 12px;
+  max-width: min(100%, 680px);
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, #d66b58 36%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, #d66b58 8%, var(--surface));
+}
+
+.settings-danger-zone strong,
+.settings-danger-zone span,
+.settings-danger-zone label {
+  display: block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.settings-danger-zone strong {
+  color: #9a392e;
+  font-weight: 950;
+}
+
+.settings-danger-zone span {
+  margin-top: 4px;
+  color: var(--ink-2);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.settings-danger-zone form {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+}
+
+.settings-danger-zone label {
+  color: var(--ink-3);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.settings-danger-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 158px), auto);
+  gap: 10px;
+  min-width: 0;
+}
+
+.settings-danger-actions input {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, #d66b58 38%, var(--line));
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink-0);
+  font: inherit;
+  font-weight: 850;
+}
+
+.settings-danger-actions input:focus {
+  border-color: #d66b58;
+  box-shadow: 0 0 0 4px rgba(214, 107, 88, 0.16);
+  outline: none;
+}
+
+.settings-danger-button {
+  min-width: 0;
+  min-height: 48px;
+  justify-content: center;
+  border-color: color-mix(in srgb, #d66b58 46%, var(--line));
+  color: #9a392e;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.settings-danger-button:hover,
+.settings-danger-button:focus-visible {
+  border-color: #d66b58;
+  background: color-mix(in srgb, #d66b58 12%, var(--surface));
+}
+
 .settings-billing-panel {
   align-content: start;
 }
@@ -7799,6 +7886,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 @container (max-width: 430px) {
   .settings-profile-edit-row,
+  .settings-danger-actions,
   .settings-profile-actions,
   .settings-billing-head,
   .settings-export-actions {
@@ -7806,6 +7894,7 @@ html[data-theme="dark"] input::file-selector-button {
   }
 
   .settings-profile-edit-row .primary-button,
+  .settings-danger-button,
   .settings-billing-head form,
   .settings-billing-head .ghost-button,
   .settings-inline-link {
@@ -11260,6 +11349,32 @@ html[data-theme="dark"] .settings-profile-edit-row input {
 
 html[data-theme="dark"] .settings-profile-edit-row input::placeholder {
   color: rgba(231, 226, 214, 0.48);
+}
+
+html[data-theme="dark"] .settings-danger-zone {
+  background: rgba(214, 107, 88, 0.1);
+  border-color: rgba(255, 168, 151, 0.28);
+}
+
+html[data-theme="dark"] .settings-danger-zone strong,
+html[data-theme="dark"] .settings-danger-button {
+  color: #ffb4a8;
+}
+
+html[data-theme="dark"] .settings-danger-zone span {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .settings-danger-actions input {
+  background: rgba(255, 247, 233, 0.06);
+  border-color: rgba(255, 168, 151, 0.26);
+  color: #fff8ea;
+}
+
+html[data-theme="dark"] .settings-danger-button:hover,
+html[data-theme="dark"] .settings-danger-button:focus-visible {
+  background: rgba(214, 107, 88, 0.16);
+  border-color: rgba(255, 168, 151, 0.46);
 }
 
 html[data-theme="dark"] .settings-plan-includes span {

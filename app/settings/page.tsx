@@ -55,6 +55,12 @@ function accountNotice(value: string | undefined) {
       return { tone: "warn" as const, text: "Use a display name of 80 characters or fewer." };
     case "profile-unavailable":
       return { tone: "warn" as const, text: "Profile changes are temporarily unavailable." };
+    case "delete-invalid":
+      return { tone: "warn" as const, text: "Type DELETE to confirm account deletion." };
+    case "delete-billing-active":
+      return { tone: "warn" as const, text: "Cancel Premium from Manage billing before deleting this account." };
+    case "delete-unavailable":
+      return { tone: "warn" as const, text: "Account deletion is temporarily unavailable." };
     default:
       return null;
   }
@@ -358,6 +364,31 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 <form action="/auth/signout" method="post">
                   <input type="hidden" name="next" value="/login?account=signed-out" />
                   <button className="ghost-button" type="submit">Sign out</button>
+                </form>
+              </div>
+              <div className="settings-danger-zone" id="account-danger">
+                <div>
+                  <strong>Delete account</strong>
+                  <span>
+                    Permanently removes your RoleForge account and saved projects. Download your summary first. Premium accounts must cancel billing before deletion.
+                  </span>
+                </div>
+                <form action="/api/account/delete" method="post">
+                  <label htmlFor="settings-delete-confirmation">Type DELETE</label>
+                  <div className="settings-danger-actions">
+                    <input
+                      id="settings-delete-confirmation"
+                      name="confirmation"
+                      type="text"
+                      autoComplete="off"
+                      inputMode="text"
+                      spellCheck={false}
+                      required
+                    />
+                    <button className="ghost-button settings-danger-button" type="submit">
+                      Delete account
+                    </button>
+                  </div>
                 </form>
               </div>
             </div>

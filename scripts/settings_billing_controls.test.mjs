@@ -44,6 +44,16 @@ test("settings account panel includes an editable profile display name", () => {
   assert.match(stylesheet, /\.settings-profile-edit-row\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*minmax\(min\(100%,\s*138px\),\s*auto\)[^}]*\}/s);
 });
 
+test("settings account panel exposes guarded account deletion", () => {
+  assert.match(settingsPage, /id="account-danger"/);
+  assert.match(settingsPage, /action="\/api\/account\/delete"/);
+  assert.match(settingsPage, /name="confirmation"/);
+  assert.match(settingsPage, /Type DELETE/);
+  assert.match(settingsPage, /Cancel Premium from Manage billing before deleting this account\./);
+  assert.match(stylesheet, /\.settings-danger-zone\s*\{/);
+  assert.match(stylesheet, /\.settings-danger-button\s*\{/);
+});
+
 test("inactive settings billing action does not animate like a clickable control", () => {
   assert.match(stylesheet, /\.settings-disabled-action\s*\{[^}]*cursor:\s*default[^}]*opacity:\s*0\.78[^}]*\}/s);
   assert.match(stylesheet, /\.settings-disabled-action:hover\s*\{[^}]*transform:\s*none[^}]*\}/s);

@@ -7,6 +7,7 @@ test("formats login status notices for auth redirects", () => {
   assert.equal(loginNoticeCopy("signin-required"), "Sign in to start tailoring resumes and keep saved projects tied to your account.");
   assert.equal(loginNoticeCopy("check-email"), "Check your email for the secure sign-in link.");
   assert.equal(loginNoticeCopy("signed-out"), "You are signed out.");
+  assert.equal(loginNoticeCopy("account-deleted"), "Your RoleForge account has been deleted.");
   assert.equal(loginNoticeCopy("signin-error"), "Sign-in could not finish. Try Google or send a new email link.");
   assert.equal(loginNoticeCopy("unknown"), "Choose Google or a secure email link to continue to the studio.");
 });
@@ -20,5 +21,6 @@ test("assigns customer-facing tones to login statuses", () => {
   assert.equal(loginNoticeTone("check-email"), "success");
   assert.equal(loginNoticeTone("signin-error"), "error");
   assert.equal(loginNoticeTone("signed-out"), "neutral");
+  assert.equal(loginNoticeTone("account-deleted"), "neutral");
   assert.equal(loginNoticeTone("signin-required"), "info");
 });

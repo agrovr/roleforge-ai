@@ -8,6 +8,8 @@ export function loginNoticeCopy(account: string | undefined) {
       return "Check your email for the secure sign-in link.";
     case "signed-out":
       return "You are signed out.";
+    case "account-deleted":
+      return "Your RoleForge account has been deleted.";
     case "account-not-configured":
       return "Sign-in is temporarily unavailable. Try again shortly.";
     case "signin-error":
@@ -20,6 +22,6 @@ export function loginNoticeCopy(account: string | undefined) {
 export function loginNoticeTone(account: string | undefined): LoginNoticeTone {
   if (account === "check-email") return "success";
   if (account === "signin-error" || account === "account-not-configured") return "error";
-  if (account === "signed-out") return "neutral";
+  if (account === "signed-out" || account === "account-deleted") return "neutral";
   return "info";
 }
