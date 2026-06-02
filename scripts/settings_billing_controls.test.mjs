@@ -31,6 +31,21 @@ test("settings billing submit buttons show progress while Stripe opens", () => {
   assert.match(settingsPage, /pendingLabel="Opening billing\.\.\."/);
 });
 
+test("settings billing panel explains portal, cancellation, and support paths", () => {
+  assert.match(settingsPage, /billingControlItems/);
+  assert.match(settingsPage, /settings-billing-control-list/);
+  assert.match(settingsPage, /aria-label="Billing controls and access details"/);
+  assert.match(settingsPage, /Subscription controls/);
+  assert.match(settingsPage, /Manage billing opens Stripe for cancellation, invoices, and payment method changes\./);
+  assert.match(settingsPage, /Access through period end/);
+  assert.match(settingsPage, /DOCX, TXT, and unlimited runs stay available until \$\{premiumEndLabel\}\./);
+  assert.match(settingsPage, /Support opens with this billing page attached/);
+  assert.match(settingsPage, /Checkout opens in Stripe and Premium activates after the subscription syncs\./);
+  assert.match(stylesheet, /\.settings-billing-control-list\s*\{(?=[^}]*display:\s*grid)(?=[^}]*border-block:\s*1px solid var\(--line\))[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-billing-control-item\s*\{(?=[^}]*grid-template-columns:\s*34px minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-billing-control-item strong,\s*\.settings-billing-control-item small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
+});
+
 test("settings account panel includes an editable profile display name", () => {
   assert.match(settingsPage, /updateAccountProfileAction/);
   assert.match(settingsPage, /saveAccountProfile\(supabase,\s*user/);

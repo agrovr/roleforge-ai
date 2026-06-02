@@ -9445,6 +9445,64 @@ html[data-theme="dark"] input::file-selector-button {
   text-wrap: pretty;
 }
 
+.settings-billing-control-list {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+  border-block: 1px solid var(--line);
+}
+
+.settings-billing-control-item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  min-width: 0;
+  padding: 13px 0;
+}
+
+.settings-billing-control-item + .settings-billing-control-item {
+  border-top: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+}
+
+.settings-billing-control-item > span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--brand) 22%, var(--line));
+  border-radius: 999px;
+  color: var(--brand);
+  background: color-mix(in srgb, var(--brand-soft) 42%, transparent);
+}
+
+.settings-billing-control-item > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.settings-billing-control-item strong,
+.settings-billing-control-item small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.settings-billing-control-item strong {
+  color: var(--ink-0);
+  font-size: 0.95rem;
+  font-weight: 940;
+  line-height: 1.18;
+}
+
+.settings-billing-control-item small {
+  color: var(--ink-2);
+  font-size: 0.84rem;
+  font-weight: 680;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
 .settings-billing-note {
   margin: 0;
   color: var(--ink-2);

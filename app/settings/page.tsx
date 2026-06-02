@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { AccountAvatar } from "../components/AccountAvatar";
 import { Brand } from "../components/Brand";
 import { ResumePreview } from "../components/ResumePreview";
-import { RoleForgeIcon } from "../components/RoleForgeIcons";
+import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { validateAccountEmail } from "../lib/accountEmail";
 import { loadAccountProfile, saveAccountProfile } from "../lib/accountProfile";
@@ -431,6 +431,47 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     : `${usage.remainingRuns} ${remainingRunWord} left this month`;
   const settingsAccountExportValue = entitlement.exportFormats.docx ? "PDF DOCX TXT" : "PDF";
   const settingsAccountExportCaption = entitlement.exportFormats.docx ? "Premium exports active" : "DOCX and TXT need Premium";
+  const billingControlItems: Array<{ icon: RoleForgeIconName; title: string; detail: string }> = premiumActive
+    ? [
+        {
+          icon: "settings",
+          title: "Subscription controls",
+          detail: portalReady
+            ? "Manage billing opens Stripe for cancellation, invoices, and payment method changes."
+            : "Premium status is active, but billing management is unavailable right now.",
+        },
+        {
+          icon: premiumEnding ? "check" : "lock",
+          title: premiumEnding ? "Access through period end" : "Premium access",
+          detail: premiumEnding && premiumEndLabel
+            ? `DOCX, TXT, and unlimited runs stay available until ${premiumEndLabel}.`
+            : "DOCX, TXT, and unlimited runs stay available while the subscription is active.",
+        },
+        {
+          icon: "mail",
+          title: "Billing support",
+          detail: "Support opens with this billing page attached so Premium access questions have account context.",
+        },
+      ]
+    : [
+        {
+          icon: "lock",
+          title: "Secure checkout",
+          detail: checkoutReady
+            ? "Checkout opens in Stripe and Premium activates after the subscription syncs."
+            : "Premium checkout is paused while payments are prepared.",
+        },
+        {
+          icon: "check",
+          title: "What Premium unlocks",
+          detail: "Upgrade for unlimited tailoring runs plus DOCX and TXT exports.",
+        },
+        {
+          icon: "mail",
+          title: "Billing support",
+          detail: "Ask about checkout, invoices, or Premium access from a support request linked to this page.",
+        },
+      ];
 
   return (
     <main className="settings-page-shell">
@@ -1146,6 +1187,19 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   </article>
                 </div>
               )}
+              <div className="settings-billing-control-list" aria-label="Billing controls and access details">
+                {billingControlItems.map((item) => (
+                  <div className="settings-billing-control-item" key={item.title}>
+                    <span>
+                      <RoleForgeIcon name={item.icon} size={15} />
+                    </span>
+                    <div>
+                      <strong>{item.title}</strong>
+                      <small>{item.detail}</small>
+                    </div>
+                  </div>
+                ))}
+              </div>
               <p className="settings-billing-note">
                 {premiumActive
                   ? premiumEnding
