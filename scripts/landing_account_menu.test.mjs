@@ -33,3 +33,20 @@ test("landing account menu stays compact in the nav", () => {
   assert.match(stylesheet, /@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.landing-account-popover\s*\{(?=[^}]*right:\s*-12px)(?=[^}]*width:\s*min\(340px,\s*calc\(100vw\s*-\s*18px\)\))[^}]*\}/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.landing-account-button/);
 });
+
+test("landing pricing explains billing management before checkout", () => {
+  assert.match(landingPage, /pricing-clarity-grid/);
+  assert.match(landingPage, /aria-label="Billing clarity"/);
+  assert.match(landingPage, /Manage in Settings/);
+  assert.match(landingPage, /Stripe billing opens from Settings for invoices, payment methods, and plan changes\./);
+  assert.match(landingPage, /Cancel through billing/);
+  assert.match(landingPage, /Premium access stays active through the paid period\./);
+  assert.match(landingPage, /Billing support/);
+  assert.match(landingPage, /contextUrl:\s*"\/#pricing"/);
+  assert.match(landingPage, /Can I cancel Premium\?/);
+  assert.match(landingPage, /Premium access remains active until that period ends\./);
+  assert.match(stylesheet, /\.pricing-clarity-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(min\(100%,\s*220px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.pricing-clarity-grid\s+a\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*34px\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.pricing-clarity-grid\s+strong,\s*\.pricing-clarity-grid\s+small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.pricing-clarity-grid a/);
+});

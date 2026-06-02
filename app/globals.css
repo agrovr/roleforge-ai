@@ -2387,6 +2387,66 @@ html.rf-custom-pointer [contenteditable=""] {
   }
 }
 
+.pricing-clarity-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+  min-width: 0;
+  margin-top: 16px;
+}
+
+.pricing-clarity-grid a {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  color: inherit;
+  text-decoration: none;
+}
+
+.pricing-clarity-grid a:hover,
+.pricing-clarity-grid a:focus-visible {
+  border-color: var(--brand);
+  background: var(--surface-warm);
+}
+
+.pricing-clarity-grid a > span {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--brand-dark);
+}
+
+.pricing-clarity-grid strong,
+.pricing-clarity-grid small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.pricing-clarity-grid strong {
+  align-self: center;
+  color: var(--ink-0);
+  font-size: 0.95rem;
+  font-weight: 850;
+  line-height: 1.15;
+}
+
+.pricing-clarity-grid small {
+  grid-column: 2;
+  color: var(--ink-2);
+  line-height: 1.4;
+}
+
 .faq-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3210,6 +3270,7 @@ html[data-theme="dark"] .steps {
 
 html[data-theme="dark"] .feature-card,
 html[data-theme="dark"] .price-card:not(.featured),
+html[data-theme="dark"] .pricing-clarity-grid a,
 html[data-theme="dark"] .faq-item,
 html[data-theme="dark"] .template-card,
 html[data-theme="dark"] .dash-stat,

@@ -11,6 +11,7 @@ import { getStripeBillingConfig, PREMIUM_PRICE } from "./lib/billing/stripe";
 import { FREE_ENTITLEMENT, loadAccountEntitlement } from "./lib/entitlements";
 import { loadAccountProfile } from "./lib/accountProfile";
 import { createRoleForgeServerClient } from "./lib/supabase/server";
+import { supportRequestHref } from "./lib/supportRequests";
 import { monthlyRunAllowanceLabel } from "./lib/usage";
 
 type LandingLinks = {
@@ -560,6 +561,12 @@ function Pricing({
   const premiumPaused = !premiumActive && !checkoutReady;
   const premiumStatus = premiumActive ? (premiumEnding ? "Active until period end" : "Current plan") : premiumPaused ? "Paused" : "Upgrade";
   const premiumCta = premiumActive ? "Manage Premium" : premiumPaused ? "Use free studio" : signedIn ? "View plans" : "Sign in to upgrade";
+  const billingHref = signedIn ? "/settings#billing" : "/login?next=/settings%23billing";
+  const billingSupportHref = supportRequestHref({
+    category: "billing",
+    subject: "Billing or Premium access",
+    contextUrl: "/#pricing",
+  });
 
   return (
     <section className="section" id="pricing">
@@ -609,6 +616,23 @@ function Pricing({
             <Link className="btn btn-brand btn-lg" href={premiumHref}>{premiumCta}</Link>
           </article>
         </div>
+        <div className="pricing-clarity-grid" aria-label="Billing clarity">
+          <Link href={billingHref}>
+            <span><RoleForgeIcon name="settings" size={15} /></span>
+            <strong>Manage in Settings</strong>
+            <small>Stripe billing opens from Settings for invoices, payment methods, and plan changes.</small>
+          </Link>
+          <Link href={billingHref}>
+            <span><RoleForgeIcon name="lock" size={15} /></span>
+            <strong>Cancel through billing</strong>
+            <small>When a subscription is canceled, Premium access stays active through the paid period.</small>
+          </Link>
+          <Link href={billingSupportHref}>
+            <span><RoleForgeIcon name="mail" size={15} /></span>
+            <strong>Billing support</strong>
+            <small>Open a support request with billing context attached when checkout or access needs help.</small>
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -621,6 +645,7 @@ function FAQ({ checkoutReady }: Pick<LandingLinks, "checkoutReady">) {
     ["What file formats can I export?", "The free workflow exports PDF. Premium enables DOCX and TXT exports when your plan is active."],
     ["Can I use templates?", "Yes. Pick a template direction before opening the studio, and RoleForge sends that direction with new exports."],
     ["Is sign-in available?", "Yes. Google and email magic-link sign-in are available. Saved projects sync after sign-in."],
+    ["Can I cancel Premium?", "Yes. Manage billing opens Stripe from Settings for plan changes and cancellation. If you cancel during a paid period, Premium access remains active until that period ends."],
     ["How much is Premium?", checkoutReady
       ? `The launch price is $${PREMIUM_MONTHLY_PRICE}/month or $${PREMIUM_YEARLY_PRICE}/year. Billing management is handled by Stripe.`
       : `The launch price is $${PREMIUM_MONTHLY_PRICE}/month or $${PREMIUM_YEARLY_PRICE}/year. Premium billing is paused for launch while the free studio stays open.`],
