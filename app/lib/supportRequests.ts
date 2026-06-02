@@ -23,7 +23,23 @@ export type SupportRequestResult = {
   createdAt: string;
 };
 
+export type SupportRequestStatus = "open" | "reviewing" | "closed";
+
+export type SupportRequestSummary = {
+  id: string;
+  category: SupportRequestCategory;
+  categoryLabel: string;
+  subject: string;
+  messagePreview: string;
+  contextUrl: string | null;
+  status: SupportRequestStatus;
+  statusLabel: string;
+  createdAt: string;
+  createdLabel: string;
+};
+
 const supportCategorySet = new Set<string>(SUPPORT_REQUEST_CATEGORIES);
+const supportStatusSet = new Set<string>(["open", "reviewing", "closed"]);
 
 function stringValue(value: unknown) {
   return typeof value === "string" ? value : "";
@@ -65,6 +81,72 @@ export function supportCategoryLabel(category: SupportRequestCategory) {
     case "other":
       return "Other";
   }
+}
+
+export function supportStatusLabel(status: SupportRequestStatus) {
+  switch (status) {
+    case "open":
+      return "Open";
+    case "reviewing":
+      return "Reviewing";
+    case "closed":
+      return "Closed";
+  }
+}
+
+export function supportRequestDateLabel(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Recently";
+  return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+function normalizeSupportCategory(value: unknown): SupportRequestCategory {
+  const category = compactSingleLine(value);
+  return supportCategorySet.has(category) ? category as SupportRequestCategory : "other";
+}
+
+function normalizeSupportStatus(value: unknown): SupportRequestStatus {
+  const status = compactSingleLine(value);
+  return supportStatusSet.has(status) ? status as SupportRequestStatus : "open";
+}
+
+function previewMessage(value: unknown) {
+  const message = compactMessage(value).replace(/\s+/g, " ");
+  return message.length > 180 ? `${message.slice(0, 177).trim()}...` : message;
+}
+
+export async function loadSupportRequests(
+  client: SupabaseClient,
+  userId: string,
+  options: { limit?: number } = {},
+): Promise<SupportRequestSummary[]> {
+  const limit = Math.min(Math.max(options.limit ?? 5, 1), 20);
+  const { data, error } = await client
+    .from("support_requests")
+    .select("id, category, subject, message, context_url, status, created_at")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+
+  return (data ?? []).map((row) => {
+    const category = normalizeSupportCategory(row.category);
+    const status = normalizeSupportStatus(row.status);
+    const createdAt = typeof row.created_at === "string" ? row.created_at : "";
+    return {
+      id: String(row.id),
+      category,
+      categoryLabel: supportCategoryLabel(category),
+      subject: compactSingleLine(row.subject) || "Support request",
+      messagePreview: previewMessage(row.message),
+      contextUrl: normalizeContextUrl(row.context_url),
+      status,
+      statusLabel: supportStatusLabel(status),
+      createdAt,
+      createdLabel: supportRequestDateLabel(createdAt),
+    };
+  });
 }
 
 export function parseSupportRequestInput(payload: {

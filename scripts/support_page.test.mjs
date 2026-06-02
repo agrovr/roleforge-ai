@@ -26,6 +26,10 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /Get help with your workflow/);
   assert.match(supportPage, /Signed-in requests are saved to your account/);
   assert.match(supportPage, /action="\/api\/support-requests"/);
+  assert.match(supportPage, /loadSupportRequests\(supabase,\s*user\.id,\s*\{ limit: 5 \}\)/);
+  assert.match(supportPage, /Recent requests/);
+  assert.match(supportPage, /support-history-list/);
+  assert.match(supportPage, /support-status-badge/);
   assert.match(supportPage, /name="category"/);
   assert.match(supportPage, /name="subject"/);
   assert.match(supportPage, /name="message"/);
@@ -57,6 +61,18 @@ test("support requests have protected Supabase ownership policies", () => {
   assert.match(supportMigration, /revoke all on table public\.support_requests from anon/);
   assert.match(supportMigration, /grant select, insert on table public\.support_requests to authenticated/);
   assert.match(supportLib, /SUPPORT_REQUEST_CATEGORIES/);
+  assert.match(supportLib, /loadSupportRequests/);
+  assert.match(supportLib, /supportStatusLabel/);
+});
+
+test("settings exposes account support request history", () => {
+  assert.match(settingsPage, /loadSupportRequests\(supabase,\s*user\.id,\s*\{ limit: 4 \}\)/);
+  assert.match(settingsPage, /id="support"/);
+  assert.match(settingsPage, /Support requests/);
+  assert.match(settingsPage, /settings-support-list/);
+  assert.match(settingsPage, /support-status-badge/);
+  assert.match(settingsPage, /Open support/);
+  assert.match(settingsPage, /href="#support"/);
 });
 
 test("support page is discoverable across public and account surfaces", () => {
@@ -74,6 +90,9 @@ test("support page has overflow-safe responsive form layout", () => {
   assert.match(stylesheet, /\.support-guide-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*42px\s+minmax\(0,\s*1fr\))[^}]*\}/s);
   assert.match(stylesheet, /\.support-request-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*gap:\s*16px)[^}]*\}/s);
   assert.match(stylesheet, /\.support-form\s+input,\s*\.support-form\s+select,\s*\.support-form\s+textarea\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-history-item,\s*\.settings-support-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-status-badge\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.support-layout\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.support-history-item,\s*\.settings-support-item\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-request-card/);
 });

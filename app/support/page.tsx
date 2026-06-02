@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
-import { SUPPORT_REQUEST_CATEGORIES, supportCategoryLabel } from "../lib/supportRequests";
+import { SUPPORT_REQUEST_CATEGORIES, loadSupportRequests, supportCategoryLabel } from "../lib/supportRequests";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -61,6 +61,9 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
   } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
   const signedIn = Boolean(user);
   const accountEmail = user?.email ?? "";
+  const recentSupportRequests = supabase && user
+    ? await loadSupportRequests(supabase, user.id, { limit: 5 }).catch(() => [])
+    : [];
 
   return (
     <main className="legal-shell support-shell">
@@ -160,6 +163,35 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
               </Link>
             </div>
           )}
+
+          {signedIn ? (
+            <section className="support-history" aria-label="Recent support requests">
+              <div className="support-history-head">
+                <span className="eyebrow">Recent requests</span>
+                <Link className="btn btn-soft btn-sm" href="/settings#support">View in Settings</Link>
+              </div>
+              {recentSupportRequests.length ? (
+                <div className="support-history-list">
+                  {recentSupportRequests.map((request) => (
+                    <article className="support-history-item" key={request.id}>
+                      <div>
+                        <span>{request.categoryLabel} · {request.createdLabel}</span>
+                        <strong>{request.subject}</strong>
+                        <p>{request.messagePreview}</p>
+                        {request.contextUrl ? <small>{request.contextUrl}</small> : null}
+                      </div>
+                      <span className={`support-status-badge ${request.status}`}>{request.statusLabel}</span>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div className="support-history-empty">
+                  <strong>No support requests yet</strong>
+                  <span>Requests submitted from this account will appear here with their current status.</span>
+                </div>
+              )}
+            </section>
+          ) : null}
         </section>
       </section>
 

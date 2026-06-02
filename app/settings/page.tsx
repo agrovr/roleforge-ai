@@ -32,6 +32,7 @@ import {
 } from "../lib/resumeTemplates";
 import { settingsProjectSummaries } from "../lib/settingsProjects";
 import { getConfiguredSiteOrigin } from "../lib/siteUrl";
+import { loadSupportRequests } from "../lib/supportRequests";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 import { deleteSavedProject, loadSavedRuns, renameSavedProject, updateSavedProjectStatus } from "../lib/supabase/savedProjects";
 import {
@@ -334,10 +335,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     redirect(`/settings?billing=${syncedCheckout ? "checkout-success" : "checkout-syncing"}#billing`);
   }
 
-  const [projectCount, runCount, recentSavedRuns, accountProfile] = await Promise.all([
+  const [projectCount, runCount, recentSavedRuns, recentSupportRequests, accountProfile] = await Promise.all([
     countRows(supabase, "resume_projects", user.id),
     countRows(supabase, "tailor_runs", user.id),
     loadSavedRuns(supabase, user.id).catch(() => []),
+    loadSupportRequests(supabase, user.id, { limit: 4 }).catch(() => []),
     loadAccountProfile(supabase, user.id).catch(() => null),
     reconcileUserSubscriptionEntitlement(user.id).catch(() => false),
   ]);
@@ -499,6 +501,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 <Link href="/support">
                   <RoleForgeIcon name="mail" size={14} /> Contact support
                 </Link>
+                <a href="#support">
+                  <RoleForgeIcon name="mail" size={14} /> Support requests
+                </a>
                 <Link href="/status">
                   <RoleForgeIcon name="scan" size={14} /> System status
                 </Link>
@@ -628,6 +633,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 <a href="#account"><RoleForgeIcon name="settings" size={14} /> Edit profile</a>
                 <a href="#billing"><RoleForgeIcon name="lock" size={14} /> Billing</a>
                 <a href="#projects"><RoleForgeIcon name="chart" size={14} /> Projects</a>
+                <a href="#support"><RoleForgeIcon name="mail" size={14} /> Support</a>
                 <Link href={resumeTemplateStudioHref(selectedTemplate.slug)}><RoleForgeIcon name="file" size={14} /> Studio</Link>
               </div>
             </section>
@@ -1002,6 +1008,39 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               <div className="settings-export-actions">
                 <span>{selectedTemplate.name} is selected as your resume direction and is sent with new exports.</span>
                 <Link className="btn btn-soft btn-sm settings-inline-link" href="/templates">Browse templates</Link>
+              </div>
+            </div>
+          </section>
+
+          <section className="settings-section" id="support">
+            <div className="settings-section-copy">
+              <h2>Support</h2>
+              <p>Track account-linked requests for workflow, export, billing, and saved project issues.</p>
+            </div>
+            <div className="settings-section-panel">
+              {recentSupportRequests.length ? (
+                <div className="settings-support-list" aria-label="Recent support requests">
+                  {recentSupportRequests.map((request) => (
+                    <article className="settings-support-item" key={request.id}>
+                      <div>
+                        <span>{request.categoryLabel} · {request.createdLabel}</span>
+                        <strong>{request.subject}</strong>
+                        <p>{request.messagePreview}</p>
+                        {request.contextUrl ? <small>{request.contextUrl}</small> : null}
+                      </div>
+                      <span className={`support-status-badge ${request.status}`}>{request.statusLabel}</span>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div className="settings-project-empty settings-support-empty">
+                  <strong>No support requests yet</strong>
+                  <span>Use Support when an export, billing, saved project, or workflow issue needs account-linked context.</span>
+                </div>
+              )}
+              <div className="settings-export-actions">
+                <span>Support requests are saved with your account email for follow-up.</span>
+                <Link className="btn btn-soft btn-sm settings-inline-link" href="/support">Open support</Link>
               </div>
             </div>
           </section>

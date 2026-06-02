@@ -10,6 +10,7 @@ const settingsSections = [
   { id: "projects", label: "Saved projects", icon: "chart" },
   { id: "usage", label: "Usage", icon: "sparkle" },
   { id: "exports", label: "Exports", icon: "download" },
+  { id: "support", label: "Support", icon: "mail" },
   { id: "billing", label: "Billing", icon: "lock" },
 ] as const;
 

@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { parseSupportRequestInput, saveSupportRequest, supportCategoryLabel } from "./supportRequests";
+import {
+  loadSupportRequests,
+  parseSupportRequestInput,
+  saveSupportRequest,
+  supportCategoryLabel,
+  supportStatusLabel,
+} from "./supportRequests";
 
 test("parses valid support request input", () => {
   const result = parseSupportRequestInput({
@@ -48,6 +54,71 @@ test("keeps support request context safe and bounded", () => {
 test("labels support request categories for the form", () => {
   assert.equal(supportCategoryLabel("saved-projects"), "Saved projects");
   assert.equal(supportCategoryLabel("billing"), "Billing");
+  assert.equal(supportStatusLabel("reviewing"), "Reviewing");
+});
+
+test("loads recent support requests with customer-facing status summaries", async () => {
+  const calls: Array<{ table: string; query?: string; userId?: string; limit?: number }> = [];
+  const fakeClient = {
+    from(table: string) {
+      calls.push({ table });
+      return {
+        select(query: string) {
+          calls[calls.length - 1].query = query;
+          return {
+            eq(column: string, userId: string) {
+              assert.equal(column, "user_id");
+              calls[calls.length - 1].userId = userId;
+              return {
+                order(columnName: string, options: { ascending: boolean }) {
+                  assert.equal(columnName, "created_at");
+                  assert.deepEqual(options, { ascending: false });
+                  return {
+                    async limit(value: number) {
+                      calls[calls.length - 1].limit = value;
+                      return {
+                        data: [
+                          {
+                            id: "support-1",
+                            category: "billing",
+                            subject: "Premium sync",
+                            message: "Checkout completed and the billing panel still says free plan.",
+                            context_url: "/settings#billing",
+                            status: "reviewing",
+                            created_at: "2026-06-02T18:00:00.000Z",
+                          },
+                        ],
+                        error: null,
+                      };
+                    },
+                  };
+                },
+              };
+            },
+          };
+        },
+      };
+    },
+  };
+
+  const requests = await loadSupportRequests(fakeClient as never, "user-123", { limit: 5 });
+
+  assert.equal(calls[0]?.table, "support_requests");
+  assert.equal(calls[0]?.query, "id, category, subject, message, context_url, status, created_at");
+  assert.equal(calls[0]?.userId, "user-123");
+  assert.equal(calls[0]?.limit, 5);
+  assert.deepEqual(requests[0], {
+    id: "support-1",
+    category: "billing",
+    categoryLabel: "Billing",
+    subject: "Premium sync",
+    messagePreview: "Checkout completed and the billing panel still says free plan.",
+    contextUrl: "/settings#billing",
+    status: "reviewing",
+    statusLabel: "Reviewing",
+    createdAt: "2026-06-02T18:00:00.000Z",
+    createdLabel: "Jun 2, 2026",
+  });
 });
 
 test("saves support requests without exposing protected account data", async () => {
