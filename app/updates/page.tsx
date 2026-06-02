@@ -28,6 +28,19 @@ type UpdateItem = {
 
 const updates: readonly UpdateItem[] = [
   {
+    title: "Help Center is searchable",
+    date: "June 2, 2026",
+    eyebrow: "Help",
+    icon: "scan",
+    summary: "Help now filters account, billing, export, saved-project, and workflow guidance from one search field.",
+    details: [
+      "The Help page filters both topic cards and quick actions as you type, so billing, export, account, and saved-project answers are easier to find.",
+      "When there is no match, Help points users toward an account-linked support request instead of leaving them at a dead end.",
+    ],
+    actionHref: "/help",
+    actionLabel: "Search help",
+  },
+  {
     title: "Settings project controls are cleaner",
     date: "June 2, 2026",
     eyebrow: "Saved projects",

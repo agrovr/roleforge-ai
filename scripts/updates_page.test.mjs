@@ -23,6 +23,9 @@ test("updates page is a factual public product log", () => {
   assert.match(updatesPage, /What changed in RoleForge/);
   assert.match(updatesPage, /A factual log of shipped workflow, account, export, and billing improvements/);
   assert.match(updatesPage, /June 2, 2026/);
+  assert.match(updatesPage, /Help Center is searchable/);
+  assert.match(updatesPage, /Help now filters account, billing, export, saved-project, and workflow guidance/);
+  assert.match(updatesPage, /When there is no match, Help points users toward an account-linked support request/);
   assert.match(updatesPage, /Settings project controls are cleaner/);
   assert.match(updatesPage, /Saved project controls in Settings now stack into readable action rows/);
   assert.match(updatesPage, /Status and Support now guide next steps/);
@@ -35,6 +38,7 @@ test("updates page is a factual public product log", () => {
   assert.match(updatesPage, /Free accounts keep PDF export/);
   assert.match(updatesPage, /Premium access unlocks DOCX and TXT/);
   assert.match(updatesPage, /actionHref: "\/settings#projects"/);
+  assert.match(updatesPage, /actionHref: "\/help"/);
   assert.match(updatesPage, /actionHref: "\/support"/);
   assert.match(updatesPage, /actionHref: "\/status"/);
   assert.match(updatesPage, /actionHref: "\/templates"/);

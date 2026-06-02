@@ -19,6 +19,9 @@ test("help page covers account, exports, billing, and saved project guidance", (
   assert.match(helpPage, /Exports and templates/);
   assert.match(helpPage, /Premium and billing/);
   assert.match(helpPage, /When something looks stuck/);
+  assert.match(helpPage, /HelpSearch/);
+  assert.match(helpPage, /quickLinks=\{quickLinks\}/);
+  assert.match(helpPage, /helpSections=\{helpSections\}/);
   assert.match(helpPage, /Free accounts can export PDF/);
   assert.match(helpPage, /Premium accounts unlock DOCX and TXT/);
   assert.match(helpPage, /href: "\/status"/);
@@ -44,6 +47,8 @@ test("help page is discoverable from public navigation and crawler metadata", ()
 });
 
 test("help quick links are compact and overflow-safe", () => {
+  assert.match(stylesheet, /\.help-search-card\s*\{/);
+  assert.match(stylesheet, /\.help-search-field\s+input\s*\{/);
   assert.match(stylesheet, /\.help-quick-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*220px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.help-quick-link\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.help-quick-link\s+strong,\s*\.help-quick-link\s+small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);

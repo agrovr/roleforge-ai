@@ -6,6 +6,7 @@ import { PublicAccountMenu } from "../components/PublicAccountMenu";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { supportRequestHref } from "../lib/supportRequests";
+import { HelpSearch } from "./HelpSearch";
 
 export const metadata: Metadata = {
   title: "Help Center",
@@ -15,7 +16,19 @@ export const metadata: Metadata = {
   },
 };
 
-const helpSections = [
+export type HelpSection = {
+  title: string;
+  body: readonly string[];
+};
+
+export type HelpQuickLink = {
+  href: string;
+  icon: "file" | "layers" | "settings" | "mail" | "scan" | "lock" | "sparkle";
+  label: string;
+  detail: string;
+};
+
+const helpSections: readonly HelpSection[] = [
   {
     title: "Start a resume run",
     body: [
@@ -60,23 +73,23 @@ const helpSections = [
   },
 ] as const;
 
-const quickLinks = [
-  { href: "/app", icon: "file" as const, label: "Open studio", detail: "Build or restore a resume workflow." },
-  { href: "/templates", icon: "layers" as const, label: "Browse templates", detail: "Choose the default export direction." },
-  { href: "/settings", icon: "settings" as const, label: "Account settings", detail: "Manage profile, projects, exports, and billing." },
+const quickLinks: readonly HelpQuickLink[] = [
+  { href: "/app", icon: "file", label: "Open studio", detail: "Build or restore a resume workflow." },
+  { href: "/templates", icon: "layers", label: "Browse templates", detail: "Choose the default export direction." },
+  { href: "/settings", icon: "settings", label: "Account settings", detail: "Manage profile, projects, exports, and billing." },
   {
     href: supportRequestHref({
       category: "workflow",
       subject: "Workflow or export issue",
       contextUrl: "/help",
     }),
-    icon: "mail" as const,
+    icon: "mail",
     label: "Contact support",
     detail: "Send account-linked workflow or billing details.",
   },
-  { href: "/status", icon: "scan" as const, label: "System status", detail: "Check workflow, export, account, and billing readiness." },
-  { href: "/updates", icon: "sparkle" as const, label: "Product updates", detail: "Review recent shipped improvements." },
-  { href: "/privacy", icon: "lock" as const, label: "Privacy", detail: "Review how account and workflow data is handled." },
+  { href: "/status", icon: "scan", label: "System status", detail: "Check workflow, export, account, and billing readiness." },
+  { href: "/updates", icon: "sparkle", label: "Product updates", detail: "Review recent shipped improvements." },
+  { href: "/privacy", icon: "lock", label: "Privacy", detail: "Review how account and workflow data is handled." },
 ] as const;
 
 export default function HelpPage() {
@@ -113,26 +126,7 @@ export default function HelpPage() {
         </div>
       </section>
 
-      <nav className="help-quick-grid" aria-label="Help quick links">
-        {quickLinks.map((item) => (
-          <Link className="help-quick-link" href={item.href} key={item.href}>
-            <span><RoleForgeIcon name={item.icon} size={16} /></span>
-            <strong>{item.label}</strong>
-            <small>{item.detail}</small>
-          </Link>
-        ))}
-      </nav>
-
-      <section className="legal-grid" aria-label="Help topics">
-        {helpSections.map((section) => (
-          <article className="legal-card" key={section.title}>
-            <h2>{section.title}</h2>
-            {section.body.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </article>
-        ))}
-      </section>
+      <HelpSearch quickLinks={quickLinks} helpSections={helpSections} />
 
       <section className="legal-footer-card" aria-label="Help footer">
         <div>
