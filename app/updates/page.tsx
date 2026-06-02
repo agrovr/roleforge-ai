@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Brand } from "../components/Brand";
+import { PublicAccountMenu } from "../components/PublicAccountMenu";
 import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { supportRequestHref } from "../lib/supportRequests";
 
 export const metadata: Metadata = {
   title: "Product Updates",
@@ -115,6 +117,13 @@ export default function UpdatesPage() {
           <Link className="btn btn-soft btn-sm" href="/app">Studio</Link>
           <Link className="btn btn-soft btn-sm" href="/status">Status</Link>
           <ThemeToggle />
+          <PublicAccountMenu
+            supportHref={supportRequestHref({
+              category: "workflow",
+              subject: "Product updates question",
+              contextUrl: "/updates",
+            })}
+          />
         </div>
       </header>
 

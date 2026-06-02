@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Brand } from "../components/Brand";
+import { PublicAccountMenu } from "../components/PublicAccountMenu";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import {
@@ -111,6 +112,13 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
           <Link className="btn btn-soft btn-sm" href="/help">Help</Link>
           <Link className="btn btn-soft btn-sm" href="/status">Status</Link>
           <ThemeToggle />
+          <PublicAccountMenu
+            supportHref={supportRequestHref({
+              category: "workflow",
+              subject: "Support page question",
+              contextUrl: "/support",
+            })}
+          />
         </div>
       </header>
 

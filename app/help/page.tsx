@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Brand } from "../components/Brand";
+import { PublicAccountMenu } from "../components/PublicAccountMenu";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { supportRequestHref } from "../lib/supportRequests";
@@ -86,6 +87,13 @@ export default function HelpPage() {
         <div className="settings-page-actions">
           <Link className="btn btn-soft btn-sm" href="/app">Studio</Link>
           <ThemeToggle />
+          <PublicAccountMenu
+            supportHref={supportRequestHref({
+              category: "workflow",
+              subject: "Help center question",
+              contextUrl: "/help",
+            })}
+          />
         </div>
       </header>
 

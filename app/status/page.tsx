@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Brand } from "../components/Brand";
+import { PublicAccountMenu } from "../components/PublicAccountMenu";
 import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { billingReadiness } from "../lib/billing/readiness";
@@ -162,6 +163,13 @@ export default async function StatusPage() {
           <Link className="btn btn-soft btn-sm" href="/app">Studio</Link>
           <Link className="btn btn-soft btn-sm" href="/help">Help</Link>
           <ThemeToggle />
+          <PublicAccountMenu
+            supportHref={supportRequestHref({
+              category: "workflow",
+              subject: "Status page question",
+              contextUrl: "/status",
+            })}
+          />
         </div>
       </header>
 
