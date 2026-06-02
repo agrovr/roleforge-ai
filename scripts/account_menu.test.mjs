@@ -92,3 +92,9 @@ test("settings account recent projects inherit overflow-safe menu layout", () =>
   assert.match(globalsCss, /\.settings-account-recent-link\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(globalsCss, /\.settings-account-recent-link\s+strong\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
 });
+
+test("settings saved project management rows avoid squeezed action columns", () => {
+  assert.match(globalsCss, /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))[^}]*\}/s);
+  assert.match(globalsCss, /\.settings-project-item\s+small\s*\{(?=[^}]*justify-self:\s*start)(?=[^}]*max-width:\s*100%)[^}]*\}/s);
+  assert.match(globalsCss, /\.settings-project-stage-controls\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*148px\),\s*1fr\)\))[^}]*\}/s);
+});
