@@ -46,6 +46,20 @@ test("settings billing panel explains portal, cancellation, and support paths", 
   assert.match(stylesheet, /\.settings-billing-control-item strong,\s*\.settings-billing-control-item small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
 });
 
+test("settings billing panel surfaces plan renewal and status information", () => {
+  assert.match(settingsPage, /planInformationItems/);
+  assert.match(settingsPage, /formatPlanDate\(entitlement\.currentPeriodEnd\)/);
+  assert.match(settingsPage, /billingDateTitle\s*=\s*premiumEnding\s*\?\s*"Access ends"\s*:\s*premiumActive\s*\?\s*"Next renewal"\s*:\s*"Billing date"/);
+  assert.match(settingsPage, /aria-label="Plan information"/);
+  assert.match(settingsPage, /Premium features stay available through this date\./);
+  assert.match(settingsPage, /Stripe manages renewal, invoices, and payment methods\./);
+  assert.match(settingsPage, /No renewal date while this account is on Free\./);
+  assert.match(settingsPage, /detail:\s*billingDetail/);
+  assert.match(stylesheet, /\.settings-plan-info\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\))[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-plan-info-item\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*border:\s*1px solid var\(--line\))[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-plan-info-item span,\s*\.settings-plan-info-item strong,\s*\.settings-plan-info-item small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
+});
+
 test("settings account panel includes an editable profile display name", () => {
   assert.match(settingsPage, /updateAccountProfileAction/);
   assert.match(settingsPage, /saveAccountProfile\(supabase,\s*user/);

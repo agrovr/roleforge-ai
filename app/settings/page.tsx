@@ -431,6 +431,32 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     : `${usage.remainingRuns} ${remainingRunWord} left this month`;
   const settingsAccountExportValue = entitlement.exportFormats.docx ? "PDF DOCX TXT" : "PDF";
   const settingsAccountExportCaption = entitlement.exportFormats.docx ? "Premium exports active" : "DOCX and TXT need Premium";
+  const billingDateLabel = premiumEnding ? premiumEndLabel : formatPlanDate(entitlement.currentPeriodEnd);
+  const billingDateTitle = premiumEnding ? "Access ends" : premiumActive ? "Next renewal" : "Billing date";
+  const billingDateDetail = billingDateLabel
+    ? premiumEnding
+      ? "Premium features stay available through this date."
+      : "Stripe manages renewal, invoices, and payment methods."
+    : premiumActive
+      ? "Open billing for the latest renewal and invoice details."
+      : "No renewal date while this account is on Free.";
+  const planInformationItems = [
+    {
+      label: "Plan",
+      value: premiumEnding ? "Premium ending" : planLabel,
+      detail: premiumActive ? "DOCX, TXT, and unlimited runs are unlocked." : "PDF export and saved project sync are included.",
+    },
+    {
+      label: billingDateTitle,
+      value: billingDateLabel || (premiumActive ? "Open billing" : "None"),
+      detail: billingDateDetail,
+    },
+    {
+      label: "Status",
+      value: billingLabel,
+      detail: billingDetail,
+    },
+  ];
   const billingControlItems: Array<{ icon: RoleForgeIconName; title: string; detail: string }> = premiumActive
     ? [
         {
@@ -1187,6 +1213,15 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   </article>
                 </div>
               )}
+              <div className="settings-plan-info" aria-label="Plan information">
+                {planInformationItems.map((item) => (
+                  <div className="settings-plan-info-item" key={item.label}>
+                    <span>{item.label}</span>
+                    <strong>{item.value}</strong>
+                    <small>{item.detail}</small>
+                  </div>
+                ))}
+              </div>
               <div className="settings-billing-control-list" aria-label="Billing controls and access details">
                 {billingControlItems.map((item) => (
                   <div className="settings-billing-control-item" key={item.title}>
