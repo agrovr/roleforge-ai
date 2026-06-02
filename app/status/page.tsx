@@ -6,6 +6,7 @@ import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIc
 import { ThemeToggle } from "../components/ThemeToggle";
 import { billingReadiness } from "../lib/billing/readiness";
 import { getStripeBillingConfig } from "../lib/billing/stripe";
+import { supportRequestHref } from "../lib/supportRequests";
 import { getSupabaseConfig } from "../lib/supabase/config";
 import { normalizeWorkflowCapabilities, type WorkflowCapabilities } from "../lib/workflowCapabilities";
 
@@ -26,6 +27,13 @@ type StatusItem = {
   value: string;
   detail: string;
   tone: StatusTone;
+  icon: RoleForgeIconName;
+};
+
+type StatusAction = {
+  title: string;
+  detail: string;
+  href: string;
   icon: RoleForgeIconName;
 };
 
@@ -111,6 +119,40 @@ export default async function StatusPage() {
       icon: "settings",
     },
   ];
+  const actions: StatusAction[] = [
+    {
+      title: "Run a workflow check",
+      detail: "Open Studio to verify upload, targeting, export, and saved project behavior from your account.",
+      href: "/app",
+      icon: "file",
+    },
+    {
+      title: "Review account controls",
+      detail: "Open Settings for profile, security, saved projects, exports, usage, and billing state.",
+      href: "/settings",
+      icon: "settings",
+    },
+    {
+      title: "Report a workflow issue",
+      detail: "Create a support request with the workflow category and Status page context already attached.",
+      href: supportRequestHref({
+        category: "workflow",
+        subject: "Status page workflow issue",
+        contextUrl: "/status",
+      }),
+      icon: "mail",
+    },
+    {
+      title: "Report billing access",
+      detail: "Create a billing support request when checkout, billing management, or Premium access looks out of sync.",
+      href: supportRequestHref({
+        category: "billing",
+        subject: "Status page billing issue",
+        contextUrl: "/status",
+      }),
+      icon: "lock",
+    },
+  ];
 
   return (
     <main className="legal-shell status-shell">
@@ -151,6 +193,16 @@ export default async function StatusPage() {
               <p>{item.detail}</p>
             </div>
           </article>
+        ))}
+      </section>
+
+      <section className="status-action-grid" aria-label="Status next steps">
+        {actions.map((action) => (
+          <Link className="status-action-card" href={action.href} key={action.title}>
+            <span><RoleForgeIcon name={action.icon} size={16} /></span>
+            <strong>{action.title}</strong>
+            <small>{action.detail}</small>
+          </Link>
         ))}
       </section>
 

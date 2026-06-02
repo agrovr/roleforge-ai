@@ -32,6 +32,15 @@ test("status page covers account, workflow, export, and billing surfaces", () =>
   assert.match(statusPage, /Exports/);
   assert.match(statusPage, /Premium billing/);
   assert.match(statusPage, /Free PDF workflow can remain available/);
+  assert.match(statusPage, /Status next steps/);
+  assert.match(statusPage, /Run a workflow check/);
+  assert.match(statusPage, /Review account controls/);
+  assert.match(statusPage, /Report a workflow issue/);
+  assert.match(statusPage, /Report billing access/);
+  assert.match(statusPage, /supportRequestHref/);
+  assert.match(statusPage, /subject:\s*"Status page workflow issue"/);
+  assert.match(statusPage, /subject:\s*"Status page billing issue"/);
+  assert.match(statusPage, /contextUrl:\s*"\/status"/);
   assert.match(statusPage, /System status/);
   assert.match(statusPage, /href="\/templates"/);
   assert.match(statusPage, /href="\/support"/);
@@ -65,6 +74,11 @@ test("status page has overflow-safe responsive cards", () => {
   assert.match(stylesheet, /\.status-card\s+strong\s*\{(?=[^}]*font-size:\s*clamp\(1\.52rem,\s*11cqi,\s*2rem\))(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
   assert.match(stylesheet, /\.status-card\s+p\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*pretty)[^}]*\}/s);
   assert.match(stylesheet, /@container\s+status-card\s+\(max-width:\s*250px\)/);
+  assert.match(stylesheet, /\.status-action-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(min\(100%,\s*220px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.status-action-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.status-action-card\s+strong,\s*\.status-action-card\s+small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*620px\)\s*\{[\s\S]*?\.status-grid\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*620px\)\s*\{[\s\S]*?\.status-action-grid\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.status-card/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.status-action-card/);
 });
