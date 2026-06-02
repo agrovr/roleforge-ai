@@ -20,9 +20,37 @@ type UpdateItem = {
   icon: RoleForgeIconName;
   summary: string;
   details: readonly string[];
+  actionHref: string;
+  actionLabel: string;
 };
 
 const updates: readonly UpdateItem[] = [
+  {
+    title: "Settings project controls are cleaner",
+    date: "June 2, 2026",
+    eyebrow: "Saved projects",
+    icon: "chart",
+    summary: "Saved project controls in Settings now stack into readable action rows instead of squeezing labels.",
+    details: [
+      "Project stage buttons, rename controls, downloads, and removal controls now sit in full-width rows with wider labels.",
+      "The production smoke guard now checks the new saved-project layout so status pills and action labels do not collapse into vertical text.",
+    ],
+    actionHref: "/settings#projects",
+    actionLabel: "Open projects",
+  },
+  {
+    title: "Status and Support now guide next steps",
+    date: "June 2, 2026",
+    eyebrow: "Support",
+    icon: "mail",
+    summary: "Status and Support now point users toward the right workflow, billing, account, or saved-project action.",
+    details: [
+      "The Status page includes next-step cards for checking the workflow, reviewing account controls, and opening prefilled support requests.",
+      "The Support page topic cards now prefill the request category, subject, and related page before a signed-in request is sent.",
+    ],
+    actionHref: "/support",
+    actionLabel: "Open support",
+  },
   {
     title: "Profile controls now follow you across the site",
     date: "June 2, 2026",
@@ -33,6 +61,8 @@ const updates: readonly UpdateItem[] = [
       "The landing page, Studio, Templates, and Settings expose account menus with plan, export, billing, status, security, and sign-out controls.",
       "Signed-in users can reach account export, preferences, saved projects, Help, and System status without leaving the current surface.",
     ],
+    actionHref: "/settings",
+    actionLabel: "Open settings",
   },
   {
     title: "System status is public",
@@ -44,6 +74,8 @@ const updates: readonly UpdateItem[] = [
       "Status reports account access, resume workflow capabilities, export availability, and Premium billing readiness from live configuration and backend capabilities.",
       "Robots and sitemap now expose public Help, Status, Updates, legal, and template pages while protected routes stay excluded.",
     ],
+    actionHref: "/status",
+    actionLabel: "Open status",
   },
   {
     title: "Settings is now an account workspace",
@@ -55,6 +87,8 @@ const updates: readonly UpdateItem[] = [
       "Settings includes profile display name, email update controls, account export, guarded deletion, security metadata, saved projects, usage, export preferences, and billing actions.",
       "Saved projects can be renamed, restored, staged, and removed from the account area.",
     ],
+    actionHref: "/settings",
+    actionLabel: "Open settings",
   },
   {
     title: "Free and Premium export rules are explicit",
@@ -67,6 +101,8 @@ const updates: readonly UpdateItem[] = [
       "Premium access unlocks DOCX and TXT while the subscription is active.",
       "Template direction can be chosen before new studio runs and exports.",
     ],
+    actionHref: "/templates",
+    actionLabel: "Browse templates",
   },
 ];
 
@@ -116,6 +152,11 @@ export default function UpdatesPage() {
                   <li key={detail}><RoleForgeIcon name="check" size={13} />{detail}</li>
                 ))}
               </ul>
+              <div className="updates-card-actions">
+                <Link className="btn btn-soft btn-sm" href={item.actionHref}>
+                  {item.actionLabel} <RoleForgeIcon name="arrow" size={13} />
+                </Link>
+              </div>
             </div>
           </article>
         ))}
