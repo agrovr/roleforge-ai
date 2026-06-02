@@ -13,13 +13,16 @@ param(
   [switch]$CopyPromoCode,
   [switch]$AutoPoll,
   [switch]$PromptForSecret,
-  [switch]$PromptForSupabaseServiceRole
+  [switch]$PromptForSupabaseServiceRole,
+  [switch]$CacheStripeSecretOnly,
+  [switch]$DisableOneTimeSecretCache
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $RepoRoot = Split-Path -Parent $PSScriptRoot
+$OneTimeSecretCachePath = Join-Path $RepoRoot ".codex-qa\roleforge-stripe-secret.clixml"
 if (-not $NodePath) {
   $BundledNode = "C:\Users\ashmi\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
   $NodePath = if (Test-Path $BundledNode) { $BundledNode } else { "node" }
@@ -80,6 +83,7 @@ function ConvertFrom-SecureStringForProcess {
 }
 
 $SecretCameFromClipboard = $false
+$SecretCacheUsed = $false
 
 function Get-ClipboardTextSafe {
   try {
@@ -98,14 +102,87 @@ function Clear-SecretClipboard {
     [string]$Text = ""
   )
 
-  if ($Text -match "^sk_(live|test)_[A-Za-z0-9_\-]+$" -or $SecretCameFromClipboard) {
+  if (
+    $Text -match "^sk_(live|test)_[A-Za-z0-9_\-]+$" -or
+    $Text -match "^(sb_secret_|sbp_|eyJ)[A-Za-z0-9_\-.]+$" -or
+    $SecretCameFromClipboard
+  ) {
     Set-Clipboard -Value ""
+  }
+}
+
+function Save-OneTimeStripeSecret {
+  param(
+    [Parameter(Mandatory = $true)][string]$Value
+  )
+
+  if ($DisableOneTimeSecretCache) {
+    return
+  }
+
+  $cacheDir = Split-Path -Parent $OneTimeSecretCachePath
+  New-Item -ItemType Directory -Force -Path $cacheDir | Out-Null
+  ConvertTo-SecureString -String $Value -AsPlainText -Force | Export-Clixml -LiteralPath $OneTimeSecretCachePath
+  Write-Host "Stored the live Stripe secret in a Windows-encrypted one-time cache for this proof run."
+}
+
+function Read-OneTimeStripeSecret {
+  if ($DisableOneTimeSecretCache -or -not (Test-Path -LiteralPath $OneTimeSecretCachePath)) {
+    return ""
+  }
+
+  $secure = Import-Clixml -LiteralPath $OneTimeSecretCachePath
+  $value = ConvertFrom-SecureStringForProcess $secure
+  if ($value -match "^sk_live_[A-Za-z0-9_\-]+$") {
+    $script:SecretCacheUsed = $true
+    return $value.Trim()
+  }
+
+  Remove-Item -LiteralPath $OneTimeSecretCachePath -Force -ErrorAction SilentlyContinue
+  throw "The encrypted one-time Stripe secret cache was not valid and was removed. Secret value was not printed."
+}
+
+function Clear-OneTimeStripeSecret {
+  Remove-Item -LiteralPath $OneTimeSecretCachePath -Force -ErrorAction SilentlyContinue
+}
+
+function Read-SupabaseCredentialFromClipboard {
+  if ($env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY -or $env:SUPABASE_SERVICE_ROLE_KEY -or $env:SUPABASE_ACCESS_TOKEN) {
+    return
+  }
+
+  $clipboard = (Get-ClipboardTextSafe).Trim()
+  if ($clipboard -match "^(sb_secret_|eyJ)[A-Za-z0-9_\-.]+$") {
+    $script:SecretCameFromClipboard = $true
+    $env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY = $clipboard
+    Clear-SecretClipboard $clipboard
+    Write-Host "Loaded Supabase service-role access from clipboard. Secret value was not printed."
+    return
+  }
+
+  if ($clipboard -match "^sbp_[A-Za-z0-9_\-.]+$") {
+    $script:SecretCameFromClipboard = $true
+    $env:SUPABASE_ACCESS_TOKEN = $clipboard
+    Clear-SecretClipboard $clipboard
+    Write-Host "Loaded Supabase access token from clipboard. Secret value was not printed."
   }
 }
 
 function Read-SupabaseServiceRole {
   if ($env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY -or $env:SUPABASE_SERVICE_ROLE_KEY) {
     return
+  }
+
+  Read-SupabaseCredentialFromClipboard
+  if ($env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY -or $env:SUPABASE_SERVICE_ROLE_KEY) {
+    return
+  }
+
+  if ($env:SUPABASE_ACCESS_TOKEN) {
+    Set-ServiceRoleFromSupabaseCli
+    if ($env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY -or $env:SUPABASE_SERVICE_ROLE_KEY) {
+      return
+    }
   }
 
   if (-not $PromptForSupabaseServiceRole) {
@@ -129,13 +206,22 @@ function Read-LiveStripeSecret {
     return $envSecret.Trim()
   }
 
+  $cachedSecret = Read-OneTimeStripeSecret
+  if ($cachedSecret) {
+    Write-Host "Loaded the live Stripe secret from the Windows-encrypted one-time cache. Secret value was not printed."
+    return $cachedSecret
+  }
+
   $clipboard = (Get-ClipboardTextSafe).Trim()
   if ($clipboard -match "^sk_live_[A-Za-z0-9_\-]+$") {
     $script:SecretCameFromClipboard = $true
+    Save-OneTimeStripeSecret $clipboard
     Clear-SecretClipboard $clipboard
     return $clipboard
   }
-  Clear-SecretClipboard $clipboard
+  if ($clipboard -match "^sk_test_[A-Za-z0-9_\-]+$") {
+    Clear-SecretClipboard $clipboard
+  }
 
   if ($PromptForSecret) {
     $secure = Read-Host "Paste the live Stripe secret key" -AsSecureString
@@ -152,56 +238,62 @@ Push-Location $RepoRoot
 $proofUserId = ""
 $secret = ""
 $exitCode = 0
+$keepOneTimeSecretCache = $false
 
 try {
   $secret = Read-LiveStripeSecret
   $env:STRIPE_SECRET_KEY = $secret
   $env:ROLEFORGE_STRIPE_SECRET_KEY = $secret
 
-  if (-not $SkipVercelUpdate) {
-    $secret | & $NodePath "scripts\set_vercel_billing_env.mjs" "STRIPE_SECRET_KEY"
-    if ($LASTEXITCODE -ne 0) {
-      throw "Failed to update STRIPE_SECRET_KEY in Vercel Production."
-    }
-  }
-
-  if (-not $SkipRedeploy -and -not $SkipVercelUpdate) {
-    Invoke-Vercel @("deploy", "--prod", "--scope", "team_kEe4HW272D5nYJDD92amj55H", "--yes")
-  }
-
-  try {
-    Set-ServiceRoleFromSupabaseCli
-  } catch {
-    Read-SupabaseServiceRole
-    if (-not $env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY -and -not $env:SUPABASE_SERVICE_ROLE_KEY) {
-      throw $_
-    }
-  }
-
-  $promo = Invoke-NodeJson @("scripts\create_live_promo_code.mjs", "--expires-hours", "24", "--max-redemptions", "1")
-  Write-Host "Created one-use live promo code: $($promo.code)"
-  if ($CopyPromoCode) {
-    Set-Clipboard -Value $promo.code
-    Write-Host "Promo code copied to clipboard. The Stripe secret key is no longer on the clipboard."
-  }
-
-  $proof = Invoke-NodeJson @("scripts\live_checkout_entitlement_test.mjs", "start", "--interval", $Interval)
-  $proofUserId = $proof.userId
-  Write-Host "Temporary proof user: $($proof.email)"
-  Write-Host "Checkout URL: $($proof.checkoutUrl)"
-  Write-Host "Use the promo code above in Stripe Checkout, complete checkout, then return here."
-  Start-Process $proof.checkoutUrl
-  if ($AutoPoll) {
-    Write-Host "Waiting up to $WaitSeconds seconds for Stripe webhook Premium activation."
+  if ($CacheStripeSecretOnly) {
+    $keepOneTimeSecretCache = $true
+    Write-Host "Cached the live Stripe secret for one proof retry and cleared it from the clipboard. Secret value was not printed."
   } else {
-    Read-Host "Press Enter after Stripe Checkout returns to RoleForge"
-  }
+    if (-not $SkipVercelUpdate) {
+      $secret | & $NodePath "scripts\set_vercel_billing_env.mjs" "STRIPE_SECRET_KEY"
+      if ($LASTEXITCODE -ne 0) {
+        throw "Failed to update STRIPE_SECRET_KEY in Vercel Production."
+      }
+    }
 
-  $check = Invoke-NodeJson @("scripts\check_premium_entitlement.mjs", "--user-id", $proofUserId, "--wait-seconds", "$WaitSeconds")
-  if (-not $check.ok) {
-    throw "Premium entitlement did not activate before timeout. Last plan=$($check.plan), billingStatus=$($check.billingStatus)."
+    if (-not $SkipRedeploy -and -not $SkipVercelUpdate) {
+      Invoke-Vercel @("deploy", "--prod", "--scope", "team_kEe4HW272D5nYJDD92amj55H", "--yes")
+    }
+
+    try {
+      Set-ServiceRoleFromSupabaseCli
+    } catch {
+      Read-SupabaseServiceRole
+      if (-not $env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY -and -not $env:SUPABASE_SERVICE_ROLE_KEY) {
+        throw $_
+      }
+    }
+
+    $promo = Invoke-NodeJson @("scripts\create_live_promo_code.mjs", "--expires-hours", "24", "--max-redemptions", "1")
+    Write-Host "Created one-use live promo code: $($promo.code)"
+    if ($CopyPromoCode) {
+      Set-Clipboard -Value $promo.code
+      Write-Host "Promo code copied to clipboard. The Stripe secret key is no longer on the clipboard."
+    }
+
+    $proof = Invoke-NodeJson @("scripts\live_checkout_entitlement_test.mjs", "start", "--interval", $Interval)
+    $proofUserId = $proof.userId
+    Write-Host "Temporary proof user: $($proof.email)"
+    Write-Host "Checkout URL: $($proof.checkoutUrl)"
+    Write-Host "Use the promo code above in Stripe Checkout, complete checkout, then return here."
+    Start-Process $proof.checkoutUrl
+    if ($AutoPoll) {
+      Write-Host "Waiting up to $WaitSeconds seconds for Stripe webhook Premium activation."
+    } else {
+      Read-Host "Press Enter after Stripe Checkout returns to RoleForge"
+    }
+
+    $check = Invoke-NodeJson @("scripts\check_premium_entitlement.mjs", "--user-id", $proofUserId, "--wait-seconds", "$WaitSeconds")
+    if (-not $check.ok) {
+      throw "Premium entitlement did not activate before timeout. Last plan=$($check.plan), billingStatus=$($check.billingStatus)."
+    }
+    Write-Host "Premium entitlement is active for the proof user."
   }
-  Write-Host "Premium entitlement is active for the proof user."
 } catch {
   $exitCode = 1
   Write-Host "ERROR: $($_.Exception.Message)" -ForegroundColor Red
@@ -219,10 +311,16 @@ try {
 
   Remove-Item Env:\STRIPE_SECRET_KEY -ErrorAction SilentlyContinue
   Remove-Item Env:\ROLEFORGE_STRIPE_SECRET_KEY -ErrorAction SilentlyContinue
+  Remove-Item Env:\SUPABASE_ACCESS_TOKEN -ErrorAction SilentlyContinue
   if (-not $env:SUPABASE_SERVICE_ROLE_KEY) {
     Remove-Item Env:\ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY -ErrorAction SilentlyContinue
   }
   Clear-SecretClipboard
+  if ($exitCode -eq 0 -and -not $keepOneTimeSecretCache) {
+    Clear-OneTimeStripeSecret
+  } elseif ($SecretCacheUsed -or (Test-Path -LiteralPath $OneTimeSecretCachePath)) {
+    Write-Host "Encrypted one-time Stripe secret cache kept for retry. It will be deleted after a successful proof cleanup."
+  }
   $secret = ""
   Pop-Location
 }
