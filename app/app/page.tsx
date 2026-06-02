@@ -2981,6 +2981,9 @@ export default function Page() {
                         <Link href="/settings" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="settings" size={14} /> Settings
                         </Link>
+                        <Link href="/help" onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="mail" size={14} /> Help
+                        </Link>
                         <button
                           type="button"
                           onClick={() => {
@@ -3031,6 +3034,9 @@ export default function Page() {
                         </Link>
                         <Link href="/settings#security" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="lock" size={14} /> Security
+                        </Link>
+                        <Link href="/help" onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="mail" size={14} /> Help center
                         </Link>
                       </div>
                       <form className="studio-account-form" action="/auth/signout" method="post">

@@ -567,6 +567,7 @@ function Footer() {
         </div>
         <div className="footer-col">
           <h3>Trust</h3>
+          <Link href="/help">Help</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
         </div>

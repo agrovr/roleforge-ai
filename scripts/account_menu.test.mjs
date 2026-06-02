@@ -14,6 +14,8 @@ test("studio account menu acts as a workspace command center", () => {
   assert.match(studioPage, /Account status summary/);
   assert.match(studioPage, /href="\/templates"/);
   assert.match(studioPage, /href="\/settings#billing"/);
+  assert.match(studioPage, /href="\/help"/);
+  assert.match(studioPage, /Help center/);
   assert.match(studioPage, /Saved projects/);
   assert.match(studioPage, /DOCX and TXT/);
   assert.match(studioPage, /recentAccountProjects/);
@@ -63,6 +65,8 @@ test("settings topbar exposes account, project, usage, and billing controls", ()
   assert.match(settingsPage, /href="#projects"/);
   assert.match(settingsPage, /href="#usage"/);
   assert.match(settingsPage, /href="#billing"/);
+  assert.match(settingsPage, /href="\/help"/);
+  assert.match(settingsPage, /Help center/);
   assert.match(settingsPage, /href="\/app#history"/);
   assert.match(settingsPage, /action="\/auth\/signout"/);
 });
