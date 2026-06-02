@@ -614,7 +614,7 @@ async function checkPublicShell(baseUrl) {
     "settings active plan studio link can still collapse into cramped text",
   );
   requireCondition(
-    /@container\s*\(max-width:\s*430px\)\s*\{[\s\S]*?\.settings-profile-actions,\s*\.settings-billing-head,\s*\.settings-export-actions\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText),
+    /@container\s*\(max-width:\s*430px\)\s*\{[\s\S]*?\.settings-profile-actions,\s*\.settings-billing-head,\s*\.settings-export-actions(?:,\s*\.settings-plan-info)?\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText),
     "settings controls are missing compact container stacking",
   );
   requireCondition(
