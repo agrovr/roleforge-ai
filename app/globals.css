@@ -7885,10 +7885,23 @@ html[data-theme="dark"] input::file-selector-button {
   grid-template-columns: 42px minmax(0, 1fr);
   grid-template-areas:
     "icon title"
-    "icon copy";
+    "icon copy"
+    "icon action";
   gap: 4px 12px;
   align-items: start;
   padding: 16px;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+
+.support-guide-card:hover,
+.support-guide-card:focus-visible {
+  border-color: color-mix(in srgb, var(--sky) 42%, var(--line));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--sky-soft) 34%, transparent), color-mix(in srgb, var(--bg-alt) 70%, transparent)),
+    var(--surface);
+  transform: translateY(-1px);
 }
 
 .support-guide-card > span {
@@ -7922,6 +7935,18 @@ html[data-theme="dark"] input::file-selector-button {
   line-height: 1.45;
   overflow-wrap: anywhere;
   text-wrap: pretty;
+}
+
+.support-guide-card small {
+  grid-area: action;
+  color: var(--sky);
+  font-size: 0.76rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .support-request-card {

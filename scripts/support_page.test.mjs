@@ -25,6 +25,9 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /canonical: "\/support"/);
   assert.match(supportPage, /Get help with your workflow/);
   assert.match(supportPage, /Signed-in requests are saved to your account/);
+  assert.match(supportPage, /supportGuides\.map/);
+  assert.match(supportPage, /href=\{guide\.href\}/);
+  assert.match(supportPage, /Prefill request/);
   assert.match(supportPage, /action="\/api\/support-requests"/);
   assert.match(supportPage, /loadSupportRequests\(supabase,\s*user\.id,\s*\{ limit: 5 \}\)/);
   assert.match(supportPage, /parseSupportRequestPrefill/);
@@ -41,6 +44,22 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /name="contextUrl"/);
   assert.match(supportPage, /Sign in for support/);
   assert.match(supportPage, /Never paste full payment card details or private credentials/);
+});
+
+test("support topic cards prefill the right request category", () => {
+  assert.match(supportPage, /title: "Workflow or export problem"/);
+  assert.match(supportPage, /category:\s*"workflow"/);
+  assert.match(supportPage, /subject:\s*"Workflow or export issue"/);
+  assert.match(supportPage, /title: "Billing or Premium issue"/);
+  assert.match(supportPage, /category:\s*"billing"/);
+  assert.match(supportPage, /subject:\s*"Billing or Premium access"/);
+  assert.match(supportPage, /contextUrl:\s*"\/settings#billing"/);
+  assert.match(supportPage, /title: "Saved project or account issue"/);
+  assert.match(supportPage, /category:\s*"saved-projects"/);
+  assert.match(supportPage, /contextUrl:\s*"\/settings#projects"/);
+  assert.match(supportPage, /title: "Sign-in or profile access"/);
+  assert.match(supportPage, /category:\s*"account"/);
+  assert.match(supportPage, /contextUrl:\s*"\/settings#account"/);
 });
 
 test("support request route requires auth, validates input, and saves through Supabase", () => {
@@ -106,6 +125,8 @@ test("contextual support links prefill workflow, export, and billing details", (
 test("support page has overflow-safe responsive form layout", () => {
   assert.match(stylesheet, /\.support-layout\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(260px,\s*0\.72fr\)\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.support-guide-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*42px\s+minmax\(0,\s*1fr\))[^}]*\}/s);
+  assert.match(stylesheet, /\.support-guide-card:hover,\s*\.support-guide-card:focus-visible\s*\{(?=[^}]*border-color:)(?=[^}]*transform:\s*translateY\(-1px\))[^}]*\}/s);
+  assert.match(stylesheet, /\.support-guide-card\s+small\s*\{(?=[^}]*grid-area:\s*action)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
   assert.match(stylesheet, /\.support-request-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*gap:\s*16px)[^}]*\}/s);
   assert.match(stylesheet, /\.support-prefill-note\s*\{(?=[^}]*border-color:)(?=[^}]*background:)[^}]*\}/s);
   assert.match(stylesheet, /\.support-form\s+input,\s*\.support-form\s+select,\s*\.support-form\s+textarea\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);

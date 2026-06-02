@@ -28,16 +28,41 @@ const supportGuides = [
     title: "Workflow or export problem",
     detail: "Include the file type, selected export format, and any request id shown in the Studio.",
     icon: "file" as const,
+    href: supportRequestHref({
+      category: "workflow",
+      subject: "Workflow or export issue",
+      contextUrl: "/support#request",
+    }),
   },
   {
     title: "Billing or Premium issue",
     detail: "Mention whether checkout, billing management, or Premium access sync is the part that looks wrong.",
     icon: "lock" as const,
+    href: supportRequestHref({
+      category: "billing",
+      subject: "Billing or Premium access",
+      contextUrl: "/settings#billing",
+    }),
   },
   {
     title: "Saved project or account issue",
     detail: "Share the project name, account email, and whether the issue appears in Studio, Settings, or Templates.",
     icon: "settings" as const,
+    href: supportRequestHref({
+      category: "saved-projects",
+      subject: "Saved project or account issue",
+      contextUrl: "/settings#projects",
+    }),
+  },
+  {
+    title: "Sign-in or profile access",
+    detail: "Use this when login, email changes, security details, or account deletion controls need attention.",
+    icon: "mail" as const,
+    href: supportRequestHref({
+      category: "account",
+      subject: "Account access question",
+      contextUrl: "/settings#account",
+    }),
   },
 ] as const;
 
@@ -108,11 +133,12 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
       <section className="support-layout" aria-label="Support request workspace">
         <div className="support-guides">
           {supportGuides.map((guide) => (
-            <article className="support-guide-card" key={guide.title}>
+            <Link className="support-guide-card" href={guide.href} key={guide.title}>
               <span><RoleForgeIcon name={guide.icon} size={16} /></span>
               <strong>{guide.title}</strong>
               <p>{guide.detail}</p>
-            </article>
+              <small>Prefill request</small>
+            </Link>
           ))}
         </div>
 
