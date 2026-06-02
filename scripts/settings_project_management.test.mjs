@@ -36,15 +36,18 @@ test("settings saved project cards keep history links separate from stage forms"
 });
 
 test("settings saved project stage controls are compact and overflow-safe", () => {
-  assert.match(stylesheet, /\.settings-project-stage-form\s*\{(?=[^}]*flex:\s*1\s+1\s+100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);
-  assert.match(stylesheet, /\.settings-project-stage-controls\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*92px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-item\s+small\s*\{(?=[^}]*justify-self:\s*end)(?=[^}]*max-width:\s*min\(100%,\s*260px\))[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-stage-form\s*\{(?=[^}]*grid-column:\s*1\s*\/\s*-1)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-stage-controls\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-stage-controls\s+button\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
-  assert.match(stylesheet, /\.settings-project-rename\s*\{(?=[^}]*flex:\s*1\s+1\s+100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);
-  assert.match(stylesheet, /\.settings-project-rename-row\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*112px\),\s*auto\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-rename\s*\{(?=[^}]*grid-column:\s*1\s*\/\s*-1)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-rename-row\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*136px\),\s*auto\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-rename-row\s+button\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
-  assert.match(stylesheet, /\.settings-project-downloads\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*92px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-downloads\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*104px\),\s*max-content\)\))(?=[^}]*grid-column:\s*1\s*\/\s*-1)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-downloads\s+\.btn\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
-  assert.match(stylesheet, /\.settings-project-delete\s*\{(?=[^}]*flex:\s*1\s+1\s+100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);
-  assert.match(stylesheet, /\.settings-project-delete-row\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*120px\),\s*auto\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-delete\s*\{(?=[^}]*grid-column:\s*1\s*\/\s*-1)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-delete-row\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*136px\),\s*auto\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-delete-row\s+button\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?\.settings-project-item\s*\{[^}]*grid-template-columns:\s*1fr/s);
 });
