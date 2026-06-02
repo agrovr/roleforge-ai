@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { supportRequestHref } from "../lib/supportRequests";
 
 export const metadata: Metadata = {
   title: "Help Center",
@@ -62,7 +63,16 @@ const quickLinks = [
   { href: "/app", icon: "file" as const, label: "Open studio", detail: "Build or restore a resume workflow." },
   { href: "/templates", icon: "layers" as const, label: "Browse templates", detail: "Choose the default export direction." },
   { href: "/settings", icon: "settings" as const, label: "Account settings", detail: "Manage profile, projects, exports, and billing." },
-  { href: "/support", icon: "mail" as const, label: "Contact support", detail: "Send account-linked workflow or billing details." },
+  {
+    href: supportRequestHref({
+      category: "workflow",
+      subject: "Workflow or export issue",
+      contextUrl: "/help",
+    }),
+    icon: "mail" as const,
+    label: "Contact support",
+    detail: "Send account-linked workflow or billing details.",
+  },
   { href: "/status", icon: "scan" as const, label: "System status", detail: "Check workflow, export, account, and billing readiness." },
   { href: "/updates", icon: "sparkle" as const, label: "Product updates", detail: "Review recent shipped improvements." },
   { href: "/privacy", icon: "lock" as const, label: "Privacy", detail: "Review how account and workflow data is handled." },

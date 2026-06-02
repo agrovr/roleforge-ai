@@ -38,6 +38,13 @@ export type SupportRequestSummary = {
   createdLabel: string;
 };
 
+export type SupportRequestPrefill = {
+  category: SupportRequestCategory;
+  subject: string;
+  contextUrl: string | null;
+  hasPrefill: boolean;
+};
+
 const supportCategorySet = new Set<string>(SUPPORT_REQUEST_CATEGORIES);
 const supportStatusSet = new Set<string>(["open", "reviewing", "closed"]);
 
@@ -56,7 +63,7 @@ function compactMessage(value: unknown) {
     .trim();
 }
 
-function normalizeContextUrl(value: unknown) {
+export function normalizeSupportRequestContextUrl(value: unknown) {
   const contextUrl = compactSingleLine(value);
   if (!contextUrl) return null;
   if (contextUrl.length > 300) return null;
@@ -140,7 +147,7 @@ export async function loadSupportRequests(
       categoryLabel: supportCategoryLabel(category),
       subject: compactSingleLine(row.subject) || "Support request",
       messagePreview: previewMessage(row.message),
-      contextUrl: normalizeContextUrl(row.context_url),
+      contextUrl: normalizeSupportRequestContextUrl(row.context_url),
       status,
       statusLabel: supportStatusLabel(status),
       createdAt,
@@ -158,7 +165,7 @@ export function parseSupportRequestInput(payload: {
   const category = compactSingleLine(payload.category);
   const subject = compactSingleLine(payload.subject);
   const message = compactMessage(payload.message);
-  const contextUrl = normalizeContextUrl(payload.contextUrl);
+  const contextUrl = normalizeSupportRequestContextUrl(payload.contextUrl);
 
   if (!supportCategorySet.has(category)) {
     return { ok: false, error: "Choose a support topic." };
@@ -181,6 +188,36 @@ export function parseSupportRequestInput(payload: {
       contextUrl,
     },
   };
+}
+
+export function parseSupportRequestPrefill(payload: {
+  category?: unknown;
+  subject?: unknown;
+  contextUrl?: unknown;
+  context?: unknown;
+}): SupportRequestPrefill {
+  const requestedCategory = compactSingleLine(payload.category);
+  const category = supportCategorySet.has(requestedCategory) ? requestedCategory as SupportRequestCategory : "workflow";
+  const subject = compactSingleLine(payload.subject);
+  const boundedSubject = subject.length >= 4 && subject.length <= 120 ? subject : "";
+  const rawContext = payload.contextUrl ?? payload.context;
+  const contextUrl = normalizeSupportRequestContextUrl(rawContext);
+
+  return {
+    category,
+    subject: boundedSubject,
+    contextUrl,
+    hasPrefill: supportCategorySet.has(requestedCategory) || Boolean(boundedSubject) || Boolean(contextUrl),
+  };
+}
+
+export function supportRequestHref(prefill: Partial<SupportRequestPrefill> & { category?: SupportRequestCategory } = {}) {
+  const params = new URLSearchParams();
+  if (prefill.category) params.set("category", prefill.category);
+  if (prefill.subject) params.set("subject", prefill.subject);
+  if (prefill.contextUrl) params.set("context", prefill.contextUrl);
+  const query = params.toString();
+  return query ? `/support?${query}#request` : "/support";
 }
 
 export async function saveSupportRequest(

@@ -27,6 +27,11 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /Signed-in requests are saved to your account/);
   assert.match(supportPage, /action="\/api\/support-requests"/);
   assert.match(supportPage, /loadSupportRequests\(supabase,\s*user\.id,\s*\{ limit: 5 \}\)/);
+  assert.match(supportPage, /parseSupportRequestPrefill/);
+  assert.match(supportPage, /defaultValue=\{prefill\.category\}/);
+  assert.match(supportPage, /defaultValue=\{prefill\.subject\}/);
+  assert.match(supportPage, /defaultValue=\{prefill\.contextUrl \?\? ""\}/);
+  assert.match(supportPage, /support-prefill-note/);
   assert.match(supportPage, /Recent requests/);
   assert.match(supportPage, /support-history-list/);
   assert.match(supportPage, /support-status-badge/);
@@ -67,6 +72,9 @@ test("support requests have protected Supabase ownership policies", () => {
 
 test("settings exposes account support request history", () => {
   assert.match(settingsPage, /loadSupportRequests\(supabase,\s*user\.id,\s*\{ limit: 4 \}\)/);
+  assert.match(settingsPage, /supportRequestHref/);
+  assert.match(settingsPage, /Billing or Premium access/);
+  assert.match(settingsPage, /Workflow or export issue/);
   assert.match(settingsPage, /id="support"/);
   assert.match(settingsPage, /Support requests/);
   assert.match(settingsPage, /settings-support-list/);
@@ -85,10 +93,21 @@ test("support page is discoverable across public and account surfaces", () => {
   assert.match(smokeLayout, /path: "\/support"/);
 });
 
+test("contextual support links prefill workflow, export, and billing details", () => {
+  assert.match(studioPage, /premiumExportSupportHref/);
+  assert.match(studioPage, /workflowSupportHref/);
+  assert.match(studioPage, /Contact support/);
+  assert.match(studioPage, /contextUrl:\s*workflowError\?\.requestId \?\? "\/app"/);
+  assert.match(settingsPage, /billingSupportHref/);
+  assert.match(settingsPage, /contextUrl:\s*"\/settings#billing"/);
+  assert.match(helpPage, /supportRequestHref\(\{[\s\S]*?category:\s*"workflow"[\s\S]*?Workflow or export issue/);
+});
+
 test("support page has overflow-safe responsive form layout", () => {
   assert.match(stylesheet, /\.support-layout\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(260px,\s*0\.72fr\)\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.support-guide-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*42px\s+minmax\(0,\s*1fr\))[^}]*\}/s);
   assert.match(stylesheet, /\.support-request-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*gap:\s*16px)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-prefill-note\s*\{(?=[^}]*border-color:)(?=[^}]*background:)[^}]*\}/s);
   assert.match(stylesheet, /\.support-form\s+input,\s*\.support-form\s+select,\s*\.support-form\s+textarea\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.support-history-item,\s*\.settings-support-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.support-status-badge\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);

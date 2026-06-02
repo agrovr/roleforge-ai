@@ -23,7 +23,8 @@ test("help page covers account, exports, billing, and saved project guidance", (
   assert.match(helpPage, /Premium accounts unlock DOCX and TXT/);
   assert.match(helpPage, /href: "\/status"/);
   assert.match(helpPage, /System status/);
-  assert.match(helpPage, /href: "\/support"/);
+  assert.match(helpPage, /supportRequestHref/);
+  assert.match(helpPage, /Workflow or export issue/);
   assert.match(helpPage, /Contact support/);
   assert.match(helpPage, /href: "\/updates"/);
   assert.match(helpPage, /Product updates/);

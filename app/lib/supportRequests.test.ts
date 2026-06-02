@@ -3,9 +3,11 @@ import test from "node:test";
 
 import {
   loadSupportRequests,
+  parseSupportRequestPrefill,
   parseSupportRequestInput,
   saveSupportRequest,
   supportCategoryLabel,
+  supportRequestHref,
   supportStatusLabel,
 } from "./supportRequests";
 
@@ -49,6 +51,42 @@ test("keeps support request context safe and bounded", () => {
   });
   assert.equal(unsafe.ok, true);
   if (unsafe.ok) assert.equal(unsafe.input.contextUrl, null);
+});
+
+test("parses support request prefill without trusting unsafe input", () => {
+  const prefill = parseSupportRequestPrefill({
+    category: "billing",
+    subject: " Premium access ",
+    context: "/settings#billing",
+  });
+
+  assert.deepEqual(prefill, {
+    category: "billing",
+    subject: "Premium access",
+    contextUrl: "/settings#billing",
+    hasPrefill: true,
+  });
+
+  const unsafe = parseSupportRequestPrefill({
+    category: "bad",
+    subject: "No",
+    context: "javascript:alert(1)",
+  });
+
+  assert.deepEqual(unsafe, {
+    category: "workflow",
+    subject: "",
+    contextUrl: null,
+    hasPrefill: false,
+  });
+});
+
+test("builds compact support request hrefs for contextual links", () => {
+  assert.equal(
+    supportRequestHref({ category: "exports", subject: "DOCX export access", contextUrl: "/app" }),
+    "/support?category=exports&subject=DOCX+export+access&context=%2Fapp#request",
+  );
+  assert.equal(supportRequestHref(), "/support");
 });
 
 test("labels support request categories for the form", () => {

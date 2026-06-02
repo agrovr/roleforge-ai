@@ -4,7 +4,13 @@ import Link from "next/link";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
-import { SUPPORT_REQUEST_CATEGORIES, loadSupportRequests, supportCategoryLabel } from "../lib/supportRequests";
+import {
+  SUPPORT_REQUEST_CATEGORIES,
+  loadSupportRequests,
+  parseSupportRequestPrefill,
+  supportCategoryLabel,
+  supportRequestHref,
+} from "../lib/supportRequests";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -55,6 +61,13 @@ function supportNotice(value: string | undefined) {
 export default async function SupportPage({ searchParams }: { searchParams: SupportSearchParams }) {
   const params = await searchParams;
   const notice = supportNotice(getParam(params.support));
+  const prefill = parseSupportRequestPrefill({
+    category: getParam(params.category),
+    subject: getParam(params.subject),
+    context: getParam(params.context),
+    contextUrl: getParam(params.contextUrl),
+  });
+  const signInNext = encodeURIComponent(supportRequestHref(prefill.hasPrefill ? prefill : {}));
   const supabase = await createRoleForgeServerClient();
   const {
     data: { user },
@@ -121,11 +134,18 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
             </div>
           ) : null}
 
+          {prefill.hasPrefill ? (
+            <div className="support-prefill-note" role="status">
+              <RoleForgeIcon name="check" size={15} />
+              <span>Support details were prefilled from the page where you asked for help.</span>
+            </div>
+          ) : null}
+
           {signedIn ? (
             <form className="support-form" action="/api/support-requests" method="post">
               <label>
                 <span>Topic</span>
-                <select name="category" required defaultValue="workflow">
+                <select name="category" required defaultValue={prefill.category}>
                   {SUPPORT_REQUEST_CATEGORIES.map((category) => (
                     <option key={category} value={category}>{supportCategoryLabel(category)}</option>
                   ))}
@@ -133,11 +153,23 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
               </label>
               <label>
                 <span>Subject</span>
-                <input name="subject" maxLength={120} minLength={4} required placeholder="Export download is not updating" />
+                <input
+                  name="subject"
+                  maxLength={120}
+                  minLength={4}
+                  required
+                  defaultValue={prefill.subject}
+                  placeholder="Export download is not updating"
+                />
               </label>
               <label>
                 <span>Related page or request id</span>
-                <input name="contextUrl" maxLength={300} placeholder="/settings#billing or req_..." />
+                <input
+                  name="contextUrl"
+                  maxLength={300}
+                  defaultValue={prefill.contextUrl ?? ""}
+                  placeholder="/settings#billing or req_..."
+                />
               </label>
               <label>
                 <span>Message</span>
@@ -158,7 +190,7 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
             <div className="support-signin-card">
               <strong>Use your account session</strong>
               <p>Support requests are saved with the signed-in account so billing, export access, and saved project context can be checked safely.</p>
-              <Link className="primary-button support-submit" href="/login?next=%2Fsupport&account=signin-required">
+              <Link className="primary-button support-submit" href={`/login?next=${signInNext}&account=signin-required`}>
                 Sign in for support <RoleForgeIcon name="arrow" size={14} />
               </Link>
             </div>

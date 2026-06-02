@@ -34,6 +34,7 @@ import {
   type ResumeTemplateSlug,
 } from "../lib/resumeTemplates";
 import { savedRunHistoryHref } from "../lib/savedRunLinks";
+import { supportRequestHref } from "../lib/supportRequests";
 import {
   buildReviewSuggestionCards,
   reviewSuggestionWorkspaceKey,
@@ -2475,6 +2476,16 @@ export default function Page() {
   const currentDownloadLabel = downloadFormat.toUpperCase();
   const premiumExportFormat = stringDetail(workflowError?.details, "format")?.toUpperCase() ?? selectedFormatLabel;
   const premiumExportRequested = exportNotice ?? (workflowError?.code === "premium_required" ? { format: selectedExportFormat, label: premiumExportFormat } : null);
+  const premiumExportSupportHref = supportRequestHref({
+    category: "exports",
+    subject: `${premiumExportRequested?.label ?? selectedFormatLabel} export access`,
+    contextUrl: "/app",
+  });
+  const workflowSupportHref = supportRequestHref({
+    category: "workflow",
+    subject: workflowError?.requestId ? "Workflow request help" : "Workflow stopped",
+    contextUrl: workflowError?.requestId ?? "/app",
+  });
   const topExportLabel = topDownloadReady
     ? `Download ${currentDownloadLabel}`
     : result?.tailored_text?.trim()
@@ -3561,6 +3572,9 @@ export default function Page() {
                       <Link className="primary-button" href="/settings#billing">
                         {premiumExportSyncing || !premiumBillingReady ? "Open settings" : "View plans"} <RoleForgeIcon name="sparkle" size={14} />
                       </Link>
+                      <Link className="ghost-button" href={premiumExportSupportHref}>
+                        Contact support
+                      </Link>
                       <button
                         className="ghost-button"
                         type="button"
@@ -3596,6 +3610,9 @@ export default function Page() {
                     <strong>Workflow stopped</strong>
                     <p>{error}</p>
                     {workflowError?.requestId ? <p className="rf-callout-meta">Request {workflowError.requestId}</p> : null}
+                    <div className="rf-callout-actions">
+                      <Link className="ghost-button" href={workflowSupportHref}>Contact support</Link>
+                    </div>
                   </div>
                 ) : null}
               </div>

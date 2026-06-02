@@ -32,7 +32,7 @@ import {
 } from "../lib/resumeTemplates";
 import { settingsProjectSummaries } from "../lib/settingsProjects";
 import { getConfiguredSiteOrigin } from "../lib/siteUrl";
-import { loadSupportRequests } from "../lib/supportRequests";
+import { loadSupportRequests, supportRequestHref } from "../lib/supportRequests";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 import { deleteSavedProject, loadSavedRuns, renameSavedProject, updateSavedProjectStatus } from "../lib/supabase/savedProjects";
 import {
@@ -370,6 +370,21 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
         ? "Billing management is unavailable right now."
         : "Premium billing is not accepting payments right now.";
   const inactiveBillingActionLabel = premiumActive ? "Billing unavailable right now" : "Premium billing unavailable";
+  const accountSupportHref = supportRequestHref({
+    category: "account",
+    subject: "Account settings question",
+    contextUrl: "/settings#account",
+  });
+  const billingSupportHref = supportRequestHref({
+    category: "billing",
+    subject: "Billing or Premium access",
+    contextUrl: "/settings#billing",
+  });
+  const supportHistoryHref = supportRequestHref({
+    category: "workflow",
+    subject: "Workflow or export issue",
+    contextUrl: "/settings#support",
+  });
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName = accountDisplayName(user, accountProfile?.displayName);
   const accountInitials = (displayName || user.email || "RF").slice(0, 2).toUpperCase();
@@ -498,7 +513,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 <Link href="/help">
                   <RoleForgeIcon name="mail" size={14} /> Help center
                 </Link>
-                <Link href="/support">
+                <Link href={accountSupportHref}>
                   <RoleForgeIcon name="mail" size={14} /> Contact support
                 </Link>
                 <a href="#support">
@@ -1040,7 +1055,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               )}
               <div className="settings-export-actions">
                 <span>Support requests are saved with your account email for follow-up.</span>
-                <Link className="btn btn-soft btn-sm settings-inline-link" href="/support">Open support</Link>
+                <Link className="btn btn-soft btn-sm settings-inline-link" href={supportHistoryHref}>Open support</Link>
               </div>
             </div>
           </section>
@@ -1140,6 +1155,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   ? "Checkout opens securely in Stripe. Premium access updates after the subscription syncs."
                   : "Premium billing is paused while payments are prepared. The free signed-in studio remains available."}
               </p>
+              <div className="settings-export-actions">
+                <span>Need help with checkout, invoices, or Premium access?</span>
+                <Link className="btn btn-soft btn-sm settings-inline-link" href={billingSupportHref}>Contact support</Link>
+              </div>
             </div>
           </section>
         </section>
