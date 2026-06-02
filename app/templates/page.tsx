@@ -83,6 +83,7 @@ export default async function TemplatesPage() {
                   <Link href="/settings#security"><RoleForgeIcon name="lock" size={14} /> Security</Link>
                   <Link href="/status"><RoleForgeIcon name="scan" size={14} /> Status</Link>
                   <Link href="/updates"><RoleForgeIcon name="sparkle" size={14} /> Updates</Link>
+                  <Link href="/support"><RoleForgeIcon name="mail" size={14} /> Support</Link>
                   <Link href="/help"><RoleForgeIcon name="mail" size={14} /> Help</Link>
                 </div>
                 <div className="studio-account-utilities settings-account-utilities" aria-label="Account utilities">
@@ -94,6 +95,9 @@ export default async function TemplatesPage() {
                   </Link>
                   <Link href="/help">
                     <RoleForgeIcon name="mail" size={14} /> Help center
+                  </Link>
+                  <Link href="/support">
+                    <RoleForgeIcon name="mail" size={14} /> Contact support
                   </Link>
                   <Link href="/status">
                     <RoleForgeIcon name="scan" size={14} /> System status

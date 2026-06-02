@@ -62,6 +62,7 @@ const quickLinks = [
   { href: "/app", icon: "file" as const, label: "Open studio", detail: "Build or restore a resume workflow." },
   { href: "/templates", icon: "layers" as const, label: "Browse templates", detail: "Choose the default export direction." },
   { href: "/settings", icon: "settings" as const, label: "Account settings", detail: "Manage profile, projects, exports, and billing." },
+  { href: "/support", icon: "mail" as const, label: "Contact support", detail: "Send account-linked workflow or billing details." },
   { href: "/status", icon: "scan" as const, label: "System status", detail: "Check workflow, export, account, and billing readiness." },
   { href: "/updates", icon: "sparkle" as const, label: "Product updates", detail: "Review recent shipped improvements." },
   { href: "/privacy", icon: "lock" as const, label: "Privacy", detail: "Review how account and workflow data is handled." },
@@ -122,6 +123,7 @@ export default function HelpPage() {
         </div>
         <div className="legal-footer-actions">
           <Link className="btn btn-soft btn-sm" href="/settings">Open settings</Link>
+          <Link className="btn btn-soft btn-sm" href="/support">Support</Link>
           <Link className="btn btn-soft btn-sm" href="/updates">Updates</Link>
           <Link className="btn btn-soft btn-sm" href="/terms">Terms</Link>
           <Link className="btn btn-soft btn-sm" href="/privacy">Privacy</Link>

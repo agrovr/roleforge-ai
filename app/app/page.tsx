@@ -2984,6 +2984,9 @@ export default function Page() {
                         <Link href="/help" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="mail" size={14} /> Help
                         </Link>
+                        <Link href="/support" onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="mail" size={14} /> Support
+                        </Link>
                         <Link href="/status" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="scan" size={14} /> Status
                         </Link>
@@ -3043,6 +3046,9 @@ export default function Page() {
                         </Link>
                         <Link href="/help" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="mail" size={14} /> Help center
+                        </Link>
+                        <Link href="/support" onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="mail" size={14} /> Contact support
                         </Link>
                         <Link href="/status" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="scan" size={14} /> System status

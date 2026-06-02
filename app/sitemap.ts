@@ -28,6 +28,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.5,
     },
     {
+      url: `${siteUrl}/support`,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.45,
+    },
+    {
       url: `${siteUrl}/status`,
       lastModified,
       changeFrequency: "daily",

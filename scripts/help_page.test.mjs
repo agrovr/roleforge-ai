@@ -23,6 +23,8 @@ test("help page covers account, exports, billing, and saved project guidance", (
   assert.match(helpPage, /Premium accounts unlock DOCX and TXT/);
   assert.match(helpPage, /href: "\/status"/);
   assert.match(helpPage, /System status/);
+  assert.match(helpPage, /href: "\/support"/);
+  assert.match(helpPage, /Contact support/);
   assert.match(helpPage, /href: "\/updates"/);
   assert.match(helpPage, /Product updates/);
 });
@@ -34,6 +36,8 @@ test("help page is discoverable from public navigation and crawler metadata", ()
   assert.match(sitemapRoute, /`\$\{siteUrl\}\/help`/);
   assert.match(robotsRoute, /"\/status"/);
   assert.match(sitemapRoute, /`\$\{siteUrl\}\/status`/);
+  assert.match(robotsRoute, /"\/support"/);
+  assert.match(sitemapRoute, /`\$\{siteUrl\}\/support`/);
   assert.match(robotsRoute, /"\/updates"/);
   assert.match(sitemapRoute, /`\$\{siteUrl\}\/updates`/);
 });

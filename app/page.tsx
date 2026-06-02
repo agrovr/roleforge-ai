@@ -156,6 +156,7 @@ function Nav({
                   <Link href="/settings"><RoleForgeIcon name="settings" size={14} /> Settings</Link>
                   <Link href="/settings#billing"><RoleForgeIcon name="lock" size={14} /> Billing</Link>
                   <Link href="/help"><RoleForgeIcon name="mail" size={14} /> Help</Link>
+                  <Link href="/support"><RoleForgeIcon name="mail" size={14} /> Support</Link>
                   <Link href="/updates"><RoleForgeIcon name="sparkle" size={14} /> Updates</Link>
                   <Link href="/status"><RoleForgeIcon name="scan" size={14} /> System status</Link>
                 </div>
@@ -168,6 +169,9 @@ function Nav({
                   </Link>
                   <Link href="/settings#preferences">
                     <RoleForgeIcon name="layers" size={14} /> Preferences
+                  </Link>
+                  <Link href="/support">
+                    <RoleForgeIcon name="mail" size={14} /> Contact support
                   </Link>
                 </div>
                 <form className="studio-account-form" action="/auth/signout" method="post">
@@ -685,6 +689,7 @@ function Footer() {
         <div className="footer-col">
           <h3>Trust</h3>
           <Link href="/help">Help</Link>
+          <Link href="/support">Support</Link>
           <Link href="/status">Status</Link>
           <Link href="/updates">Updates</Link>
           <Link href="/privacy">Privacy</Link>

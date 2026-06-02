@@ -129,6 +129,7 @@ export default function UpdatesPage() {
         <div className="legal-footer-actions">
           <Link className="btn btn-soft btn-sm" href="/status">Open status</Link>
           <Link className="btn btn-soft btn-sm" href="/settings">Open settings</Link>
+          <Link className="btn btn-soft btn-sm" href="/support">Support</Link>
           <Link className="btn btn-soft btn-sm" href="/help">Help</Link>
         </div>
       </section>
