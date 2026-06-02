@@ -23,6 +23,9 @@ test("updates page is a factual public product log", () => {
   assert.match(updatesPage, /What changed in RoleForge/);
   assert.match(updatesPage, /A factual log of shipped workflow, account, export, and billing improvements/);
   assert.match(updatesPage, /June 2, 2026/);
+  assert.match(updatesPage, /Quick actions now support keyboard shortcuts/);
+  assert.match(updatesPage, /Ctrl or Command\+K opens quick actions/);
+  assert.match(updatesPage, /honors S, T, A, D, C, and R/);
   assert.match(updatesPage, /Help Center is searchable/);
   assert.match(updatesPage, /Help now filters account, billing, export, saved-project, and workflow guidance/);
   assert.match(updatesPage, /When there is no match, Help points users toward an account-linked support request/);

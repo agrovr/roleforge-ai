@@ -28,6 +28,19 @@ type UpdateItem = {
 
 const updates: readonly UpdateItem[] = [
   {
+    title: "Quick actions now support keyboard shortcuts",
+    date: "June 2, 2026",
+    eyebrow: "Navigation",
+    icon: "settings",
+    summary: "The RoleForge quick-action menu can now open from the keyboard and its visible shortcut letters perform real actions.",
+    details: [
+      "Ctrl or Command+K opens quick actions when focus is not inside a form field.",
+      "The quick-action menu now honors S, T, A, D, C, and R for Studio, Templates, Account settings, theme, copy link, and refresh.",
+    ],
+    actionHref: "/help",
+    actionLabel: "Open help",
+  },
+  {
     title: "Help Center is searchable",
     date: "June 2, 2026",
     eyebrow: "Help",

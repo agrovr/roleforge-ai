@@ -23,13 +23,21 @@ test("custom cursor stays responsive and accessibility-aware", () => {
 
 test("context menu supports keyboard and native-menu escape hatches", () => {
   assert.match(pointerEffects, /document\.addEventListener\("contextmenu"/);
+  assert.match(pointerEffects, /document\.addEventListener\("keydown", handleGlobalKeyDown\)/);
+  assert.match(pointerEffects, /event\.key\.toLowerCase\(\) === "k"/);
+  assert.match(pointerEffects, /event\.ctrlKey \|\| event\.metaKey/);
+  assert.match(pointerEffects, /openQuickMenu\(\)/);
   assert.match(pointerEffects, /event\.shiftKey \|\| event\.ctrlKey \|\| event\.metaKey \|\| event\.altKey/);
   assert.match(pointerEffects, /role="menu"/);
   assert.match(pointerEffects, /role="menuitem"/);
   assert.match(pointerEffects, /ArrowDown/);
   assert.match(pointerEffects, /ArrowUp/);
   assert.match(pointerEffects, /Escape/);
+  assert.match(pointerEffects, /quickActionHandlers/);
+  assert.match(pointerEffects, /\["s", "t", "a", "d", "c", "r"\]\.includes\(shortcut\)/);
+  assert.match(pointerEffects, /runMenuAction\(quickActionHandlers\(\)\[shortcut as QuickActionKey\]\)/);
   assert.match(pointerEffects, /clampMenuPosition/);
   assert.match(globals, /\.rf-context-menu/);
+  assert.match(pointerEffects, /Press Ctrl\/Command\+K for quick actions/);
   assert.match(pointerEffects, /Hold Shift while right-clicking/);
 });

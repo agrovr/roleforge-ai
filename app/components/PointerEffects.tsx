@@ -11,6 +11,8 @@ type MenuState = {
   y: number;
 };
 
+type QuickActionKey = "s" | "t" | "a" | "d" | "c" | "r";
+
 const MENU_WIDTH = 276;
 const MENU_GAP = 14;
 
@@ -68,6 +70,17 @@ function toggleTheme() {
 async function copyCurrentUrl() {
   if (!navigator.clipboard) return;
   await navigator.clipboard.writeText(window.location.href);
+}
+
+function quickActionHandlers(): Record<QuickActionKey, () => void | Promise<void>> {
+  return {
+    s: () => openPath("/app"),
+    t: () => openPath("/templates"),
+    a: () => openPath("/settings"),
+    d: toggleTheme,
+    c: copyCurrentUrl,
+    r: () => window.location.reload(),
+  };
 }
 
 function MenuIcon({ type }: { type: "studio" | "templates" | "settings" | "theme" | "copy" | "refresh" }) {
@@ -129,6 +142,12 @@ export function PointerEffects() {
   const [cursorMode, setCursorMode] = useState<CursorMode>("default");
   const [pressed, setPressed] = useState(false);
   const [menu, setMenu] = useState<MenuState>({ open: false, x: 0, y: 0 });
+
+  const openQuickMenu = useCallback((point?: { x: number; y: number }) => {
+    const position = clampMenuPosition(point?.x ?? window.innerWidth / 2, point?.y ?? Math.min(window.innerHeight / 2, 420));
+    setCursorMode("menu");
+    setMenu({ open: true, x: position.x, y: position.y });
+  }, []);
 
   const closeMenu = useCallback(() => {
     setMenu((current) => current.open ? { ...current, open: false } : current);
@@ -214,9 +233,7 @@ export function PointerEffects() {
 
       event.preventDefault();
       const point = contextPoint(event);
-      const position = clampMenuPosition(point.x, point.y);
-      setCursorMode("menu");
-      setMenu({ open: true, x: position.x, y: position.y });
+      openQuickMenu(point);
     }
 
     function closeFromPointer(event: PointerEvent) {
@@ -238,7 +255,28 @@ export function PointerEffects() {
       window.removeEventListener("scroll", closeFromScroll);
       window.removeEventListener("resize", closeFromScroll);
     };
-  }, [closeMenu]);
+  }, [closeMenu, openQuickMenu]);
+
+  useEffect(() => {
+    function handleGlobalKeyDown(event: globalThis.KeyboardEvent) {
+      if (isEditableTarget(event.target)) return;
+
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        if (menu.open) {
+          closeMenu();
+        } else {
+          openQuickMenu();
+        }
+      }
+    }
+
+    document.addEventListener("keydown", handleGlobalKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleGlobalKeyDown);
+    };
+  }, [closeMenu, menu.open, openQuickMenu]);
 
   useEffect(() => {
     if (!menu.open || !menuRef.current) return;
@@ -254,10 +292,23 @@ export function PointerEffects() {
   function handleMenuKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     const items = Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>(".rf-context-menu-item") ?? []);
     const currentIndex = items.findIndex((item) => item === document.activeElement);
+    const shortcut = event.key.toLowerCase();
 
     if (event.key === "Escape") {
       event.preventDefault();
       closeMenu();
+      return;
+    }
+
+    if (shortcut === "k" && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      closeMenu();
+      return;
+    }
+
+    if (!event.ctrlKey && !event.metaKey && !event.altKey && ["s", "t", "a", "d", "c", "r"].includes(shortcut)) {
+      event.preventDefault();
+      runMenuAction(quickActionHandlers()[shortcut as QuickActionKey]);
       return;
     }
 
@@ -310,38 +361,38 @@ export function PointerEffects() {
             <span>RoleForge AI</span>
             <small>Quick actions</small>
           </div>
-          <button className="rf-context-menu-item" role="menuitem" type="button" onClick={() => runMenuAction(() => openPath("/app"))}>
+          <button className="rf-context-menu-item" role="menuitem" type="button" onClick={() => runMenuAction(quickActionHandlers().s)}>
             <span className="rf-context-menu-icon"><MenuIcon type="studio" /></span>
             <span>Open studio</span>
             <kbd>S</kbd>
           </button>
-          <button className="rf-context-menu-item" role="menuitem" type="button" onClick={() => runMenuAction(() => openPath("/templates"))}>
+          <button className="rf-context-menu-item" role="menuitem" type="button" onClick={() => runMenuAction(quickActionHandlers().t)}>
             <span className="rf-context-menu-icon"><MenuIcon type="templates" /></span>
             <span>Browse templates</span>
             <kbd>T</kbd>
           </button>
-          <button className="rf-context-menu-item" role="menuitem" type="button" onClick={() => runMenuAction(() => openPath("/settings"))}>
+          <button className="rf-context-menu-item" role="menuitem" type="button" onClick={() => runMenuAction(quickActionHandlers().a)}>
             <span className="rf-context-menu-icon"><MenuIcon type="settings" /></span>
             <span>Account settings</span>
             <kbd>A</kbd>
           </button>
           <span className="rf-context-menu-separator" role="separator" />
-          <button className="rf-context-menu-item" role="menuitem" type="button" onClick={() => runMenuAction(toggleTheme)}>
+          <button className="rf-context-menu-item" role="menuitem" type="button" onClick={() => runMenuAction(quickActionHandlers().d)}>
             <span className="rf-context-menu-icon"><MenuIcon type="theme" /></span>
             <span>Switch theme</span>
             <kbd>D</kbd>
           </button>
-          <button className="rf-context-menu-item" role="menuitem" type="button" onClick={() => runMenuAction(copyCurrentUrl)}>
+          <button className="rf-context-menu-item" role="menuitem" type="button" onClick={() => runMenuAction(quickActionHandlers().c)}>
             <span className="rf-context-menu-icon"><MenuIcon type="copy" /></span>
             <span>Copy page link</span>
             <kbd>C</kbd>
           </button>
-          <button className="rf-context-menu-item" role="menuitem" type="button" onClick={() => runMenuAction(() => window.location.reload())}>
+          <button className="rf-context-menu-item" role="menuitem" type="button" onClick={() => runMenuAction(quickActionHandlers().r)}>
             <span className="rf-context-menu-icon"><MenuIcon type="refresh" /></span>
             <span>Refresh view</span>
             <kbd>R</kbd>
           </button>
-          <div className="rf-context-menu-note">Hold Shift while right-clicking for the browser menu.</div>
+          <div className="rf-context-menu-note">Press Ctrl/Command+K for quick actions. Hold Shift while right-clicking for the browser menu.</div>
         </div>
       ) : null}
     </>
