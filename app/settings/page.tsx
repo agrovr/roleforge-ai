@@ -460,6 +460,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 <Link href="/app#history"><RoleForgeIcon name="chart" size={14} /> Saved projects</Link>
                 <Link href="/templates"><RoleForgeIcon name="layers" size={14} /> Templates</Link>
                 <a href="#billing"><RoleForgeIcon name="lock" size={14} /> Billing</a>
+                <Link href="/status"><RoleForgeIcon name="scan" size={14} /> Status</Link>
                 <Link href="/help"><RoleForgeIcon name="mail" size={14} /> Help</Link>
               </div>
               {recentProjectSummaries.length ? (
@@ -492,6 +493,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 </a>
                 <Link href="/help">
                   <RoleForgeIcon name="mail" size={14} /> Help center
+                </Link>
+                <Link href="/status">
+                  <RoleForgeIcon name="scan" size={14} /> System status
                 </Link>
               </div>
               <div className="studio-account-list">

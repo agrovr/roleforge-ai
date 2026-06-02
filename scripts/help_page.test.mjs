@@ -21,6 +21,8 @@ test("help page covers account, exports, billing, and saved project guidance", (
   assert.match(helpPage, /When something looks stuck/);
   assert.match(helpPage, /Free accounts can export PDF/);
   assert.match(helpPage, /Premium accounts unlock DOCX and TXT/);
+  assert.match(helpPage, /href: "\/status"/);
+  assert.match(helpPage, /System status/);
 });
 
 test("help page is discoverable from public navigation and crawler metadata", () => {
@@ -28,6 +30,8 @@ test("help page is discoverable from public navigation and crawler metadata", ()
   assert.match(legalPage, /href="\/help"/);
   assert.match(robotsRoute, /"\/help"/);
   assert.match(sitemapRoute, /`\$\{siteUrl\}\/help`/);
+  assert.match(robotsRoute, /"\/status"/);
+  assert.match(sitemapRoute, /`\$\{siteUrl\}\/status`/);
 });
 
 test("help quick links are compact and overflow-safe", () => {

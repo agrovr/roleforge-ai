@@ -133,6 +133,28 @@ const PAGE_CHECKS = [
     ],
   },
   {
+    path: "/status",
+    name: "status",
+    selectors: [".legal-shell", ".legal-topbar", ".legal-hero", ".status-grid", ".status-card", ".legal-footer-card"],
+    textFitSelectors: [
+      ".legal-hero h1",
+      ".legal-hero p",
+      ".legal-hero-card span",
+      ".status-card span",
+      ".status-card strong",
+      ".status-card p",
+      ".legal-footer-card strong",
+      ".legal-footer-actions .btn",
+    ],
+    containedSelectors: [
+      { container: ".legal-shell", selector: ".legal-hero", tolerance: 4 },
+      { container: ".legal-shell", selector: ".status-grid", tolerance: 4 },
+      { container: ".legal-shell", selector: ".legal-footer-card", tolerance: 4 },
+      { container: "closest:.status-card", selector: ".status-card strong", tolerance: 4 },
+      { container: "closest:.status-card", selector: ".status-card p", tolerance: 4 },
+    ],
+  },
+  {
     path: "/privacy",
     name: "privacy",
     selectors: [".legal-shell", ".legal-topbar", ".legal-hero", ".legal-grid", ".legal-card", ".legal-footer-card"],

@@ -7505,6 +7505,130 @@ html[data-theme="dark"] input::file-selector-button {
   text-wrap: pretty;
 }
 
+.status-shell {
+  --status-good: color-mix(in srgb, var(--good) 86%, var(--brand-dark));
+  --status-ready: color-mix(in srgb, var(--brand) 82%, var(--good));
+  --status-warn: color-mix(in srgb, var(--accent) 88%, var(--danger));
+}
+
+.status-hero-card {
+  border-color: color-mix(in srgb, var(--brand) 22%, var(--line));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 42%, transparent), transparent),
+    color-mix(in srgb, var(--surface) 88%, var(--bg-alt));
+}
+
+.status-hero-card svg {
+  color: var(--brand-dark);
+}
+
+.status-grid {
+  width: min(1280px, 100%);
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(min(100%, 230px), 1fr));
+  gap: 14px;
+  min-width: 0;
+  margin: 0 auto;
+}
+
+.status-card {
+  container: status-card / inline-size;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  overflow: hidden;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--bg-alt) 76%, transparent)),
+    var(--surface);
+  box-shadow: 0 20px 54px -44px var(--shadow);
+}
+
+.status-card.good {
+  border-color: color-mix(in srgb, var(--status-good) 24%, var(--line));
+}
+
+.status-card.ready {
+  border-color: color-mix(in srgb, var(--status-ready) 24%, var(--line));
+}
+
+.status-card.warn {
+  border-color: color-mix(in srgb, var(--status-warn) 28%, var(--line));
+}
+
+.status-card-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, currentColor 20%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, currentColor 9%, var(--surface));
+}
+
+.status-card.good .status-card-icon {
+  color: var(--status-good);
+}
+
+.status-card.ready .status-card-icon {
+  color: var(--status-ready);
+}
+
+.status-card.warn .status-card-icon {
+  color: var(--status-warn);
+}
+
+.status-card div:last-child {
+  min-width: 0;
+}
+
+.status-card span {
+  display: block;
+  color: var(--ink-3);
+  font-size: 0.74rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.status-card strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--ink-0);
+  font-family: var(--font-display);
+  font-size: clamp(1.52rem, 11cqi, 2rem);
+  line-height: 1.02;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.status-card p {
+  margin: 10px 0 0;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  font-weight: 680;
+  line-height: 1.48;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+@container status-card (max-width: 250px) {
+  .status-card {
+    grid-template-columns: 1fr;
+  }
+
+  .status-card strong {
+    font-size: clamp(1.35rem, 14cqi, 1.72rem);
+  }
+}
+
 .legal-card,
 .legal-footer-card {
   min-width: 0;
@@ -7570,6 +7694,10 @@ html[data-theme="dark"] input::file-selector-button {
     grid-template-columns: 1fr;
   }
 
+  .status-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .legal-hero {
     align-items: start;
     padding-top: 42px;
@@ -7577,6 +7705,12 @@ html[data-theme="dark"] input::file-selector-button {
 
   .legal-hero-card {
     max-width: 100%;
+  }
+}
+
+@media (max-width: 620px) {
+  .status-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -12228,6 +12362,35 @@ html[data-theme="dark"] .help-quick-link strong {
 
 html[data-theme="dark"] .help-quick-link small {
   color: var(--ink-3);
+}
+
+html[data-theme="dark"] .status-hero-card,
+html[data-theme="dark"] .status-card {
+  border-color: rgba(255, 247, 233, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.045), rgba(255, 247, 233, 0.02)),
+    rgba(12, 17, 31, 0.78);
+}
+
+html[data-theme="dark"] .status-hero-card svg {
+  color: #f3c16d;
+}
+
+html[data-theme="dark"] .status-card.good {
+  border-color: rgba(137, 209, 190, 0.28);
+}
+
+html[data-theme="dark"] .status-card.ready {
+  border-color: rgba(141, 181, 214, 0.28);
+}
+
+html[data-theme="dark"] .status-card.warn {
+  border-color: rgba(231, 188, 111, 0.3);
+}
+
+html[data-theme="dark"] .status-card-icon {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: rgba(255, 247, 233, 0.055);
 }
 
 html[data-theme="dark"] .settings-project-stage-controls button.active,

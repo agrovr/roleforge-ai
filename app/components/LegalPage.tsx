@@ -61,6 +61,7 @@ export function LegalPage({
           <strong>May 31, 2026</strong>
         </div>
         <div className="legal-footer-actions">
+          <Link className="btn btn-soft btn-sm" href="/status">Status</Link>
           <Link className="btn btn-soft btn-sm" href="/help">Help</Link>
           <Link className="btn btn-soft btn-sm" href="/privacy">Privacy</Link>
           <Link className="btn btn-soft btn-sm" href="/terms">Terms</Link>

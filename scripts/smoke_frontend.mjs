@@ -907,6 +907,7 @@ async function checkCrawlerMetadata(baseUrl, canonicalUrl = baseUrl) {
   requireCondition(sitemap.text.includes(`${canonicalUrl}/`) || sitemap.text.includes(`${canonicalUrl}</loc>`), "sitemap.xml did not include the home page");
   requireCondition(sitemap.text.includes(`${canonicalUrl}/templates`), "sitemap.xml did not include templates");
   requireCondition(sitemap.text.includes(`${canonicalUrl}/help`), "sitemap.xml did not include help");
+  requireCondition(sitemap.text.includes(`${canonicalUrl}/status`), "sitemap.xml did not include status");
   requireCondition(sitemap.text.includes(`${canonicalUrl}/privacy`), "sitemap.xml did not include privacy");
   requireCondition(sitemap.text.includes(`${canonicalUrl}/terms`), "sitemap.xml did not include terms");
   requireCondition(!sitemap.text.includes(`${canonicalUrl}/app`), "sitemap.xml included the protected studio route");

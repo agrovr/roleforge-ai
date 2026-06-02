@@ -16,9 +16,11 @@ test("templates page keeps signed-in account controls in the topbar", () => {
   assert.match(templatesPage, /href="\/settings#billing"/);
   assert.match(templatesPage, /href="\/settings#security"/);
   assert.match(templatesPage, /href="\/help"/);
+  assert.match(templatesPage, /href="\/status"/);
   assert.match(templatesPage, /href="\/api\/account\/export"/);
   assert.match(templatesPage, /Download summary/);
   assert.match(templatesPage, /Help center/);
+  assert.match(templatesPage, /System status/);
   assert.match(templatesPage, /action="\/auth\/signout"/);
 });
 

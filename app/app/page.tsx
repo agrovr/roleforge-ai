@@ -2984,6 +2984,9 @@ export default function Page() {
                         <Link href="/help" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="mail" size={14} /> Help
                         </Link>
+                        <Link href="/status" onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="scan" size={14} /> Status
+                        </Link>
                         <button
                           type="button"
                           onClick={() => {
@@ -3037,6 +3040,9 @@ export default function Page() {
                         </Link>
                         <Link href="/help" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="mail" size={14} /> Help center
+                        </Link>
+                        <Link href="/status" onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="scan" size={14} /> System status
                         </Link>
                       </div>
                       <form className="studio-account-form" action="/auth/signout" method="post">

@@ -62,6 +62,7 @@ const quickLinks = [
   { href: "/app", icon: "file" as const, label: "Open studio", detail: "Build or restore a resume workflow." },
   { href: "/templates", icon: "layers" as const, label: "Browse templates", detail: "Choose the default export direction." },
   { href: "/settings", icon: "settings" as const, label: "Account settings", detail: "Manage profile, projects, exports, and billing." },
+  { href: "/status", icon: "scan" as const, label: "System status", detail: "Check workflow, export, account, and billing readiness." },
   { href: "/privacy", icon: "lock" as const, label: "Privacy", detail: "Review how account and workflow data is handled." },
 ] as const;
 
