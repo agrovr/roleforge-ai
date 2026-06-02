@@ -6,6 +6,7 @@ import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { accountAvatarUrl, accountDisplayName } from "../lib/accountUser";
 import { RESUME_TEMPLATE_COOKIE, getResumeTemplate, resumeTemplateStudioHref } from "../lib/resumeTemplates";
+import { supportRequestHref } from "../lib/supportRequests";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 import { TemplateLibrary } from "./TemplateLibrary";
@@ -20,6 +21,11 @@ async function getTemplateLinks() {
   const initialTemplateSlug = getResumeTemplate(templateCookie).slug;
   const displayName = accountDisplayName(user);
   const accountInitials = (displayName || user?.email || "RF").slice(0, 2).toUpperCase();
+  const billingSupportHref = supportRequestHref({
+    category: "billing",
+    subject: "Billing or Premium access",
+    contextUrl: "/templates",
+  });
 
   return {
     accountImageUrl: accountAvatarUrl(user),
@@ -28,13 +34,14 @@ async function getTemplateLinks() {
     email: user?.email ?? "",
     signedIn,
     initialTemplateSlug,
+    billingSupportHref,
     studioHref: signedIn ? "/app" : "/login?next=/app",
     settingsHref: signedIn ? "/settings#exports" : `/login?next=${encodeURIComponent("/settings#exports")}`,
   };
 }
 
 export default async function TemplatesPage() {
-  const { accountImageUrl, accountInitials, accountName, email, signedIn, initialTemplateSlug, studioHref, settingsHref } = await getTemplateLinks();
+  const { accountImageUrl, accountInitials, accountName, email, signedIn, initialTemplateSlug, billingSupportHref, studioHref, settingsHref } = await getTemplateLinks();
   const selectedTemplate = getResumeTemplate(initialTemplateSlug);
 
   return (
@@ -96,8 +103,8 @@ export default async function TemplatesPage() {
                   <Link href="/help">
                     <RoleForgeIcon name="mail" size={14} /> Help center
                   </Link>
-                  <Link href="/support">
-                    <RoleForgeIcon name="mail" size={14} /> Contact support
+                  <Link href={billingSupportHref}>
+                    <RoleForgeIcon name="mail" size={14} /> Billing support
                   </Link>
                   <Link href="/status">
                     <RoleForgeIcon name="scan" size={14} /> System status

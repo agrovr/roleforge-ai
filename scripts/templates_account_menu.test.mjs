@@ -9,6 +9,7 @@ test("templates page keeps signed-in account controls in the topbar", () => {
   assert.match(templatesPage, /AccountAvatar/);
   assert.match(templatesPage, /accountAvatarUrl\(user\)/);
   assert.match(templatesPage, /accountDisplayName\(user/);
+  assert.match(templatesPage, /supportRequestHref/);
   assert.match(templatesPage, /templates-account-menu/);
   assert.match(templatesPage, /aria-label="Open account menu"/);
   assert.match(templatesPage, /selectedTemplate\.name/);
@@ -19,12 +20,16 @@ test("templates page keeps signed-in account controls in the topbar", () => {
   assert.match(templatesPage, /href="\/status"/);
   assert.match(templatesPage, /href="\/updates"/);
   assert.match(templatesPage, /href="\/support"/);
+  assert.match(templatesPage, /billingSupportHref/);
+  assert.match(templatesPage, /category:\s*"billing"/);
+  assert.match(templatesPage, /subject:\s*"Billing or Premium access"/);
+  assert.match(templatesPage, /href=\{billingSupportHref\}/);
   assert.match(templatesPage, /href="\/api\/account\/export"/);
   assert.match(templatesPage, /Download summary/);
   assert.match(templatesPage, /Help center/);
   assert.match(templatesPage, /System status/);
   assert.match(templatesPage, /Product updates/);
-  assert.match(templatesPage, /Contact support/);
+  assert.match(templatesPage, /Billing support/);
   assert.match(templatesPage, /action="\/auth\/signout"/);
 });
 

@@ -18,10 +18,14 @@ test("studio account menu acts as a workspace command center", () => {
   assert.match(studioPage, /href="\/status"/);
   assert.match(studioPage, /href="\/updates"/);
   assert.match(studioPage, /href="\/support"/);
+  assert.match(studioPage, /accountBillingSupportHref/);
+  assert.match(studioPage, /category:\s*"billing"/);
+  assert.match(studioPage, /subject:\s*"Billing or Premium access"/);
+  assert.match(studioPage, /href=\{accountBillingSupportHref\}/);
   assert.match(studioPage, /Help center/);
   assert.match(studioPage, /System status/);
   assert.match(studioPage, /Product updates/);
-  assert.match(studioPage, /Contact support/);
+  assert.match(studioPage, /Billing support/);
   assert.match(studioPage, /Saved projects/);
   assert.match(studioPage, /DOCX and TXT/);
   assert.match(studioPage, /recentAccountProjects/);

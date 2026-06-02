@@ -2486,6 +2486,11 @@ export default function Page() {
     subject: workflowError?.requestId ? "Workflow request help" : "Workflow stopped",
     contextUrl: workflowError?.requestId ?? "/app",
   });
+  const accountBillingSupportHref = supportRequestHref({
+    category: "billing",
+    subject: "Billing or Premium access",
+    contextUrl: "/app#account",
+  });
   const topExportLabel = topDownloadReady
     ? `Download ${currentDownloadLabel}`
     : result?.tailored_text?.trim()
@@ -3058,8 +3063,8 @@ export default function Page() {
                         <Link href="/help" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="mail" size={14} /> Help center
                         </Link>
-                        <Link href="/support" onClick={() => setAccountPanelOpen(false)}>
-                          <RoleForgeIcon name="mail" size={14} /> Contact support
+                        <Link href={accountBillingSupportHref} onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="mail" size={14} /> Billing support
                         </Link>
                         <Link href="/status" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="scan" size={14} /> System status
