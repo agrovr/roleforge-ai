@@ -28,6 +28,19 @@ type UpdateItem = {
 
 const updates: readonly UpdateItem[] = [
   {
+    title: "Public sign-in keeps your place",
+    date: "June 2, 2026",
+    eyebrow: "Account",
+    icon: "lock",
+    summary: "The public account menu now sends signed-out users back to the page they started from after login.",
+    details: [
+      "Sign-in links from Help, Status, Support, Updates, and other public surfaces preserve the current path, query, and hash.",
+      "Public account controls still fall back to Studio when the current page cannot be read safely.",
+    ],
+    actionHref: "/help",
+    actionLabel: "Open help",
+  },
+  {
     title: "Quick actions now support keyboard shortcuts",
     date: "June 2, 2026",
     eyebrow: "Navigation",

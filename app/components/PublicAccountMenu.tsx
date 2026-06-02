@@ -43,6 +43,11 @@ function runAllowanceLabel(limit: number | null | undefined) {
   return "Usage";
 }
 
+function currentPagePath() {
+  const path = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  return path.startsWith("/") ? path : "/app";
+}
+
 export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMenuProps) {
   const [status, setStatus] = useState<PublicAccountStatus | null>(null);
 
@@ -84,7 +89,14 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
 
   if (!signedIn) {
     return (
-      <Link className="btn btn-soft btn-sm public-account-signin" href="/login?next=/app&account=signin-required">
+      <Link
+        className="btn btn-soft btn-sm public-account-signin"
+        href="/login?next=/app&account=signin-required"
+        onClick={(event) => {
+          event.preventDefault();
+          window.location.assign(`/login?next=${encodeURIComponent(currentPagePath())}&account=signin-required`);
+        }}
+      >
         Sign in
       </Link>
     );

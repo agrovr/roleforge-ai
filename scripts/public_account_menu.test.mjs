@@ -13,6 +13,12 @@ test("public account menu turns static topbars into signed-in command centers", 
   assert.match(publicAccountMenu, /"use client"/);
   assert.match(publicAccountMenu, /fetch\("\/api\/auth\/status"/);
   assert.match(publicAccountMenu, /credentials:\s*"same-origin"/);
+  assert.match(publicAccountMenu, /currentPagePath/);
+  assert.match(publicAccountMenu, /window\.location\.pathname/);
+  assert.match(publicAccountMenu, /window\.location\.search/);
+  assert.match(publicAccountMenu, /window\.location\.hash/);
+  assert.match(publicAccountMenu, /encodeURIComponent\(currentPagePath\(\)\)/);
+  assert.match(publicAccountMenu, /window\.location\.assign/);
   assert.match(publicAccountMenu, /AccountAvatar/);
   assert.match(publicAccountMenu, /aria-label="Open account menu"/);
   assert.match(publicAccountMenu, /Public page account summary/);
@@ -26,6 +32,7 @@ test("public account menu turns static topbars into signed-in command centers", 
   assert.match(publicAccountMenu, /href=\{supportHref\}/);
   assert.match(publicAccountMenu, /href="\/api\/account\/export"/);
   assert.match(publicAccountMenu, /action="\/auth\/signout"/);
+  assert.match(publicAccountMenu, /href="\/login\?next=\/app&account=signin-required"/);
   assert.match(publicAccountMenu, /Sign in/);
 });
 
