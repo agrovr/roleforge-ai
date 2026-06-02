@@ -62,6 +62,7 @@ export function LegalPage({
         </div>
         <div className="legal-footer-actions">
           <Link className="btn btn-soft btn-sm" href="/status">Status</Link>
+          <Link className="btn btn-soft btn-sm" href="/updates">Updates</Link>
           <Link className="btn btn-soft btn-sm" href="/help">Help</Link>
           <Link className="btn btn-soft btn-sm" href="/privacy">Privacy</Link>
           <Link className="btn btn-soft btn-sm" href="/terms">Terms</Link>

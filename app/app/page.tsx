@@ -2987,6 +2987,9 @@ export default function Page() {
                         <Link href="/status" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="scan" size={14} /> Status
                         </Link>
+                        <Link href="/updates" onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="sparkle" size={14} /> Updates
+                        </Link>
                         <button
                           type="button"
                           onClick={() => {
@@ -3043,6 +3046,9 @@ export default function Page() {
                         </Link>
                         <Link href="/status" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="scan" size={14} /> System status
+                        </Link>
+                        <Link href="/updates" onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="sparkle" size={14} /> Product updates
                         </Link>
                       </div>
                       <form className="studio-account-form" action="/auth/signout" method="post">

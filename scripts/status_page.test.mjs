@@ -34,6 +34,7 @@ test("status page covers account, workflow, export, and billing surfaces", () =>
   assert.match(statusPage, /Free PDF workflow can remain available/);
   assert.match(statusPage, /System status/);
   assert.match(statusPage, /href="\/templates"/);
+  assert.match(statusPage, /href="\/updates"/);
   assert.doesNotMatch(statusPage, /backend missing/i);
   assert.doesNotMatch(statusPage, /Supabase configuration missing/i);
   assert.doesNotMatch(statusPage, /STRIPE_SECRET_KEY/);
@@ -49,6 +50,10 @@ test("status page is discoverable from public and signed-in navigation", () => {
   assert.match(sitemapRoute, /`\$\{siteUrl\}\/status`/);
   assert.match(smokeFrontend, /sitemap\.text\.includes\(`\$\{canonicalUrl\}\/status`\)/);
   assert.match(smokeLayout, /path: "\/status"/);
+  assert.match(robotsRoute, /"\/updates"/);
+  assert.match(sitemapRoute, /`\$\{siteUrl\}\/updates`/);
+  assert.match(smokeFrontend, /sitemap\.text\.includes\(`\$\{canonicalUrl\}\/updates`\)/);
+  assert.match(smokeLayout, /path: "\/updates"/);
 });
 
 test("status page has overflow-safe responsive cards", () => {

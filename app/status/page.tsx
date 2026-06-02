@@ -163,6 +163,7 @@ export default async function StatusPage() {
           <Link className="btn btn-soft btn-sm" href="/app">Studio</Link>
           <Link className="btn btn-soft btn-sm" href="/settings">Settings</Link>
           <Link className="btn btn-soft btn-sm" href="/templates">Templates</Link>
+          <Link className="btn btn-soft btn-sm" href="/updates">Updates</Link>
           <Link className="btn btn-soft btn-sm" href="/help">Help</Link>
         </div>
       </section>
