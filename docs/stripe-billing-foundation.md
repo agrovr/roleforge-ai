@@ -72,6 +72,15 @@ If you only want the live Stripe secret key on the clipboard for a few seconds, 
 
 Use `-PromptForSecret` to paste the key into a hidden PowerShell prompt instead of the clipboard, `-PromptForSupabaseServiceRole` if Supabase CLI is not logged in, `-SkipVercelUpdate` if Vercel already has the rotated key, `-SkipRedeploy` if you are redeploying through GitHub instead, `-CopyPromoCode` if you want the generated promo code copied after the secret has been cleared, or `-AutoPoll` to open Checkout and wait for webhook Premium activation without a terminal prompt.
 
+If the copied Stripe or Supabase credential will be needed after the clipboard is cleared, cache it for a single proof retry first:
+
+```powershell
+.\scripts\live_billing_one_time_proof.ps1 -CacheStripeSecretOnly
+.\scripts\live_billing_one_time_proof.ps1 -CacheSupabaseCredentialOnly
+```
+
+The cache files are per-user Windows DPAPI blobs under `.codex-qa`, are not committed, and are deleted after a successful proof cleanup. The Supabase cache accepts either the project service-role key or a Supabase access token that can read project API keys.
+
 ## Live checkout smoke
 
 Use this after billing env changes or before a launch announcement:
@@ -87,26 +96,13 @@ The smoke creates a temporary confirmed Supabase user, submits the signed-in che
 
 ## No-charge Premium entitlement test
 
-Stripe test card numbers only work in test mode, so do not use them against live checkout. To test the full live entitlement flow without a charge, create a one-redemption live promotion code:
+Stripe test card numbers only work in test mode, so do not use them against live checkout. To test the full live entitlement flow without a charge, run the proof helper after the live Stripe secret and Supabase admin credential are available:
 
 ```powershell
-$env:STRIPE_SECRET_KEY = "<sk_live_...>"
-node scripts\create_live_promo_code.mjs --code ROLEFORGE-FREE-TEST --expires-hours 24 --max-redemptions 1
-Remove-Item Env:\STRIPE_SECRET_KEY
+.\scripts\live_billing_one_time_proof.ps1 -CopyPromoCode
 ```
 
-Then sign in with a real or temporary RoleForge account, start Premium from `/settings#billing`, enter the generated code in Stripe Checkout, and complete the no-charge subscription. The webhook should grant Premium after Stripe sends `checkout.session.completed` and subscription lifecycle events.
-
-After Checkout returns, verify the account entitlement:
-
-```powershell
-$keysJson = (npx supabase projects api-keys --project-ref ijdspodwpkuhwszmvqip --output json) | Out-String
-$env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY = (($keysJson | ConvertFrom-Json) | Where-Object { $_.id -eq "service_role" } | Select-Object -First 1).api_key
-node scripts\check_premium_entitlement.mjs --email user@example.com --wait-seconds 60
-Remove-Item Env:\ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY
-```
-
-The entitlement check passes only when `account_entitlements.plan = premium` and `billing_status` is `active` or `trialing`.
+The helper creates a one-redemption live promotion code, starts Checkout for a temporary confirmed Supabase user, waits for the webhook, verifies `account_entitlements.plan = premium` with `billing_status` active or trialing, then cancels/deletes the proof resources.
 
 ## Stripe webhook endpoint
 

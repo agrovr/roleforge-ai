@@ -15,6 +15,7 @@ param(
   [switch]$PromptForSecret,
   [switch]$PromptForSupabaseServiceRole,
   [switch]$CacheStripeSecretOnly,
+  [switch]$CacheSupabaseCredentialOnly,
   [switch]$DisableOneTimeSecretCache
 )
 
@@ -22,7 +23,8 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $RepoRoot = Split-Path -Parent $PSScriptRoot
-$OneTimeSecretCachePath = Join-Path $RepoRoot ".codex-qa\roleforge-stripe-secret.clixml"
+$OneTimeStripeSecretCachePath = Join-Path $RepoRoot ".codex-qa\roleforge-stripe-secret.dpapi"
+$OneTimeSupabaseCredentialCachePath = Join-Path $RepoRoot ".codex-qa\roleforge-supabase-admin.dpapi"
 if (-not $NodePath) {
   $BundledNode = "C:\Users\ashmi\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
   $NodePath = if (Test-Path $BundledNode) { $BundledNode } else { "node" }
@@ -83,7 +85,8 @@ function ConvertFrom-SecureStringForProcess {
 }
 
 $SecretCameFromClipboard = $false
-$SecretCacheUsed = $false
+$StripeSecretCacheUsed = $false
+$SupabaseCredentialCacheUsed = $false
 
 function Get-ClipboardTextSafe {
   try {
@@ -111,39 +114,116 @@ function Clear-SecretClipboard {
   }
 }
 
-function Save-OneTimeStripeSecret {
+function Save-OneTimeSecretCache {
   param(
-    [Parameter(Mandatory = $true)][string]$Value
+    [Parameter(Mandatory = $true)][string]$Path,
+    [Parameter(Mandatory = $true)][string]$Value,
+    [Parameter(Mandatory = $true)][string]$Description
   )
 
   if ($DisableOneTimeSecretCache) {
     return
   }
 
-  $cacheDir = Split-Path -Parent $OneTimeSecretCachePath
+  $cacheDir = Split-Path -Parent $Path
   New-Item -ItemType Directory -Force -Path $cacheDir | Out-Null
-  ConvertTo-SecureString -String $Value -AsPlainText -Force | Export-Clixml -LiteralPath $OneTimeSecretCachePath
-  Write-Host "Stored the live Stripe secret in a Windows-encrypted one-time cache for this proof run."
+  Add-Type -AssemblyName System.Security
+  $bytes = [Text.Encoding]::UTF8.GetBytes($Value)
+  $protected = [Security.Cryptography.ProtectedData]::Protect(
+    $bytes,
+    $null,
+    [Security.Cryptography.DataProtectionScope]::CurrentUser
+  )
+  [Convert]::ToBase64String($protected) | Set-Content -LiteralPath $Path
+  Write-Host "Stored $Description in a Windows-encrypted one-time cache for this proof run."
 }
 
-function Read-OneTimeStripeSecret {
-  if ($DisableOneTimeSecretCache -or -not (Test-Path -LiteralPath $OneTimeSecretCachePath)) {
+function Read-OneTimeSecretCache {
+  param(
+    [Parameter(Mandatory = $true)][string]$Path,
+    [Parameter(Mandatory = $true)][string]$Description
+  )
+
+  if ($DisableOneTimeSecretCache -or -not (Test-Path -LiteralPath $Path)) {
     return ""
   }
 
-  $secure = Import-Clixml -LiteralPath $OneTimeSecretCachePath
-  $value = ConvertFrom-SecureStringForProcess $secure
+  Add-Type -AssemblyName System.Security
+  try {
+    $protected = [Convert]::FromBase64String((Get-Content -LiteralPath $Path -Raw).Trim())
+    $bytes = [Security.Cryptography.ProtectedData]::Unprotect(
+      $protected,
+      $null,
+      [Security.Cryptography.DataProtectionScope]::CurrentUser
+    )
+    $value = [Text.Encoding]::UTF8.GetString($bytes)
+  } catch {
+    Remove-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+    throw "The encrypted one-time $Description cache could not be decrypted and was removed. Secret value was not printed."
+  }
+
+  return $value.Trim()
+}
+
+function Save-OneTimeStripeSecret {
+  param(
+    [Parameter(Mandatory = $true)][string]$Value
+  )
+
+  Save-OneTimeSecretCache -Path $OneTimeStripeSecretCachePath -Value $Value -Description "the live Stripe secret"
+}
+
+function Read-OneTimeStripeSecret {
+  $value = Read-OneTimeSecretCache -Path $OneTimeStripeSecretCachePath -Description "Stripe secret"
+  if (-not $value) {
+    return ""
+  }
+
   if ($value -match "^sk_live_[A-Za-z0-9_\-]+$") {
-    $script:SecretCacheUsed = $true
+    $script:StripeSecretCacheUsed = $true
     return $value.Trim()
   }
 
-  Remove-Item -LiteralPath $OneTimeSecretCachePath -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $OneTimeStripeSecretCachePath -Force -ErrorAction SilentlyContinue
   throw "The encrypted one-time Stripe secret cache was not valid and was removed. Secret value was not printed."
 }
 
 function Clear-OneTimeStripeSecret {
-  Remove-Item -LiteralPath $OneTimeSecretCachePath -Force -ErrorAction SilentlyContinue
+  Remove-Item -LiteralPath $OneTimeStripeSecretCachePath -Force -ErrorAction SilentlyContinue
+}
+
+function Save-OneTimeSupabaseCredential {
+  param(
+    [Parameter(Mandatory = $true)][string]$Value
+  )
+
+  Save-OneTimeSecretCache -Path $OneTimeSupabaseCredentialCachePath -Value $Value -Description "the Supabase admin credential"
+}
+
+function Read-OneTimeSupabaseCredential {
+  $value = Read-OneTimeSecretCache -Path $OneTimeSupabaseCredentialCachePath -Description "Supabase admin credential"
+  if (-not $value) {
+    return $false
+  }
+
+  if ($value -match "^(sb_secret_|eyJ)[A-Za-z0-9_\-.]+$") {
+    $script:SupabaseCredentialCacheUsed = $true
+    $env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY = $value.Trim()
+    return $true
+  }
+
+  if ($value -match "^sbp_[A-Za-z0-9_\-.]+$") {
+    $script:SupabaseCredentialCacheUsed = $true
+    $env:SUPABASE_ACCESS_TOKEN = $value.Trim()
+    return $true
+  }
+
+  Remove-Item -LiteralPath $OneTimeSupabaseCredentialCachePath -Force -ErrorAction SilentlyContinue
+  throw "The encrypted one-time Supabase admin credential cache was not valid and was removed. Secret value was not printed."
+}
+
+function Clear-OneTimeSupabaseCredential {
+  Remove-Item -LiteralPath $OneTimeSupabaseCredentialCachePath -Force -ErrorAction SilentlyContinue
 }
 
 function Read-SupabaseCredentialFromClipboard {
@@ -154,6 +234,7 @@ function Read-SupabaseCredentialFromClipboard {
   $clipboard = (Get-ClipboardTextSafe).Trim()
   if ($clipboard -match "^(sb_secret_|eyJ)[A-Za-z0-9_\-.]+$") {
     $script:SecretCameFromClipboard = $true
+    Save-OneTimeSupabaseCredential $clipboard
     $env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY = $clipboard
     Clear-SecretClipboard $clipboard
     Write-Host "Loaded Supabase service-role access from clipboard. Secret value was not printed."
@@ -162,6 +243,7 @@ function Read-SupabaseCredentialFromClipboard {
 
   if ($clipboard -match "^sbp_[A-Za-z0-9_\-.]+$") {
     $script:SecretCameFromClipboard = $true
+    Save-OneTimeSupabaseCredential $clipboard
     $env:SUPABASE_ACCESS_TOKEN = $clipboard
     Clear-SecretClipboard $clipboard
     Write-Host "Loaded Supabase access token from clipboard. Secret value was not printed."
@@ -176,6 +258,16 @@ function Read-SupabaseServiceRole {
   Read-SupabaseCredentialFromClipboard
   if ($env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY -or $env:SUPABASE_SERVICE_ROLE_KEY) {
     return
+  }
+
+  if (Read-OneTimeSupabaseCredential) {
+    if ($env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY -or $env:SUPABASE_SERVICE_ROLE_KEY) {
+      Write-Host "Loaded Supabase service-role access from the Windows-encrypted one-time cache. Secret value was not printed."
+      return
+    }
+    if ($env:SUPABASE_ACCESS_TOKEN) {
+      Write-Host "Loaded Supabase access token from the Windows-encrypted one-time cache. Secret value was not printed."
+    }
   }
 
   if ($env:SUPABASE_ACCESS_TOKEN) {
@@ -193,6 +285,7 @@ function Read-SupabaseServiceRole {
   $prompted = ConvertFrom-SecureStringForProcess $secure
   $trimmed = $prompted.Trim()
   if ($trimmed -match "^(sb_secret_|eyJ)[A-Za-z0-9_\-.]+$") {
+    Save-OneTimeSupabaseCredential $trimmed
     $env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY = $trimmed
     return
   }
@@ -241,14 +334,25 @@ $exitCode = 0
 $keepOneTimeSecretCache = $false
 
 try {
-  $secret = Read-LiveStripeSecret
-  $env:STRIPE_SECRET_KEY = $secret
-  $env:ROLEFORGE_STRIPE_SECRET_KEY = $secret
-
-  if ($CacheStripeSecretOnly) {
+  if ($CacheSupabaseCredentialOnly) {
+    Read-SupabaseServiceRole
+    $supabaseCredential = @($env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY, $env:SUPABASE_SERVICE_ROLE_KEY, $env:SUPABASE_ACCESS_TOKEN) | Where-Object { $_ -and $_.Trim() } | Select-Object -First 1
+    if (-not $supabaseCredential) {
+      throw "No Supabase admin credential was available. Put exactly one service-role key or Supabase access token on the clipboard, or rerun with -PromptForSupabaseServiceRole. Secret value was not printed."
+    }
+    Save-OneTimeSupabaseCredential $supabaseCredential.Trim()
     $keepOneTimeSecretCache = $true
-    Write-Host "Cached the live Stripe secret for one proof retry and cleared it from the clipboard. Secret value was not printed."
+    Write-Host "Cached the Supabase admin credential for one proof retry and cleared it from the clipboard. Secret value was not printed."
   } else {
+    $secret = Read-LiveStripeSecret
+    $env:STRIPE_SECRET_KEY = $secret
+    $env:ROLEFORGE_STRIPE_SECRET_KEY = $secret
+
+    if ($CacheStripeSecretOnly) {
+      Save-OneTimeStripeSecret $secret
+      $keepOneTimeSecretCache = $true
+      Write-Host "Cached the live Stripe secret for one proof retry and cleared it from the clipboard. Secret value was not printed."
+    } else {
     if (-not $SkipVercelUpdate) {
       $secret | & $NodePath "scripts\set_vercel_billing_env.mjs" "STRIPE_SECRET_KEY"
       if ($LASTEXITCODE -ne 0) {
@@ -293,6 +397,7 @@ try {
       throw "Premium entitlement did not activate before timeout. Last plan=$($check.plan), billingStatus=$($check.billingStatus)."
     }
     Write-Host "Premium entitlement is active for the proof user."
+    }
   }
 } catch {
   $exitCode = 1
@@ -318,8 +423,9 @@ try {
   Clear-SecretClipboard
   if ($exitCode -eq 0 -and -not $keepOneTimeSecretCache) {
     Clear-OneTimeStripeSecret
-  } elseif ($SecretCacheUsed -or (Test-Path -LiteralPath $OneTimeSecretCachePath)) {
-    Write-Host "Encrypted one-time Stripe secret cache kept for retry. It will be deleted after a successful proof cleanup."
+    Clear-OneTimeSupabaseCredential
+  } elseif ($StripeSecretCacheUsed -or $SupabaseCredentialCacheUsed -or (Test-Path -LiteralPath $OneTimeStripeSecretCachePath) -or (Test-Path -LiteralPath $OneTimeSupabaseCredentialCachePath)) {
+    Write-Host "Encrypted one-time secret cache kept for retry. It will be deleted after a successful proof cleanup."
   }
   $secret = ""
   Pop-Location

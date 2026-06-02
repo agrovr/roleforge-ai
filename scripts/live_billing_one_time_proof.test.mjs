@@ -21,6 +21,23 @@ test("one-shot live billing proof clears copied Stripe secrets", () => {
   assert.match(script, /Remove-Item Env:\\ROLEFORGE_STRIPE_SECRET_KEY/);
 });
 
+test("cache-only mode writes the encrypted one-time Stripe cache", () => {
+  assert.match(script, /roleforge-stripe-secret\.dpapi/);
+  assert.match(script, /if \(\$CacheStripeSecretOnly\) \{/);
+  assert.match(script, /Save-OneTimeStripeSecret \$secret/);
+  assert.match(script, /ProtectedData\]::Protect/);
+  assert.match(script, /ProtectedData\]::Unprotect/);
+});
+
+test("cache-only mode supports one-time Supabase admin credentials", () => {
+  assert.match(script, /roleforge-supabase-admin\.dpapi/);
+  assert.match(script, /\[switch\]\$CacheSupabaseCredentialOnly/);
+  assert.match(script, /Save-OneTimeSupabaseCredential \$clipboard/);
+  assert.match(script, /Save-OneTimeSupabaseCredential \$supabaseCredential\.Trim\(\)/);
+  assert.match(script, /Read-OneTimeSupabaseCredential/);
+  assert.match(script, /Clear-OneTimeSupabaseCredential/);
+});
+
 test("live billing proof docs mention autopoll and promo-code clipboard handoff", () => {
   assert.match(stripeDocs, /-CopyPromoCode/);
   assert.match(stripeDocs, /-AutoPoll/);
