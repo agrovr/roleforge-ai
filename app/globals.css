@@ -9564,9 +9564,12 @@ html[data-theme="dark"] input::file-selector-button {
   .settings-profile-edit-row,
   .settings-danger-actions,
   .settings-profile-actions,
-  .settings-plan-info,
   .settings-billing-head,
   .settings-export-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-plan-info {
     grid-template-columns: 1fr;
   }
 
