@@ -38,6 +38,14 @@ test("cache-only mode supports one-time Supabase admin credentials", () => {
   assert.match(script, /Clear-OneTimeSupabaseCredential/);
 });
 
+test("one-shot live billing proof can load server-only local proof secrets", () => {
+  assert.match(script, /function Import-LocalProofEnv/);
+  assert.match(script, /Join-Path \$RepoRoot ".env.local"/);
+  assert.match(script, /"ROLEFORGE_STRIPE_SECRET_KEY"/);
+  assert.match(script, /"ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY"/);
+  assert.doesNotMatch(script, /NEXT_PUBLIC_[A-Z0-9_]*SERVICE_ROLE/);
+});
+
 test("live billing proof docs mention autopoll and promo-code clipboard handoff", () => {
   assert.match(stripeDocs, /-CopyPromoCode/);
   assert.match(stripeDocs, /-AutoPoll/);

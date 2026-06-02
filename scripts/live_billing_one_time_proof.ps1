@@ -30,6 +30,49 @@ if (-not $NodePath) {
   $NodePath = if (Test-Path $BundledNode) { $BundledNode } else { "node" }
 }
 
+function Import-LocalProofEnv {
+  $envPath = Join-Path $RepoRoot ".env.local"
+  if (-not (Test-Path -LiteralPath $envPath)) {
+    return
+  }
+
+  $allowedKeys = @(
+    "ROLEFORGE_STRIPE_SECRET_KEY",
+    "STRIPE_SECRET_KEY",
+    "ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "SUPABASE_ACCESS_TOKEN"
+  )
+
+  foreach ($line in Get-Content -LiteralPath $envPath) {
+    $trimmed = $line.Trim()
+    if (-not $trimmed -or $trimmed.StartsWith("#")) {
+      continue
+    }
+    if ($trimmed -notmatch "^([A-Za-z_][A-Za-z0-9_]*)=(.*)$") {
+      continue
+    }
+
+    $name = $Matches[1]
+    if ($allowedKeys -notcontains $name) {
+      continue
+    }
+    if ([Environment]::GetEnvironmentVariable($name, "Process")) {
+      continue
+    }
+
+    $value = $Matches[2].Trim()
+    if (($value.StartsWith('"') -and $value.EndsWith('"')) -or ($value.StartsWith("'") -and $value.EndsWith("'"))) {
+      $value = $value.Substring(1, $value.Length - 2)
+    }
+    if ($value) {
+      [Environment]::SetEnvironmentVariable($name, $value, "Process")
+    }
+  }
+}
+
+Import-LocalProofEnv
+
 function Invoke-NodeJson {
   param(
     [Parameter(Mandatory = $true)][string[]]$Arguments

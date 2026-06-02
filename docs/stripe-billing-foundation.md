@@ -81,6 +81,8 @@ If the copied Stripe or Supabase credential will be needed after the clipboard i
 
 The cache files are per-user Windows DPAPI blobs under `.codex-qa`, are not committed, and are deleted after a successful proof cleanup. The Supabase cache accepts either the project service-role key or a Supabase access token that can read project API keys.
 
+For repeated local proof runs, save `ROLEFORGE_STRIPE_SECRET_KEY` and `ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY` in `.env.local`. The file is gitignored and the helper imports only server-only proof secret names, never `NEXT_PUBLIC_*` variables.
+
 ## Live checkout smoke
 
 Use this after billing env changes or before a launch announcement:

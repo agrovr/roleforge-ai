@@ -175,6 +175,8 @@ If a copied secret will be needed after the clipboard is cleared, cache it for a
 
 The cache files are per-user Windows DPAPI blobs under `.codex-qa`, are not committed, and are deleted after a successful proof cleanup. The Supabase cache accepts either the project service-role key or a Supabase access token that can read project API keys.
 
+For repeated local proof runs, save `ROLEFORGE_STRIPE_SECRET_KEY` and `ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY` in `.env.local`. The file is gitignored and the helper imports only server-only proof secret names, never `NEXT_PUBLIC_*` variables.
+
 To verify live checkout without charging a card, run the live checkout smoke with the Supabase service-role key available in the environment:
 
 ```powershell
