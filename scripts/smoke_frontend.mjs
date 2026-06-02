@@ -465,6 +465,8 @@ async function checkPublicShell(baseUrl) {
   requireCondition(stylesheetText.includes(".nav-cta-short"), "landing mobile nav compact CTA styles were missing");
   requireCondition(/\.nav-link-secondary,\s*\.nav-link-account,\s*\.nav-divider\s*\{\s*display:\s*none/.test(stylesheetText), "landing mobile nav still exposes full navigation links");
   requireCondition(/\.nav\s+\.btn-brand\s*\{[^}]*min-width:\s*0/.test(stylesheetText), "landing mobile nav CTA can still force header overflow");
+  requireCondition(/\.landing-account-popover\s*\{(?=[^}]*width:\s*min\(430px,\s*calc\(100vw\s*-\s*36px\)\))[^}]*\}/s.test(sourceStylesheetText), "landing account menu popover can still overflow desktop nav");
+  requireCondition(/@media\s*\(max-width:\s*620px\)\s*\{[\s\S]*?\.landing-account-popover\s*\{(?=[^}]*width:\s*min\(360px,\s*calc\(100vw\s*-\s*24px\)\))[^}]*\}/s.test(sourceStylesheetText), "landing account menu popover can still overflow mobile nav");
   requireCondition(/body\s*\{[\s\S]*?overflow-x:\s*clip/s.test(stylesheetText), "landing page can still expose decorative horizontal overflow");
   requireCondition(/@media\s*\(max-width:\s*355px\)/.test(stylesheetText), "landing nav was missing narrow-phone overflow protection");
   requireCondition(/@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.nav\s+\.btn-brand\s*\{[^}]*display:\s*none/s.test(stylesheetText), "landing narrow-phone nav still shows a clipped CTA");

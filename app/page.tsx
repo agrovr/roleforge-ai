@@ -1,12 +1,15 @@
 import Link from "next/link";
+import { AccountAvatar } from "./components/AccountAvatar";
 import { Brand } from "./components/Brand";
 import { FaqAccordion } from "./components/FaqAccordion";
 import { ResumePreview } from "./components/ResumePreview";
 import { RoleForgeIcon } from "./components/RoleForgeIcons";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { accountAvatarUrl, accountDisplayName } from "./lib/accountUser";
 import { billingReadiness } from "./lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "./lib/billing/stripe";
 import { FREE_ENTITLEMENT, loadAccountEntitlement } from "./lib/entitlements";
+import { loadAccountProfile } from "./lib/accountProfile";
 import { createRoleForgeServerClient } from "./lib/supabase/server";
 import { monthlyRunAllowanceLabel } from "./lib/usage";
 
@@ -17,6 +20,15 @@ type LandingLinks = {
   checkoutReady: boolean;
   studioHref: string;
   premiumHref: string;
+  accountName: string;
+  accountEmail: string;
+  accountInitials: string;
+  accountImageUrl: string;
+  planLabel: string;
+  planCaption: string;
+  exportLabel: string;
+  exportCaption: string;
+  billingHref: string;
 };
 
 const FREE_RUN_ALLOWANCE = monthlyRunAllowanceLabel(FREE_ENTITLEMENT.monthlyRunLimit);
@@ -30,6 +42,7 @@ async function getLandingLinks(): Promise<LandingLinks> {
   } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
   const signedIn = Boolean(user);
   const entitlement = user && supabase ? await loadAccountEntitlement(supabase, user.id) : FREE_ENTITLEMENT;
+  const profile = user && supabase ? await loadAccountProfile(supabase, user.id) : null;
   const premiumActive = entitlement.plan === "premium" && ["active", "trialing"].includes(entitlement.billingStatus);
   const billing = billingReadiness(getStripeBillingConfig(), {
     hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()),
@@ -38,6 +51,16 @@ async function getLandingLinks(): Promise<LandingLinks> {
   const premiumHref = premiumActive || billing.checkoutReady
     ? signedIn ? "/settings#billing" : `/login?next=${encodeURIComponent("/settings#billing")}`
     : signedIn ? "/app" : "/login?next=/app";
+  const displayName = user ? accountDisplayName(user, profile?.displayName) : "";
+  const accountName = displayName || user?.email || "RoleForge account";
+  const accountEmail = user?.email || "Signed in";
+  const accountInitials = (displayName || accountEmail || "RF").slice(0, 2).toUpperCase();
+  const planLabel = premiumActive ? "Premium" : "Free";
+  const planCaption = premiumActive
+    ? entitlement.cancelAtPeriodEnd ? "Active until period end" : "Unlimited runs active"
+    : billing.checkoutReady ? "PDF export now, Premium available" : "PDF export now";
+  const exportLabel = entitlement.exportFormats.docx ? "PDF DOCX TXT" : "PDF";
+  const exportCaption = entitlement.exportFormats.docx ? "Premium exports active" : "DOCX and TXT need Premium";
 
   return {
     signedIn,
@@ -46,10 +69,44 @@ async function getLandingLinks(): Promise<LandingLinks> {
     checkoutReady: billing.checkoutReady,
     studioHref: signedIn ? "/app" : "/login?next=/app",
     premiumHref,
+    accountName,
+    accountEmail,
+    accountInitials,
+    accountImageUrl: accountAvatarUrl(user),
+    planLabel,
+    planCaption,
+    exportLabel,
+    exportCaption,
+    billingHref: signedIn ? "/settings#billing" : "/login?next=/settings%23billing",
   };
 }
 
-function Nav({ signedIn, studioHref }: Pick<LandingLinks, "signedIn" | "studioHref">) {
+function Nav({
+  signedIn,
+  studioHref,
+  accountName,
+  accountEmail,
+  accountInitials,
+  accountImageUrl,
+  planLabel,
+  planCaption,
+  exportLabel,
+  exportCaption,
+  billingHref,
+}: Pick<
+  LandingLinks,
+  | "signedIn"
+  | "studioHref"
+  | "accountName"
+  | "accountEmail"
+  | "accountInitials"
+  | "accountImageUrl"
+  | "planLabel"
+  | "planCaption"
+  | "exportLabel"
+  | "exportCaption"
+  | "billingHref"
+>) {
   return (
     <header className="nav">
       <div className="nav-inner">
@@ -61,7 +118,66 @@ function Nav({ signedIn, studioHref }: Pick<LandingLinks, "signedIn" | "studioHr
           <a className="nav-link nav-link-secondary" href="#pricing">Pricing</a>
           <span className="nav-divider" aria-hidden="true" />
           <ThemeToggle />
-          <Link className="nav-link nav-link-account" href={studioHref}>{signedIn ? "Studio" : "Sign in"}</Link>
+          {signedIn ? (
+            <details className="landing-account-menu">
+              <summary className="studio-account-button landing-account-button" aria-label="Open account menu">
+                <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
+              </summary>
+              <div className="studio-account-popover landing-account-popover" role="group" aria-label="Account menu">
+                <div className="studio-account-popover-head">
+                  <span>Account</span>
+                </div>
+                <div className="studio-account-identity">
+                  <div className="studio-account-avatar" aria-hidden="true">
+                    <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
+                  </div>
+                  <div>
+                    <strong className="studio-account-email" title={accountEmail}>{accountName}</strong>
+                    <span>{accountEmail}</span>
+                  </div>
+                </div>
+                <div className="studio-account-insights landing-account-insights" aria-label="Landing account summary">
+                  <Link href={billingHref}>
+                    <strong>{planLabel}</strong>
+                    <span>{planCaption}</span>
+                  </Link>
+                  <Link href="/settings#exports">
+                    <strong>{exportLabel}</strong>
+                    <span>{exportCaption}</span>
+                  </Link>
+                  <Link href="/status">
+                    <strong>Status</strong>
+                    <span>Live readiness</span>
+                  </Link>
+                </div>
+                <div className="studio-account-shortcuts landing-account-shortcuts">
+                  <Link href="/app"><RoleForgeIcon name="file" size={14} /> Studio</Link>
+                  <Link href="/templates"><RoleForgeIcon name="layers" size={14} /> Templates</Link>
+                  <Link href="/settings"><RoleForgeIcon name="settings" size={14} /> Settings</Link>
+                  <Link href="/settings#billing"><RoleForgeIcon name="lock" size={14} /> Billing</Link>
+                  <Link href="/help"><RoleForgeIcon name="mail" size={14} /> Help</Link>
+                  <Link href="/status"><RoleForgeIcon name="scan" size={14} /> System status</Link>
+                </div>
+                <div className="studio-account-utilities landing-account-utilities" aria-label="Account utilities">
+                  <a href="/api/account/export">
+                    <RoleForgeIcon name="download" size={14} /> Download summary
+                  </a>
+                  <Link href="/settings#security">
+                    <RoleForgeIcon name="lock" size={14} /> Security
+                  </Link>
+                  <Link href="/settings#preferences">
+                    <RoleForgeIcon name="layers" size={14} /> Preferences
+                  </Link>
+                </div>
+                <form className="studio-account-form" action="/auth/signout" method="post">
+                  <input type="hidden" name="next" value="/login?account=signed-out" />
+                  <button className="ghost-button studio-account-submit" type="submit">Sign out</button>
+                </form>
+              </div>
+            </details>
+          ) : (
+            <Link className="nav-link nav-link-account" href={studioHref}>Sign in</Link>
+          )}
           <Link className="btn btn-brand" href={studioHref}>
             <span className="nav-cta-full">Build my resume</span>
             <span className="nav-cta-short">Build</span>
@@ -586,7 +702,19 @@ export default async function Landing() {
 
   return (
     <main className="page-shell">
-      <Nav signedIn={links.signedIn} studioHref={links.studioHref} />
+      <Nav
+        signedIn={links.signedIn}
+        studioHref={links.studioHref}
+        accountName={links.accountName}
+        accountEmail={links.accountEmail}
+        accountInitials={links.accountInitials}
+        accountImageUrl={links.accountImageUrl}
+        planLabel={links.planLabel}
+        planCaption={links.planCaption}
+        exportLabel={links.exportLabel}
+        exportCaption={links.exportCaption}
+        billingHref={links.billingHref}
+      />
       <Hero studioHref={links.studioHref} />
       <RoleStrip />
       <HowItWorks />
