@@ -523,6 +523,62 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
           detail: "Ask about checkout, invoices, or Premium access from a support request linked to this page.",
         },
       ];
+  const hasDisplayName = Boolean(accountProfile?.displayName?.trim());
+  const accountHealthItems: Array<{
+    icon: RoleForgeIconName;
+    label: string;
+    value: string;
+    detail: string;
+    href: string;
+    action: string;
+    tone: "good" | "ready" | "warn";
+  }> = [
+    {
+      icon: "settings",
+      label: "Profile",
+      value: hasDisplayName ? "Named" : "Add name",
+      detail: hasDisplayName ? "Your account label is ready for menus and saved project records." : "Add a display name so account menus feel easier to scan.",
+      href: "#account",
+      action: hasDisplayName ? "Edit profile" : "Add name",
+      tone: hasDisplayName ? "good" : "ready",
+    },
+    {
+      icon: "chart",
+      label: "Projects",
+      value: projectCount ? `${projectCount} saved` : "Start first",
+      detail: projectCount ? `${runCount} ${runCountLabel.toLowerCase()} can be restored from your account history.` : "Create a run in Studio so completed work is saved here.",
+      href: projectCount ? "#projects" : "/app",
+      action: projectCount ? "Review projects" : "Open studio",
+      tone: projectCount ? "good" : "ready",
+    },
+    {
+      icon: "download",
+      label: "Exports",
+      value: settingsAccountExportValue,
+      detail: entitlement.exportFormats.docx ? "PDF, DOCX, and TXT exports are available from completed runs." : "PDF export is included. Premium unlocks DOCX and TXT.",
+      href: "#exports",
+      action: "View exports",
+      tone: entitlement.exportFormats.docx ? "good" : "ready",
+    },
+    {
+      icon: "lock",
+      label: "Billing",
+      value: premiumActive ? billingLabel : checkoutReady ? "Checkout ready" : "Free",
+      detail: premiumActive ? billingDetail : checkoutReady ? "Stripe checkout is available if you want Premium exports and unlimited runs." : "Free access is available; checkout is unavailable right now.",
+      href: "#billing",
+      action: premiumActive ? "Manage plan" : "View billing",
+      tone: premiumEnding ? "warn" : premiumActive || checkoutReady ? "good" : "ready",
+    },
+    {
+      icon: "mail",
+      label: "Support",
+      value: latestSupportRequest ? latestSupportRequest.referenceLabel : supportRequestCount ? `${supportRequestCount} saved` : "Ready",
+      detail: latestSupportRequest ? `${latestSupportRequest.statusLabel} request saved with account context.` : "Support requests and safe references stay attached to your account.",
+      href: "#support",
+      action: latestSupportRequest ? "View request" : "Open support",
+      tone: latestSupportRequest || supportRequestCount ? "good" : "ready",
+    },
+  ];
 
   return (
     <main className="settings-page-shell">
@@ -780,6 +836,31 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               </div>
             </section>
           </div>
+
+          <section className="settings-account-health" aria-label="Workspace health">
+            <div className="settings-account-health-head">
+              <div>
+                <span className="settings-overview-kicker">Workspace health</span>
+                <h2>Account next steps</h2>
+              </div>
+              <p>Profile, projects, exports, billing, and support are checked from your current account state.</p>
+            </div>
+            <div className="settings-account-health-grid">
+              {accountHealthItems.map((item) => (
+                <a className={`settings-account-health-card ${item.tone}`} href={item.href} key={item.label}>
+                  <span className="settings-account-health-icon" aria-hidden="true">
+                    <RoleForgeIcon name={item.icon} size={16} />
+                  </span>
+                  <span className="settings-account-health-copy">
+                    <span>{item.label}</span>
+                    <strong>{item.value}</strong>
+                    <small>{item.detail}</small>
+                  </span>
+                  <span className="settings-account-health-action">{item.action}</span>
+                </a>
+              ))}
+            </div>
+          </section>
 
           <section className="settings-section" id="account">
             <div className="settings-section-copy">

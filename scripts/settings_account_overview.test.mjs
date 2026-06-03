@@ -20,6 +20,24 @@ test("settings page exposes an account overview strip", () => {
   assert.match(settingsPage, /href=\{resumeTemplateStudioHref\(selectedTemplate\.slug\)\}/);
 });
 
+test("settings page summarizes workspace health from real account state", () => {
+  assert.match(settingsPage, /accountHealthItems/);
+  assert.match(settingsPage, /hasDisplayName/);
+  assert.match(settingsPage, /settings-account-health/);
+  assert.match(settingsPage, /aria-label="Workspace health"/);
+  assert.match(settingsPage, /Account next steps/);
+  assert.match(settingsPage, /checked from your current account state/);
+  assert.match(settingsPage, /label:\s*"Profile"/);
+  assert.match(settingsPage, /label:\s*"Projects"/);
+  assert.match(settingsPage, /label:\s*"Exports"/);
+  assert.match(settingsPage, /label:\s*"Billing"/);
+  assert.match(settingsPage, /label:\s*"Support"/);
+  assert.match(settingsPage, /projectCount \? `\$\{projectCount\} saved` : "Start first"/);
+  assert.match(settingsPage, /entitlement\.exportFormats\.docx \? "PDF, DOCX, and TXT exports are available from completed runs\."/);
+  assert.match(settingsPage, /latestSupportRequest \? latestSupportRequest\.referenceLabel/);
+  assert.match(settingsPage, /className=\{`settings-account-health-card \$\{item\.tone\}`\}/);
+});
+
 test("settings account overview is compact and overflow-safe", () => {
   assert.match(stylesheet, /\.settings-overview-frame\s*\{(?=[^}]*container:\s*settings-overview\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-account-overview\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1\.05fr\)\s+minmax\(min\(100%,\s*360px\),\s*0\.95fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
@@ -29,4 +47,16 @@ test("settings account overview is compact and overflow-safe", () => {
   assert.match(stylesheet, /\.settings-overview-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))[^}]*\}/s);
   assert.match(stylesheet, /@container\s+settings-overview\s*\(max-width:\s*720px\)\s*\{[\s\S]*?\.settings-account-overview\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(stylesheet, /html\[data-theme="dark"\] \.settings-account-overview/);
+});
+
+test("settings workspace health cards are compact and dark-mode safe", () => {
+  assert.match(stylesheet, /\.settings-account-health\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-account-health-head\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0\.85fr\)\s+minmax\(min\(100%,\s*360px\),\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-account-health-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*210px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-account-health-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\))(?=[^}]*min-height:\s*142px)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-account-health-copy span,\s*\.settings-account-health-copy strong,\s*\.settings-account-health-copy small,\s*\.settings-account-health-action\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*720px\)\s*\{[\s\S]*?\.settings-account-health-head\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-account-health/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-account-health-card\.good/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-account-health-icon,\s*html\[data-theme="dark"\]\s+\.settings-account-health-action/);
 });
