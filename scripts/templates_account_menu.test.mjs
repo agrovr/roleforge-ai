@@ -26,7 +26,9 @@ test("templates page keeps signed-in account controls in the topbar", () => {
   assert.match(templatesPage, /subject:\s*"Billing or Premium access"/);
   assert.match(templatesPage, /href=\{billingSupportHref\}/);
   assert.match(templatesPage, /href="\/api\/account\/export"/);
-  assert.match(templatesPage, /Download summary/);
+  assert.match(templatesPage, /Export account record/);
+  assert.match(templatesPage, /href="\/settings#support"/);
+  assert.match(templatesPage, /Support history/);
   assert.match(templatesPage, /Help center/);
   assert.match(templatesPage, /System status/);
   assert.match(templatesPage, /Product updates/);

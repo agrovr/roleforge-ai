@@ -95,10 +95,13 @@ export default async function TemplatesPage() {
                 </div>
                 <div className="studio-account-utilities settings-account-utilities" aria-label="Account utilities">
                   <a href="/api/account/export">
-                    <RoleForgeIcon name="download" size={14} /> Download summary
+                    <RoleForgeIcon name="download" size={14} /> Export account record
                   </a>
                   <Link href="/settings#preferences">
                     <RoleForgeIcon name="layers" size={14} /> Preferences
+                  </Link>
+                  <Link href="/settings#support">
+                    <RoleForgeIcon name="mail" size={14} /> Support history
                   </Link>
                   <Link href="/help">
                     <RoleForgeIcon name="mail" size={14} /> Help center

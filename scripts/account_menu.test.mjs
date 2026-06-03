@@ -40,7 +40,12 @@ test("studio account menu acts as a workspace command center", () => {
   assert.match(studioPage, /Save browser/);
   assert.match(studioPage, /studio-account-utilities/);
   assert.match(studioPage, /href="\/api\/account\/export"/);
-  assert.match(studioPage, /Download summary/);
+  assert.match(studioPage, /Export account record/);
+  assert.match(studioPage, /accountSummary/);
+  assert.match(studioPage, /accountSavedProjectCount/);
+  assert.match(studioPage, /accountSupportRequestCount/);
+  assert.match(studioPage, /Support history/);
+  assert.match(studioPage, /href="\/settings#support"/);
 });
 
 test("account menu layout has responsive status cards", () => {

@@ -163,13 +163,16 @@ function Nav({
                 </div>
                 <div className="studio-account-utilities landing-account-utilities" aria-label="Account utilities">
                   <a href="/api/account/export">
-                    <RoleForgeIcon name="download" size={14} /> Download summary
+                    <RoleForgeIcon name="download" size={14} /> Export account record
                   </a>
                   <Link href="/settings#security">
                     <RoleForgeIcon name="lock" size={14} /> Security
                   </Link>
                   <Link href="/settings#preferences">
                     <RoleForgeIcon name="layers" size={14} /> Preferences
+                  </Link>
+                  <Link href="/settings#support">
+                    <RoleForgeIcon name="mail" size={14} /> Support history
                   </Link>
                   <Link href="/support">
                     <RoleForgeIcon name="mail" size={14} /> Contact support

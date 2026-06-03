@@ -193,6 +193,10 @@ type AccountStatus = {
   user: AccountUser | null;
   entitlement?: AccountEntitlement;
   usage?: AccountUsage | null;
+  accountSummary?: {
+    savedProjectCount?: number | null;
+    supportRequestCount?: number | null;
+  } | null;
   billing?: {
     checkoutReady: boolean;
     portalReady: boolean;
@@ -2658,6 +2662,18 @@ export default function Page() {
     : premiumBillingReady
       ? "Premium adds DOCX and TXT"
       : "Premium exports unavailable";
+  const accountSavedProjectCount = accountStatus?.accountSummary?.savedProjectCount;
+  const accountSupportRequestCount = accountStatus?.accountSummary?.supportRequestCount;
+  const accountProjectsValue = typeof accountSavedProjectCount === "number" ? `${accountSavedProjectCount}` : signedIn ? "Saved" : "Guest";
+  const accountProjectsCaption = typeof accountSavedProjectCount === "number"
+    ? `${accountSavedProjectCount === 1 ? "project" : "projects"} in account`
+    : signedIn
+      ? "History in Settings"
+      : "Sign in to save";
+  const accountSupportValue = typeof accountSupportRequestCount === "number" ? `${accountSupportRequestCount}` : signedIn ? "Support" : "Help";
+  const accountSupportCaption = typeof accountSupportRequestCount === "number"
+    ? `${accountSupportRequestCount === 1 ? "request" : "requests"} saved`
+    : "Support history";
   const accountPlanValue = accountPremiumEnding ? "Ending" : accountPremiumActive ? "Premium" : signedIn ? "Free" : "Guest";
   const accountPlanCaption = signedIn
     ? accountPremiumEnding && accountPremiumEndLabel
@@ -2716,6 +2732,14 @@ export default function Page() {
         : "Premium checkout is unavailable right now. Free studio access is available.",
       href: "/settings#billing",
       icon: "settings",
+    },
+    {
+      label: "Support",
+      detail: typeof accountSupportRequestCount === "number"
+        ? `${accountSupportRequestCount} account-linked support ${accountSupportRequestCount === 1 ? "request" : "requests"} saved.`
+        : "Support history and account-linked requests live in Settings.",
+      href: "/settings#support",
+      icon: "mail",
     },
   ];
   const localHistoryCount = history.filter((entry) => !isAccountHistoryItem(entry, syncedHistoryIds)).length;
@@ -2972,6 +2996,14 @@ export default function Page() {
                           <strong>{accountExportValue}</strong>
                           <span>{accountExportCaption}</span>
                         </Link>
+                        <Link href="/settings#projects" onClick={() => setAccountPanelOpen(false)}>
+                          <strong>{accountProjectsValue}</strong>
+                          <span>{accountProjectsCaption}</span>
+                        </Link>
+                        <Link href="/settings#support" onClick={() => setAccountPanelOpen(false)}>
+                          <strong>{accountSupportValue}</strong>
+                          <span>{accountSupportCaption}</span>
+                        </Link>
                       </div>
                       <small className={`studio-account-sync ${historySyncState}`}>{historySyncMessage}</small>
                       {syncableLocalHistoryCount ? (
@@ -3055,7 +3087,7 @@ export default function Page() {
                       ) : null}
                       <div className="studio-account-utilities" aria-label="Account utilities">
                         <Link href="/api/account/export" onClick={() => setAccountPanelOpen(false)}>
-                          <RoleForgeIcon name="download" size={14} /> Download summary
+                          <RoleForgeIcon name="download" size={14} /> Export account record
                         </Link>
                         <Link href="/settings#security" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="lock" size={14} /> Security
@@ -3065,6 +3097,9 @@ export default function Page() {
                         </Link>
                         <Link href={accountBillingSupportHref} onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="mail" size={14} /> Billing support
+                        </Link>
+                        <Link href="/settings#support" onClick={() => setAccountPanelOpen(false)}>
+                          <RoleForgeIcon name="mail" size={14} /> Support history
                         </Link>
                         <Link href="/status" onClick={() => setAccountPanelOpen(false)}>
                           <RoleForgeIcon name="scan" size={14} /> System status

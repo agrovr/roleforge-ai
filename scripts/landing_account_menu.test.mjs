@@ -19,6 +19,9 @@ test("landing nav exposes a signed-in account menu from real account data", () =
   assert.match(landingPage, /href="\/updates"/);
   assert.match(landingPage, /href="\/support"/);
   assert.match(landingPage, /href="\/api\/account\/export"/);
+  assert.match(landingPage, /Export account record/);
+  assert.match(landingPage, /href="\/settings#support"/);
+  assert.match(landingPage, /Support history/);
   assert.match(landingPage, /System status/);
   assert.match(landingPage, /Updates/);
   assert.match(landingPage, /Contact support/);
