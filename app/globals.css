@@ -8873,12 +8873,65 @@ html[data-theme="dark"] input::file-selector-button {
   position: sticky;
   top: 28px;
   display: grid;
-  gap: 6px;
+  gap: 8px;
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: rgba(255, 253, 248, 0.9);
   box-shadow: var(--shadow-soft);
+}
+
+.settings-section-search {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.settings-section-search > span {
+  color: var(--ink-3);
+  font-size: 0.7rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.settings-section-search > div {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 86%, var(--bg-alt));
+  color: var(--ink-3);
+}
+
+.settings-section-search input {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-0);
+  font-size: 0.82rem;
+  font-weight: 760;
+  outline: none;
+}
+
+.settings-section-search input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+.settings-section-search > div:focus-within {
+  border-color: color-mix(in srgb, var(--brand-dark) 38%, var(--line));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-soft) 70%, transparent);
+}
+
+.settings-section-list {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
 }
 
 .settings-page-nav a {
@@ -8897,6 +8950,17 @@ html[data-theme="dark"] input::file-selector-button {
 .settings-page-nav a.active {
   background: var(--ink-0);
   color: var(--surface);
+}
+
+.settings-section-empty {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  color: var(--ink-3);
+  font-size: 0.82rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
 }
 
 .settings-page-main {
@@ -13670,6 +13734,26 @@ html[data-theme="dark"] .settings-section {
   border-color: rgba(255, 247, 233, 0.18);
 }
 
+html[data-theme="dark"] .settings-section-search > span,
+html[data-theme="dark"] .settings-section-empty {
+  color: var(--ink-3);
+}
+
+html[data-theme="dark"] .settings-section-search > div,
+html[data-theme="dark"] .settings-section-empty {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: rgba(255, 247, 233, 0.055);
+}
+
+html[data-theme="dark"] .settings-section-search input {
+  color: var(--ink-0);
+}
+
+html[data-theme="dark"] .settings-section-search > div:focus-within {
+  border-color: rgba(222, 162, 79, 0.38);
+  box-shadow: 0 0 0 4px rgba(222, 162, 79, 0.14);
+}
+
 html[data-theme="dark"] .settings-billing-alert {
   background:
     linear-gradient(180deg, rgba(222, 162, 79, 0.12), rgba(255, 247, 233, 0.035)),
@@ -14184,14 +14268,20 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
   .settings-page-nav {
     position: static;
+    display: grid;
+    gap: 8px;
+    overflow: visible;
+    padding: 8px;
+  }
+
+  .settings-section-list {
     display: flex;
     gap: 8px;
     overflow-x: auto;
-    padding: 8px;
     scrollbar-width: none;
   }
 
-  .settings-page-nav::-webkit-scrollbar {
+  .settings-section-list::-webkit-scrollbar {
     display: none;
   }
 
@@ -14661,9 +14751,15 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
 
   .settings-page-nav {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     overflow: visible;
     padding: 7px;
+  }
+
+  .settings-section-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
   }
 
   .settings-page-nav a {
@@ -15476,6 +15572,10 @@ body,
 
   .settings-page-nav {
     position: static;
+    grid-template-columns: 1fr;
+  }
+
+  .settings-section-list {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr));
   }
 
