@@ -6998,6 +6998,94 @@ html[data-theme="dark"] input::file-selector-button {
   white-space: nowrap;
 }
 
+.settings-project-kit {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--brand) 16%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 86%, var(--surface-2));
+}
+
+.settings-project-kit-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.settings-project-kit-head span,
+.settings-project-kit-head small {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.settings-project-kit-head span {
+  color: var(--ink-0);
+  font-size: 0.78rem;
+  font-weight: 950;
+  letter-spacing: 0.06em;
+  line-height: 1.12;
+  text-transform: uppercase;
+}
+
+.settings-project-kit-head small {
+  width: auto;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.settings-project-kit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr));
+  gap: 7px;
+  min-width: 0;
+}
+
+.settings-project-kit-item {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 0;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 84%, var(--bg-alt));
+  color: var(--ink-2);
+  font-size: 0.7rem;
+  font-weight: 900;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
+}
+
+.settings-project-kit-item.ready {
+  border-color: color-mix(in srgb, var(--good) 34%, var(--line));
+  background: color-mix(in srgb, var(--good-soft) 28%, var(--surface));
+  color: var(--good);
+}
+
+.settings-project-kit-item.locked {
+  border-color: color-mix(in srgb, var(--brand) 28%, var(--line));
+  background: color-mix(in srgb, var(--brand-soft) 32%, var(--surface));
+  color: var(--brand-dark);
+}
+
 .settings-project-delete {
   min-width: 0;
   border-top: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
@@ -13704,6 +13792,37 @@ html[data-theme="dark"] .settings-template-button.selected {
 html[data-theme="dark"] .settings-project-item small {
   border-color: rgba(255, 247, 233, 0.16);
   background: rgba(255, 247, 233, 0.055);
+}
+
+html[data-theme="dark"] .settings-project-kit {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: rgba(255, 247, 233, 0.055);
+}
+
+html[data-theme="dark"] .settings-project-kit-head span {
+  color: var(--ink-0);
+}
+
+html[data-theme="dark"] .settings-project-kit-head small,
+html[data-theme="dark"] .settings-project-kit-item {
+  color: var(--ink-3);
+}
+
+html[data-theme="dark"] .settings-project-kit-item {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: rgba(255, 247, 233, 0.055);
+}
+
+html[data-theme="dark"] .settings-project-kit-item.ready {
+  border-color: rgba(146, 191, 160, 0.34);
+  background: rgba(95, 132, 109, 0.18);
+  color: #b7e5c4;
+}
+
+html[data-theme="dark"] .settings-project-kit-item.locked {
+  border-color: rgba(222, 162, 79, 0.34);
+  background: rgba(222, 162, 79, 0.14);
+  color: #f3c16d;
 }
 
 html[data-theme="dark"] .settings-project-stage-controls button {

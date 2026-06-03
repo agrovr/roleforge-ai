@@ -1146,6 +1146,20 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                             ))}
                           </div>
                         ) : null}
+                        <div className="settings-project-kit" aria-label={`Application kit for ${project.title}`}>
+                          <div className="settings-project-kit-head">
+                            <span>Application kit</span>
+                            <small>{project.kitSummary}</small>
+                          </div>
+                          <div className="settings-project-kit-grid">
+                            {project.kitItems.map((item) => (
+                              <span className={`settings-project-kit-item ${item.status}`} key={`${project.key}-${item.label}`} title={item.detail}>
+                                <RoleForgeIcon name={item.status === "ready" ? "check" : item.status === "locked" ? "lock" : "settings"} size={12} />
+                                {item.label}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
                         {project.projectId ? (
                           <details className="settings-project-delete">
                             <summary>Remove</summary>

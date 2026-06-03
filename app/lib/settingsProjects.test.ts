@@ -76,6 +76,17 @@ test("groups settings saved projects by project with a restore link", () => {
   assert.equal(summaries[0].actionLabel, "Restore");
   assert.equal(summaries[0].stageStatus, "exported");
   assert.equal(summaries[0].stageLabel, "Ready");
+  assert.equal(summaries[0].kitSummary, "4/5 application kit items ready");
+  assert.deepEqual(
+    summaries[0].kitItems.map((item) => [item.label, item.status]),
+    [
+      ["Tailored resume", "ready"],
+      ["Exports", "ready"],
+      ["Cover letter", "ready"],
+      ["Interview prep", "ready"],
+      ["Follow-up", "missing"],
+    ],
+  );
 });
 
 test("settings saved project downloads respect premium export entitlement", () => {
@@ -100,6 +111,7 @@ test("settings saved project downloads respect premium export entitlement", () =
     summaries[0].downloads.map((download) => download.label),
     ["PDF", "DOCX", "TXT"],
   );
+  assert.match(summaries[0].kitItems.find((item) => item.label === "Exports")?.detail ?? "", /PDF, DOCX, TXT ready/);
 });
 
 test("uses project status when a settings project cannot be restored", () => {
@@ -113,6 +125,35 @@ test("uses project status when a settings project cannot be restored", () => {
   assert.equal(summaries[0].href, "/app?historyRun=download-run#history");
   assert.equal(summaries[0].actionLabel, "Download ready");
   assert.match(summaries[0].actionDetail, /download-ready/);
+  assert.equal(summaries[0].kitSummary, "1/5 application kit items ready");
+  assert.deepEqual(
+    summaries[0].kitItems.map((item) => [item.label, item.status]),
+    [
+      ["Tailored resume", "missing"],
+      ["Exports", "ready"],
+      ["Cover letter", "missing"],
+      ["Interview prep", "missing"],
+      ["Follow-up", "missing"],
+    ],
+  );
+});
+
+test("settings project kit marks premium export gaps without pretending files exist", () => {
+  const summaries = settingsProjectSummaries([
+    savedRun({
+      downloadUrl: "",
+      downloads: {},
+      snapshot: {
+        result: {
+          tailored_text: "Latest tailored draft",
+        },
+      },
+    }),
+  ], freeEntitlement);
+
+  const exportItem = summaries[0].kitItems.find((item) => item.label === "Exports");
+  assert.equal(exportItem?.status, "locked");
+  assert.match(exportItem?.detail ?? "", /DOCX and TXT require Premium/);
 });
 
 test("reads settings restore and template metadata from saved run snapshots", () => {
