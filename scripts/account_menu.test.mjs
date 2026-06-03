@@ -47,6 +47,8 @@ test("account menu layout has responsive status cards", () => {
   assert.match(globalsCss, /\.account-avatar-photo\s*\{/);
   assert.match(globalsCss, /\.account-avatar-initials\s*\{/);
   assert.match(globalsCss, /\.studio-account-insights\s*\{/);
+  assert.match(globalsCss, /\.studio-account-insights strong,\s*\.studio-account-insights span\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
+  assert.doesNotMatch(globalsCss, /\.studio-account-insights strong,\s*\.studio-account-insights span\s*\{[^}]*text-overflow:\s*ellipsis/s);
   assert.match(globalsCss, /@container studio-account-popover \(max-width: 360px\)/);
   assert.match(globalsCss, /html\[data-theme="dark"\] \.studio-account-insights a/);
   assert.match(globalsCss, /\.studio-account-recent\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);

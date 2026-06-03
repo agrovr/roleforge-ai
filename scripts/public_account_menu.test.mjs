@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const publicAccountMenu = readFileSync("app/components/PublicAccountMenu.tsx", "utf8");
+const authStatusRoute = readFileSync("app/api/auth/status/route.ts", "utf8");
 const helpPage = readFileSync("app/help/page.tsx", "utf8");
 const statusPage = readFileSync("app/status/page.tsx", "utf8");
 const supportPage = readFileSync("app/support/page.tsx", "utf8");
@@ -26,15 +27,33 @@ test("public account menu turns static topbars into signed-in command centers", 
   assert.match(publicAccountMenu, /href="\/settings#billing"/);
   assert.match(publicAccountMenu, /href="\/settings#exports"/);
   assert.match(publicAccountMenu, /href="\/settings#usage"/);
+  assert.match(publicAccountMenu, /href="\/settings#support"/);
   assert.match(publicAccountMenu, /href="\/settings#projects"/);
   assert.match(publicAccountMenu, /href="\/templates"/);
   assert.match(publicAccountMenu, /href="\/status"/);
   assert.match(publicAccountMenu, /href="\/updates"/);
   assert.match(publicAccountMenu, /href=\{supportHref\}/);
   assert.match(publicAccountMenu, /href="\/api\/account\/export"/);
+  assert.match(publicAccountMenu, /Export account record/);
+  assert.match(publicAccountMenu, /Support history/);
+  assert.match(publicAccountMenu, /savedProjectCount/);
+  assert.match(publicAccountMenu, /supportRequestCount/);
+  assert.match(publicAccountMenu, /countLabel/);
   assert.match(publicAccountMenu, /action="\/auth\/signout"/);
   assert.match(publicAccountMenu, /href="\/login\?next=\/app&account=signin-required"/);
   assert.match(publicAccountMenu, /Sign in/);
+});
+
+test("auth status exposes safe account counts for public menus", () => {
+  assert.match(authStatusRoute, /countAccountRows/);
+  assert.match(authStatusRoute, /table:\s*"resume_projects"\s*\|\s*"support_requests"/);
+  assert.match(authStatusRoute, /\.select\("id",\s*\{\s*count:\s*"exact",\s*head:\s*true\s*\}\)/);
+  assert.match(authStatusRoute, /\.eq\("user_id",\s*userId\)/);
+  assert.match(authStatusRoute, /countAccountRows\(supabase,\s*"resume_projects",\s*user\.id\)/);
+  assert.match(authStatusRoute, /countAccountRows\(supabase,\s*"support_requests",\s*user\.id\)/);
+  assert.match(authStatusRoute, /accountSummary/);
+  assert.match(authStatusRoute, /savedProjectCount/);
+  assert.match(authStatusRoute, /supportRequestCount/);
 });
 
 test("help status support and updates mount the public account menu", () => {

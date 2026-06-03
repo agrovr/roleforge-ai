@@ -27,6 +27,10 @@ type PublicAccountStatus = {
     monthlyRuns?: number;
     remainingRuns?: number | null;
   } | null;
+  accountSummary?: {
+    savedProjectCount?: number | null;
+    supportRequestCount?: number | null;
+  } | null;
   billing?: {
     checkoutReady?: boolean;
     portalReady?: boolean;
@@ -41,6 +45,11 @@ function runAllowanceLabel(limit: number | null | undefined) {
   if (limit === null) return "Unlimited";
   if (typeof limit === "number") return `${limit} monthly`;
   return "Usage";
+}
+
+function countLabel(count: number | null | undefined, singular: string, plural: string) {
+  if (typeof count !== "number") return "Account";
+  return `${count} ${count === 1 ? singular : plural}`;
 }
 
 function currentPagePath() {
@@ -86,6 +95,12 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
   const usageCaption = typeof status?.usage?.monthlyRuns === "number"
     ? `${status.usage.monthlyRuns} used${typeof status.usage.remainingRuns === "number" ? `, ${status.usage.remainingRuns} left` : ""}`
     : "Refreshes in Settings";
+  const savedProjectCount = status?.accountSummary?.savedProjectCount;
+  const supportRequestCount = status?.accountSummary?.supportRequestCount;
+  const savedProjectLabel = countLabel(savedProjectCount, "project", "projects");
+  const savedProjectCaption = typeof savedProjectCount === "number" ? "Saved to account" : "Manage in Settings";
+  const supportRequestLabel = countLabel(supportRequestCount, "request", "requests");
+  const supportRequestCaption = typeof supportRequestCount === "number" ? "Support history" : "Track from Support";
 
   if (!signedIn) {
     return (
@@ -133,6 +148,14 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
             <strong>{usageLabel}</strong>
             <span>{usageCaption}</span>
           </Link>
+          <Link href="/settings#projects">
+            <strong>{savedProjectLabel}</strong>
+            <span>{savedProjectCaption}</span>
+          </Link>
+          <Link href="/settings#support">
+            <strong>{supportRequestLabel}</strong>
+            <span>{supportRequestCaption}</span>
+          </Link>
         </div>
         <div className="studio-account-shortcuts settings-account-shortcuts public-account-shortcuts">
           <Link href="/app"><RoleForgeIcon name="file" size={14} /> Studio</Link>
@@ -146,10 +169,13 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
         </div>
         <div className="studio-account-utilities settings-account-utilities public-account-utilities" aria-label="Account utilities">
           <a href="/api/account/export">
-            <RoleForgeIcon name="download" size={14} /> Download summary
+            <RoleForgeIcon name="download" size={14} /> Export account record
           </a>
           <Link href="/settings#security">
             <RoleForgeIcon name="lock" size={14} /> Security
+          </Link>
+          <Link href="/settings#support">
+            <RoleForgeIcon name="mail" size={14} /> Support history
           </Link>
           <Link href="/help">
             <RoleForgeIcon name="mail" size={14} /> Help center

@@ -5888,9 +5888,9 @@ html[data-theme="dark"] input::file-selector-button {
 .studio-account-insights span {
   display: block;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.18;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .studio-account-insights strong {

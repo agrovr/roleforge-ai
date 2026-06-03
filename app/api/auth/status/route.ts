@@ -10,6 +10,21 @@ import { getSupabaseConfig } from "@/app/lib/supabase/config";
 import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
 import { loadAccountUsage } from "@/app/lib/usage";
 
+type CountResult = { count: number | null; error: unknown };
+
+async function countAccountRows(
+  supabase: NonNullable<Awaited<ReturnType<typeof createRoleForgeServerClient>>>,
+  table: "resume_projects" | "support_requests",
+  userId: string,
+) {
+  const { count, error } = await supabase
+    .from(table)
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId) as CountResult;
+
+  return error ? null : count ?? 0;
+}
+
 export async function GET() {
   const config = getSupabaseConfig();
 
@@ -48,6 +63,15 @@ export async function GET() {
   const usage = user && supabase
     ? await loadAccountUsage(supabase, user.id, entitlement).catch(() => null)
     : null;
+  const accountSummary = user && supabase
+    ? await Promise.all([
+        countAccountRows(supabase, "resume_projects", user.id).catch(() => null),
+        countAccountRows(supabase, "support_requests", user.id).catch(() => null),
+      ]).then(([savedProjectCount, supportRequestCount]) => ({
+        savedProjectCount,
+        supportRequestCount,
+      }))
+    : null;
   const billing = billingReadiness(getStripeBillingConfig(), {
     hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()),
     billingStatus: entitlement.billingStatus,
@@ -60,6 +84,7 @@ export async function GET() {
     user,
     entitlement,
     usage,
+    accountSummary,
     billing,
     next: user
       ? usage
