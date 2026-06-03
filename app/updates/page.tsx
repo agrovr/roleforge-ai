@@ -28,6 +28,20 @@ type UpdateItem = {
 
 const updates: readonly UpdateItem[] = [
   {
+    title: "Account support actions are easier to find",
+    date: "June 3, 2026",
+    eyebrow: "Account support",
+    icon: "mail",
+    summary: "Settings and Support now make common account tasks and saved support references faster to use.",
+    details: [
+      "Settings includes task shortcuts for canceling Premium, exporting account data, reviewing support history, and restoring saved projects.",
+      "Support and Settings histories include a copy control for the safe RF support reference shown to the user.",
+      "The account menus now use consistent account export and support-history actions across public and signed-in surfaces.",
+    ],
+    actionHref: "/support",
+    actionLabel: "Open support",
+  },
+  {
     title: "Public sign-in keeps your place",
     date: "June 2, 2026",
     eyebrow: "Account",
