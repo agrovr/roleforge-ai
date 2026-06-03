@@ -17,6 +17,18 @@ const settingsSections = [
 type SettingsSectionId = (typeof settingsSections)[number]["id"];
 type SettingsSectionRect = { id: SettingsSectionId; rect: DOMRect };
 
+const settingsTaskShortcuts: Array<{
+  label: string;
+  query: string;
+  sectionId: SettingsSectionId;
+  icon: "chart" | "download" | "lock" | "mail";
+}> = [
+  { label: "Cancel Premium", query: "cancel premium", sectionId: "billing", icon: "lock" },
+  { label: "Export data", query: "account export", sectionId: "account", icon: "download" },
+  { label: "Support history", query: "support request", sectionId: "support", icon: "mail" },
+  { label: "Restore projects", query: "restore saved projects", sectionId: "projects", icon: "chart" },
+];
+
 export function SettingsSectionNav() {
   const [activeSection, setActiveSection] = useState<SettingsSectionId>("account");
   const [query, setQuery] = useState("");
@@ -158,6 +170,21 @@ export function SettingsSectionNav() {
           />
         </div>
       </label>
+      <div className="settings-task-shortcuts" aria-label="Common account tasks">
+        {settingsTaskShortcuts.map((task) => (
+          <a
+            href={`#${task.sectionId}`}
+            key={task.label}
+            onClick={(event) => {
+              event.preventDefault();
+              setQuery(task.query);
+              navigateToSection(task.sectionId);
+            }}
+          >
+            <RoleForgeIcon name={task.icon} size={14} /> {task.label}
+          </a>
+        ))}
+      </div>
       <div className="settings-section-list" aria-label="Matching settings sections" ref={navRef}>
         {visibleSections.map((section) => (
           <a
