@@ -59,13 +59,39 @@ test("builds a safe account summary export without protected URLs or Stripe ids"
       export_template: "classic",
       created_at: "2026-06-01T01:00:00.000Z",
     }],
+    supportRequests: [{
+      id: "4adcd15a-769a-4c2f-939f-09df6e70a225",
+      referenceLabel: "RF-70A225",
+      category: "exports",
+      categoryLabel: "Exports",
+      subject: "DOCX export did not unlock",
+      messagePreview: "The export button still says Premium after checkout.",
+      contextUrl: "/settings#billing",
+      status: "reviewing",
+      statusLabel: "Reviewing",
+      createdAt: "2026-06-01T02:00:00.000Z",
+      createdLabel: "Jun 1, 2026",
+    }],
   });
 
   assert.equal(payload.account.displayName, "Avery Stone");
   assert.equal(payload.savedProjects[0].title, "Product Manager");
   assert.equal(payload.tailoringRuns[0].downloadFilename, "tailored.pdf");
+  assert.deepEqual(payload.supportRequests[0], {
+    reference: "RF-70A225",
+    category: "exports",
+    categoryLabel: "Exports",
+    subject: "DOCX export did not unlock",
+    messagePreview: "The export button still says Premium after checkout.",
+    contextUrl: "/settings#billing",
+    status: "reviewing",
+    statusLabel: "Reviewing",
+    createdAt: "2026-06-01T02:00:00.000Z",
+    createdLabel: "Jun 1, 2026",
+  });
   assert.equal(JSON.stringify(payload).includes("stripe_"), false);
   assert.equal(JSON.stringify(payload).includes("downloadUrl"), false);
+  assert.equal(JSON.stringify(payload).includes("4adcd15a-769a-4c2f-939f-09df6e70a225"), false);
 });
 
 test("creates filesystem-safe account export filenames", () => {

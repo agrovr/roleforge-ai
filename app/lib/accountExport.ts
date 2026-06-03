@@ -4,6 +4,7 @@ import { loadAccountProfile, type AccountProfile } from "./accountProfile";
 import type { AccountIdentitySource } from "./accountUser";
 import { accountDisplayName } from "./accountUser";
 import type { AccountEntitlement } from "./entitlements";
+import { loadSupportRequests, type SupportRequestSummary } from "./supportRequests";
 import type { AccountUsage } from "./usage";
 
 type ExportUser = AccountIdentitySource & {
@@ -63,6 +64,7 @@ export function buildAccountExportPayload({
   usage,
   projects,
   runs,
+  supportRequests = [],
   generatedAt = new Date().toISOString(),
 }: {
   user: ExportUser;
@@ -71,6 +73,7 @@ export function buildAccountExportPayload({
   usage: AccountUsage;
   projects: ProjectExportRow[];
   runs: RunExportRow[];
+  supportRequests?: SupportRequestSummary[];
   generatedAt?: string;
 }) {
   return {
@@ -99,6 +102,18 @@ export function buildAccountExportPayload({
       remainingRuns: usage.remainingRuns,
       runLimited: usage.runLimited,
     },
+    supportRequests: supportRequests.map((request) => ({
+      reference: request.referenceLabel,
+      category: request.category,
+      categoryLabel: request.categoryLabel,
+      subject: request.subject,
+      messagePreview: request.messagePreview,
+      contextUrl: request.contextUrl,
+      status: request.status,
+      statusLabel: request.statusLabel,
+      createdAt: request.createdAt,
+      createdLabel: request.createdLabel,
+    })),
     savedProjects: projects.map((project) => ({
       id: project.id,
       title: project.title || "Untitled resume",
@@ -138,8 +153,9 @@ export async function loadAccountExportData(
   entitlement: AccountEntitlement,
   usage: AccountUsage,
 ) {
-  const [profile, projectsResult, runsResult] = await Promise.all([
+  const [profile, supportRequests, projectsResult, runsResult] = await Promise.all([
     loadAccountProfile(client, user.id),
+    loadSupportRequests(client, user.id, { limit: 20 }),
     client
       .from("resume_projects")
       .select("id, title, status, source_filename, source_name, target_title, target_source, last_target_summary, latest_run_id, created_at, updated_at")
@@ -164,5 +180,6 @@ export async function loadAccountExportData(
     usage,
     projects: (projectsResult.data ?? []) as ProjectExportRow[],
     runs: (runsResult.data ?? []) as RunExportRow[],
+    supportRequests,
   });
 }
