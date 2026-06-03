@@ -67,7 +67,8 @@ test("settings account panel includes an editable profile display name", () => {
   assert.match(settingsPage, /defaultValue=\{displayName\}/);
   assert.match(settingsPage, /Save name/);
   assert.match(settingsPage, /href="\/api\/account\/export"/);
-  assert.match(settingsPage, /Download summary/);
+  assert.match(settingsPage, /Export account record/);
+  assert.match(settingsPage, /Download account, project, run, and support-reference details\./);
   assert.match(stylesheet, /\.settings-profile-form\s*\{[^}]*max-width:\s*min\(100%,\s*560px\)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-profile-edit-row\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*minmax\(min\(100%,\s*138px\),\s*auto\)[^}]*\}/s);
 });

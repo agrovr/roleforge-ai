@@ -129,7 +129,7 @@ function accountNotice(value: string | undefined) {
 
 async function countRows(
   supabase: NonNullable<Awaited<ReturnType<typeof createRoleForgeServerClient>>>,
-  table: "resume_projects" | "tailor_runs",
+  table: "resume_projects" | "tailor_runs" | "support_requests",
   userId: string,
 ) {
   const { count, error } = await supabase
@@ -350,9 +350,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     redirect(`/settings?billing=${syncedCheckout ? "checkout-success" : "checkout-syncing"}#billing`);
   }
 
-  const [projectCount, runCount, recentSavedRuns, recentSupportRequests, accountProfile] = await Promise.all([
+  const [projectCount, runCount, supportRequestCount, recentSavedRuns, recentSupportRequests, accountProfile] = await Promise.all([
     countRows(supabase, "resume_projects", user.id),
     countRows(supabase, "tailor_runs", user.id),
+    countRows(supabase, "support_requests", user.id),
     loadSavedRuns(supabase, user.id).catch(() => []),
     loadSupportRequests(supabase, user.id, { limit: 4 }).catch(() => []),
     loadAccountProfile(supabase, user.id).catch(() => null),
@@ -434,7 +435,15 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const usageTrackWidth = usageProgressPercent(usage);
   const projectCountLabel = projectCount === 1 ? "Project" : "Projects";
   const runCountLabel = runCount === 1 ? "Run" : "Runs";
+  const supportRequestCountLabel = supportRequestCount === 1 ? "Request" : "Requests";
   const recentProjectSummaries = settingsProjectSummaries(recentSavedRuns, entitlement);
+  const latestSupportRequest = recentSupportRequests[0] ?? null;
+  const supportOverviewValue = latestSupportRequest ? latestSupportRequest.referenceLabel : supportRequestCount;
+  const supportOverviewCaption = latestSupportRequest
+    ? `${latestSupportRequest.statusLabel} · ${latestSupportRequest.categoryLabel}`
+    : supportRequestCount
+      ? `${supportRequestCount} ${supportRequestCountLabel.toLowerCase()} saved`
+      : "No requests yet";
   const settingsAccountPlanCaption = premiumEnding && premiumEndLabel
     ? `Access until ${premiumEndLabel}`
     : premiumActive
@@ -585,9 +594,30 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   ))}
                 </div>
               ) : null}
+              {recentSupportRequests.length ? (
+                <div className="studio-account-recent settings-account-recent settings-account-support-recent" aria-label="Recent support requests">
+                  <div className="studio-account-recent-head settings-account-recent-head">
+                    <span>Recent support</span>
+                    <a href="#support">View</a>
+                  </div>
+                  {recentSupportRequests.slice(0, 2).map((request) => (
+                    <a
+                      className="studio-account-recent-link settings-account-recent-link"
+                      href="#support"
+                      key={request.id}
+                    >
+                      <span>
+                        <strong>{request.referenceLabel}</strong>
+                        <small>{request.statusLabel} · {request.subject}</small>
+                      </span>
+                      <RoleForgeIcon name="mail" size={14} />
+                    </a>
+                  ))}
+                </div>
+              ) : null}
               <div className="studio-account-utilities settings-account-utilities" aria-label="Account utilities">
                 <a href="/api/account/export">
-                  <RoleForgeIcon name="download" size={14} /> Download summary
+                  <RoleForgeIcon name="download" size={14} /> Export account record
                 </a>
                 <a href="#security">
                   <RoleForgeIcon name="lock" size={14} /> Security
@@ -624,6 +654,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 <a className="studio-account-summary" href="#billing">
                   <span><RoleForgeIcon name="settings" size={14} /> Billing</span>
                   <small>{billingDetail}</small>
+                </a>
+                <a className="studio-account-summary" href="#support">
+                  <span><RoleForgeIcon name="mail" size={14} /> Support</span>
+                  <small>{supportRequestCount} {supportRequestCountLabel.toLowerCase()} saved; account export includes safe request references.</small>
                 </a>
               </div>
               <form className="studio-account-form" action="/auth/signout" method="post">
@@ -683,7 +717,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
             <a className="settings-workspace-action" href="/api/account/export">
               <span><RoleForgeIcon name="download" size={16} /></span>
               <strong>Export account</strong>
-              <small>Download a private account summary.</small>
+              <small>Download account, project, run, and support-reference details.</small>
+            </a>
+            <a className="settings-workspace-action" href="#support">
+              <span><RoleForgeIcon name="mail" size={16} /></span>
+              <strong>Support history</strong>
+              <small>{supportRequestCount} {supportRequestCountLabel.toLowerCase()} saved with your account.</small>
             </a>
             <a className="settings-workspace-action" href="#billing">
               <span><RoleForgeIcon name="settings" size={16} /></span>
@@ -724,6 +763,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <span>Exports</span>
                   <strong>{settingsAccountExportValue}</strong>
                   <small>{settingsAccountExportCaption}</small>
+                </a>
+                <a href="#support">
+                  <span>Support</span>
+                  <strong>{supportOverviewValue}</strong>
+                  <small>{supportOverviewCaption}</small>
                 </a>
               </div>
               <div className="settings-overview-actions" aria-label="Account overview actions">
@@ -807,7 +851,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <RoleForgeIcon name="file" size={14} /> Open studio
                 </Link>
                 <a className="ghost-button" href="/api/account/export">
-                  <RoleForgeIcon name="download" size={14} /> Download summary
+                  <RoleForgeIcon name="download" size={14} /> Export account record
                 </a>
                 <form action="/auth/signout" method="post">
                   <input type="hidden" name="next" value="/login?account=signed-out" />
@@ -1140,7 +1184,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 </div>
               )}
               <div className="settings-export-actions">
-                <span>Support requests are saved with your account email for follow-up.</span>
+                <span>Support requests are saved with your account email and included in account exports as safe references.</span>
                 <Link className="btn btn-soft btn-sm settings-inline-link" href={supportHistoryHref}>Open support</Link>
               </div>
             </div>

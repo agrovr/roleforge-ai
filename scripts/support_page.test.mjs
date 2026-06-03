@@ -95,17 +95,24 @@ test("support requests have protected Supabase ownership policies", () => {
 });
 
 test("settings exposes account support request history", () => {
+  assert.match(settingsPage, /countRows\(supabase,\s*"support_requests",\s*user\.id\)/);
   assert.match(settingsPage, /loadSupportRequests\(supabase,\s*user\.id,\s*\{ limit: 4 \}\)/);
   assert.match(settingsPage, /supportRequestHref/);
   assert.match(settingsPage, /Billing or Premium access/);
   assert.match(settingsPage, /Workflow or export issue/);
+  assert.match(settingsPage, /supportRequestCountLabel/);
+  assert.match(settingsPage, /supportOverviewCaption/);
+  assert.match(settingsPage, /Support history/);
   assert.match(settingsPage, /id="support"/);
   assert.match(settingsPage, /Support requests/);
   assert.match(settingsPage, /settings-support-list/);
+  assert.match(settingsPage, /settings-account-support-recent/);
+  assert.match(settingsPage, /Recent support/);
   assert.match(settingsPage, /request\.referenceLabel/);
   assert.match(settingsPage, /support-status-badge/);
   assert.match(settingsPage, /Open support/);
   assert.match(settingsPage, /href="#support"/);
+  assert.match(settingsPage, /account exports as safe references/);
 });
 
 test("support page is discoverable across public and account surfaces", () => {

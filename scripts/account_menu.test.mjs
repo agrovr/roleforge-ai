@@ -72,7 +72,7 @@ test("settings topbar exposes account, project, usage, and billing controls", ()
   assert.match(settingsPage, /href=\{project\.href\}/);
   assert.match(settingsPage, /settings-account-utilities/);
   assert.match(settingsPage, /href="\/api\/account\/export"/);
-  assert.match(settingsPage, /Download summary/);
+  assert.match(settingsPage, /Export account record/);
   assert.match(settingsPage, /href="#security"/);
   assert.match(settingsPage, /href="#preferences"/);
   assert.match(settingsPage, /href="#projects"/);
@@ -86,6 +86,10 @@ test("settings topbar exposes account, project, usage, and billing controls", ()
   assert.match(settingsPage, /System status/);
   assert.match(settingsPage, /Product updates/);
   assert.match(settingsPage, /Contact support/);
+  assert.match(settingsPage, /Recent support/);
+  assert.match(settingsPage, /settings-account-support-recent/);
+  assert.match(settingsPage, /supportRequestCount/);
+  assert.match(settingsPage, /supportOverviewValue/);
   assert.match(settingsPage, /href="\/app#history"/);
   assert.match(settingsPage, /action="\/auth\/signout"/);
 });
