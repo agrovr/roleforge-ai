@@ -8,8 +8,18 @@ import { pathToFileURL } from "node:url";
 const LIVE_SITE_HOST = "roleforgeai.vercel.app";
 const DEFAULT_VERCEL_TEAM_ID = "team_kEe4HW272D5nYJDD92amj55H";
 const TEMP_VERCEL_ENV_FILE = ".codex-vercel-production.env";
+const VERCEL_ENCRYPTED_VALUE = "__VERCEL_ENCRYPTED__";
+const VERCEL_PRODUCTION_NAMES = [
+  "NEXT_PUBLIC_SITE_URL",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "STRIPE_SECRET_KEY",
+  "STRIPE_PREMIUM_MONTHLY_PRICE_ID",
+  "STRIPE_PREMIUM_YEARLY_PRICE_ID",
+  "STRIPE_WEBHOOK_SECRET",
+];
 
 export function stripeKeyMode(secretKey = "") {
+  if (secretKey === VERCEL_ENCRYPTED_VALUE) return "encrypted";
   if (secretKey.startsWith("sk_live_")) return "live";
   if (secretKey.startsWith("sk_test_")) return "test";
   return secretKey ? "unknown" : "missing";
@@ -26,10 +36,12 @@ function productionRequiresLiveStripeKey(env) {
 }
 
 function priceIdLooksValid(value = "") {
+  if (value === VERCEL_ENCRYPTED_VALUE) return true;
   return value.startsWith("price_");
 }
 
 function webhookSecretLooksValid(value = "") {
+  if (value === VERCEL_ENCRYPTED_VALUE) return true;
   return value.startsWith("whsec_");
 }
 
@@ -60,7 +72,7 @@ export function evaluateBillingLaunchReadiness(env = process.env) {
     message: secretKey ? `STRIPE_SECRET_KEY is configured (${mode} mode)` : "STRIPE_SECRET_KEY is missing",
   });
 
-  if (secretKey && liveKeyRequired && mode !== "live") {
+  if (secretKey && liveKeyRequired && mode !== "live" && mode !== "encrypted") {
     findings.push({
       ok: false,
       level: "fail",
@@ -77,6 +89,12 @@ export function evaluateBillingLaunchReadiness(env = process.env) {
       ok: true,
       level: "warn",
       message: "Stripe is in test mode; Premium checkout stays paused on the production domain",
+    });
+  } else if (secretKey && mode === "encrypted") {
+    findings.push({
+      ok: true,
+      level: "warn",
+      message: "STRIPE_SECRET_KEY is encrypted in Vercel and cannot be inspected by the CLI; prove live mode with a live checkout proof",
     });
   }
 
@@ -98,8 +116,9 @@ export function evaluateBillingLaunchReadiness(env = process.env) {
     message: "STRIPE_WEBHOOK_SECRET is configured",
   });
 
-  const checkoutReady = Boolean(secretKey && priceIdLooksValid(monthlyPriceId) && priceIdLooksValid(yearlyPriceId) && (!liveKeyRequired || mode === "live"));
-  const webhookReady = Boolean(secretKey && webhookSecretLooksValid(webhookSecret) && (!liveKeyRequired || mode === "live"));
+  const productionKeyReady = !liveKeyRequired || mode === "live" || mode === "encrypted";
+  const checkoutReady = Boolean(secretKey && priceIdLooksValid(monthlyPriceId) && priceIdLooksValid(yearlyPriceId) && productionKeyReady);
+  const webhookReady = Boolean(secretKey && webhookSecretLooksValid(webhookSecret) && productionKeyReady);
   const ready = checkoutReady && webhookReady && valuePresent(env, "SUPABASE_SERVICE_ROLE_KEY") && valuePresent(env, "NEXT_PUBLIC_SITE_URL");
 
   return {
@@ -135,6 +154,7 @@ export function parseEnvFile(contents) {
 
 export function safeValueKind(name, value = "") {
   if (!value) return "missing";
+  if (value === VERCEL_ENCRYPTED_VALUE) return "encrypted";
   if (name === "STRIPE_SECRET_KEY") return stripeKeyMode(value);
   if (name === "STRIPE_WEBHOOK_SECRET") return value.startsWith("whsec_") ? "webhook-secret" : "present";
   if (name.includes("PRICE_ID")) return value.startsWith("price_") ? "price" : "present";
@@ -142,20 +162,48 @@ export function safeValueKind(name, value = "") {
   return "present";
 }
 
+function invokeVercel(args, { cwd = process.cwd() } = {}) {
+  const command = process.platform === "win32" ? "cmd.exe" : "npx";
+  const commandArgs = process.platform === "win32" ? ["/d", "/s", "/c", "npx", "vercel", ...args] : ["vercel", ...args];
+  return execFileSync(command, commandArgs, { cwd, stdio: ["ignore", "pipe", "pipe"], encoding: "utf8" });
+}
+
+export function parseVercelEnvList(output = "") {
+  const env = {};
+  for (const line of output.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("name ") || trimmed.startsWith("> ") || trimmed.startsWith("Vercel CLI")) continue;
+    const name = trimmed.split(/\s+/)[0];
+    if (VERCEL_PRODUCTION_NAMES.includes(name) && /\bEncrypted\b/.test(trimmed)) {
+      env[name] = VERCEL_ENCRYPTED_VALUE;
+    }
+  }
+  return env;
+}
+
+export function mergePulledAndListedVercelEnv(pulledEnv = {}, listedEnv = {}) {
+  const merged = { ...pulledEnv };
+  for (const [name, value] of Object.entries(listedEnv)) {
+    if (!merged[name]?.trim()) {
+      merged[name] = value;
+    }
+  }
+  return merged;
+}
+
+function listVercelProductionEnv({ teamId = DEFAULT_VERCEL_TEAM_ID, cwd = process.cwd() } = {}) {
+  return parseVercelEnvList(invokeVercel(["env", "ls", "production", "--scope", teamId], { cwd }));
+}
+
 function pullVercelProductionEnv({ teamId = DEFAULT_VERCEL_TEAM_ID, cwd = process.cwd(), tempFile = TEMP_VERCEL_ENV_FILE } = {}) {
   const tempPath = join(cwd, tempFile);
   if (existsSync(tempPath)) rmSync(tempPath, { force: true });
-  const vercelArgs = ["vercel", "env", "pull", tempFile, "--environment=production", "--scope", teamId];
-  const command = process.platform === "win32" ? "cmd.exe" : "npx";
-  const args = process.platform === "win32" ? ["/d", "/s", "/c", "npx", ...vercelArgs] : vercelArgs;
 
   try {
-    execFileSync(
-      command,
-      args,
-      { cwd, stdio: ["ignore", "pipe", "pipe"], encoding: "utf8" },
-    );
-    return parseEnvFile(readFileSync(tempPath, "utf8"));
+    invokeVercel(["env", "pull", tempFile, "--environment=production", "--scope", teamId], { cwd });
+    const pulledEnv = parseEnvFile(readFileSync(tempPath, "utf8"));
+    const listedEnv = listVercelProductionEnv({ teamId, cwd });
+    return mergePulledAndListedVercelEnv(pulledEnv, listedEnv);
   } finally {
     if (existsSync(tempPath)) rmSync(tempPath, { force: true });
   }
@@ -218,14 +266,7 @@ export function runBillingLaunchReadinessCli(argv = process.argv.slice(2), env =
   console.log("RoleForge AI billing launch readiness");
   if (options.vercelProduction) {
     console.log(`Source: Vercel production env (${options.teamId})`);
-    for (const name of [
-      "NEXT_PUBLIC_SITE_URL",
-      "SUPABASE_SERVICE_ROLE_KEY",
-      "STRIPE_SECRET_KEY",
-      "STRIPE_PREMIUM_MONTHLY_PRICE_ID",
-      "STRIPE_PREMIUM_YEARLY_PRICE_ID",
-      "STRIPE_WEBHOOK_SECRET",
-    ]) {
+    for (const name of VERCEL_PRODUCTION_NAMES) {
       console.log(`SAFE ${name}: ${safeValueKind(name, effectiveEnv[name])}`);
     }
     console.log("");

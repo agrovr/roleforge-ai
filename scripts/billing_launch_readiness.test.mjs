@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
-import { evaluateBillingLaunchReadiness, parseEnvFile, safeValueKind } from "./check_billing_launch_readiness.mjs";
+import {
+  evaluateBillingLaunchReadiness,
+  mergePulledAndListedVercelEnv,
+  parseEnvFile,
+  parseVercelEnvList,
+  safeValueKind,
+} from "./check_billing_launch_readiness.mjs";
 
 const scriptPath = "scripts/check_billing_launch_readiness.mjs";
 
@@ -74,6 +80,47 @@ test("billing readiness parses pulled env files without exposing values", () => 
   assert.equal(safeValueKind("STRIPE_SECRET_KEY", env.STRIPE_SECRET_KEY), "live");
   assert.equal(safeValueKind("STRIPE_PREMIUM_MONTHLY_PRICE_ID", env.STRIPE_PREMIUM_MONTHLY_PRICE_ID), "price");
   assert.equal(evaluateBillingLaunchReadiness(env).ready, true);
+});
+
+test("billing readiness treats Vercel encrypted production vars as configured without exposing values", () => {
+  const env = parseVercelEnvList(`
+ name                                       value               environments                        created
+ STRIPE_SECRET_KEY                          Encrypted           Production                          2h ago
+ STRIPE_PREMIUM_YEARLY_PRICE_ID             Encrypted           Production                          3d ago
+ STRIPE_PREMIUM_MONTHLY_PRICE_ID            Encrypted           Production                          3d ago
+ STRIPE_WEBHOOK_SECRET                      Encrypted           Production                          3d ago
+ SUPABASE_SERVICE_ROLE_KEY                  Encrypted           Production                          3d ago
+ NEXT_PUBLIC_SITE_URL                       Encrypted           Production                          18d ago
+`);
+
+  const result = evaluateBillingLaunchReadiness(env);
+  assert.equal(safeValueKind("STRIPE_SECRET_KEY", env.STRIPE_SECRET_KEY), "encrypted");
+  assert.equal(result.mode, "encrypted");
+  assert.equal(result.ready, true);
+  assert.match(result.findings.map((finding) => finding.message).join("\n"), /prove live mode with a live checkout proof/);
+});
+
+test("billing readiness fills blank pulled Vercel secrets from encrypted env listing", () => {
+  const pulled = parseEnvFile([
+    "NEXT_PUBLIC_SITE_URL=https://roleforgeai.vercel.app",
+    "STRIPE_SECRET_KEY=",
+    "STRIPE_PREMIUM_MONTHLY_PRICE_ID=",
+    "STRIPE_PREMIUM_YEARLY_PRICE_ID=",
+    "STRIPE_WEBHOOK_SECRET=",
+    "SUPABASE_SERVICE_ROLE_KEY=",
+  ].join("\n"));
+  const listed = parseVercelEnvList(`
+ STRIPE_SECRET_KEY                          Encrypted           Production                          2h ago
+ STRIPE_PREMIUM_YEARLY_PRICE_ID             Encrypted           Production                          3d ago
+ STRIPE_PREMIUM_MONTHLY_PRICE_ID            Encrypted           Production                          3d ago
+ STRIPE_WEBHOOK_SECRET                      Encrypted           Production                          3d ago
+ SUPABASE_SERVICE_ROLE_KEY                  Encrypted           Production                          3d ago
+`);
+  const merged = mergePulledAndListedVercelEnv(pulled, listed);
+
+  assert.equal(merged.NEXT_PUBLIC_SITE_URL, "https://roleforgeai.vercel.app");
+  assert.equal(safeValueKind("STRIPE_SECRET_KEY", merged.STRIPE_SECRET_KEY), "encrypted");
+  assert.equal(evaluateBillingLaunchReadiness(merged).ready, true);
 });
 
 test("safe value kinds never include secret values", () => {
