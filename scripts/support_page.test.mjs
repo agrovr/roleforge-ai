@@ -42,6 +42,9 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /request\.referenceLabel/);
   assert.match(supportPage, /SupportReferenceCopyButton/);
   assert.match(supportPage, /referenceLabel=\{request\.referenceLabel\}/);
+  assert.match(supportPage, /referenceLabel" in notice/);
+  assert.match(supportPage, /SupportReferenceCopyButton referenceLabel=\{notice\.referenceLabel\}/);
+  assert.match(supportPage, /support-notice-content/);
   assert.match(supportPage, /support-status-badge/);
   assert.match(supportPage, /name="category"/);
   assert.match(supportPage, /name="subject"/);
@@ -157,6 +160,7 @@ test("support page has overflow-safe responsive form layout", () => {
   assert.match(stylesheet, /\.support-guide-card\s+small\s*\{(?=[^}]*grid-area:\s*action)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
   assert.match(stylesheet, /\.support-request-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*gap:\s*16px)[^}]*\}/s);
   assert.match(stylesheet, /\.support-prefill-note\s*\{(?=[^}]*border-color:)(?=[^}]*background:)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-notice-content\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.support-form\s+input,\s*\.support-form\s+select,\s*\.support-form\s+textarea\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.support-history-item,\s*\.settings-support-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.support-history-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*justify-items:\s*end)(?=[^}]*min-width:\s*0)[^}]*\}/s);

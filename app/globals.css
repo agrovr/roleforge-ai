@@ -2293,9 +2293,10 @@ html.rf-custom-pointer [contenteditable=""] {
 }
 
 .price-card.featured .price-status {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--brand-soft);
+  border-color: rgba(255, 247, 233, 0.42);
+  background: rgba(255, 247, 233, 0.14);
+  color: #fff7e9;
+  box-shadow: inset 0 0 0 1px rgba(255, 247, 233, 0.08);
 }
 
 .price-amount .v {
@@ -3208,6 +3209,23 @@ html[data-theme="dark"] .price-card.featured .price-list,
 html[data-theme="dark"] .cta-band p,
 html[data-theme="dark"] .cta-band .btn-ghost {
   color: #c7ccdf;
+}
+
+html[data-theme="dark"] .price-status {
+  border-color: rgba(255, 247, 233, 0.24);
+  background: rgba(255, 247, 233, 0.08);
+  color: #fff7e9;
+}
+
+html[data-theme="dark"] .price-card.featured .price-status {
+  border-color: rgba(255, 247, 233, 0.5);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.18), rgba(255, 247, 233, 0.09)),
+    rgba(10, 14, 34, 0.88);
+  color: #fff7e9;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 247, 233, 0.12),
+    0 10px 28px -18px rgba(0, 0, 0, 0.7);
 }
 
 html[data-theme="dark"] .cta-band h2,
@@ -8233,6 +8251,14 @@ html[data-theme="dark"] input::file-selector-button {
 .support-notice.success {
   border-color: color-mix(in srgb, var(--good) 28%, var(--line));
   background: color-mix(in srgb, var(--good-soft) 48%, var(--surface));
+}
+
+.support-notice-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 .support-notice span,

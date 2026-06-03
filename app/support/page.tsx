@@ -75,13 +75,16 @@ function getParam(value: string | string[] | undefined) {
 
 function supportNotice(value: string | undefined, reference?: string) {
   switch (value) {
-    case "sent":
+    case "sent": {
+      const referenceLabel = reference ? supportRequestReference(reference) : "";
       return {
         tone: "success" as const,
-        text: reference
-          ? `Support request saved as ${supportRequestReference(reference)}. We will use your account email for follow-up.`
+        referenceLabel,
+        text: referenceLabel
+          ? `Support request saved as ${referenceLabel}. We will use your account email for follow-up.`
           : "Support request saved. We will use your account email for follow-up.",
       };
+    }
     case "invalid":
       return { tone: "warn" as const, text: "Add a topic, a short subject, and a detailed message." };
     case "unavailable":
@@ -171,7 +174,12 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
           {notice ? (
             <div className={`support-notice ${notice.tone}`} role="status">
               <RoleForgeIcon name={notice.tone === "success" ? "check" : "settings"} size={15} />
-              <span>{notice.text}</span>
+              <div className="support-notice-content">
+                <span>{notice.text}</span>
+                {"referenceLabel" in notice && notice.referenceLabel ? (
+                  <SupportReferenceCopyButton referenceLabel={notice.referenceLabel} />
+                ) : null}
+              </div>
             </div>
           ) : null}
 
