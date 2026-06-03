@@ -115,7 +115,7 @@ export default async function StatusPage() {
         ? "Stripe checkout and billing portal configuration are ready for signed-in accounts."
         : billing.portalReady
           ? "Existing Stripe customers can open billing management; new checkout is not open."
-          : "Premium checkout is paused while billing configuration is completed. Free PDF workflow can remain available.",
+          : "Premium checkout is unavailable right now. Free PDF workflow can remain available.",
       tone: billing.checkoutReady ? "good" : billing.portalReady ? "ready" : "warn",
       icon: "settings",
     },

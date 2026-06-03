@@ -280,11 +280,11 @@ export function runBillingLaunchReadinessCli(argv = process.argv.slice(2), env =
 
   console.log("");
   if (result.ready) {
-    console.log("PASS Premium checkout can be re-enabled after deploy with these live billing settings.");
+    console.log("PASS Premium checkout is ready with these live billing settings.");
     return 0;
   }
 
-  console.log("WARN Premium checkout remains paused. The signed-in free workflow can stay open while billing is prepared.");
+  console.log("WARN Premium checkout is not ready. The signed-in free workflow can stay open while billing is restored.");
   return options.strict ? 1 : 0;
 }
 

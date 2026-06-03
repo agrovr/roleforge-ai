@@ -368,8 +368,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
       ? "Open secure Stripe checkout"
       : premiumActive
         ? "Billing management is unavailable right now."
-        : "Premium billing is not accepting payments right now.";
-  const inactiveBillingActionLabel = premiumActive ? "Billing unavailable right now" : "Premium billing unavailable";
+        : "Premium checkout is unavailable right now.";
+  const inactiveBillingActionLabel = premiumActive ? "Billing unavailable right now" : "Premium checkout unavailable";
   const accountSupportHref = supportRequestHref({
     category: "account",
     subject: "Account settings question",
@@ -485,7 +485,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
           title: "Secure checkout",
           detail: checkoutReady
             ? "Checkout opens in Stripe and Premium activates after the subscription syncs."
-            : "Premium checkout is paused while payments are prepared.",
+            : "Premium checkout is unavailable right now.",
         },
         {
           icon: "check",
@@ -1242,7 +1242,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     : "Use Manage billing for subscription changes and invoices."
                   : checkoutReady
                   ? "Checkout opens securely in Stripe. Premium access updates after the subscription syncs."
-                  : "Premium billing is paused while payments are prepared. The free signed-in studio remains available."}
+                  : "Premium checkout is unavailable right now. The free signed-in studio remains available."}
               </p>
               <div className="settings-export-actions">
                 <span>Need help with checkout, invoices, or Premium access?</span>

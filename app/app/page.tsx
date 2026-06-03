@@ -2628,7 +2628,7 @@ export default function Page() {
           }
         : {
             title: "Free workspace",
-            detail: "Premium billing is paused. PDF export and saved projects are available now.",
+            detail: "Premium checkout is unavailable right now. PDF export and saved projects are available now.",
             href: "/settings#billing",
             action: "View settings",
           }
@@ -2657,7 +2657,7 @@ export default function Page() {
     ? "Premium exports active"
     : premiumBillingReady
       ? "Premium adds DOCX and TXT"
-      : "Premium exports paused";
+      : "Premium exports unavailable";
   const accountPlanValue = accountPremiumEnding ? "Ending" : accountPremiumActive ? "Premium" : signedIn ? "Free" : "Guest";
   const accountPlanCaption = signedIn
     ? accountPremiumEnding && accountPremiumEndLabel
@@ -2705,7 +2705,7 @@ export default function Page() {
         ? "PDF, DOCX, and TXT exports are available for this account."
         : premiumBillingReady
           ? "PDF exports are included. DOCX and TXT unlock with Premium."
-          : "PDF exports are included. Premium exports are paused for launch.",
+          : "PDF exports are included. Premium exports are unavailable right now.",
       href: "/settings#exports",
       icon: "download",
     },
@@ -2713,7 +2713,7 @@ export default function Page() {
       label: "Billing",
       detail: premiumBillingReady || accountPremiumActive
         ? "Manage plan changes and invoices from Settings."
-        : "Premium billing is paused. Free studio access is available.",
+        : "Premium checkout is unavailable right now. Free studio access is available.",
       href: "/settings#billing",
       icon: "settings",
     },
@@ -3571,7 +3571,7 @@ export default function Page() {
                         ? "Try again in a moment, or open Settings to refresh your plan state. PDF remains available while your export access catches up."
                         : premiumBillingReady
                           ? "Upgrade to export DOCX and TXT files, or keep using PDF on the free plan."
-                          : "Premium billing is paused for launch. Keep using PDF export on the free plan."}
+                          : "Premium checkout is unavailable right now. Keep using PDF export on the free plan."}
                     </p>
                     <div className="rf-callout-actions">
                       <Link className="primary-button" href="/settings#billing">

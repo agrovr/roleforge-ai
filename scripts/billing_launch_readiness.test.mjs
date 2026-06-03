@@ -50,7 +50,7 @@ test("strict billing readiness fails closed without leaking secret values", () =
   });
 
   assert.notEqual(result.status, 0);
-  assert.match(result.stdout, /Premium checkout remains paused/);
+  assert.match(result.stdout, /Premium checkout is not ready/);
   assert.doesNotMatch(`${result.stdout}\n${result.stderr}`, new RegExp(secret));
 });
 
@@ -62,7 +62,7 @@ test("strict billing readiness passes with live production settings", () => {
   });
 
   assert.equal(result.status, 0);
-  assert.match(result.stdout, /Premium checkout can be re-enabled/);
+  assert.match(result.stdout, /Premium checkout is ready/);
 });
 
 test("billing readiness parses pulled env files without exposing values", () => {

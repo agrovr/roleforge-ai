@@ -61,6 +61,6 @@ test("public and signed-in shells expose billing readiness before promising upgr
   assert.match(authStatusRoute, /\bbilling,\s*\n/);
   assert.match(landingPage, /checkoutReady:\s*boolean/);
   assert.match(landingPage, /premiumPaused\s*=\s*!premiumActive\s*&&\s*!checkoutReady/);
-  assert.match(landingPage, /Premium billing is paused for launch/);
+  assert.match(landingPage, /Premium checkout is currently unavailable/);
   assert.match(landingPage, /Use free studio/);
 });

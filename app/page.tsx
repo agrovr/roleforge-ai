@@ -576,7 +576,11 @@ function Pricing({
             <div className="eyebrow">Pricing</div>
             <h2 className="display h2">Start lean, upgrade when you need more room.</h2>
           </div>
-          <p className="lede">Free covers the core PDF workflow with a monthly run limit. Premium pricing is listed for early users when billing is open.</p>
+          <p className="lede">
+            {checkoutReady || premiumActive
+              ? "Free covers the core PDF workflow with a monthly run limit. Premium is available for early users who need more exports and runs."
+              : "Free covers the core PDF workflow with a monthly run limit. Premium details stay visible while checkout is unavailable."}
+          </p>
         </div>
         <div className="pricing-grid two">
           <article className="price-card">
@@ -605,7 +609,7 @@ function Pricing({
               {premiumActive
                 ? "Your account has unlimited runs plus PDF, DOCX, and TXT exports in the studio."
                 : premiumPaused
-                  ? "Premium billing is paused for launch. The free signed-in studio remains open with PDF export."
+                  ? "Premium checkout is currently unavailable. The free signed-in studio remains open with PDF export."
                 : `$${PREMIUM_YEARLY_PRICE}/year for early users. Premium unlocks unlimited runs plus DOCX and TXT exports.`}
             </div>
             <ul className="price-list">
@@ -648,7 +652,7 @@ function FAQ({ checkoutReady }: Pick<LandingLinks, "checkoutReady">) {
     ["Can I cancel Premium?", "Yes. Manage billing opens Stripe from Settings for plan changes and cancellation. If you cancel during a paid period, Premium access remains active until that period ends."],
     ["How much is Premium?", checkoutReady
       ? `The launch price is $${PREMIUM_MONTHLY_PRICE}/month or $${PREMIUM_YEARLY_PRICE}/year. Billing management is handled by Stripe.`
-      : `The launch price is $${PREMIUM_MONTHLY_PRICE}/month or $${PREMIUM_YEARLY_PRICE}/year. Premium billing is paused for launch while the free studio stays open.`],
+      : `The launch price is $${PREMIUM_MONTHLY_PRICE}/month or $${PREMIUM_YEARLY_PRICE}/year. Premium checkout is currently unavailable while the free studio stays open.`],
   ] as const;
 
   return (

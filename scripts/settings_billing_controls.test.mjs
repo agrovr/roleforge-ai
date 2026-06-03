@@ -13,12 +13,11 @@ test("settings billing action distinguishes active portals from inactive billing
   assert.match(settingsPage, /action="\/api\/billing\/checkout"/);
   assert.match(settingsPage, /readyLabel="Manage billing"/);
   assert.match(settingsPage, /readyLabel="Start Premium"/);
-  assert.match(settingsPage, /inactiveBillingActionLabel\s*=\s*premiumActive\s*\?\s*"Billing unavailable right now"\s*:\s*"Premium billing unavailable"/);
+  assert.match(settingsPage, /inactiveBillingActionLabel\s*=\s*premiumActive\s*\?\s*"Billing unavailable right now"\s*:\s*"Premium checkout unavailable"/);
   assert.match(settingsPage, /\{inactiveBillingActionLabel\}/);
   assert.match(settingsPage, /aria-disabled="true"/);
   assert.match(settingsPage, /Billing management is unavailable right now\./);
-  assert.match(settingsPage, /Premium billing is not accepting payments right now\./);
-  assert.match(settingsPage, /Premium billing is paused while payments are prepared/);
+  assert.match(settingsPage, /Premium checkout is unavailable right now\./);
   assert.doesNotMatch(settingsPage, /No billing portal yet/);
   assert.doesNotMatch(settingsPage, /type="submit"\s+disabled=\{!portalReady\}/);
 });
