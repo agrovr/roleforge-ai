@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Brand } from "../components/Brand";
 import { PublicAccountMenu } from "../components/PublicAccountMenu";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
+import { SupportReferenceCopyButton } from "../components/SupportReferenceCopyButton";
 import { ThemeToggle } from "../components/ThemeToggle";
 import {
   SUPPORT_REQUEST_CATEGORIES,
@@ -252,7 +253,10 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
                         <p>{request.messagePreview}</p>
                         {request.contextUrl ? <small>{request.contextUrl}</small> : null}
                       </div>
-                      <span className={`support-status-badge ${request.status}`}>{request.statusLabel}</span>
+                      <div className="support-history-actions">
+                        <SupportReferenceCopyButton referenceLabel={request.referenceLabel} />
+                        <span className={`support-status-badge ${request.status}`}>{request.statusLabel}</span>
+                      </div>
                     </article>
                   ))}
                 </div>

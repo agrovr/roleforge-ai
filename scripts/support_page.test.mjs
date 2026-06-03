@@ -5,6 +5,7 @@ import test from "node:test";
 const supportPage = readFileSync("app/support/page.tsx", "utf8");
 const supportRoute = readFileSync("app/api/support-requests/route.ts", "utf8");
 const supportLib = readFileSync("app/lib/supportRequests.ts", "utf8");
+const supportReferenceCopyButton = readFileSync("app/components/SupportReferenceCopyButton.tsx", "utf8");
 const supportMigration = readFileSync("supabase/migrations/20260602013000_support_requests.sql", "utf8");
 const landingPage = readFileSync("app/page.tsx", "utf8");
 const helpPage = readFileSync("app/help/page.tsx", "utf8");
@@ -39,6 +40,8 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /Recent requests/);
   assert.match(supportPage, /support-history-list/);
   assert.match(supportPage, /request\.referenceLabel/);
+  assert.match(supportPage, /SupportReferenceCopyButton/);
+  assert.match(supportPage, /referenceLabel=\{request\.referenceLabel\}/);
   assert.match(supportPage, /support-status-badge/);
   assert.match(supportPage, /name="category"/);
   assert.match(supportPage, /name="subject"/);
@@ -109,6 +112,8 @@ test("settings exposes account support request history", () => {
   assert.match(settingsPage, /settings-account-support-recent/);
   assert.match(settingsPage, /Recent support/);
   assert.match(settingsPage, /request\.referenceLabel/);
+  assert.match(settingsPage, /SupportReferenceCopyButton/);
+  assert.match(settingsPage, /referenceLabel=\{request\.referenceLabel\}/);
   assert.match(settingsPage, /support-status-badge/);
   assert.match(settingsPage, /Open support/);
   assert.match(settingsPage, /href="#support"/);
@@ -135,6 +140,16 @@ test("contextual support links prefill workflow, export, and billing details", (
   assert.match(helpPage, /supportRequestHref\(\{[\s\S]*?category:\s*"workflow"[\s\S]*?Workflow or export issue/);
 });
 
+test("support request references can be copied without exposing raw ids", () => {
+  assert.match(supportReferenceCopyButton, /"use client"/);
+  assert.match(supportReferenceCopyButton, /writeClipboardText\(referenceLabel\)/);
+  assert.match(supportReferenceCopyButton, /Copy support reference \$\{referenceLabel\}/);
+  assert.match(supportReferenceCopyButton, /Copy ref/);
+  assert.match(supportReferenceCopyButton, /Copied/);
+  assert.match(supportReferenceCopyButton, /Copy failed/);
+  assert.doesNotMatch(supportReferenceCopyButton, /request\.id/);
+});
+
 test("support page has overflow-safe responsive form layout", () => {
   assert.match(stylesheet, /\.support-layout\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(260px,\s*0\.72fr\)\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.support-guide-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*42px\s+minmax\(0,\s*1fr\))[^}]*\}/s);
@@ -144,8 +159,12 @@ test("support page has overflow-safe responsive form layout", () => {
   assert.match(stylesheet, /\.support-prefill-note\s*\{(?=[^}]*border-color:)(?=[^}]*background:)[^}]*\}/s);
   assert.match(stylesheet, /\.support-form\s+input,\s*\.support-form\s+select,\s*\.support-form\s+textarea\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.support-history-item,\s*\.settings-support-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-history-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*justify-items:\s*end)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.support-status-badge\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-reference-copy\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.support-layout\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.support-history-item,\s*\.settings-support-item\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.support-history-actions\s*\{[^}]*justify-items:\s*start/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-request-card/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-reference-copy/);
 });

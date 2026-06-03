@@ -6,6 +6,7 @@ import { AccountAvatar } from "../components/AccountAvatar";
 import { Brand } from "../components/Brand";
 import { ResumePreview } from "../components/ResumePreview";
 import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
+import { SupportReferenceCopyButton } from "../components/SupportReferenceCopyButton";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { validateAccountEmail } from "../lib/accountEmail";
 import { loadAccountProfile, saveAccountProfile } from "../lib/accountProfile";
@@ -1173,7 +1174,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                         <p>{request.messagePreview}</p>
                         {request.contextUrl ? <small>{request.contextUrl}</small> : null}
                       </div>
-                      <span className={`support-status-badge ${request.status}`}>{request.statusLabel}</span>
+                      <div className="support-history-actions">
+                        <SupportReferenceCopyButton referenceLabel={request.referenceLabel} />
+                        <span className={`support-status-badge ${request.status}`}>{request.statusLabel}</span>
+                      </div>
                     </article>
                   ))}
                 </div>
