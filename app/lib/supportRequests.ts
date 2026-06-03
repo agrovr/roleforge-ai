@@ -27,6 +27,7 @@ export type SupportRequestStatus = "open" | "reviewing" | "closed";
 
 export type SupportRequestSummary = {
   id: string;
+  referenceLabel: string;
   category: SupportRequestCategory;
   categoryLabel: string;
   subject: string;
@@ -107,6 +108,13 @@ export function supportRequestDateLabel(value: string) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
+export function supportRequestReference(value: unknown) {
+  const raw = compactSingleLine(value).toUpperCase();
+  const withoutPrefix = raw.startsWith("RF-") ? raw.slice(3) : raw;
+  const token = withoutPrefix.replace(/[^A-Z0-9]/g, "").slice(-6);
+  return token ? `RF-${token.padStart(6, "0")}` : "RF-REQUEST";
+}
+
 function normalizeSupportCategory(value: unknown): SupportRequestCategory {
   const category = compactSingleLine(value);
   return supportCategorySet.has(category) ? category as SupportRequestCategory : "other";
@@ -143,6 +151,7 @@ export async function loadSupportRequests(
     const createdAt = typeof row.created_at === "string" ? row.created_at : "";
     return {
       id: String(row.id),
+      referenceLabel: supportRequestReference(row.id),
       category,
       categoryLabel: supportCategoryLabel(category),
       subject: compactSingleLine(row.subject) || "Support request",

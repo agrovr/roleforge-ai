@@ -35,8 +35,10 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /defaultValue=\{prefill\.subject\}/);
   assert.match(supportPage, /defaultValue=\{prefill\.contextUrl \?\? ""\}/);
   assert.match(supportPage, /support-prefill-note/);
+  assert.match(supportPage, /supportRequestReference\(reference\)/);
   assert.match(supportPage, /Recent requests/);
   assert.match(supportPage, /support-history-list/);
+  assert.match(supportPage, /request\.referenceLabel/);
   assert.match(supportPage, /support-status-badge/);
   assert.match(supportPage, /name="category"/);
   assert.match(supportPage, /name="subject"/);
@@ -68,8 +70,10 @@ test("support request route requires auth, validates input, and saves through Su
   assert.match(supportRoute, /login\?next=\/support&account=signin-required/);
   assert.match(supportRoute, /parseSupportRequestInput/);
   assert.match(supportRoute, /saveSupportRequest/);
+  assert.match(supportRoute, /supportRequestReference/);
   assert.match(supportRoute, /withAccountDatabase/);
-  assert.match(supportRoute, /supportRedirect\(request, "sent"\)/);
+  assert.match(supportRoute, /supportRedirect\(request,\s*"sent",\s*saved\.id\)/);
+  assert.match(supportRoute, /url\.searchParams\.set\("ref",\s*supportRequestReference\(reference\)\)/);
   assert.match(supportRoute, /supportRedirect\(request, "invalid"\)/);
   assert.match(supportRoute, /supportRedirect\(request, "unavailable"\)/);
 });
@@ -86,6 +90,7 @@ test("support requests have protected Supabase ownership policies", () => {
   assert.match(supportMigration, /grant select, insert on table public\.support_requests to authenticated/);
   assert.match(supportLib, /SUPPORT_REQUEST_CATEGORIES/);
   assert.match(supportLib, /loadSupportRequests/);
+  assert.match(supportLib, /supportRequestReference/);
   assert.match(supportLib, /supportStatusLabel/);
 });
 
@@ -97,6 +102,7 @@ test("settings exposes account support request history", () => {
   assert.match(settingsPage, /id="support"/);
   assert.match(settingsPage, /Support requests/);
   assert.match(settingsPage, /settings-support-list/);
+  assert.match(settingsPage, /request\.referenceLabel/);
   assert.match(settingsPage, /support-status-badge/);
   assert.match(settingsPage, /Open support/);
   assert.match(settingsPage, /href="#support"/);

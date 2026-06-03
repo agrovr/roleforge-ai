@@ -1124,7 +1124,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   {recentSupportRequests.map((request) => (
                     <article className="settings-support-item" key={request.id}>
                       <div>
-                        <span>{request.categoryLabel} · {request.createdLabel}</span>
+                        <span>{request.referenceLabel} · {request.categoryLabel} · {request.createdLabel}</span>
                         <strong>{request.subject}</strong>
                         <p>{request.messagePreview}</p>
                         {request.contextUrl ? <small>{request.contextUrl}</small> : null}

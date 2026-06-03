@@ -2,10 +2,14 @@ import { NextResponse } from "next/server";
 
 import { withAccountDatabase } from "@/app/lib/supabase/accountDatabase";
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
-import { parseSupportRequestInput, saveSupportRequest } from "@/app/lib/supportRequests";
+import { parseSupportRequestInput, saveSupportRequest, supportRequestReference } from "@/app/lib/supportRequests";
 
-function supportRedirect(request: Request, status: string) {
-  return new URL(`/support?support=${status}#request`, request.url);
+function supportRedirect(request: Request, status: string, reference?: string) {
+  const url = new URL("/support", request.url);
+  url.searchParams.set("support", status);
+  if (reference) url.searchParams.set("ref", supportRequestReference(reference));
+  url.hash = "request";
+  return url;
 }
 
 export async function POST(request: Request) {
@@ -51,10 +55,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    await withAccountDatabase(
+    const saved = await withAccountDatabase(
       routeClient.supabase,
       (dbClient) => saveSupportRequest(dbClient, parsed.input, user),
       { label: "Support request save database operation" },
+    );
+    return withSupabaseCookies(
+      NextResponse.redirect(supportRedirect(request, "sent", saved.id), 303),
+      routeClient.cookiesToSet,
     );
   } catch (saveError) {
     console.error("Support request save failed", saveError);
@@ -64,8 +72,4 @@ export async function POST(request: Request) {
     );
   }
 
-  return withSupabaseCookies(
-    NextResponse.redirect(supportRedirect(request, "sent"), 303),
-    routeClient.cookiesToSet,
-  );
 }

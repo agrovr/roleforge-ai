@@ -11,6 +11,7 @@ import {
   parseSupportRequestPrefill,
   supportCategoryLabel,
   supportRequestHref,
+  supportRequestReference,
 } from "../lib/supportRequests";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 
@@ -71,10 +72,15 @@ function getParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
 
-function supportNotice(value: string | undefined) {
+function supportNotice(value: string | undefined, reference?: string) {
   switch (value) {
     case "sent":
-      return { tone: "success" as const, text: "Support request saved. We will use your account email for follow-up." };
+      return {
+        tone: "success" as const,
+        text: reference
+          ? `Support request saved as ${supportRequestReference(reference)}. We will use your account email for follow-up.`
+          : "Support request saved. We will use your account email for follow-up.",
+      };
     case "invalid":
       return { tone: "warn" as const, text: "Add a topic, a short subject, and a detailed message." };
     case "unavailable":
@@ -86,7 +92,7 @@ function supportNotice(value: string | undefined) {
 
 export default async function SupportPage({ searchParams }: { searchParams: SupportSearchParams }) {
   const params = await searchParams;
-  const notice = supportNotice(getParam(params.support));
+  const notice = supportNotice(getParam(params.support), getParam(params.ref));
   const prefill = parseSupportRequestPrefill({
     category: getParam(params.category),
     subject: getParam(params.subject),
@@ -241,7 +247,7 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
                   {recentSupportRequests.map((request) => (
                     <article className="support-history-item" key={request.id}>
                       <div>
-                        <span>{request.categoryLabel} · {request.createdLabel}</span>
+                        <span>{request.referenceLabel} · {request.categoryLabel} · {request.createdLabel}</span>
                         <strong>{request.subject}</strong>
                         <p>{request.messagePreview}</p>
                         {request.contextUrl ? <small>{request.contextUrl}</small> : null}

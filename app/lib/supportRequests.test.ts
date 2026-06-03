@@ -7,6 +7,7 @@ import {
   parseSupportRequestInput,
   saveSupportRequest,
   supportCategoryLabel,
+  supportRequestReference,
   supportRequestHref,
   supportStatusLabel,
 } from "./supportRequests";
@@ -95,6 +96,13 @@ test("labels support request categories for the form", () => {
   assert.equal(supportStatusLabel("reviewing"), "Reviewing");
 });
 
+test("builds customer-safe support request references", () => {
+  assert.equal(supportRequestReference("4adcd15a-769a-4c2f-939f-09df6e70a225"), "RF-70A225");
+  assert.equal(supportRequestReference("RF-70A225"), "RF-70A225");
+  assert.equal(supportRequestReference("abc"), "RF-000ABC");
+  assert.equal(supportRequestReference(""), "RF-REQUEST");
+});
+
 test("loads recent support requests with customer-facing status summaries", async () => {
   const calls: Array<{ table: string; query?: string; userId?: string; limit?: number }> = [];
   const fakeClient = {
@@ -117,7 +125,7 @@ test("loads recent support requests with customer-facing status summaries", asyn
                       return {
                         data: [
                           {
-                            id: "support-1",
+                            id: "4adcd15a-769a-4c2f-939f-09df6e70a225",
                             category: "billing",
                             subject: "Premium sync",
                             message: "Checkout completed and the billing panel still says free plan.",
@@ -146,7 +154,8 @@ test("loads recent support requests with customer-facing status summaries", asyn
   assert.equal(calls[0]?.userId, "user-123");
   assert.equal(calls[0]?.limit, 5);
   assert.deepEqual(requests[0], {
-    id: "support-1",
+    id: "4adcd15a-769a-4c2f-939f-09df6e70a225",
+    referenceLabel: "RF-70A225",
     category: "billing",
     categoryLabel: "Billing",
     subject: "Premium sync",
