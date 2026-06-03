@@ -4,6 +4,8 @@ import test from "node:test";
 
 const studioPage = readFileSync("app/app/page.tsx", "utf8");
 const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
+const rootLayout = readFileSync("app/layout.tsx", "utf8");
+const accountMenuBehavior = readFileSync("app/components/AccountMenuBehavior.tsx", "utf8");
 const globalsCss = readFileSync("app/globals.css", "utf8");
 
 test("studio account menu acts as a workspace command center", () => {
@@ -61,6 +63,7 @@ test("settings topbar exposes account, project, usage, and billing controls", ()
   assert.match(settingsPage, /AccountAvatar/);
   assert.match(settingsPage, /accountAvatarUrl\(user\)/);
   assert.match(settingsPage, /settings-account-menu/);
+  assert.match(settingsPage, /data-account-menu="true"/);
   assert.match(settingsPage, /aria-label="Open account menu"/);
   assert.match(settingsPage, /recentProjectSummaries/);
   assert.match(settingsPage, /settings-account-recent/);
@@ -85,6 +88,19 @@ test("settings topbar exposes account, project, usage, and billing controls", ()
   assert.match(settingsPage, /Contact support/);
   assert.match(settingsPage, /href="\/app#history"/);
   assert.match(settingsPage, /action="\/auth\/signout"/);
+});
+
+test("global account details menus close on outside click escape and navigation actions", () => {
+  assert.match(rootLayout, /import \{ AccountMenuBehavior \}/);
+  assert.match(rootLayout, /<AccountMenuBehavior \/>/);
+  assert.match(accountMenuBehavior, /"use client"/);
+  assert.match(accountMenuBehavior, /details\[data-account-menu\]\[open\]/);
+  assert.match(accountMenuBehavior, /document\.addEventListener\("pointerdown",\s*handlePointerDown\)/);
+  assert.match(accountMenuBehavior, /target\.closest(?:<HTMLDetailsElement>)?\("details\[data-account-menu\]"\)/);
+  assert.match(accountMenuBehavior, /target\.closest\("summary"\)/);
+  assert.match(accountMenuBehavior, /target\.closest\("a, button\[type='submit'\]"\)/);
+  assert.match(accountMenuBehavior, /event\.key !== "Escape"/);
+  assert.match(accountMenuBehavior, /removeAttribute\("open"\)/);
 });
 
 test("settings account recent projects inherit overflow-safe menu layout", () => {

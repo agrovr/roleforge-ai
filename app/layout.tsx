@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { AccountMenuBehavior } from "./components/AccountMenuBehavior";
 import { PointerEffects } from "./components/PointerEffects";
 import "./globals.css";
 
@@ -83,6 +84,7 @@ export default function RootLayout({
           }}
         />
         {children}
+        <AccountMenuBehavior />
         <PointerEffects />
         <Analytics />
       </body>

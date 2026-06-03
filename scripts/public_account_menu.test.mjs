@@ -20,6 +20,7 @@ test("public account menu turns static topbars into signed-in command centers", 
   assert.match(publicAccountMenu, /encodeURIComponent\(currentPagePath\(\)\)/);
   assert.match(publicAccountMenu, /window\.location\.assign/);
   assert.match(publicAccountMenu, /AccountAvatar/);
+  assert.match(publicAccountMenu, /data-account-menu="true"/);
   assert.match(publicAccountMenu, /aria-label="Open account menu"/);
   assert.match(publicAccountMenu, /Public page account summary/);
   assert.match(publicAccountMenu, /href="\/settings#billing"/);

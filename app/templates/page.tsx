@@ -52,7 +52,7 @@ export default async function TemplatesPage() {
           <Link className="btn btn-soft btn-sm" href={studioHref}>Studio</Link>
           <ThemeToggle />
           {signedIn ? (
-            <details className="settings-account-menu templates-account-menu">
+            <details className="settings-account-menu templates-account-menu" data-account-menu="true">
               <summary className="studio-account-button templates-topbar-avatar" aria-label="Open account menu">
                 <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
               </summary>

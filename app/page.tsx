@@ -120,7 +120,7 @@ function Nav({
           <span className="nav-divider" aria-hidden="true" />
           <ThemeToggle />
           {signedIn ? (
-            <details className="landing-account-menu">
+            <details className="landing-account-menu" data-account-menu="true">
               <summary className="studio-account-button landing-account-button" aria-label="Open account menu">
                 <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
               </summary>

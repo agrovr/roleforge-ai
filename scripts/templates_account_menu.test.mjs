@@ -11,6 +11,7 @@ test("templates page keeps signed-in account controls in the topbar", () => {
   assert.match(templatesPage, /accountDisplayName\(user/);
   assert.match(templatesPage, /supportRequestHref/);
   assert.match(templatesPage, /templates-account-menu/);
+  assert.match(templatesPage, /data-account-menu="true"/);
   assert.match(templatesPage, /aria-label="Open account menu"/);
   assert.match(templatesPage, /selectedTemplate\.name/);
   assert.match(templatesPage, /href=\{resumeTemplateStudioHref\(initialTemplateSlug\)\}/);

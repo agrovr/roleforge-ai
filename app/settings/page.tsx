@@ -506,7 +506,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
         <div className="settings-page-actions">
           <Link className="btn btn-soft btn-sm" href="/app">Studio</Link>
           <ThemeToggle />
-          <details className="settings-account-menu">
+          <details className="settings-account-menu" data-account-menu="true">
             <summary className="studio-account-button settings-topbar-avatar" aria-label="Open account menu">
               <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
             </summary>
