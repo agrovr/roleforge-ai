@@ -65,6 +65,21 @@ function formatPlanDate(value: string | null) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }
 
+function settingsStageLabel(status: string, fallback: string) {
+  switch (status) {
+    case "tailored":
+      return "Tailored";
+    case "exported":
+      return "Ready";
+    case "active":
+      return "Active";
+    case "archived":
+      return "Archive";
+    default:
+      return fallback;
+  }
+}
+
 function accountNotice(value: string | undefined) {
   switch (value) {
     case "profile-saved":
@@ -937,91 +952,95 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                       className="settings-project-item"
                       key={project.key}
                     >
-                      <div>
-                        <Link href={project.href} aria-label={`Open ${project.title} in History`}>
-                          <strong>{project.title}</strong>
-                        </Link>
-                        <span>{project.detail}</span>
-                      </div>
-                      <small title={`${project.stageDetail} ${project.actionDetail}`}>
-                        {project.stageLabel} · {project.actionLabel}
-                      </small>
-                      {project.projectId ? (
-                        <form className="settings-project-stage-form" action={updateSettingsProjectStatusAction}>
-                          <input type="hidden" name="projectId" value={project.projectId} />
-                          <div className="settings-project-stage-controls" role="group" aria-label={`Set project stage for ${project.title}`}>
-                            {APPLICATION_STATUS_OPTIONS.map((option) => {
-                              const selected = project.stageStatus === option.status;
-                              return (
-                                <button
-                                  className={selected ? "active" : ""}
-                                  disabled={selected}
-                                  key={`${project.projectId}-${option.status}`}
-                                  name="status"
-                                  type="submit"
-                                  value={option.status}
-                                  title={option.detail}
-                                  aria-pressed={selected}
-                                >
-                                  {option.label}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </form>
-                      ) : null}
-                      {project.projectId ? (
-                        <form className="settings-project-rename" action={renameSettingsProjectAction}>
-                          <input type="hidden" name="projectId" value={project.projectId} />
-                          <label>
-                            <span>Project name</span>
-                            <div className="settings-project-rename-row">
-                              <input
-                                name="title"
-                                defaultValue={project.title}
-                                maxLength={120}
-                                aria-label={`Rename ${project.title}`}
-                                autoComplete="off"
-                              />
-                              <button type="submit">Save name</button>
-                            </div>
-                          </label>
-                        </form>
-                      ) : null}
-                      {project.downloads.length ? (
-                        <div className="settings-project-downloads" aria-label={`Downloads for ${project.title}`}>
-                          {project.downloads.map((download) => (
-                            <a
-                              className="btn btn-soft btn-sm"
-                              href={download.url}
-                              key={`${project.key}-${download.format}`}
-                            >
-                              <RoleForgeIcon name="download" size={12} />
-                              {download.label}
-                            </a>
-                          ))}
+                      <div className="settings-project-summary">
+                        <div className="settings-project-title-block">
+                          <Link href={project.href} aria-label={`Open ${project.title} in History`}>
+                            <strong>{project.title}</strong>
+                          </Link>
+                          <span>{project.detail}</span>
                         </div>
-                      ) : null}
-                      {project.projectId ? (
-                        <details className="settings-project-delete">
-                          <summary>Remove project</summary>
-                          <form action={deleteSettingsProjectAction}>
+                        <small title={`${project.stageDetail} ${project.actionDetail}`}>
+                          {settingsStageLabel(project.stageStatus, project.stageLabel)} · {project.actionLabel}
+                        </small>
+                      </div>
+                      <div className="settings-project-controls">
+                        {project.projectId ? (
+                          <form className="settings-project-stage-form" action={updateSettingsProjectStatusAction}>
+                            <input type="hidden" name="projectId" value={project.projectId} />
+                            <div className="settings-project-stage-controls" role="group" aria-label={`Set project stage for ${project.title}`}>
+                              {APPLICATION_STATUS_OPTIONS.map((option) => {
+                                const selected = project.stageStatus === option.status;
+                                return (
+                                  <button
+                                    className={selected ? "active" : ""}
+                                    disabled={selected}
+                                    key={`${project.projectId}-${option.status}`}
+                                    name="status"
+                                    type="submit"
+                                    value={option.status}
+                                    title={option.detail}
+                                    aria-pressed={selected}
+                                  >
+                                    {settingsStageLabel(option.status, option.label)}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </form>
+                        ) : null}
+                        {project.projectId ? (
+                          <form className="settings-project-rename" action={renameSettingsProjectAction}>
                             <input type="hidden" name="projectId" value={project.projectId} />
                             <label>
-                              <span>Type DELETE to remove this saved project and its runs.</span>
-                              <div className="settings-project-delete-row">
+                              <span>Project name</span>
+                              <div className="settings-project-rename-row">
                                 <input
-                                  name="confirmDelete"
-                                  aria-label={`Type DELETE to remove ${project.title}`}
+                                  name="title"
+                                  defaultValue={project.title}
+                                  maxLength={120}
+                                  aria-label={`Rename ${project.title}`}
                                   autoComplete="off"
-                                  placeholder="DELETE"
                                 />
-                                <button type="submit">Remove</button>
+                                <button type="submit">Save</button>
                               </div>
                             </label>
                           </form>
-                        </details>
-                      ) : null}
+                        ) : null}
+                        {project.downloads.length ? (
+                          <div className="settings-project-downloads" aria-label={`Downloads for ${project.title}`}>
+                            {project.downloads.map((download) => (
+                              <a
+                                className="btn btn-soft btn-sm"
+                                href={download.url}
+                                key={`${project.key}-${download.format}`}
+                              >
+                                <RoleForgeIcon name="download" size={12} />
+                                {download.label}
+                              </a>
+                            ))}
+                          </div>
+                        ) : null}
+                        {project.projectId ? (
+                          <details className="settings-project-delete">
+                            <summary>Remove</summary>
+                            <form action={deleteSettingsProjectAction}>
+                              <input type="hidden" name="projectId" value={project.projectId} />
+                              <label>
+                                <span>Type DELETE to remove this saved project and its runs.</span>
+                                <div className="settings-project-delete-row">
+                                  <input
+                                    name="confirmDelete"
+                                    aria-label={`Type DELETE to remove ${project.title}`}
+                                    autoComplete="off"
+                                    placeholder="DELETE"
+                                  />
+                                  <button type="submit">Remove</button>
+                                </div>
+                              </label>
+                            </form>
+                          </details>
+                        ) : null}
+                      </div>
                     </article>
                   ))}
                 </div>

@@ -6739,8 +6739,9 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-item {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: flex-start;
+  grid-template-columns: minmax(220px, 0.95fr) minmax(360px, 1.35fr);
+  align-items: start;
+  gap: 16px;
   color: inherit;
   transition:
     border-color 160ms ease,
@@ -6764,10 +6765,24 @@ html[data-theme="dark"] input::file-selector-button {
   outline-offset: 3px;
 }
 
-.settings-project-item div,
+.settings-project-summary,
+.settings-project-title-block,
+.settings-project-controls,
 .settings-project-empty {
-  flex: 1 1 auto;
   min-width: 0;
+}
+
+.settings-project-summary,
+.settings-project-controls {
+  display: grid;
+}
+
+.settings-project-summary {
+  gap: 10px;
+}
+
+.settings-project-controls {
+  gap: 10px;
 }
 
 .settings-project-item strong,
@@ -6819,7 +6834,6 @@ html[data-theme="dark"] input::file-selector-button {
   justify-self: start;
   width: fit-content;
   max-width: 100%;
-  margin-top: -4px;
   padding: 7px 9px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -6837,14 +6851,13 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-project-stage-form {
-  grid-column: 1 / -1;
   min-width: 0;
   margin: 0;
 }
 
 .settings-project-stage-controls {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 148px), 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   min-width: 0;
   padding-top: 2px;
@@ -6863,11 +6876,9 @@ html[data-theme="dark"] input::file-selector-button {
   font-size: 0.74rem;
   font-weight: 950;
   line-height: 1.12;
-  overflow-wrap: anywhere;
   text-align: center;
-  text-wrap: balance;
   text-transform: uppercase;
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .settings-project-stage-controls button:hover,
@@ -6885,7 +6896,6 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-project-rename {
-  grid-column: 1 / -1;
   min-width: 0;
   margin: 0;
 }
@@ -6906,7 +6916,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-rename-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 136px), auto);
+  grid-template-columns: minmax(0, 1fr) 78px;
   gap: 8px;
   min-width: 0;
 }
@@ -6941,11 +6951,9 @@ html[data-theme="dark"] input::file-selector-button {
   font-size: 0.76rem;
   font-weight: 950;
   line-height: 1.12;
-  overflow-wrap: anywhere;
   padding: 8px 11px;
   text-align: center;
-  text-wrap: balance;
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .settings-project-rename-row button:hover,
@@ -6955,28 +6963,24 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-project-downloads {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 104px), max-content));
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  grid-column: 1 / -1;
   min-width: 0;
 }
 
 .settings-project-downloads .btn {
-  width: 100%;
+  width: auto;
   min-width: 0;
   min-height: 38px;
   justify-content: center;
   padding: 8px 10px;
   font-size: 0.76rem;
   line-height: 1.12;
-  overflow-wrap: anywhere;
-  text-wrap: balance;
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .settings-project-delete {
-  grid-column: 1 / -1;
   min-width: 0;
   border-top: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
   padding-top: 2px;
@@ -6991,9 +6995,8 @@ html[data-theme="dark"] input::file-selector-button {
   font-size: 0.76rem;
   font-weight: 900;
   line-height: 1.2;
-  overflow-wrap: anywhere;
   padding: 7px 0;
-  text-wrap: balance;
+  white-space: nowrap;
 }
 
 .settings-project-delete summary:focus-visible {
@@ -7023,7 +7026,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-delete-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 136px), auto);
+  grid-template-columns: minmax(0, 1fr) 96px;
   gap: 8px;
   min-width: 0;
 }
@@ -7059,17 +7062,30 @@ html[data-theme="dark"] input::file-selector-button {
   font-size: 0.76rem;
   font-weight: 950;
   line-height: 1.12;
-  overflow-wrap: anywhere;
   padding: 8px 11px;
   text-align: center;
-  text-wrap: balance;
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .settings-project-delete-row button:hover,
 .settings-project-delete-row button:focus-visible {
   border-color: color-mix(in srgb, var(--danger) 48%, var(--line));
   background: color-mix(in srgb, var(--danger-soft) 88%, var(--surface));
+}
+
+@container settings-section (max-width: 720px) {
+  .settings-project-item {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-project-stage-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .settings-project-rename-row,
+  .settings-project-delete-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
 }
 
 .settings-project-empty {
@@ -14192,6 +14208,10 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   .settings-project-item {
     grid-template-columns: 1fr;
     gap: 10px;
+  }
+
+  .settings-project-stage-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .settings-project-item small {
