@@ -62,3 +62,28 @@ test("studio export readiness panel is compact and dark-mode safe", () => {
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.export-readiness-item\.good/);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.export-readiness-item\.warn/);
 });
+
+test("studio exposes workflow recovery actions from real error state", () => {
+  assert.match(studioPage, /workflowRecoveryTitle/);
+  assert.match(studioPage, /workflowRecoveryDetail/);
+  assert.match(studioPage, /workflowRecoverySteps/);
+  assert.match(studioPage, /aria-label="Workflow recovery"/);
+  assert.match(studioPage, /Recovery checklist/);
+  assert.match(studioPage, /Retry workflow/);
+  assert.match(studioPage, /href="\/status"/);
+  assert.match(studioPage, /href="\/help#try-first"/);
+  assert.match(studioPage, /href=\{workflowSupportHref\}/);
+  assert.match(studioPage, /Request \{workflowError\.requestId\}/);
+});
+
+test("studio workflow recovery panel is responsive and dark-mode safe", () => {
+  assert.match(stylesheet, /\.rf-recovery-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.rf-recovery-head\s*\{(?=[^}]*grid-template-columns:\s*42px\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.rf-recovery-steps\s*\{(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(min\(100%,\s*168px\),\s*1fr\)\))[^}]*\}/s);
+  assert.match(stylesheet, /\.rf-recovery-actions\s*\{(?=[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))[^}]*\}/s);
+  assert.match(stylesheet, /\.rf-recovery-actions\s+\.primary-button,\s*\.rf-recovery-actions\s+\.ghost-button\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.rf-recovery-card/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.rf-recovery-detail/);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.rf-recovery-actions\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?\.rf-recovery-head,[\s\S]*?\.rf-recovery-steps,[\s\S]*?\.rf-recovery-actions\s*\{[^}]*grid-template-columns:\s*1fr/s);
+});

@@ -2490,6 +2490,31 @@ export default function Page() {
     subject: workflowError?.requestId ? "Workflow request help" : "Workflow stopped",
     contextUrl: workflowError?.requestId ?? "/app",
   });
+  const workflowRecoveryTitle =
+    workflowError?.code === "premium_required"
+      ? `${premiumExportFormat} export needs Premium access`
+      : workflowError?.code === "plan_limit_reached"
+        ? "Monthly run limit reached"
+        : workflowError?.requestId
+          ? "Workflow stopped with a traceable request"
+          : "Workflow stopped before finishing";
+  const workflowRecoveryDetail =
+    workflowError?.code === "premium_required"
+      ? "Switch to PDF, refresh Billing, or contact support if Premium access should already be active."
+      : workflowError?.code === "plan_limit_reached"
+        ? resetLabel
+          ? `Free runs reset ${resetLabel}. Upgrade or wait for the next monthly reset.`
+          : "Upgrade or wait for the next monthly reset before running another tailored draft."
+        : workflowError?.requestId
+          ? "Use the request reference below if you contact support. It helps trace the exact workflow attempt."
+          : "Retry the workflow after checking status. If it repeats, send a support request from this account.";
+  const workflowRecoverySteps = workflowError
+    ? [
+        workflowError.requestId ? `Copy request ${workflowError.requestId} into a support note.` : "Keep the current resume and target in place.",
+        workflowError.code === "premium_required" ? "Use PDF or refresh Billing before trying the premium export again." : "Check Status for workflow and export readiness.",
+        workflowError.code === "plan_limit_reached" ? "Open Usage or Billing to review the account limit." : "Retry from Studio; contact support if the same step fails again.",
+      ]
+    : [];
   const accountBillingSupportHref = supportRequestHref({
     category: "billing",
     subject: "Billing or Premium access",
@@ -3955,14 +3980,43 @@ export default function Page() {
                       <Link className="ghost-button" href="/settings#usage">View usage</Link>
                     </div>
                   </div>
+                ) : error && workflowError ? (
+                  <div className="rf-callout danger rf-recovery-card" role="alert" aria-label="Workflow recovery">
+                    <div className="rf-recovery-head">
+                      <span className="rf-recovery-icon" aria-hidden="true">
+                        <RoleForgeIcon name="settings" size={16} />
+                      </span>
+                      <div>
+                        <span className="eyebrow">Recovery checklist</span>
+                        <strong>{workflowRecoveryTitle}</strong>
+                        <p>{error}</p>
+                      </div>
+                    </div>
+                    <div className="rf-recovery-detail">
+                      <p>{workflowRecoveryDetail}</p>
+                      {workflowError.requestId ? <span>Request {workflowError.requestId}</span> : null}
+                    </div>
+                    <div className="rf-recovery-steps" aria-label="Recovery steps">
+                      {workflowRecoverySteps.map((step, index) => (
+                        <span key={step}>
+                          <strong>{index + 1}</strong>
+                          {step}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="rf-callout-actions rf-recovery-actions">
+                      <button className="primary-button" type="button" onClick={onRun} disabled={!canRun || busy}>
+                        Retry workflow <RoleForgeIcon name="arrow" size={14} />
+                      </button>
+                      <Link className="ghost-button" href="/status">Check status</Link>
+                      <Link className="ghost-button" href="/help#try-first">Help guide</Link>
+                      <Link className="ghost-button" href={workflowSupportHref}>Contact support</Link>
+                    </div>
+                  </div>
                 ) : error ? (
                   <div className="rf-callout danger">
                     <strong>Workflow stopped</strong>
                     <p>{error}</p>
-                    {workflowError?.requestId ? <p className="rf-callout-meta">Request {workflowError.requestId}</p> : null}
-                    <div className="rf-callout-actions">
-                      <Link className="ghost-button" href={workflowSupportHref}>Contact support</Link>
-                    </div>
                   </div>
                 ) : null}
               </div>
