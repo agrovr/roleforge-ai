@@ -8484,6 +8484,143 @@ html[data-theme="dark"] input::file-selector-button {
   overflow-wrap: anywhere;
 }
 
+.help-action-routes {
+  width: min(1280px, 100%);
+  max-width: 100%;
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  margin: 0 auto;
+  padding: 18px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--brand) 20%, var(--line));
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 34%, transparent), transparent),
+    color-mix(in srgb, var(--surface) 92%, var(--bg-alt));
+  box-shadow: 0 20px 52px -42px var(--shadow);
+}
+
+.help-action-head {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(260px, 0.72fr);
+  gap: 14px;
+  align-items: end;
+  min-width: 0;
+}
+
+.help-action-head > *,
+.help-action-card > *,
+.help-action-card > div,
+.help-action-buttons > * {
+  min-width: 0;
+}
+
+.help-action-head h2 {
+  margin: 5px 0 0;
+  color: var(--ink-0);
+  font-family: var(--font-display);
+  font-size: clamp(1.72rem, 3vw, 2.55rem);
+  font-weight: 650;
+  line-height: 1.04;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.help-action-head p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.94rem;
+  font-weight: 720;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.help-action-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.help-action-card {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 10px;
+  align-content: start;
+  min-width: 0;
+  overflow: hidden;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--brand) 16%, var(--line));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 88%, var(--bg-alt));
+}
+
+.help-action-card > span {
+  display: inline-grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--brand-soft) 52%, var(--surface));
+  color: var(--brand-dark);
+}
+
+.help-action-card strong,
+.help-action-card p,
+.help-action-card small {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.help-action-card strong {
+  color: var(--ink-0);
+  font-size: 0.96rem;
+  font-weight: 950;
+  line-height: 1.14;
+  text-wrap: balance;
+}
+
+.help-action-card p {
+  margin: 7px 0 0;
+  color: var(--ink-2);
+  font-size: 0.84rem;
+  font-weight: 760;
+  line-height: 1.36;
+  text-wrap: pretty;
+}
+
+.help-action-card small {
+  margin-top: 8px;
+  color: var(--ink-3);
+  font-size: 0.76rem;
+  font-weight: 780;
+  line-height: 1.3;
+  text-wrap: pretty;
+}
+
+.help-action-buttons {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.help-action-buttons .btn {
+  width: 100%;
+  min-width: 0;
+  justify-content: center;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
+}
+
 .legal-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -9822,6 +9959,11 @@ html[data-theme="dark"] input::file-selector-button {
     grid-template-columns: 1fr;
   }
 
+  .help-action-head,
+  .help-action-grid {
+    grid-template-columns: 1fr;
+  }
+
   .legal-grid {
     grid-template-columns: 1fr;
     min-width: 0;
@@ -9870,6 +10012,10 @@ html[data-theme="dark"] input::file-selector-button {
   .help-search-meta {
     justify-content: flex-start;
     text-align: left;
+  }
+
+  .help-action-buttons {
+    grid-template-columns: 1fr;
   }
 
   .status-grid {
@@ -15730,6 +15876,40 @@ html[data-theme="dark"] .settings-project-stage-controls button:hover,
 html[data-theme="dark"] .settings-project-stage-controls button:focus-visible {
   border-color: rgba(222, 162, 79, 0.34);
   color: var(--ink-0);
+}
+
+html[data-theme="dark"] .help-action-routes {
+  border-color: rgba(255, 247, 233, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.05), rgba(255, 247, 233, 0.02)),
+    rgba(12, 17, 31, 0.82);
+}
+
+html[data-theme="dark"] .help-action-head h2,
+html[data-theme="dark"] .help-action-card strong {
+  color: var(--ink-0);
+}
+
+html[data-theme="dark"] .help-action-head p,
+html[data-theme="dark"] .help-action-card p {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .help-action-card {
+  border-color: rgba(255, 247, 233, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.045), rgba(255, 247, 233, 0.02)),
+    rgba(17, 23, 41, 0.84);
+}
+
+html[data-theme="dark"] .help-action-card > span {
+  border-color: rgba(222, 162, 79, 0.28);
+  background: rgba(222, 162, 79, 0.16);
+  color: #f3c16d;
+}
+
+html[data-theme="dark"] .help-action-card small {
+  color: var(--ink-3);
 }
 
 html[data-theme="dark"] .help-quick-link {

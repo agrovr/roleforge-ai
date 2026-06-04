@@ -28,6 +28,15 @@ export type HelpQuickLink = {
   detail: string;
 };
 
+type HelpActionRoute = {
+  title: string;
+  issue: string;
+  firstStep: string;
+  href: string;
+  supportHref: string;
+  icon: "file" | "download" | "lock" | "settings";
+};
+
 const helpSections: readonly HelpSection[] = [
   {
     title: "Start a resume run",
@@ -92,6 +101,57 @@ const quickLinks: readonly HelpQuickLink[] = [
   { href: "/privacy", icon: "lock", label: "Privacy", detail: "Review how account and workflow data is handled." },
 ] as const;
 
+const helpActionRoutes: readonly HelpActionRoute[] = [
+  {
+    title: "Workflow is stuck",
+    issue: "Tailor, upload, generated assets, or request IDs look stalled.",
+    firstStep: "Open Status, then retry from Studio after the workflow service is healthy.",
+    href: "/status",
+    supportHref: supportRequestHref({
+      category: "workflow",
+      subject: "Workflow is stuck",
+      contextUrl: "/help#try-first",
+    }),
+    icon: "file",
+  },
+  {
+    title: "Export is missing",
+    issue: "A PDF, DOCX, or TXT download is locked, unavailable, or attached to an older run.",
+    firstStep: "Check export access in Settings and confirm the selected format matches your plan.",
+    href: "/settings#exports",
+    supportHref: supportRequestHref({
+      category: "exports",
+      subject: "Export download issue",
+      contextUrl: "/settings#exports",
+    }),
+    icon: "download",
+  },
+  {
+    title: "Premium looks out of sync",
+    issue: "Checkout finished, billing changed, or the current plan badge does not match access.",
+    firstStep: "Refresh Billing in Settings; Premium access updates after the Stripe sync reaches the account.",
+    href: "/settings#billing",
+    supportHref: supportRequestHref({
+      category: "billing",
+      subject: "Premium access sync issue",
+      contextUrl: "/settings#billing",
+    }),
+    icon: "lock",
+  },
+  {
+    title: "Saved work is missing",
+    issue: "A project, restore action, application stage, or saved export is not where expected.",
+    firstStep: "Open Saved projects in Settings and compare account-saved runs with browser history in Studio.",
+    href: "/settings#projects",
+    supportHref: supportRequestHref({
+      category: "saved-projects",
+      subject: "Saved project issue",
+      contextUrl: "/settings#projects",
+    }),
+    icon: "settings",
+  },
+] as const;
+
 export default function HelpPage() {
   return (
     <main className="legal-shell help-shell">
@@ -123,6 +183,34 @@ export default function HelpPage() {
           <span>Profile menu links to saved work, billing, security, and Help</span>
           <span>Free export is PDF; Premium adds DOCX and TXT</span>
           <span>Review generated output before using it in an application</span>
+        </div>
+      </section>
+
+      <section className="help-action-routes" id="try-first" aria-labelledby="help-action-title">
+        <div className="help-action-head">
+          <div>
+            <span className="eyebrow">Try this first</span>
+            <h2 id="help-action-title">Route the issue to the right place.</h2>
+          </div>
+          <p>
+            Start with the account or status page that owns the live state, then send a prefilled support request if the issue still looks wrong.
+          </p>
+        </div>
+        <div className="help-action-grid">
+          {helpActionRoutes.map((route) => (
+            <article className="help-action-card" key={route.title}>
+              <span aria-hidden="true"><RoleForgeIcon name={route.icon} size={16} /></span>
+              <div>
+                <strong>{route.title}</strong>
+                <p>{route.issue}</p>
+                <small>{route.firstStep}</small>
+              </div>
+              <div className="help-action-buttons">
+                <Link className="btn btn-soft btn-sm" href={route.href}>Open check</Link>
+                <Link className="btn btn-ghost btn-sm" href={route.supportHref}>Ask support</Link>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
