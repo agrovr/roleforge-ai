@@ -41,6 +41,9 @@ export function SettingsSectionNav() {
         `${section.id} ${section.label} ${section.keywords}`.toLowerCase().includes(normalizedQuery),
       )
     : settingsSections;
+  const resultLabel = normalizedQuery
+    ? `${visibleSections.length} ${visibleSections.length === 1 ? "section" : "sections"} match "${query.trim()}"`
+    : "All settings sections shown";
 
   const scrollToSection = useCallback((sectionId: SettingsSectionId, behavior: ScrollBehavior = "smooth") => {
     document.getElementById(sectionId)?.scrollIntoView({ behavior, block: "start" });
@@ -78,6 +81,16 @@ export function SettingsSectionNav() {
     if (!nextSectionId) return;
     event.preventDefault();
     moveSectionFocus(nextSectionId);
+  }
+
+  function clearSettingsSearch() {
+    setQuery("");
+  }
+
+  function onSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key !== "Escape" || !query) return;
+    event.preventDefault();
+    clearSettingsSearch();
   }
 
   useEffect(() => {
@@ -165,10 +178,17 @@ export function SettingsSectionNav() {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.currentTarget.value)}
+            onKeyDown={onSearchKeyDown}
             placeholder="Billing, exports, saved projects..."
             autoComplete="off"
           />
+          {query ? (
+            <button className="settings-section-clear" type="button" onClick={clearSettingsSearch} aria-label="Clear settings search">
+              <RoleForgeIcon name="x" size={13} />
+            </button>
+          ) : null}
         </div>
+        <small className="settings-section-result" role="status">{resultLabel}</small>
       </label>
       <div className="settings-task-shortcuts" aria-label="Common account tasks">
         {settingsTaskShortcuts.map((task) => (

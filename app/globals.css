@@ -10425,7 +10425,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-section-search > div {
   display: grid;
-  grid-template-columns: 18px minmax(0, 1fr);
+  grid-template-columns: 18px minmax(0, 1fr) auto;
   align-items: center;
   gap: 7px;
   min-width: 0;
@@ -10449,6 +10449,39 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-section-search input::-webkit-search-cancel-button {
   cursor: pointer;
+}
+
+.settings-section-clear {
+  width: 28px;
+  height: 28px;
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.settings-section-clear:hover,
+.settings-section-clear:focus-visible {
+  border-color: color-mix(in srgb, var(--brand-dark) 34%, var(--line));
+  background: color-mix(in srgb, var(--brand-soft) 68%, var(--surface));
+  color: var(--ink-0);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.settings-section-result {
+  min-width: 0;
+  color: var(--ink-3);
+  font-size: 0.72rem;
+  font-weight: 820;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .settings-section-search > div:focus-within {
@@ -16548,6 +16581,7 @@ html[data-theme="dark"] .settings-section {
 }
 
 html[data-theme="dark"] .settings-section-search > span,
+html[data-theme="dark"] .settings-section-result,
 html[data-theme="dark"] .settings-section-empty {
   color: var(--ink-3);
 }
@@ -16560,6 +16594,19 @@ html[data-theme="dark"] .settings-section-empty {
 
 html[data-theme="dark"] .settings-section-search input {
   color: var(--ink-0);
+}
+
+html[data-theme="dark"] .settings-section-clear {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: rgba(255, 247, 233, 0.055);
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .settings-section-clear:hover,
+html[data-theme="dark"] .settings-section-clear:focus-visible {
+  border-color: rgba(222, 162, 79, 0.32);
+  background: rgba(222, 162, 79, 0.13);
+  color: #fff4da;
 }
 
 html[data-theme="dark"] .settings-section-search > div:focus-within {
