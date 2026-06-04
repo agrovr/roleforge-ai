@@ -9766,6 +9766,145 @@ html[data-theme="dark"] input::file-selector-button {
   }
 }
 
+.settings-activity-panel {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 34%, transparent), transparent 52%),
+    color-mix(in srgb, var(--surface) 92%, var(--surface-2));
+  box-shadow: var(--shadow-soft);
+}
+
+.settings-activity-head {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(min(100%, 390px), 1fr);
+  gap: 12px;
+  min-width: 0;
+  align-items: end;
+}
+
+.settings-activity-head h2 {
+  margin: 3px 0 0;
+  color: var(--ink-0);
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 5cqi, 1.85rem);
+  line-height: 1;
+}
+
+.settings-activity-head p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.86rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.settings-activity-list {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.settings-activity-item {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) minmax(94px, auto);
+  gap: 10px;
+  min-width: 0;
+  align-items: center;
+  padding: 11px;
+  border: 1px solid color-mix(in srgb, var(--brand) 15%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.settings-activity-item:hover,
+.settings-activity-item:focus-visible {
+  border-color: color-mix(in srgb, var(--brand) 38%, var(--line));
+  box-shadow: 0 14px 30px -24px var(--shadow);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.settings-activity-item.good {
+  border-color: color-mix(in srgb, var(--good) 28%, var(--line));
+}
+
+.settings-activity-item.warn {
+  border-color: color-mix(in srgb, var(--warn) 34%, var(--line));
+}
+
+.settings-activity-icon {
+  display: inline-grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-soft) 50%, var(--surface));
+  color: var(--brand-dark);
+}
+
+.settings-activity-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.settings-activity-copy span,
+.settings-activity-copy strong,
+.settings-activity-copy small,
+.settings-activity-action {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.settings-activity-copy span {
+  color: var(--ink-3);
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1.12;
+  text-transform: uppercase;
+}
+
+.settings-activity-copy strong {
+  color: var(--ink-0);
+  font-size: 0.95rem;
+  font-weight: 950;
+  line-height: 1.14;
+  text-wrap: balance;
+}
+
+.settings-activity-copy small {
+  color: var(--ink-2);
+  font-size: 0.78rem;
+  font-weight: 760;
+  line-height: 1.25;
+  text-wrap: pretty;
+}
+
+.settings-activity-action {
+  justify-self: end;
+  padding: 7px 9px;
+  border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-soft) 44%, var(--surface));
+  color: var(--brand-dark);
+  font-size: 0.72rem;
+  font-weight: 950;
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
+}
+
 .settings-account-health {
   display: grid;
   gap: 12px;
@@ -9911,9 +10050,19 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 @media (max-width: 720px) {
+  .settings-activity-head,
   .settings-account-health-head {
     grid-template-columns: 1fr;
     align-items: start;
+  }
+
+  .settings-activity-item {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+
+  .settings-activity-action {
+    grid-column: 1 / -1;
+    justify-self: stretch;
   }
 }
 
@@ -14026,6 +14175,8 @@ html[data-theme="dark"] .settings-card-head small {
 html[data-theme="dark"] .settings-status-pill,
 html[data-theme="dark"] .settings-card,
 html[data-theme="dark"] .settings-account-overview,
+html[data-theme="dark"] .settings-activity-panel,
+html[data-theme="dark"] .settings-activity-item,
 html[data-theme="dark"] .settings-account-health,
 html[data-theme="dark"] .settings-account-health-card,
 html[data-theme="dark"] .settings-workspace-action,
@@ -14072,6 +14223,8 @@ html[data-theme="dark"] .settings-overview-status a:hover,
 html[data-theme="dark"] .settings-overview-status a:focus-visible,
 html[data-theme="dark"] .settings-overview-actions a:hover,
 html[data-theme="dark"] .settings-overview-actions a:focus-visible,
+html[data-theme="dark"] .settings-activity-item:hover,
+html[data-theme="dark"] .settings-activity-item:focus-visible,
 html[data-theme="dark"] .settings-account-health-card:hover,
 html[data-theme="dark"] .settings-account-health-card:focus-visible {
   border-color: rgba(231, 188, 111, 0.36);
@@ -14088,10 +14241,20 @@ html[data-theme="dark"] .settings-account-health-card.good {
   border-color: rgba(146, 191, 160, 0.34);
 }
 
+html[data-theme="dark"] .settings-activity-item.good {
+  border-color: rgba(146, 191, 160, 0.34);
+}
+
 html[data-theme="dark"] .settings-account-health-card.warn {
   border-color: rgba(230, 183, 103, 0.38);
 }
 
+html[data-theme="dark"] .settings-activity-item.warn {
+  border-color: rgba(230, 183, 103, 0.38);
+}
+
+html[data-theme="dark"] .settings-activity-icon,
+html[data-theme="dark"] .settings-activity-action,
 html[data-theme="dark"] .settings-account-health-icon,
 html[data-theme="dark"] .settings-account-health-action {
   border-color: rgba(222, 162, 79, 0.28);
@@ -14103,6 +14266,8 @@ html[data-theme="dark"] .settings-card-head span,
 html[data-theme="dark"] .settings-account-email,
 html[data-theme="dark"] .settings-overview-identity strong,
 html[data-theme="dark"] .settings-overview-status strong,
+html[data-theme="dark"] .settings-activity-head h2,
+html[data-theme="dark"] .settings-activity-copy strong,
 html[data-theme="dark"] .settings-account-health-head h2,
 html[data-theme="dark"] .settings-account-health-copy strong,
 html[data-theme="dark"] .settings-workspace-action strong,
@@ -14120,6 +14285,9 @@ html[data-theme="dark"] .settings-metric span,
 html[data-theme="dark"] .settings-overview-kicker,
 html[data-theme="dark"] .settings-overview-status span,
 html[data-theme="dark"] .settings-overview-status small,
+html[data-theme="dark"] .settings-activity-head p,
+html[data-theme="dark"] .settings-activity-copy span,
+html[data-theme="dark"] .settings-activity-copy small,
 html[data-theme="dark"] .settings-account-health-head p,
 html[data-theme="dark"] .settings-account-health-copy span,
 html[data-theme="dark"] .settings-account-health-copy small,

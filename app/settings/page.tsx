@@ -585,6 +585,70 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
       tone: latestSupportRequest || supportRequestCount ? "good" : "ready",
     },
   ];
+  const latestProjectSummary = recentProjectSummaries[0] ?? null;
+  const latestDocumentSummary = recentDocumentSummaries[0] ?? null;
+  const hasRunsRemaining = usage.monthlyRunLimit === null || (usage.remainingRuns ?? 0) > 0;
+  const settingsActivityItems: Array<{
+    icon: RoleForgeIconName;
+    label: string;
+    value: string;
+    detail: string;
+    href: string;
+    action: string;
+    tone: "good" | "ready" | "warn";
+  }> = [
+    {
+      icon: latestProjectSummary ? "chart" : "file",
+      label: "Latest project",
+      value: latestProjectSummary?.title ?? "No saved project yet",
+      detail: latestProjectSummary?.detail ?? "Run the studio once and completed work will appear in Settings.",
+      href: latestProjectSummary?.href ?? "/app",
+      action: latestProjectSummary ? "Restore" : "Start in studio",
+      tone: latestProjectSummary ? "good" : "ready",
+    },
+    {
+      icon: "download",
+      label: "Latest document",
+      value: latestDocumentSummary?.title ?? documentReadyLabel,
+      detail: latestDocumentSummary
+        ? `${latestDocumentSummary.label} export · ${latestDocumentSummary.detail}`
+        : documentLockedLabel,
+      href: latestDocumentSummary?.url ?? "#exports",
+      action: latestDocumentSummary ? "Open file" : "View exports",
+      tone: latestDocumentSummary ? "good" : documentCounts.locked ? "warn" : "ready",
+    },
+    {
+      icon: hasRunsRemaining ? "sparkle" : "lock",
+      label: "Usage",
+      value: usageUsedLabel,
+      detail: usage.monthlyRunLimit === null
+        ? "Premium has no monthly run cap."
+        : `${usageHelperLabel}. Window resets ${usageResetLabel || "at the next monthly reset"}.`,
+      href: "#usage",
+      action: "Check usage",
+      tone: hasRunsRemaining ? "good" : "warn",
+    },
+    {
+      icon: "lock",
+      label: "Billing",
+      value: premiumEnding ? "Premium ending" : billingLabel,
+      detail: premiumActive ? billingDetail : checkoutReady ? "Stripe checkout is available from this account." : "Free plan is active with PDF export.",
+      href: "#billing",
+      action: premiumActive ? "Manage plan" : "Review plan",
+      tone: premiumEnding ? "warn" : premiumActive || checkoutReady ? "good" : "ready",
+    },
+    {
+      icon: "mail",
+      label: "Support",
+      value: latestSupportRequest?.referenceLabel ?? "No recent request",
+      detail: latestSupportRequest
+        ? `${latestSupportRequest.statusLabel} · ${latestSupportRequest.subject}`
+        : "Support requests can attach account context when something needs attention.",
+      href: latestSupportRequest ? "#support" : supportHistoryHref,
+      action: latestSupportRequest ? "View request" : "Open support",
+      tone: latestSupportRequest ? "good" : "ready",
+    },
+  ];
 
   return (
     <main className="settings-page-shell">
@@ -842,6 +906,31 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               </div>
             </section>
           </div>
+
+          <section className="settings-activity-panel" aria-label="Recent account activity">
+            <div className="settings-activity-head">
+              <div>
+                <span className="settings-overview-kicker">Recent activity</span>
+                <h2>What changed lately</h2>
+              </div>
+              <p>Projects, documents, usage, billing, and support are summarized from your current account records.</p>
+            </div>
+            <div className="settings-activity-list">
+              {settingsActivityItems.map((item) => (
+                <a className={`settings-activity-item ${item.tone}`} href={item.href} key={item.label}>
+                  <span className="settings-activity-icon" aria-hidden="true">
+                    <RoleForgeIcon name={item.icon} size={16} />
+                  </span>
+                  <span className="settings-activity-copy">
+                    <span>{item.label}</span>
+                    <strong>{item.value}</strong>
+                    <small>{item.detail}</small>
+                  </span>
+                  <span className="settings-activity-action">{item.action}</span>
+                </a>
+              ))}
+            </div>
+          </section>
 
           <section className="settings-account-health" aria-label="Workspace health">
             <div className="settings-account-health-head">
