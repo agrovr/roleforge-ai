@@ -2821,6 +2821,132 @@ export default function Page() {
       restore: Boolean(restoreEntry),
     };
   });
+  const accountMenuNextStep: {
+    action: "resume" | "target" | "run" | "export" | "history" | "sync" | "link";
+    detail: string;
+    href?: string;
+    icon: RoleForgeIconName;
+    label: string;
+    title: string;
+    tone: "good" | "ready" | "warn";
+  } = !fileSelected
+    ? {
+        action: "resume",
+        detail: "Choose a resume file to start a new tailoring run.",
+        icon: "file",
+        label: "Choose resume",
+        title: "Start with a resume",
+        tone: "ready",
+      }
+    : !hasTarget
+      ? {
+          action: "target",
+          detail: "Add a role target so the studio can tailor against the right posting.",
+          icon: "briefcase",
+          label: "Add target",
+          title: "Add the job target",
+          tone: "ready",
+        }
+      : canRun
+        ? {
+            action: "run",
+            detail: compactLabel(`${activeRole} is ready for ${tailoringMode} tailoring.`, 96),
+            icon: "sparkle",
+            label: runLabel,
+            title: "Ready to tailor",
+            tone: "good",
+          }
+        : result?.tailored_text?.trim() && selectedDownloadReady
+          ? {
+              action: "history",
+              detail: `${selectedFormatLabel} export is ready. Saved project history can reopen the run.`,
+              icon: "download",
+              label: "Open history",
+              title: "Export ready",
+              tone: "good",
+            }
+          : result?.tailored_text?.trim() && selectedExportAllowed
+            ? {
+                action: "export",
+                detail: `${selectedFormatLabel} export can be created for the selected template.`,
+                icon: "download",
+                label: `Export ${selectedFormatLabel}`,
+                title: "Create the next export",
+                tone: "ready",
+              }
+            : !selectedExportAllowed && selectedExportFormat !== "pdf"
+              ? {
+                  action: "link",
+                  detail: `${selectedFormatLabel} exports require Premium; PDF export remains available.`,
+                  href: "/settings#billing",
+                  icon: "lock",
+                  label: "View plans",
+                  title: "Premium export locked",
+                  tone: "warn",
+                }
+              : limitReached && !accountPremiumActive && premiumBillingReady
+                ? {
+                    action: "link",
+                    detail: "Free monthly runs are used. Premium unlocks unlimited tailoring runs.",
+                    href: "/settings#billing",
+                    icon: "lock",
+                    label: "Upgrade",
+                    title: "Run limit reached",
+                    tone: "warn",
+                  }
+                : syncableLocalHistoryCount
+                  ? {
+                      action: "sync",
+                      detail: `${syncableLocalHistoryCount} browser ${syncableLocalHistoryCount === 1 ? "run is" : "runs are"} ready to save to this account.`,
+                      icon: "upload",
+                      label: "Save now",
+                      title: "Save browser history",
+                      tone: "ready",
+                    }
+                  : recentAccountProjects.length
+                    ? {
+                        action: "history",
+                        detail: "Recent saved projects are available to restore or manage.",
+                        icon: "chart",
+                        label: "Open history",
+                        title: "Review saved projects",
+                        tone: "ready",
+                      }
+                    : {
+                        action: "link",
+                        detail: "Tune profile, billing, exports, and support from your account settings.",
+                        href: "/settings",
+                        icon: "settings",
+                        label: "Open settings",
+                        title: "Set up workspace",
+                        tone: "ready",
+                      };
+  const onAccountMenuNextStep = () => {
+    setAccountPanelOpen(false);
+    if (accountMenuNextStep.action === "resume") {
+      document.getElementById("input")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    if (accountMenuNextStep.action === "target") {
+      document.getElementById("target")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    if (accountMenuNextStep.action === "run") {
+      void onRun();
+      return;
+    }
+    if (accountMenuNextStep.action === "export") {
+      void onExportSelectedFormat();
+      return;
+    }
+    if (accountMenuNextStep.action === "sync") {
+      void syncLocalHistoryToAccount();
+      return;
+    }
+    if (accountMenuNextStep.action === "history") {
+      openHistoryPanel();
+    }
+  };
   const showHistoryFilter = accountHistoryGroups.length > 0 && localHistoryGroups.length > 0;
   const activeHistoryFilter = showHistoryFilter ? historyFilter : "all";
   const visibleHistoryGroups =
@@ -3064,6 +3190,30 @@ export default function Page() {
                           <strong>{accountSupportValue}</strong>
                           <span>{accountSupportCaption}</span>
                         </Link>
+                      </div>
+                      <div className={`studio-account-next-step ${accountMenuNextStep.tone}`} aria-label="Recommended workspace action">
+                        <span className="studio-account-next-step-icon" aria-hidden="true">
+                          <RoleForgeIcon name={accountMenuNextStep.icon} size={16} />
+                        </span>
+                        <span className="studio-account-next-step-copy">
+                          <span>Recommended</span>
+                          <strong>{accountMenuNextStep.title}</strong>
+                          <small>{accountMenuNextStep.detail}</small>
+                        </span>
+                        {accountMenuNextStep.action === "link" && accountMenuNextStep.href ? (
+                          <Link className="studio-account-next-step-action" href={accountMenuNextStep.href} onClick={() => setAccountPanelOpen(false)}>
+                            {accountMenuNextStep.label}
+                          </Link>
+                        ) : (
+                          <button
+                            className="studio-account-next-step-action"
+                            type="button"
+                            onClick={onAccountMenuNextStep}
+                            disabled={(accountMenuNextStep.action === "run" && !canRun) || (accountMenuNextStep.action === "export" && busy)}
+                          >
+                            {accountMenuNextStep.label}
+                          </button>
+                        )}
                       </div>
                       <small className={`studio-account-sync ${historySyncState}`}>{historySyncMessage}</small>
                       {syncableLocalHistoryCount ? (

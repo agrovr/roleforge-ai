@@ -6090,6 +6090,129 @@ html[data-theme="dark"] input::file-selector-button {
   transform: translateY(-1px);
 }
 
+.studio-account-next-step {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+  margin: -2px 0 12px;
+  padding: 11px;
+  border: 1px solid color-mix(in srgb, var(--brand) 28%, var(--line));
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 34%, transparent), transparent 58%),
+    color-mix(in srgb, var(--surface-2) 88%, white);
+}
+
+.studio-account-next-step.good {
+  border-color: color-mix(in srgb, var(--good) 42%, var(--line));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--good) 13%, transparent), transparent 62%),
+    color-mix(in srgb, var(--surface-2) 88%, white);
+}
+
+.studio-account-next-step.warn {
+  border-color: color-mix(in srgb, #d66b58 38%, var(--line));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, #d66b58 13%, transparent), transparent 62%),
+    color-mix(in srgb, var(--surface-2) 88%, white);
+}
+
+.studio-account-next-step-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-soft) 58%, var(--surface));
+  color: var(--brand-dark);
+}
+
+.studio-account-next-step.good .studio-account-next-step-icon {
+  background: color-mix(in srgb, var(--good) 14%, var(--surface));
+  color: var(--good);
+}
+
+.studio-account-next-step.warn .studio-account-next-step-icon {
+  background: color-mix(in srgb, #d66b58 14%, var(--surface));
+  color: #9a392e;
+}
+
+.studio-account-next-step-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.studio-account-next-step-copy span,
+.studio-account-next-step-copy strong,
+.studio-account-next-step-copy small {
+  display: block;
+  min-width: 0;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.studio-account-next-step-copy span {
+  color: var(--brand-dark);
+  font-size: 0.66rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.studio-account-next-step-copy strong {
+  color: var(--ink-0);
+  font-size: 0.94rem;
+  font-weight: 950;
+}
+
+.studio-account-next-step-copy small {
+  color: var(--ink-2);
+  font-size: 0.76rem;
+  font-weight: 760;
+  line-height: 1.28;
+}
+
+.studio-account-next-step-action {
+  grid-column: 1 / -1;
+  min-width: 0;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--brand-dark) 42%, var(--line));
+  border-radius: 11px;
+  background: linear-gradient(135deg, #bd672b 0%, #d99542 100%);
+  color: #fffaf0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 950;
+  line-height: 1.12;
+  text-align: center;
+  text-decoration: none;
+  text-wrap: balance;
+  white-space: normal;
+  transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.studio-account-next-step-action:hover,
+.studio-account-next-step-action:focus-visible {
+  border-color: color-mix(in srgb, var(--brand-dark) 54%, var(--line));
+  box-shadow: 0 14px 28px -24px var(--shadow);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.studio-account-next-step-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+  transform: none;
+}
+
 @container studio-account-popover (max-width: 360px) {
   .studio-account-insights,
   .studio-account-next-actions {
@@ -14369,6 +14492,7 @@ html[data-theme="dark"] .studio-account-popover-head span {
 html[data-theme="dark"] .studio-account-popover-head button,
 html[data-theme="dark"] .studio-account-insights a,
 html[data-theme="dark"] .studio-account-next-actions a,
+html[data-theme="dark"] .studio-account-next-step,
 html[data-theme="dark"] .studio-account-shortcuts a,
 html[data-theme="dark"] .studio-account-shortcuts button,
 html[data-theme="dark"] .studio-account-recent,
@@ -14376,6 +14500,55 @@ html[data-theme="dark"] .studio-account-utilities a,
 html[data-theme="dark"] .studio-account-summary {
   background: rgba(255, 247, 233, 0.06);
   border-color: rgba(255, 247, 233, 0.16);
+}
+
+html[data-theme="dark"] .studio-account-next-step {
+  background:
+    linear-gradient(135deg, rgba(222, 162, 79, 0.14), transparent 60%),
+    rgba(255, 247, 233, 0.055);
+}
+
+html[data-theme="dark"] .studio-account-next-step.good {
+  border-color: rgba(146, 191, 160, 0.34);
+  background:
+    linear-gradient(135deg, rgba(146, 191, 160, 0.12), transparent 60%),
+    rgba(255, 247, 233, 0.055);
+}
+
+html[data-theme="dark"] .studio-account-next-step.warn {
+  border-color: rgba(230, 183, 103, 0.38);
+  background:
+    linear-gradient(135deg, rgba(230, 183, 103, 0.13), transparent 60%),
+    rgba(255, 247, 233, 0.055);
+}
+
+html[data-theme="dark"] .studio-account-next-step-icon {
+  background: rgba(222, 162, 79, 0.16);
+  color: #f3c16d;
+}
+
+html[data-theme="dark"] .studio-account-next-step.good .studio-account-next-step-icon {
+  background: rgba(146, 191, 160, 0.16);
+  color: #b7e5c4;
+}
+
+html[data-theme="dark"] .studio-account-next-step.warn .studio-account-next-step-icon {
+  background: rgba(230, 183, 103, 0.14);
+  color: #f0c978;
+}
+
+html[data-theme="dark"] .studio-account-next-step-copy span {
+  color: #efb863;
+}
+
+html[data-theme="dark"] .studio-account-next-step-copy small {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .studio-account-next-step-action {
+  border-color: rgba(255, 247, 233, 0.34);
+  background: linear-gradient(135deg, #efb863 0%, #bb7736 100%);
+  color: #08101e;
 }
 
 html[data-theme="dark"] .studio-account-shortcuts a,
