@@ -2551,6 +2551,66 @@ export default function Page() {
   const targetUrlPlaceholder = fileSelected
     ? "https://company.com/careers/job - add the role link next"
     : "https://company.com/careers/job";
+  const preflightItems: Array<{
+    icon: RoleForgeIconName;
+    label: string;
+    value: string;
+    detail: string;
+    tone: "good" | "ready" | "warn";
+  }> = [
+    {
+      icon: "lock",
+      label: "Account",
+      value: signedIn ? "Signed in" : "Needed",
+      detail: signedIn
+        ? "Saved projects, exports, and usage stay attached to this account."
+        : "Sign in before running the protected studio workflow.",
+      tone: signedIn ? "good" : "warn",
+    },
+    {
+      icon: "file",
+      label: "Resume",
+      value: previewUploadState === "reading" ? "Reading" : fileSelected ? "Ready" : "Needed",
+      detail: fileSelected ? uploadStatusCopy : uploadFormatHint,
+      tone: previewUploadState === "error" ? "warn" : fileSelected ? "good" : "ready",
+    },
+    {
+      icon: "briefcase",
+      label: "Target",
+      value: hasTarget ? "Ready" : "Needed",
+      detail: hasTarget ? compactLabel(activeRole, 86) : "Paste a job description or add a public posting URL.",
+      tone: hasTarget ? "good" : "ready",
+    },
+    {
+      icon: limitReached ? "lock" : "sparkle",
+      label: "Usage",
+      value: limitReached ? "Limit reached" : usageSummary.monthlyRunLimit === null ? "Unlimited" : usageLabel,
+      detail: limitReached
+        ? resetLabel
+          ? `Free runs reset ${resetLabel}.`
+          : "Upgrade or wait for the next monthly reset."
+        : usageSummary.monthlyRunLimit === null
+          ? "Premium runs are unlimited."
+          : typeof usage?.remainingRuns === "number"
+            ? `${usage.remainingRuns} ${runWord(usage.remainingRuns)} remaining this month.`
+            : "Usage refresh is pending.",
+      tone: limitReached ? "warn" : "good",
+    },
+    {
+      icon: selectedExportAllowed ? "download" : "lock",
+      label: "Export",
+      value: selectedExportAllowed ? `${selectedFormatLabel} ready` : `${selectedFormatLabel} locked`,
+      detail: selectedExportAllowed
+        ? `${selectedTemplate.name} direction will be sent with new exports.`
+        : `${selectedFormatLabel} exports require Premium; PDF remains available.`,
+      tone: selectedExportAllowed ? "good" : "warn",
+    },
+  ];
+  const preflightReadyCount = preflightItems.filter((item) => item.tone === "good").length;
+  const preflightStatusLabel = canRun ? "Ready to tailor" : "Preflight needed";
+  const preflightStatusDetail = canRun
+    ? "Resume, target, account, usage, and export settings are ready."
+    : runDisabledReason || "Complete the required fields before running Tailor.";
   const coverLetterWordCount = countReadableWords(coverLetterText);
   const interviewQuestionCount = interviewPrep.length;
   const hasGeneratedAssets = Boolean(coverLetterText || interviewQuestionCount);
@@ -3594,6 +3654,46 @@ export default function Page() {
                     </div>
                   </div>
                 </article>
+                <section className="rf-preflight-panel" aria-label="Workflow preflight">
+                  <div className="rf-preflight-head">
+                    <div>
+                      <div className="eyebrow">Preflight</div>
+                      <h3>{preflightStatusLabel}</h3>
+                      <p>{preflightStatusDetail}</p>
+                    </div>
+                    <span className={`rf-preflight-score ${canRun ? "ready" : ""}`}>
+                      {preflightReadyCount}/{preflightItems.length}
+                    </span>
+                  </div>
+                  <div className="rf-preflight-list">
+                    {preflightItems.map((item) => (
+                      <a
+                        className={`rf-preflight-item ${item.tone}`}
+                        href={
+                          item.label === "Account"
+                            ? "#account"
+                            : item.label === "Resume"
+                              ? "#input"
+                              : item.label === "Target"
+                                ? "#target"
+                                : item.label === "Usage"
+                                  ? "#account"
+                                  : "#assets"
+                        }
+                        key={item.label}
+                      >
+                        <span className="rf-preflight-icon" aria-hidden="true">
+                          <RoleForgeIcon name={item.icon} size={15} />
+                        </span>
+                        <span className="rf-preflight-copy">
+                          <span>{item.label}</span>
+                          <strong>{item.value}</strong>
+                          <small>{item.detail}</small>
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                </section>
                 {premiumExportRequested ? (
                   <div className="rf-callout upgrade">
                     <strong>
