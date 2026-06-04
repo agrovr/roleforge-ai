@@ -48,6 +48,24 @@ test("settings saved project cards keep history links separate from stage forms"
   assert.doesNotMatch(settingsPage, /<Link[^>]*className="settings-project-item"/);
 });
 
+test("settings saved project empty state guides the first signed-in run", () => {
+  assert.match(settingsPage, /settings-project-empty settings-project-onboarding/);
+  assert.match(settingsPage, /aria-label="Start your first saved project"/);
+  assert.match(settingsPage, /Complete a signed-in Tailor run/);
+  assert.match(settingsPage, /Upload a resume/);
+  assert.match(settingsPage, /Add a role target/);
+  assert.match(settingsPage, /Run Tailor/);
+  assert.match(settingsPage, /href="\/app"/);
+  assert.match(settingsPage, /href="\/templates"/);
+  assert.match(settingsPage, /href="\/help"/);
+  assert.match(stylesheet, /\.settings-project-onboarding\s*\{(?=[^}]*display:\s*grid)(?=[^}]*gap:\s*14px)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-onboarding-steps\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-onboarding-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*142px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-onboarding-actions\s+\.primary-button,\s*\.settings-project-onboarding-actions\s+\.ghost-button\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-project-onboarding-steps\s+span\s*\{(?=[^}]*background:\s*rgba\(222,\s*162,\s*79,\s*0\.16\))(?=[^}]*color:\s*#f3c16d)[^}]*\}/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.settings-project-onboarding-steps,\s*\.settings-project-onboarding-actions\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/s);
+});
+
 test("settings saved project stage controls are compact and overflow-safe", () => {
   assert.match(stylesheet, /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(220px,\s*0\.95fr\)\s+minmax\(360px,\s*1\.35fr\))(?=[^}]*gap:\s*16px)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-summary,\s*\.settings-project-controls\s*\{(?=[^}]*display:\s*grid)[^}]*\}/s);

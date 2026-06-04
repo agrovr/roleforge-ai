@@ -2335,7 +2335,7 @@ html.rf-custom-pointer [contenteditable=""] {
 
 .price-status {
   max-inline-size: 52%;
-  padding: 5px 9px;
+  padding: 6px 11px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--surface-2);
@@ -2357,12 +2357,13 @@ html.rf-custom-pointer [contenteditable=""] {
 }
 
 .price-status.current {
-  border-color: rgba(112, 67, 20, 0.66);
-  background: linear-gradient(135deg, #fffaf0 0%, #f7d17b 100%);
-  color: #211304;
+  border-color: rgba(255, 250, 240, 0.98);
+  background: linear-gradient(135deg, #fffaf0 0%, #ffd276 100%);
+  color: #140a02;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.74),
-    0 10px 24px -18px rgba(87, 48, 14, 0.72);
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    0 0 0 1px rgba(47, 27, 10, 0.16),
+    0 14px 30px -16px rgba(87, 48, 14, 0.72);
 }
 
 .price-status.upgrade {
@@ -2378,13 +2379,13 @@ html.rf-custom-pointer [contenteditable=""] {
 }
 
 .price-card.featured .price-status.current {
-  border-color: rgba(255, 250, 240, 0.96);
-  background: linear-gradient(135deg, #fffaf0 0%, #ffd276 100%);
-  color: #160c03;
+  border-color: #fffaf0;
+  background: linear-gradient(135deg, #fffdf8 0%, #ffd276 100%);
+  color: #0f0802;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.82),
-    0 0 0 1px rgba(23, 16, 29, 0.18),
-    0 16px 34px -16px rgba(255, 196, 117, 0.82);
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 0 0 1px rgba(8, 12, 24, 0.3),
+    0 18px 38px -14px rgba(255, 196, 117, 0.9);
 }
 
 .price-amount .v {
@@ -3317,13 +3318,13 @@ html[data-theme="dark"] .price-card.featured .price-status {
 }
 
 html[data-theme="dark"] .price-status.current {
-  border-color: rgba(255, 250, 240, 0.9);
-  background: linear-gradient(135deg, #fffaf0 0%, #f7d17b 100%);
-  color: #100b05;
+  border-color: rgba(255, 250, 240, 0.98);
+  background: linear-gradient(135deg, #fffdf8 0%, #ffd276 100%);
+  color: #0f0802;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    0 0 0 1px rgba(8, 12, 24, 0.2),
-    0 14px 32px -17px rgba(255, 196, 117, 0.6);
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    0 0 0 1px rgba(8, 12, 24, 0.3),
+    0 16px 36px -15px rgba(255, 196, 117, 0.72);
 }
 
 html[data-theme="dark"] .price-status.upgrade {
@@ -3339,13 +3340,13 @@ html[data-theme="dark"] .price-status.paused {
 }
 
 html[data-theme="dark"] .price-card.featured .price-status.current {
-  border-color: rgba(255, 250, 240, 0.98);
-  background: linear-gradient(135deg, #fffaf0 0%, #ffd276 100%);
-  color: #0f0902;
+  border-color: #fffaf0;
+  background: linear-gradient(135deg, #fffdf8 0%, #ffd276 100%);
+  color: #0b0601;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.84),
-    0 0 0 1px rgba(8, 12, 24, 0.28),
-    0 18px 38px -15px rgba(255, 194, 117, 0.7);
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 0 0 1px rgba(8, 12, 24, 0.34),
+    0 20px 42px -14px rgba(255, 194, 117, 0.82);
 }
 
 html[data-theme="dark"] .cta-band h2,
@@ -7012,6 +7013,77 @@ html[data-theme="dark"] input::file-selector-button {
   overflow-wrap: anywhere;
   text-overflow: initial;
   text-wrap: pretty;
+  white-space: normal;
+}
+
+.settings-project-onboarding {
+  display: grid;
+  gap: 14px;
+  align-items: stretch;
+  min-width: 0;
+  padding: 16px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 44%, transparent), transparent 58%),
+    color-mix(in srgb, var(--surface) 92%, var(--surface-2));
+}
+
+.settings-project-onboarding strong,
+.settings-project-onboarding span {
+  white-space: normal;
+}
+
+.settings-project-onboarding strong {
+  font-size: 1.06rem;
+  line-height: 1.14;
+  text-wrap: balance;
+}
+
+.settings-project-onboarding > div:first-child {
+  min-width: 0;
+}
+
+.settings-project-onboarding-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.settings-project-onboarding-steps span {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-soft) 46%, var(--surface));
+  color: var(--ink-1);
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.settings-project-onboarding-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 142px), 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.settings-project-onboarding-actions .primary-button,
+.settings-project-onboarding-actions .ghost-button {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  justify-content: center;
+  line-height: 1.12;
+  text-align: center;
+  text-wrap: balance;
   white-space: normal;
 }
 
@@ -14432,6 +14504,18 @@ html[data-theme="dark"] .settings-workspace-action > span {
   color: #f3c16d;
 }
 
+html[data-theme="dark"] .settings-project-onboarding {
+  background:
+    linear-gradient(135deg, rgba(222, 162, 79, 0.14), transparent 58%),
+    rgba(12, 17, 31, 0.86);
+}
+
+html[data-theme="dark"] .settings-project-onboarding-steps span {
+  border-color: rgba(222, 162, 79, 0.36);
+  background: rgba(222, 162, 79, 0.16);
+  color: #f3c16d;
+}
+
 html[data-theme="dark"] .settings-account-health-card.good {
   border-color: rgba(146, 191, 160, 0.34);
 }
@@ -16754,6 +16838,11 @@ body,
   .settings-plan-includes {
     justify-items: start;
     justify-content: flex-start;
+  }
+
+  .settings-project-onboarding-steps,
+  .settings-project-onboarding-actions {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

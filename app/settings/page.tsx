@@ -1280,9 +1280,27 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   ))}
                 </div>
               ) : (
-                <div className="settings-project-empty">
-                  <strong>No saved runs yet</strong>
-                  <span>Completed exports will appear here and reopen from History.</span>
+                <div className="settings-project-empty settings-project-onboarding" aria-label="Start your first saved project">
+                  <div>
+                    <strong>No saved runs yet</strong>
+                    <span>Complete a signed-in Tailor run and this area becomes your saved-project workspace with restore links, export files, stages, and application-kit status.</span>
+                  </div>
+                  <div className="settings-project-onboarding-steps">
+                    <span><RoleForgeIcon name="file" size={13} /> Upload a resume</span>
+                    <span><RoleForgeIcon name="briefcase" size={13} /> Add a role target</span>
+                    <span><RoleForgeIcon name="sparkle" size={13} /> Run Tailor</span>
+                  </div>
+                  <div className="settings-project-onboarding-actions">
+                    <Link className="primary-button" href="/app">
+                      <RoleForgeIcon name="file" size={14} /> Start in studio
+                    </Link>
+                    <Link className="ghost-button" href="/templates">
+                      <RoleForgeIcon name="layers" size={14} /> Choose template
+                    </Link>
+                    <Link className="ghost-button" href="/help">
+                      <RoleForgeIcon name="mail" size={14} /> Saved project help
+                    </Link>
+                  </div>
                 </div>
               )}
               <Link className="btn btn-soft btn-sm settings-inline-link" href="/app#history">Open history</Link>
