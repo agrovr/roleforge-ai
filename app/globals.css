@@ -2378,6 +2378,28 @@ html.rf-custom-pointer [contenteditable=""] {
   color: #6e4520;
 }
 
+.price-card.featured .price-status.upgrade,
+.price-card.featured .price-status.paused {
+  border-color: rgba(255, 247, 233, 0.52);
+  background: rgba(255, 247, 233, 0.16);
+  color: #fff7e9;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 247, 233, 0.1),
+    0 12px 28px -20px rgba(255, 247, 233, 0.55);
+}
+
+.price-card.featured .price-status.upgrade {
+  border-color: rgba(255, 210, 118, 0.58);
+  background: rgba(255, 210, 118, 0.18);
+  color: #fff4da;
+}
+
+.price-card.featured .price-status.paused {
+  border-color: rgba(255, 186, 170, 0.48);
+  background: rgba(237, 127, 105, 0.16);
+  color: #ffd7ce;
+}
+
 .price-card.featured .price-status.current {
   border-color: #fffaf0;
   background: linear-gradient(135deg, #fffdf8 0%, #ffd276 100%);
@@ -8854,6 +8876,8 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .support-guide-card,
+.support-triage-card,
+.support-response-card,
 .support-request-card,
 .support-signin-card {
   min-width: 0;
@@ -8934,6 +8958,87 @@ html[data-theme="dark"] input::file-selector-button {
   text-wrap: balance;
 }
 
+.support-triage-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.support-triage-head {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.support-triage-head strong {
+  color: var(--ink-0);
+  font-size: 1.04rem;
+  font-weight: 950;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.support-triage-list {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+}
+
+.support-triage-item {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 9px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--sky) 16%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--sky-soft) 18%, var(--surface));
+}
+
+.support-triage-item > span {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--sky) 24%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--sky-soft) 48%, var(--surface));
+  color: var(--sky);
+}
+
+.support-triage-item div,
+.support-triage-item strong,
+.support-triage-item p,
+.support-triage-item small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.support-triage-item strong {
+  display: block;
+  color: var(--ink-0);
+  font-size: 0.86rem;
+  font-weight: 950;
+  line-height: 1.12;
+}
+
+.support-triage-item p,
+.support-triage-item small {
+  display: block;
+  margin: 4px 0 0;
+  color: var(--ink-2);
+  font-size: 0.76rem;
+  font-weight: 720;
+  line-height: 1.32;
+  text-wrap: pretty;
+}
+
+.support-triage-item small {
+  color: var(--ink-3);
+  font-weight: 780;
+}
+
 .support-request-card {
   display: grid;
   gap: 16px;
@@ -9002,6 +9107,74 @@ html[data-theme="dark"] input::file-selector-button {
 .support-prefill-note span {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.support-response-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border-color: color-mix(in srgb, var(--good) 18%, var(--line));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--good-soft) 28%, transparent), transparent 62%),
+    color-mix(in srgb, var(--surface) 92%, var(--bg-alt));
+}
+
+.support-response-head {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.support-response-head strong,
+.support-response-head p {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.support-response-head strong {
+  color: var(--ink-0);
+  font-size: 1rem;
+  font-weight: 950;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.support-response-head p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.86rem;
+  font-weight: 720;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.support-response-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.support-response-item {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--good) 16%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 82%, var(--good-soft));
+}
+
+.support-response-item small {
+  display: block;
+  min-width: 0;
+  color: var(--ink-2);
+  font-size: 0.76rem;
+  font-weight: 740;
+  line-height: 1.32;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
 .support-form {
@@ -9346,6 +9519,10 @@ html[data-theme="dark"] input::file-selector-button {
   }
 
   .support-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .support-response-list {
     grid-template-columns: 1fr;
   }
 
@@ -15046,6 +15223,8 @@ html[data-theme="dark"] .status-diagnostic-card,
 html[data-theme="dark"] .status-action-card,
 html[data-theme="dark"] .support-hero-card,
 html[data-theme="dark"] .support-guide-card,
+html[data-theme="dark"] .support-triage-card,
+html[data-theme="dark"] .support-response-card,
 html[data-theme="dark"] .support-request-card,
 html[data-theme="dark"] .support-signin-card,
 html[data-theme="dark"] .updates-hero-card,
@@ -15072,13 +15251,32 @@ html[data-theme="dark"] .updates-card-icon {
 }
 
 html[data-theme="dark"] .support-hero-card svg,
-html[data-theme="dark"] .support-guide-card > span {
+html[data-theme="dark"] .support-guide-card > span,
+html[data-theme="dark"] .support-triage-item > span {
   color: #8eb7f0;
 }
 
-html[data-theme="dark"] .support-guide-card > span {
+html[data-theme="dark"] .support-guide-card > span,
+html[data-theme="dark"] .support-triage-item > span {
   border-color: rgba(142, 183, 240, 0.28);
   background: rgba(142, 183, 240, 0.15);
+}
+
+html[data-theme="dark"] .support-triage-item {
+  border-color: rgba(142, 183, 240, 0.22);
+  background: rgba(142, 183, 240, 0.09);
+}
+
+html[data-theme="dark"] .support-response-card {
+  border-color: rgba(137, 209, 190, 0.24);
+  background:
+    linear-gradient(135deg, rgba(137, 209, 190, 0.1), transparent 62%),
+    rgba(255, 247, 233, 0.045);
+}
+
+html[data-theme="dark"] .support-response-item {
+  border-color: rgba(137, 209, 190, 0.22);
+  background: rgba(137, 209, 190, 0.08);
 }
 
 html[data-theme="dark"] .support-form input,

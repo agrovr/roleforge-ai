@@ -13,6 +13,9 @@ import {
   supportCategoryLabel,
   supportRequestHref,
   supportRequestReference,
+  supportStatusLabel,
+  type SupportRequestCategory,
+  type SupportRequestStatus,
 } from "../lib/supportRequests";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 
@@ -68,6 +71,62 @@ const supportGuides = [
     }),
   },
 ] as const;
+
+const supportTriageItems: Array<{
+  category: SupportRequestCategory;
+  detail: string;
+  evidence: string;
+  icon: "file" | "lock" | "settings" | "mail";
+}> = [
+  {
+    category: "workflow",
+    detail: "Upload, Tailor, generated assets, or export creation stopped before finishing.",
+    evidence: "Include the request id when shown, file type, selected template, and the last workflow step you tried.",
+    icon: "file",
+  },
+  {
+    category: "exports",
+    detail: "A ready PDF, DOCX, or TXT download is missing, expired, locked, or attached to the wrong run.",
+    evidence: "Include export format, saved project name, and whether the issue happens from Studio, History, or Settings.",
+    icon: "file",
+  },
+  {
+    category: "billing",
+    detail: "Checkout, billing management, cancellation, or Premium access does not match the account state.",
+    evidence: "Include whether the issue is checkout, portal, subscription status, or Premium entitlement sync.",
+    icon: "lock",
+  },
+  {
+    category: "account",
+    detail: "Sign-in, email changes, profile details, security metadata, or account deletion controls need attention.",
+    evidence: "Include sign-in method, account email, and the settings section where the issue appears.",
+    icon: "mail",
+  },
+  {
+    category: "saved-projects",
+    detail: "Restore, rename, stage, delete, or saved document history behaves unexpectedly.",
+    evidence: "Include project name, application stage, export format, and whether the run is local or account-saved.",
+    icon: "settings",
+  },
+];
+
+const supportLifecycle: Array<{
+  status: SupportRequestStatus;
+  detail: string;
+}> = [
+  {
+    status: "open",
+    detail: "Your request is saved with an RF reference and visible in Support history.",
+  },
+  {
+    status: "reviewing",
+    detail: "The request has enough account context to investigate the workflow, billing, or saved-project state.",
+  },
+  {
+    status: "closed",
+    detail: "The request is resolved or no longer needs action; the reference remains in account history.",
+  },
+];
 
 function getParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -158,6 +217,25 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
               <small>Prefill request</small>
             </Link>
           ))}
+
+          <section className="support-triage-card" aria-label="Support triage guide">
+            <div className="support-triage-head">
+              <span className="eyebrow">Before sending</span>
+              <strong>Send the details that make the issue traceable.</strong>
+            </div>
+            <div className="support-triage-list">
+              {supportTriageItems.map((item) => (
+                <article className="support-triage-item" key={item.category}>
+                  <span aria-hidden="true"><RoleForgeIcon name={item.icon} size={14} /></span>
+                  <div>
+                    <strong>{supportCategoryLabel(item.category)}</strong>
+                    <p>{item.detail}</p>
+                    <small>{item.evidence}</small>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
         </div>
 
         <section className="support-request-card" id="request" aria-label="Support request form">
@@ -189,6 +267,22 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
               <span>Support details were prefilled from the page where you asked for help.</span>
             </div>
           ) : null}
+
+          <section className="support-response-card" aria-label="Support request lifecycle">
+            <div className="support-response-head">
+              <span className="eyebrow">After submit</span>
+              <strong>Track the request from your account.</strong>
+              <p>Support requests are stored with account-safe context and an RF reference. Status changes appear here and in Settings.</p>
+            </div>
+            <div className="support-response-list">
+              {supportLifecycle.map((item) => (
+                <article className="support-response-item" key={item.status}>
+                  <span className={`support-status-badge ${item.status}`}>{supportStatusLabel(item.status)}</span>
+                  <small>{item.detail}</small>
+                </article>
+              ))}
+            </div>
+          </section>
 
           {signedIn ? (
             <form className="support-form" action="/api/support-requests" method="post">
