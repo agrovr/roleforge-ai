@@ -8475,6 +8475,145 @@ html[data-theme="dark"] input::file-selector-button {
   }
 }
 
+.status-diagnostics {
+  width: min(1280px, 100%);
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1fr);
+  gap: 14px;
+  min-width: 0;
+  margin: 0 auto;
+}
+
+.status-incident-card,
+.status-diagnostic-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--bg-alt) 76%, transparent)),
+    var(--surface);
+  box-shadow: 0 20px 54px -46px var(--shadow);
+}
+
+.status-incident-card {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  overflow: hidden;
+  padding: 16px;
+}
+
+.status-incident-card.good {
+  border-color: color-mix(in srgb, var(--status-good) 28%, var(--line));
+}
+
+.status-incident-card.warn {
+  border-color: color-mix(in srgb, var(--status-warn) 32%, var(--line));
+}
+
+.status-incident-card > span {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, currentColor 20%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, currentColor 9%, var(--surface));
+}
+
+.status-incident-card.good > span {
+  color: var(--status-good);
+}
+
+.status-incident-card.warn > span {
+  color: var(--status-warn);
+}
+
+.status-incident-card div {
+  min-width: 0;
+}
+
+.status-incident-card strong,
+.status-incident-card p,
+.status-diagnostic-card span,
+.status-diagnostic-card strong,
+.status-diagnostic-card small {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.status-incident-card strong {
+  color: var(--ink-0);
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 4vw, 1.85rem);
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+.status-incident-card p {
+  margin: 10px 0 0;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.status-diagnostic-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(min(100%, 142px), 1fr));
+  gap: 10px;
+  min-width: 0;
+}
+
+.status-diagnostic-card {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  padding: 13px;
+}
+
+.status-diagnostic-card.good {
+  border-color: color-mix(in srgb, var(--status-good) 24%, var(--line));
+}
+
+.status-diagnostic-card.ready {
+  border-color: color-mix(in srgb, var(--status-ready) 24%, var(--line));
+}
+
+.status-diagnostic-card.warn {
+  border-color: color-mix(in srgb, var(--status-warn) 28%, var(--line));
+}
+
+.status-diagnostic-card span {
+  color: var(--ink-3);
+  font-size: 0.67rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1.12;
+  text-transform: uppercase;
+}
+
+.status-diagnostic-card strong {
+  color: var(--ink-0);
+  font-size: 0.96rem;
+  font-weight: 950;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.status-diagnostic-card small {
+  color: var(--ink-3);
+  font-size: 0.75rem;
+  font-weight: 740;
+  line-height: 1.3;
+  text-wrap: pretty;
+}
+
 .status-action-grid {
   width: min(1280px, 100%);
   max-width: 100%;
@@ -9214,6 +9353,14 @@ html[data-theme="dark"] input::file-selector-button {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .status-diagnostics {
+    grid-template-columns: 1fr;
+  }
+
+  .status-diagnostic-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .status-action-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -9240,6 +9387,10 @@ html[data-theme="dark"] input::file-selector-button {
   }
 
   .status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .status-diagnostic-grid {
     grid-template-columns: 1fr;
   }
 
@@ -14890,6 +15041,8 @@ html[data-theme="dark"] .help-search-meta {
 
 html[data-theme="dark"] .status-hero-card,
 html[data-theme="dark"] .status-card,
+html[data-theme="dark"] .status-incident-card,
+html[data-theme="dark"] .status-diagnostic-card,
 html[data-theme="dark"] .status-action-card,
 html[data-theme="dark"] .support-hero-card,
 html[data-theme="dark"] .support-guide-card,
@@ -15003,9 +15156,36 @@ html[data-theme="dark"] .status-card.warn {
   border-color: rgba(231, 188, 111, 0.3);
 }
 
+html[data-theme="dark"] .status-incident-card.good,
+html[data-theme="dark"] .status-diagnostic-card.good {
+  border-color: rgba(137, 209, 190, 0.28);
+}
+
+html[data-theme="dark"] .status-diagnostic-card.ready {
+  border-color: rgba(141, 181, 214, 0.28);
+}
+
+html[data-theme="dark"] .status-incident-card.warn,
+html[data-theme="dark"] .status-diagnostic-card.warn {
+  border-color: rgba(231, 188, 111, 0.3);
+}
+
 html[data-theme="dark"] .status-card-icon {
   border-color: rgba(255, 247, 233, 0.16);
   background: rgba(255, 247, 233, 0.055);
+}
+
+html[data-theme="dark"] .status-incident-card > span {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: rgba(255, 247, 233, 0.055);
+}
+
+html[data-theme="dark"] .status-incident-card.good > span {
+  color: #b7e5c4;
+}
+
+html[data-theme="dark"] .status-incident-card.warn > span {
+  color: #f0c978;
 }
 
 html[data-theme="dark"] .settings-project-stage-controls button.active,

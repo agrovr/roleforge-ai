@@ -38,27 +38,36 @@ type StatusAction = {
   icon: RoleForgeIconName;
 };
 
+type StatusDiagnostic = {
+  label: string;
+  value: string;
+  detail: string;
+  tone: StatusTone;
+};
+
 function backendBaseUrl() {
   return process.env.NEXT_PUBLIC_BACKEND_URL?.trim().replace(/\/+$/, "") ?? "";
 }
 
-async function loadBackendCapabilities(): Promise<{ ok: boolean; capabilities: WorkflowCapabilities | null; error: string }> {
+async function loadBackendCapabilities(): Promise<{ ok: boolean; capabilities: WorkflowCapabilities | null; error: string; latencyMs: number | null }> {
   const baseUrl = backendBaseUrl();
   if (!baseUrl) {
-    return { ok: false, capabilities: null, error: "Resume workflow checks are not available for this deployment." };
+    return { ok: false, capabilities: null, error: "Resume workflow checks are not available for this deployment.", latencyMs: null };
   }
 
+  const startedAt = Date.now();
   try {
     const response = await fetch(`${baseUrl}/capabilities`, {
       cache: "no-store",
       signal: AbortSignal.timeout(6000),
     });
+    const latencyMs = Date.now() - startedAt;
     if (!response.ok) {
-      return { ok: false, capabilities: null, error: "Resume workflow checks are temporarily unavailable." };
+      return { ok: false, capabilities: null, error: "Resume workflow checks are temporarily unavailable.", latencyMs };
     }
-    return { ok: true, capabilities: normalizeWorkflowCapabilities(await response.json()), error: "" };
+    return { ok: true, capabilities: normalizeWorkflowCapabilities(await response.json()), error: "", latencyMs };
   } catch {
-    return { ok: false, capabilities: null, error: "Resume workflow checks did not respond before the status check timed out." };
+    return { ok: false, capabilities: null, error: "Resume workflow checks did not respond before the status check timed out.", latencyMs: null };
   }
 }
 
@@ -70,10 +79,18 @@ function formatList(values: string[]) {
 export default async function StatusPage() {
   const supabaseConfig = getSupabaseConfig();
   const backend = await loadBackendCapabilities();
+  const checkedAt = new Date();
+  const checkedAtLabel = new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "America/Chicago",
+  }).format(checkedAt);
   const billing = billingReadiness(getStripeBillingConfig(), {
     hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()),
     billingStatus: "none",
   });
+  const frontendUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/+$/, "") || "https://roleforgeai.vercel.app";
+  const backendUrl = backendBaseUrl();
 
   const uploadFormats = backend.capabilities?.upload_formats.filter((format) => format.enabled).map((format) => format.label) ?? [];
   const freeExports = backend.capabilities?.export_formats.filter((format) => format.enabled && format.plan !== "premium").map((format) => format.label) ?? [];
@@ -154,6 +171,50 @@ export default async function StatusPage() {
       icon: "lock",
     },
   ];
+  const hasWarning = items.some((item) => item.tone === "warn");
+  const incidentTone: StatusTone = hasWarning ? "warn" : "good";
+  const incidentTitle = hasWarning ? "Some checks need attention" : "No active incident detected";
+  const incidentDetail = hasWarning
+    ? "At least one live readiness check is degraded. Use the action cards below to retry the workflow or contact support with this Status page context."
+    : "Account access, backend capabilities, exports, and billing readiness are reporting healthy from this deployment check.";
+  const diagnostics: StatusDiagnostic[] = [
+    {
+      label: "Last checked",
+      value: checkedAtLabel,
+      detail: "Displayed in Central time from the live status render.",
+      tone: "ready",
+    },
+    {
+      label: "Frontend",
+      value: frontendUrl.replace(/^https?:\/\//, ""),
+      detail: "Public Vercel deployment serving RoleForge AI.",
+      tone: "good",
+    },
+    {
+      label: "Backend",
+      value: backend.ok && backend.latencyMs !== null ? `${backend.latencyMs} ms` : backendUrl ? "Check needed" : "Unavailable",
+      detail: backend.ok
+        ? `${backendUrl.replace(/^https?:\/\//, "")}/capabilities responded to this status render.`
+        : backend.error,
+      tone: backend.ok ? "good" : "warn",
+    },
+    {
+      label: "Account provider",
+      value: supabaseConfig.configured ? "Supabase ready" : "Check needed",
+      detail: supabaseConfig.configured ? "Auth configuration is present for protected account surfaces." : "Account sign-in is unavailable for this deployment.",
+      tone: supabaseConfig.configured ? "good" : "warn",
+    },
+    {
+      label: "Billing mode",
+      value: billing.checkoutReady ? "Live checkout" : billing.portalReady ? "Portal only" : "Paused",
+      detail: billing.checkoutReady
+        ? "New Premium checkout and customer billing management are configured."
+        : billing.portalReady
+          ? "Existing customers can manage billing, but new checkout is not open."
+          : "Premium checkout is unavailable from this deployment check.",
+      tone: billing.checkoutReady ? "good" : billing.portalReady ? "ready" : "warn",
+    },
+  ];
 
   return (
     <main className="legal-shell status-shell">
@@ -202,6 +263,25 @@ export default async function StatusPage() {
             </div>
           </article>
         ))}
+      </section>
+
+      <section className="status-diagnostics" aria-label="Status diagnostics">
+        <article className={`status-incident-card ${incidentTone}`}>
+          <span><RoleForgeIcon name={incidentTone === "good" ? "check" : "settings"} size={17} /></span>
+          <div>
+            <strong>{incidentTitle}</strong>
+            <p>{incidentDetail}</p>
+          </div>
+        </article>
+        <div className="status-diagnostic-grid">
+          {diagnostics.map((diagnostic) => (
+            <article className={`status-diagnostic-card ${diagnostic.tone}`} key={diagnostic.label}>
+              <span>{diagnostic.label}</span>
+              <strong>{diagnostic.value}</strong>
+              <small>{diagnostic.detail}</small>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="status-action-grid" aria-label="Status next steps">

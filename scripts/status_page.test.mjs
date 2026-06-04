@@ -24,6 +24,10 @@ test("status page uses live deployment readiness sources", () => {
   assert.match(statusPage, /fetch\(`\$\{baseUrl\}\/capabilities`/);
   assert.match(statusPage, /cache: "no-store"/);
   assert.match(statusPage, /normalizeWorkflowCapabilities/);
+  assert.match(statusPage, /latencyMs/);
+  assert.match(statusPage, /Date\.now\(\) - startedAt/);
+  assert.match(statusPage, /checkedAtLabel/);
+  assert.match(statusPage, /timeZone:\s*"America\/Chicago"/);
 });
 
 test("status page covers account, workflow, export, and billing surfaces", () => {
@@ -37,6 +41,18 @@ test("status page covers account, workflow, export, and billing surfaces", () =>
   assert.match(statusPage, /Review account controls/);
   assert.match(statusPage, /Report a workflow issue/);
   assert.match(statusPage, /Report billing access/);
+  assert.match(statusPage, /Status diagnostics/);
+  assert.match(statusPage, /Last checked/);
+  assert.match(statusPage, /Frontend/);
+  assert.match(statusPage, /Backend/);
+  assert.match(statusPage, /Account provider/);
+  assert.match(statusPage, /Billing mode/);
+  assert.match(statusPage, /No active incident detected/);
+  assert.match(statusPage, /Some checks need attention/);
+  assert.match(statusPage, /status-incident-card/);
+  assert.match(statusPage, /status-diagnostic-grid/);
+  assert.match(statusPage, /NEXT_PUBLIC_SITE_URL/);
+  assert.match(statusPage, /backend\.latencyMs !== null \? `\$\{backend\.latencyMs\} ms`/);
   assert.match(statusPage, /supportRequestHref/);
   assert.match(statusPage, /subject:\s*"Status page workflow issue"/);
   assert.match(statusPage, /subject:\s*"Status page billing issue"/);
@@ -74,11 +90,19 @@ test("status page has overflow-safe responsive cards", () => {
   assert.match(stylesheet, /\.status-card\s+strong\s*\{(?=[^}]*font-size:\s*clamp\(1\.52rem,\s*11cqi,\s*2rem\))(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
   assert.match(stylesheet, /\.status-card\s+p\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*pretty)[^}]*\}/s);
   assert.match(stylesheet, /@container\s+status-card\s+\(max-width:\s*250px\)/);
+  assert.match(stylesheet, /\.status-diagnostics\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(280px,\s*0\.72fr\)\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.status-incident-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*42px\s+minmax\(0,\s*1fr\))(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
+  assert.match(stylesheet, /\.status-diagnostic-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(5,\s*minmax\(min\(100%,\s*142px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.status-incident-card\s+strong,\s*\.status-incident-card\s+p,\s*\.status-diagnostic-card\s+span,\s*\.status-diagnostic-card\s+strong,\s*\.status-diagnostic-card\s+small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
   assert.match(stylesheet, /\.status-action-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(min\(100%,\s*220px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.status-action-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.status-action-card\s+strong,\s*\.status-action-card\s+small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*620px\)\s*\{[\s\S]*?\.status-grid\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.status-diagnostics\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*620px\)\s*\{[\s\S]*?\.status-diagnostic-grid\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*620px\)\s*\{[\s\S]*?\.status-action-grid\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.status-card/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.status-incident-card/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.status-diagnostic-card/);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.status-action-card/);
 });
