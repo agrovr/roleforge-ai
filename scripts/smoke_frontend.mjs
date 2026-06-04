@@ -690,7 +690,11 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.export-format-chip\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-align:\s*center)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "studio export format chip labels can still render cramped");
   requireCondition(/\.export-format-chip\s+small\s*\{(?=[^}]*line-height:\s*1\.1)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "studio export format chip subtitles can still squeeze chips");
   requireCondition(/\.studio-template-preference\s+small\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "studio template preference status can still force cramped pills");
-  pass("studio export chips and template preference include wrapping safeguards");
+  requireCondition(/\.export-readiness-panel\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*188px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "studio export readiness panel can still squeeze card tracks");
+  requireCondition(/\.export-readiness-item\s*\{(?=[^}]*grid-template-columns:\s*30px\s+minmax\(0,\s*1fr\))(?=[^}]*min-height:\s*94px)(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "studio export readiness cards can still overflow");
+  requireCondition(/\.export-readiness-copy,\s*\.export-readiness-copy span,\s*\.export-readiness-copy strong,\s*\.export-readiness-copy small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "studio export readiness text can still overflow");
+  requireCondition(/\.export-readiness-action\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "studio export readiness action can still render cramped");
+  pass("studio export controls and readiness panel include wrapping safeguards");
 
   requireCondition(/\.studio-tabs-mini\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText), "studio preview tabs can still force card overflow");
   requireCondition(/\.rf-live-card\s+\.studio-tabs-mini\s*\{(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(68px,\s*1fr\)\))(?=[^}]*width:\s*min\(100%,\s*330px\))[^}]*\}/s.test(stylesheetText), "live preview tab rail can still render too wide");

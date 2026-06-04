@@ -24,6 +24,23 @@ test("studio exposes a workflow preflight checklist from real state", () => {
   assert.match(studioPage, /: "#assets"/);
 });
 
+test("studio exposes export readiness from real entitlement and draft state", () => {
+  assert.match(studioPage, /const hasTailoredDraft = Boolean\(result\?\.tailored_text\?\.trim\(\)\)/);
+  assert.match(studioPage, /exportReadinessItems:\s*Array/);
+  assert.match(studioPage, /label:\s*"Format"/);
+  assert.match(studioPage, /value:\s*selectedExportAllowed \? `\$\{selectedFormatLabel\} available` : `\$\{selectedFormatLabel\} locked`/);
+  assert.match(studioPage, /label:\s*"Draft"/);
+  assert.match(studioPage, /value:\s*hasTailoredDraft \? "Ready" : "Run needed"/);
+  assert.match(studioPage, /label:\s*"Template"/);
+  assert.match(studioPage, /value:\s*selectedTemplate\.name/);
+  assert.match(studioPage, /label:\s*"Delivery"/);
+  assert.match(studioPage, /value:\s*selectedDownloadReady \? "Download ready"/);
+  assert.match(studioPage, /aria-label="Export readiness"/);
+  assert.match(studioPage, /className=\{`export-readiness-item \$\{item\.tone\}`\}/);
+  assert.match(studioPage, /View Premium access/);
+  assert.match(studioPage, /href="\/settings#billing"/);
+});
+
 test("studio preflight checklist is responsive and dark-mode safe", () => {
   assert.match(stylesheet, /\.rf-preflight-panel\s*\{(?=[^}]*grid-column:\s*1\s*\/\s*-1)(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.rf-preflight-head\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)(?=[^}]*min-width:\s*0)[^}]*\}/s);
@@ -34,4 +51,14 @@ test("studio preflight checklist is responsive and dark-mode safe", () => {
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.rf-preflight-score\.ready/);
   assert.match(stylesheet, /@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?\.rf-preflight-head\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?\.rf-preflight-score\s*\{[^}]*justify-self:\s*start/s);
+});
+
+test("studio export readiness panel is compact and dark-mode safe", () => {
+  assert.match(stylesheet, /\.export-readiness-panel\s*\{(?=[^}]*flex:\s*1\s+0\s+100%)(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*188px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.export-readiness-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*30px\s+minmax\(0,\s*1fr\))(?=[^}]*min-height:\s*94px)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.export-readiness-copy,\s*\.export-readiness-copy span,\s*\.export-readiness-copy strong,\s*\.export-readiness-copy small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
+  assert.match(stylesheet, /\.export-readiness-action\s*\{(?=[^}]*min-height:\s*42px)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.export-readiness-panel/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.export-readiness-item\.good/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.export-readiness-item\.warn/);
 });

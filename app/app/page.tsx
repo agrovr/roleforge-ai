@@ -2525,6 +2525,47 @@ export default function Page() {
     downloadMessage,
     hasTailoredText: Boolean(result?.tailored_text?.trim()),
   });
+  const hasTailoredDraft = Boolean(result?.tailored_text?.trim());
+  const exportReadinessItems: Array<{
+    icon: RoleForgeIconName;
+    label: string;
+    value: string;
+    detail: string;
+    tone: "good" | "ready" | "warn";
+  }> = [
+    {
+      icon: selectedExportAllowed ? "download" : "lock",
+      label: "Format",
+      value: selectedExportAllowed ? `${selectedFormatLabel} available` : `${selectedFormatLabel} locked`,
+      detail: selectedExportAllowed
+        ? `${selectedFormatLabel} can be created for the current account.`
+        : `${selectedFormatLabel} requires Premium. PDF remains available on Free.`,
+      tone: selectedExportAllowed ? "good" : "warn",
+    },
+    {
+      icon: hasTailoredDraft ? "check" : "sparkle",
+      label: "Draft",
+      value: hasTailoredDraft ? "Ready" : "Run needed",
+      detail: hasTailoredDraft ? "A tailored draft is ready to export." : "Run Tailor before creating a download.",
+      tone: hasTailoredDraft ? "good" : "ready",
+    },
+    {
+      icon: "layers",
+      label: "Template",
+      value: selectedTemplate.name,
+      detail: selectedTemplateSupported
+        ? `${selectedTemplateStatus} for new exports.`
+        : "The backend will use the classic fallback for this template.",
+      tone: selectedTemplateSupported ? "good" : "warn",
+    },
+    {
+      icon: selectedDownloadReady ? "check" : "file",
+      label: "Delivery",
+      value: selectedDownloadReady ? "Download ready" : downloadState === "checking" ? "Checking" : hasTailoredDraft ? "Export next" : "Waiting",
+      detail: selectedDownloadMessage || (hasTailoredDraft ? `Create a ${selectedFormatLabel} export when ready.` : "Exports appear after a tailored draft is generated."),
+      tone: selectedDownloadReady ? "good" : hasTailoredDraft ? "ready" : "warn",
+    },
+  ];
   const enabledUploadFormats = uploadFormats.filter((format) => format.enabled);
   const uploadAccept = enabledUploadFormats.length
     ? enabledUploadFormats.map((format) => `.${format.format}`).join(",")
@@ -3446,6 +3487,25 @@ export default function Page() {
                     {selectedDownloadMessage}
                   </span>
                 ) : null}
+                <div className="export-readiness-panel" aria-label="Export readiness">
+                  {exportReadinessItems.map((item) => (
+                    <div className={`export-readiness-item ${item.tone}`} key={item.label}>
+                      <span className="export-readiness-icon" aria-hidden="true">
+                        <RoleForgeIcon name={item.icon} size={14} />
+                      </span>
+                      <span className="export-readiness-copy">
+                        <span>{item.label}</span>
+                        <strong>{item.value}</strong>
+                        <small>{item.detail}</small>
+                      </span>
+                    </div>
+                  ))}
+                  {!selectedExportAllowed && selectedExportFormat !== "pdf" ? (
+                    <Link className="export-readiness-action" href="/settings#billing">
+                      View Premium access <RoleForgeIcon name="sparkle" size={13} />
+                    </Link>
+                  ) : null}
+                </div>
               </div>
             </div>
 
