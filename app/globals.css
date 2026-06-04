@@ -8896,7 +8896,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .status-diagnostic-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(min(100%, 142px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 142px), 1fr));
   gap: 10px;
   min-width: 0;
 }
