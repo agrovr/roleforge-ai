@@ -128,7 +128,7 @@ function Nav({
           <ThemeToggle />
           {signedIn ? (
             <details className="landing-account-menu" data-account-menu="true">
-              <summary className="studio-account-button landing-account-button" aria-label="Open account menu">
+              <summary className="studio-account-button landing-account-button" aria-expanded="false" aria-haspopup="menu" aria-label="Open account menu">
                 <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
               </summary>
               <div className="studio-account-popover landing-account-popover" role="group" aria-label="Account menu">

@@ -53,7 +53,7 @@ export default async function TemplatesPage() {
           <ThemeToggle />
           {signedIn ? (
             <details className="settings-account-menu templates-account-menu" data-account-menu="true">
-              <summary className="studio-account-button templates-topbar-avatar" aria-label="Open account menu">
+              <summary className="studio-account-button templates-topbar-avatar" aria-expanded="false" aria-haspopup="menu" aria-label="Open account menu">
                 <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
               </summary>
               <div className="studio-account-popover settings-account-popover templates-account-popover" role="group" aria-label="Account menu">

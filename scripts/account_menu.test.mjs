@@ -92,6 +92,8 @@ test("settings topbar exposes account, project, usage, and billing controls", ()
   assert.match(settingsPage, /settings-account-menu/);
   assert.match(settingsPage, /data-account-menu="true"/);
   assert.match(settingsPage, /aria-label="Open account menu"/);
+  assert.match(settingsPage, /aria-haspopup="menu"/);
+  assert.match(settingsPage, /aria-expanded="false"/);
   assert.match(settingsPage, /recentProjectSummaries/);
   assert.match(settingsPage, /settings-account-recent/);
   assert.match(settingsPage, /Recent projects/);
@@ -126,11 +128,22 @@ test("global account details menus close on outside click escape and navigation 
   assert.match(rootLayout, /<AccountMenuBehavior \/>/);
   assert.match(accountMenuBehavior, /"use client"/);
   assert.match(accountMenuBehavior, /details\[data-account-menu\]\[open\]/);
+  assert.match(accountMenuBehavior, /accountMenuSummary/);
+  assert.match(accountMenuBehavior, /syncMenuState/);
+  assert.match(accountMenuBehavior, /setAttribute\("aria-expanded",\s*menu\.open \? "true" : "false"\)/);
+  assert.match(accountMenuBehavior, /closeOtherMenus/);
+  assert.match(accountMenuBehavior, /currentFocusedMenu/);
   assert.match(accountMenuBehavior, /document\.addEventListener\("pointerdown",\s*handlePointerDown\)/);
   assert.match(accountMenuBehavior, /target\.closest(?:<HTMLDetailsElement>)?\("details\[data-account-menu\]"\)/);
   assert.match(accountMenuBehavior, /target\.closest\("summary"\)/);
   assert.match(accountMenuBehavior, /target\.closest\("a, button\[type='submit'\]"\)/);
   assert.match(accountMenuBehavior, /event\.key !== "Escape"/);
+  assert.match(accountMenuBehavior, /event\.preventDefault\(\)/);
+  assert.match(accountMenuBehavior, /restoreFocus/);
+  assert.match(accountMenuBehavior, /\.focus\(\)/);
+  assert.match(accountMenuBehavior, /document\.addEventListener\("toggle",\s*handleToggle,\s*true\)/);
+  assert.match(accountMenuBehavior, /document\.addEventListener\("focusin",\s*handleFocusIn\)/);
+  assert.match(accountMenuBehavior, /if \(menu\.open\) closeOtherMenus\(menu\)/);
   assert.match(accountMenuBehavior, /removeAttribute\("open"\)/);
 });
 

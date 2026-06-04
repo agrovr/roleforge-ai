@@ -30,6 +30,8 @@ test("public account menu turns static topbars into signed-in command centers", 
   assert.match(publicAccountMenu, /AccountAvatar/);
   assert.match(publicAccountMenu, /data-account-menu="true"/);
   assert.match(publicAccountMenu, /aria-label="Open account menu"/);
+  assert.match(publicAccountMenu, /aria-haspopup="menu"/);
+  assert.match(publicAccountMenu, /aria-expanded="false"/);
   assert.match(publicAccountMenu, /Public page account summary/);
   assert.match(publicAccountMenu, /href="\/settings#billing"/);
   assert.match(publicAccountMenu, /href="\/settings#exports"/);

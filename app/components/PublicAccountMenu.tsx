@@ -139,7 +139,7 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
 
   return (
     <details className="settings-account-menu public-account-menu" data-account-menu="true">
-      <summary className="studio-account-button settings-topbar-avatar public-topbar-avatar" aria-label="Open account menu">
+      <summary className="studio-account-button settings-topbar-avatar public-topbar-avatar" aria-expanded="false" aria-haspopup="menu" aria-label="Open account menu">
         <AccountAvatar initials={accountInitials} imageUrl={user?.imageUrl} />
       </summary>
       <div className="studio-account-popover settings-account-popover public-account-popover" role="group" aria-label="Account menu">

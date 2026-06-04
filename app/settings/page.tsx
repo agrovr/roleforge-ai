@@ -709,7 +709,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
           <Link className="btn btn-soft btn-sm" href="/app">Studio</Link>
           <ThemeToggle />
           <details className="settings-account-menu" data-account-menu="true">
-            <summary className="studio-account-button settings-topbar-avatar" aria-label="Open account menu">
+            <summary className="studio-account-button settings-topbar-avatar" aria-expanded="false" aria-haspopup="menu" aria-label="Open account menu">
               <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
             </summary>
             <div className="studio-account-popover settings-account-popover" role="group" aria-label="Account menu">
