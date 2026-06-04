@@ -564,6 +564,8 @@ function Pricing({
   const premiumPaused = !premiumActive && !checkoutReady;
   const premiumStatus = premiumActive ? (premiumEnding ? "Active until period end" : "Current plan") : premiumPaused ? "Paused" : "Upgrade";
   const premiumCta = premiumActive ? "Manage Premium" : premiumPaused ? "Use free studio" : signedIn ? "View plans" : "Sign in to upgrade";
+  const freeStatusTone = signedIn && !premiumActive ? "current" : "starter";
+  const premiumStatusTone = premiumActive ? "current" : premiumPaused ? "paused" : "upgrade";
   const billingHref = signedIn ? "/settings#billing" : "/login?next=/settings%23billing";
   const billingSupportHref = supportRequestHref({
     category: "billing",
@@ -589,7 +591,7 @@ function Pricing({
           <article className="price-card">
             <div className="price-card-top">
               <div className="price-name">Studio</div>
-              <span className="price-status">{freeStatus}</span>
+              <span className={`price-status ${freeStatusTone}`}>{freeStatus}</span>
             </div>
             <div className="price-amount"><span className="v">$0</span></div>
             <div className="price-desc">Start with {FREE_RUN_ALLOWANCE} for upload, targeting, review, and PDF export.</div>
@@ -605,7 +607,7 @@ function Pricing({
           <article className="price-card featured">
             <div className="price-card-top">
               <div className="price-name">Premium</div>
-              <span className="price-status">{premiumStatus}</span>
+              <span className={`price-status ${premiumStatusTone}`}>{premiumStatus}</span>
             </div>
             <div className="price-amount"><span className="v">${PREMIUM_MONTHLY_PRICE}</span><span className="m">/mo</span></div>
             <div className="price-desc">

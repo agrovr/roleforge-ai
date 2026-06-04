@@ -56,7 +56,12 @@ test("landing pricing explains billing management before checkout", () => {
 });
 
 test("landing pricing status pills stay readable on dark featured cards", () => {
+  assert.match(landingPage, /const freeStatusTone = signedIn && !premiumActive \? "current" : "starter";/);
+  assert.match(landingPage, /const premiumStatusTone = premiumActive \? "current" : premiumPaused \? "paused" : "upgrade";/);
+  assert.match(landingPage, /className=\{`price-status \$\{premiumStatusTone\}`\}/);
   assert.match(stylesheet, /\.price-card\.featured\s+\.price-status\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.42\))(?=[^}]*background:\s*rgba\(255,\s*247,\s*233,\s*0\.14\))(?=[^}]*color:\s*#fff7e9)[^}]*\}/s);
-  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-status\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.24\))(?=[^}]*background:\s*rgba\(255,\s*247,\s*233,\s*0\.08\))(?=[^}]*color:\s*#fff7e9)[^}]*\}/s);
-  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-card\.featured\s+\.price-status\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.5\))(?=[^}]*background:\s*linear-gradient\(180deg,\s*rgba\(255,\s*247,\s*233,\s*0\.18\),\s*rgba\(255,\s*247,\s*233,\s*0\.09\)\))(?=[^}]*color:\s*#fff7e9)[^}]*\}/s);
+  assert.match(stylesheet, /\.price-status\.current\s*\{(?=[^}]*background:\s*linear-gradient\(135deg,\s*#fff7e9\s*0%,\s*#f4d9a7\s*100%\))(?=[^}]*color:\s*#3f2814)[^}]*\}/s);
+  assert.match(stylesheet, /\.price-card\.featured\s+\.price-status\.current\s*\{(?=[^}]*background:\s*linear-gradient\(135deg,\s*#fff7e9\s*0%,\s*#ffd88d\s*100%\))(?=[^}]*color:\s*#17101d)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-status\.current\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.74\))(?=[^}]*background:\s*linear-gradient\(135deg,\s*#fff7e9\s*0%,\s*#f4d9a7\s*100%\))(?=[^}]*color:\s*#0b0f1f)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-card\.featured\s+\.price-status\.current\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.88\))(?=[^}]*background:\s*linear-gradient\(135deg,\s*#fff7e9\s*0%,\s*#ffd98f\s*100%\))(?=[^}]*color:\s*#080c18)[^}]*\}/s);
 });

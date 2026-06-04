@@ -2299,6 +2299,36 @@ html.rf-custom-pointer [contenteditable=""] {
   box-shadow: inset 0 0 0 1px rgba(255, 247, 233, 0.08);
 }
 
+.price-status.current {
+  border-color: rgba(166, 102, 38, 0.38);
+  background: linear-gradient(135deg, #fff7e9 0%, #f4d9a7 100%);
+  color: #3f2814;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.58),
+    0 10px 22px -18px rgba(166, 102, 38, 0.56);
+}
+
+.price-status.upgrade {
+  border-color: rgba(166, 102, 38, 0.32);
+  background: rgba(221, 160, 74, 0.12);
+  color: var(--brand-dark);
+}
+
+.price-status.paused {
+  border-color: rgba(145, 91, 35, 0.28);
+  background: rgba(145, 91, 35, 0.08);
+  color: #6e4520;
+}
+
+.price-card.featured .price-status.current {
+  border-color: rgba(255, 247, 233, 0.82);
+  background: linear-gradient(135deg, #fff7e9 0%, #ffd88d 100%);
+  color: #17101d;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 14px 32px -18px rgba(255, 196, 117, 0.72);
+}
+
 .price-amount .v {
   display: inline-block;
   max-width: 100%;
@@ -3226,6 +3256,36 @@ html[data-theme="dark"] .price-card.featured .price-status {
   box-shadow:
     inset 0 0 0 1px rgba(255, 247, 233, 0.12),
     0 10px 28px -18px rgba(0, 0, 0, 0.7);
+}
+
+html[data-theme="dark"] .price-status.current {
+  border-color: rgba(255, 247, 233, 0.74);
+  background: linear-gradient(135deg, #fff7e9 0%, #f4d9a7 100%);
+  color: #0b0f1f;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.68),
+    0 12px 30px -18px rgba(255, 196, 117, 0.5);
+}
+
+html[data-theme="dark"] .price-status.upgrade {
+  border-color: rgba(255, 194, 117, 0.46);
+  background: rgba(255, 194, 117, 0.16);
+  color: #ffdfae;
+}
+
+html[data-theme="dark"] .price-status.paused {
+  border-color: rgba(255, 201, 120, 0.42);
+  background: rgba(255, 201, 120, 0.13);
+  color: #f2c878;
+}
+
+html[data-theme="dark"] .price-card.featured .price-status.current {
+  border-color: rgba(255, 247, 233, 0.88);
+  background: linear-gradient(135deg, #fff7e9 0%, #ffd98f 100%);
+  color: #080c18;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 16px 34px -16px rgba(255, 194, 117, 0.58);
 }
 
 html[data-theme="dark"] .cta-band h2,
