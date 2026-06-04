@@ -83,6 +83,12 @@ test("settings billing panel audits current plan access", () => {
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-plan-access-item\.warn/);
 });
 
+test("settings status pills keep readable contrast in dark mode", () => {
+  assert.match(stylesheet, /\.settings-status-pill\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-status-pill\s*\{(?=[^}]*color:\s*#e8dfce)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-status-pill\.muted\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.26\))(?=[^}]*background:\s*rgba\(255,\s*247,\s*233,\s*0\.09\))(?=[^}]*color:\s*#d9d2bd)[^}]*\}/s);
+});
+
 test("settings account panel includes an editable profile display name", () => {
   assert.match(settingsPage, /updateAccountProfileAction/);
   assert.match(settingsPage, /saveAccountProfile\(supabase,\s*user/);
