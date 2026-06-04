@@ -83,6 +83,12 @@ export default async function TemplatesPage() {
                     <span>Plan controls</span>
                   </Link>
                 </div>
+                <div className="studio-account-next-actions templates-account-next-actions" aria-label="Recommended account actions">
+                  <Link href={resumeTemplateStudioHref(initialTemplateSlug)}><RoleForgeIcon name="file" size={14} /> Use selected</Link>
+                  <Link href="/settings#preferences"><RoleForgeIcon name="layers" size={14} /> Save preference</Link>
+                  <Link href="/settings#exports"><RoleForgeIcon name="download" size={14} /> Export access</Link>
+                  <Link href={billingSupportHref}><RoleForgeIcon name="mail" size={14} /> Billing support</Link>
+                </div>
                 <div className="studio-account-shortcuts settings-account-shortcuts">
                   <Link href="/app"><RoleForgeIcon name="file" size={14} /> Studio</Link>
                   <Link href="/settings"><RoleForgeIcon name="settings" size={14} /> Settings</Link>
