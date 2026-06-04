@@ -439,6 +439,25 @@ function fail(message) {
   process.exitCode = 1;
 }
 
+function parseCsv(value, optionName) {
+  const items = String(value || "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  if (!items.length) throw new Error(`${optionName} requires at least one value`);
+  return items;
+}
+
+function parseWidthList(value, optionName) {
+  return parseCsv(value, optionName).map((item) => {
+    const width = Number.parseInt(item, 10);
+    if (!Number.isFinite(width) || width < 320 || width > 4000) {
+      throw new Error(`${optionName} contains an invalid viewport width: ${item}`);
+    }
+    return width;
+  });
+}
+
 function parseArgs(argv) {
   const options = {};
   for (let index = 0; index < argv.length; index += 1) {
@@ -469,6 +488,30 @@ function parseArgs(argv) {
       const value = inlineValue ?? argv[index + 1];
       if (!value || value.startsWith("--")) throw new Error(`${name} requires a value`);
       options.chromePath = value;
+      if (inlineValue === undefined) index += 1;
+      continue;
+    }
+
+    if (name === "--page" || name === "--pages") {
+      const value = inlineValue ?? argv[index + 1];
+      if (!value || value.startsWith("--")) throw new Error(`${name} requires a comma-separated page name list`);
+      options.pages = parseCsv(value, name).map((page) => page.toLowerCase());
+      if (inlineValue === undefined) index += 1;
+      continue;
+    }
+
+    if (name === "--width" || name === "--widths" || name === "--viewport") {
+      const value = inlineValue ?? argv[index + 1];
+      if (!value || value.startsWith("--")) throw new Error(`${name} requires a comma-separated viewport width list`);
+      options.widths = parseWidthList(value, name);
+      if (inlineValue === undefined) index += 1;
+      continue;
+    }
+
+    if (name === "--narrow-desktop-width" || name === "--narrow-desktop-widths") {
+      const value = inlineValue ?? argv[index + 1];
+      if (!value || value.startsWith("--")) throw new Error(`${name} requires a comma-separated viewport width list`);
+      options.narrowDesktopWidths = parseWidthList(value, name);
       if (inlineValue === undefined) index += 1;
       continue;
     }
@@ -1202,6 +1245,15 @@ async function main(argv = process.argv.slice(2)) {
   const args = parseArgs(argv);
   const baseUrl = normalizeBaseUrl(args.baseUrl || process.env.ROLEFORGE_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL);
   const chromePath = findChrome(args.chromePath);
+  const pageFilters = new Set(args.pages || []);
+  const pageChecks = pageFilters.size
+    ? PAGE_CHECKS.filter((pageCheck) => pageFilters.has(pageCheck.name.toLowerCase()) || pageFilters.has(pageCheck.path.toLowerCase()))
+    : PAGE_CHECKS;
+  if (!pageChecks.length) {
+    throw new Error(`No layout smoke pages matched: ${Array.from(pageFilters).join(", ")}`);
+  }
+  const viewportWidths = args.widths || VIEWPORTS;
+  const narrowDesktopWidths = args.narrowDesktopWidths || NARROW_DESKTOP_VIEWPORTS;
   const requireSignedInLayout = args.requireSignedInLayout ?? readBooleanEnv("ROLEFORGE_REQUIRE_SIGNED_IN_LAYOUT_SMOKE");
   const signedInSession = await signInSmokeAccount();
   if (signedInSession) pass(`signed-in layout smoke configured with ${signedInSession.source}`);
@@ -1235,15 +1287,17 @@ async function main(argv = process.argv.slice(2)) {
     const page = await openCdpPage(port, baseUrl);
     try {
       const reports = [];
-      for (const pageCheck of PAGE_CHECKS) {
+      for (const pageCheck of pageChecks) {
         if (pageCheck.requiresAuth && !signedInSession?.cookie) continue;
-        for (const width of VIEWPORTS) {
+        for (const width of viewportWidths) {
+          console.log(`CHECK ${pageCheck.name} width=${width}`);
           reports.push(
             ...(await evaluateLayout(page.send, baseUrl, pageCheck, width, pageCheck.requiresAuth ? signedInSession.cookie : "")),
           );
         }
         if (!pageCheck.requiresAuth) {
-          for (const width of NARROW_DESKTOP_VIEWPORTS) {
+          for (const width of narrowDesktopWidths) {
+            console.log(`CHECK ${pageCheck.name} narrow-desktop width=${width}`);
             reports.push(
               ...(await evaluateLayout(page.send, baseUrl, pageCheck, width, "", { mobile: false, viewportMode: "narrow-desktop" })),
             );
@@ -1277,7 +1331,7 @@ async function main(argv = process.argv.slice(2)) {
 
       const checkedPageCount = new Set(reports.map((report) => report.page)).size;
       const interactionLabel = interactionReports.length ? " with preview tab interactions" : "";
-      pass(`rendered layout smoke passed ${checkedPageCount} pages across ${VIEWPORTS.length} responsive widths and ${NARROW_DESKTOP_VIEWPORTS.length} narrow desktop widths${interactionLabel}`);
+      pass(`rendered layout smoke passed ${checkedPageCount} pages across ${viewportWidths.length} responsive widths and ${narrowDesktopWidths.length} narrow desktop widths${interactionLabel}`);
     } finally {
       page.close();
     }
