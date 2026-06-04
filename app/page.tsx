@@ -94,10 +94,14 @@ function Nav({
   exportLabel,
   exportCaption,
   billingHref,
+  premiumActive,
+  checkoutReady,
 }: Pick<
   LandingLinks,
   | "signedIn"
   | "studioHref"
+  | "premiumActive"
+  | "checkoutReady"
   | "accountName"
   | "accountEmail"
   | "accountInitials"
@@ -108,6 +112,9 @@ function Nav({
   | "exportCaption"
   | "billingHref"
 >) {
+  const landingBillingAction = premiumActive ? "Manage billing" : checkoutReady ? "View Premium" : "Billing status";
+  const landingBillingHref = premiumActive || checkoutReady ? billingHref : "/status";
+
   return (
     <header className="nav">
       <div className="nav-inner">
@@ -150,6 +157,12 @@ function Nav({
                     <strong>Status</strong>
                     <span>Live readiness</span>
                   </Link>
+                </div>
+                <div className="studio-account-next-actions landing-account-next-actions" aria-label="Recommended account actions">
+                  <Link href="/app"><RoleForgeIcon name="file" size={14} /> Resume work</Link>
+                  <Link href={landingBillingHref}><RoleForgeIcon name="lock" size={14} /> {landingBillingAction}</Link>
+                  <Link href="/settings#projects"><RoleForgeIcon name="chart" size={14} /> Saved projects</Link>
+                  <Link href="/support"><RoleForgeIcon name="mail" size={14} /> Contact support</Link>
                 </div>
                 <div className="studio-account-shortcuts landing-account-shortcuts">
                   <Link href="/app"><RoleForgeIcon name="file" size={14} /> Studio</Link>
@@ -750,6 +763,8 @@ export default async function Landing() {
         accountEmail={links.accountEmail}
         accountInitials={links.accountInitials}
         accountImageUrl={links.accountImageUrl}
+        premiumActive={links.premiumActive}
+        checkoutReady={links.checkoutReady}
         planLabel={links.planLabel}
         planCaption={links.planCaption}
         exportLabel={links.exportLabel}

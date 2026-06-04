@@ -101,6 +101,16 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
   const savedProjectCaption = typeof savedProjectCount === "number" ? "Saved to account" : "Manage in Settings";
   const supportRequestLabel = countLabel(supportRequestCount, "request", "requests");
   const supportRequestCaption = typeof supportRequestCount === "number" ? "Support history" : "Track from Support";
+  const billingActionLabel = premiumActive
+    ? "Manage billing"
+    : status?.billing?.checkoutReady
+      ? "View Premium"
+      : "Billing status";
+  const billingActionHref = premiumActive || status?.billing?.checkoutReady ? "/settings#billing" : "/status";
+  const projectActionLabel = typeof savedProjectCount === "number" && savedProjectCount > 0 ? "Restore project" : "Start project";
+  const projectActionHref = typeof savedProjectCount === "number" && savedProjectCount > 0 ? "/settings#projects" : "/app";
+  const supportActionLabel = typeof supportRequestCount === "number" && supportRequestCount > 0 ? "Support history" : "Contact support";
+  const supportActionHref = typeof supportRequestCount === "number" && supportRequestCount > 0 ? "/settings#support" : supportHref;
 
   if (!signedIn) {
     return (
@@ -156,6 +166,12 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
             <strong>{supportRequestLabel}</strong>
             <span>{supportRequestCaption}</span>
           </Link>
+        </div>
+        <div className="studio-account-next-actions public-account-next-actions" aria-label="Recommended account actions">
+          <Link href="/app"><RoleForgeIcon name="file" size={14} /> Resume work</Link>
+          <Link href={billingActionHref}><RoleForgeIcon name="lock" size={14} /> {billingActionLabel}</Link>
+          <Link href={projectActionHref}><RoleForgeIcon name="chart" size={14} /> {projectActionLabel}</Link>
+          <Link href={supportActionHref}><RoleForgeIcon name="mail" size={14} /> {supportActionLabel}</Link>
         </div>
         <div className="studio-account-shortcuts settings-account-shortcuts public-account-shortcuts">
           <Link href="/app"><RoleForgeIcon name="file" size={14} /> Studio</Link>

@@ -5983,8 +5983,55 @@ html[data-theme="dark"] input::file-selector-button {
   font-weight: 850;
 }
 
+.studio-account-next-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+  margin: -2px 0 12px;
+}
+
+.studio-account-next-actions a {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 10px;
+  border: 1px solid color-mix(in srgb, var(--brand) 36%, var(--line));
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 48%, white), color-mix(in srgb, var(--surface) 88%, white));
+  color: var(--ink-0);
+  font-size: 0.84rem;
+  font-weight: 950;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-decoration: none;
+  text-wrap: balance;
+  white-space: normal;
+  transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.studio-account-next-actions a:first-child {
+  background: linear-gradient(135deg, #bd672b 0%, #d99542 100%);
+  color: #fffaf0;
+  text-shadow: 0 1px 0 rgba(82, 41, 10, 0.18);
+}
+
+.studio-account-next-actions a:hover,
+.studio-account-next-actions a:focus-visible {
+  border-color: color-mix(in srgb, var(--brand-dark) 46%, var(--line));
+  box-shadow: 0 14px 28px -24px var(--shadow);
+  outline: none;
+  transform: translateY(-1px);
+}
+
 @container studio-account-popover (max-width: 360px) {
-  .studio-account-insights {
+  .studio-account-insights,
+  .studio-account-next-actions {
     grid-template-columns: 1fr;
   }
 
@@ -13658,6 +13705,7 @@ html[data-theme="dark"] .studio-account-popover-head span {
 
 html[data-theme="dark"] .studio-account-popover-head button,
 html[data-theme="dark"] .studio-account-insights a,
+html[data-theme="dark"] .studio-account-next-actions a,
 html[data-theme="dark"] .studio-account-shortcuts a,
 html[data-theme="dark"] .studio-account-shortcuts button,
 html[data-theme="dark"] .studio-account-recent,
@@ -13686,6 +13734,8 @@ html[data-theme="dark"] .studio-account-recent-link small {
 
 html[data-theme="dark"] .studio-account-insights a:hover,
 html[data-theme="dark"] .studio-account-insights a:focus-visible,
+html[data-theme="dark"] .studio-account-next-actions a:hover,
+html[data-theme="dark"] .studio-account-next-actions a:focus-visible,
 html[data-theme="dark"] .studio-account-shortcuts a:hover,
 html[data-theme="dark"] .studio-account-shortcuts a:focus-visible,
 html[data-theme="dark"] .studio-account-shortcuts button:hover,
@@ -13696,6 +13746,13 @@ html[data-theme="dark"] .studio-account-recent-link:hover,
 html[data-theme="dark"] .studio-account-recent-link:focus-visible {
   border-color: rgba(231, 188, 111, 0.36);
   background: rgba(231, 188, 111, 0.1);
+}
+
+html[data-theme="dark"] .studio-account-next-actions a:first-child {
+  border-color: rgba(255, 247, 233, 0.34);
+  background: linear-gradient(135deg, #efb863 0%, #bb7736 100%);
+  color: #08101e;
+  text-shadow: none;
 }
 
 html[data-theme="dark"] .studio-account-summary:hover,
