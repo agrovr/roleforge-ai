@@ -31,7 +31,7 @@ import {
   isResumeTemplateSlug,
   resumeTemplateStudioHref,
 } from "../lib/resumeTemplates";
-import { settingsProjectSummaries } from "../lib/settingsProjects";
+import { settingsDocumentCounts, settingsDocumentSummaries, settingsProjectSummaries } from "../lib/settingsProjects";
 import { getConfiguredSiteOrigin } from "../lib/siteUrl";
 import { loadSupportRequests, supportRequestHref } from "../lib/supportRequests";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
@@ -438,6 +438,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const runCountLabel = runCount === 1 ? "Run" : "Runs";
   const supportRequestCountLabel = supportRequestCount === 1 ? "Request" : "Requests";
   const recentProjectSummaries = settingsProjectSummaries(recentSavedRuns, entitlement);
+  const recentDocumentSummaries = settingsDocumentSummaries(recentSavedRuns, entitlement);
+  const documentCounts = settingsDocumentCounts(recentSavedRuns, entitlement);
+  const documentReadyLabel = `${documentCounts.ready} download-ready ${documentCounts.ready === 1 ? "document" : "documents"}`;
+  const documentLockedLabel = documentCounts.locked
+    ? `${documentCounts.locked} Premium ${documentCounts.locked === 1 ? "format" : "formats"} locked`
+    : "No locked saved formats";
   const latestSupportRequest = recentSupportRequests[0] ?? null;
   const supportOverviewValue = latestSupportRequest ? latestSupportRequest.referenceLabel : supportRequestCount;
   const supportOverviewCaption = latestSupportRequest
@@ -1246,6 +1252,41 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <small>{row.enabled ? row.included : row.locked}</small>
                 </div>
               ))}
+              <div className="settings-document-hub" aria-label="Recent export documents">
+                <div className="settings-document-hub-head">
+                  <div>
+                    <span>Recent documents</span>
+                    <strong>{documentReadyLabel}</strong>
+                  </div>
+                  <small>{documentLockedLabel}</small>
+                </div>
+                {recentDocumentSummaries.length ? (
+                  <div className="settings-document-list">
+                    {recentDocumentSummaries.map((document) => (
+                      <article className="settings-document-item" key={document.key}>
+                        <span className={`settings-document-format ${document.format}`}>{document.label}</span>
+                        <div>
+                          <strong>{document.title}</strong>
+                          <small>{document.detail}</small>
+                        </div>
+                        <div className="settings-document-actions">
+                          <a className="btn btn-soft btn-sm" href={document.url}>
+                            <RoleForgeIcon name="download" size={12} /> Download
+                          </a>
+                          <Link className="btn btn-soft btn-sm" href={document.projectHref}>
+                            Open run
+                          </Link>
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="settings-project-empty settings-document-empty">
+                    <strong>No download-ready documents yet</strong>
+                    <span>Completed exports with account-safe download links will appear here.</span>
+                  </div>
+                )}
+              </div>
               <div className="settings-export-actions">
                 <span>{selectedTemplate.name} is selected as your resume direction and is sent with new exports.</span>
                 <Link className="btn btn-soft btn-sm settings-inline-link" href="/templates">Browse templates</Link>

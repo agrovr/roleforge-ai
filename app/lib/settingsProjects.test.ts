@@ -2,7 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import type { ExportEntitlement } from "./exportFormats";
-import { savedRunCanRestore, savedRunTemplateName, settingsProjectSummaries } from "./settingsProjects";
+import {
+  savedRunCanRestore,
+  savedRunTemplateName,
+  settingsDocumentCounts,
+  settingsDocumentSummaries,
+  settingsProjectSummaries,
+} from "./settingsProjects";
 import type { SavedHistoryItem } from "./supabase/savedProjects";
 
 const freeEntitlement: ExportEntitlement = {
@@ -112,6 +118,71 @@ test("settings saved project downloads respect premium export entitlement", () =
     ["PDF", "DOCX", "TXT"],
   );
   assert.match(summaries[0].kitItems.find((item) => item.label === "Exports")?.detail ?? "", /PDF, DOCX, TXT ready/);
+});
+
+test("settings document hub summarizes safe entitlement-ready downloads", () => {
+  const runs = [
+    savedRun({
+      id: "latest",
+      accountRunId: "run-latest",
+      projectTitle: "Product operations role",
+      filename: "product-ops.pdf",
+      downloadUrl: "/api/workflow/download/latest.pdf",
+      downloads: {
+        pdf: "/api/workflow/download/latest.pdf",
+        docx: "/api/workflow/download/latest.docx",
+      },
+      snapshot: {
+        result: { tailored_text: "Tailored draft" },
+        templateSlug: "modern",
+      },
+    }),
+    savedRun({
+      id: "older",
+      accountRunId: "run-older",
+      projectTitle: "Support lead role",
+      filename: "support-lead.pdf",
+      downloadUrl: "/api/workflow/download/older.pdf",
+      downloadFormat: "pdf",
+    }),
+  ];
+
+  const documents = settingsDocumentSummaries(runs, freeEntitlement);
+  const counts = settingsDocumentCounts(runs, freeEntitlement);
+
+  assert.equal(counts.ready, 2);
+  assert.equal(counts.locked, 1);
+  assert.deepEqual(
+    documents.map((document) => [document.label, document.title, document.url]),
+    [
+      ["PDF", "Product operations role", "/api/workflow/download/latest.pdf"],
+      ["PDF", "Support lead role", "/api/workflow/download/older.pdf"],
+    ],
+  );
+  assert.match(documents[0].detail, /product-ops\.pdf/);
+  assert.match(documents[0].detail, /Modern/);
+  assert.equal(documents[0].projectHref, "/app?historyRun=run-latest&historyAction=restore#history");
+});
+
+test("settings document hub exposes premium formats when entitlement allows them", () => {
+  const documents = settingsDocumentSummaries([
+    savedRun({
+      downloads: {
+        pdf: "/api/workflow/download/latest.pdf",
+        docx: "/api/workflow/download/latest.docx",
+        txt: "/api/workflow/download/latest.txt",
+      },
+    }),
+  ], {
+    plan: "premium",
+    exportFormats: {
+      pdf: true,
+      docx: true,
+      txt: true,
+    },
+  });
+
+  assert.deepEqual(documents.map((document) => document.label), ["PDF", "DOCX", "TXT"]);
 });
 
 test("uses project status when a settings project cannot be restored", () => {

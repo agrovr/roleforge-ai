@@ -6,6 +6,7 @@ import {
   historyGeneratedAssetCounts,
   historyGeneratedAssetSummary,
   historyGroupStatus,
+  lockedHistoryDownloadFormats,
   type HistoryItem,
 } from "./history";
 import { getResumeTemplate, isResumeTemplateSlug } from "./resumeTemplates";
@@ -34,6 +35,19 @@ export type SettingsProjectSummary = {
     detail: string;
   }>;
   kitSummary: string;
+};
+export type SettingsDocumentSummary = {
+  key: string;
+  title: string;
+  detail: string;
+  format: string;
+  label: string;
+  url: string;
+  projectHref: string;
+};
+export type SettingsDocumentCounts = {
+  ready: number;
+  locked: number;
 };
 
 export function formatSettingsSavedRunDate(value: string) {
@@ -142,4 +156,54 @@ export function settingsProjectSummaries(
       kitSummary,
     };
   });
+}
+
+export function settingsDocumentCounts(
+  runs: SavedHistoryItem[],
+  entitlement: ExportEntitlement,
+): SettingsDocumentCounts {
+  return runs.reduce<SettingsDocumentCounts>((counts, run) => {
+    counts.ready += historyDownloadEntries(run as HistoryItem, entitlement).length;
+    counts.locked += lockedHistoryDownloadFormats(run as HistoryItem, entitlement).length;
+    return counts;
+  }, { ready: 0, locked: 0 });
+}
+
+export function settingsDocumentSummaries(
+  runs: SavedHistoryItem[],
+  entitlement: ExportEntitlement,
+  limit = 6,
+): SettingsDocumentSummary[] {
+  const seen = new Set<string>();
+  const documents: SettingsDocumentSummary[] = [];
+
+  for (const run of runs) {
+    const entries = historyDownloadEntries(run as HistoryItem, entitlement);
+    const templateName = savedRunTemplateName(run);
+    const createdLabel = formatSettingsSavedRunDate(run.createdAt);
+    const projectHref = savedRunHistoryHref(run, { restore: savedRunCanRestore(run) });
+    const detail = [
+      run.filename,
+      createdLabel ? `created ${createdLabel}` : "",
+      templateName,
+    ].filter(Boolean).join(" · ");
+
+    for (const entry of entries) {
+      const key = `${entry.format}:${entry.url}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      documents.push({
+        key,
+        title: run.projectTitle || run.roleHint || "Saved export",
+        detail,
+        format: entry.format,
+        label: entry.format.toUpperCase(),
+        url: entry.url,
+        projectHref,
+      });
+      if (documents.length >= limit) return documents;
+    }
+  }
+
+  return documents;
 }
