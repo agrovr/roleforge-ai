@@ -2945,23 +2945,30 @@ html.rf-custom-pointer [contenteditable=""] {
 }
 
 .cta-band .btn-ghost {
-  border-color: rgba(255, 255, 255, 0.18);
-  color: var(--ink-4);
+  border-color: rgba(255, 247, 233, 0.86);
+  background: #fffdf8;
+  color: #202235;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
 .cta-band .cta-cluster {
   min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  width: min(100%, 430px);
   max-width: 100%;
   align-items: stretch;
   margin-top: 36px;
 }
 
 .cta-band .btn {
-  flex: 1 1 184px;
-  min-width: min(100%, 164px);
+  width: 100%;
+  min-width: 0;
   max-width: 100%;
-  min-height: 52px;
+  min-height: 48px;
+  padding-inline: 18px;
   justify-content: center;
+  font-size: 0.95rem;
   line-height: 1.12;
   text-align: center;
   text-wrap: balance;
@@ -2973,9 +2980,9 @@ html.rf-custom-pointer [contenteditable=""] {
 }
 
 .cta-band .btn-ghost:hover {
-  border-color: var(--bg);
-  background: transparent;
-  color: var(--bg);
+  border-color: #efb863;
+  background: #fff7e9;
+  color: #111425;
 }
 
 .cta-visual {
@@ -3606,14 +3613,15 @@ html[data-theme="dark"] .price-card.featured .price-status.paused {
   color: #ffe0d8;
 }
 
-html[data-theme="dark"] .cta-band h2,
-html[data-theme="dark"] .cta-band .btn-ghost:hover {
+html[data-theme="dark"] .cta-band h2 {
   color: #fff7e9;
 }
 
-html[data-theme="dark"] .cta-band .btn-ghost {
-  border-color: rgba(255, 247, 233, 0.24);
-  background: rgba(255, 247, 233, 0.03);
+html[data-theme="dark"] .cta-band .btn-ghost,
+html[data-theme="dark"] .cta-band .btn-ghost:hover {
+  border-color: rgba(255, 247, 233, 0.9);
+  background: #fffdf8;
+  color: #111425;
 }
 
 html[data-theme="dark"] .faq-item.open,
@@ -7415,6 +7423,8 @@ html[data-theme="dark"] input::file-selector-button {
 .settings-project-list {
   display: grid;
   gap: 8px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .settings-project-item,
@@ -7432,9 +7442,10 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-item {
   display: grid;
-  grid-template-columns: minmax(220px, 0.95fr) minmax(360px, 1.35fr);
+  grid-template-columns: minmax(0, 0.92fr) minmax(min(100%, 300px), 1.08fr);
   align-items: start;
   gap: 16px;
+  overflow: hidden;
   color: inherit;
   transition:
     border-color 160ms ease,
@@ -7476,6 +7487,8 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-controls {
   gap: 10px;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .settings-project-item strong,
@@ -7621,7 +7634,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-stage-controls {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 118px), 1fr));
   gap: 8px;
   min-width: 0;
   padding-top: 2px;
@@ -7640,9 +7653,11 @@ html[data-theme="dark"] input::file-selector-button {
   font-size: 0.74rem;
   font-weight: 950;
   line-height: 1.12;
+  overflow-wrap: anywhere;
   text-align: center;
+  text-wrap: balance;
   text-transform: uppercase;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .settings-project-stage-controls button:hover,
@@ -7793,13 +7808,14 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-kit-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 118px), 1fr));
   gap: 7px;
   min-width: 0;
 }
 
 .settings-project-kit-item {
   display: inline-flex;
+  width: 100%;
   min-width: 0;
   min-height: 32px;
   align-items: center;
@@ -18776,6 +18792,16 @@ body,
   }
 }
 
+@container settings-section (max-width: 960px) {
+  .settings-project-item {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-project-controls {
+    inline-size: 100%;
+  }
+}
+
 @container settings-section (max-width: 920px) {
   .settings-profile-actions,
   .settings-billing-head {
@@ -18832,13 +18858,20 @@ body,
   max-inline-size: 100%;
 }
 
+.cta-band .cta-cluster {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+  inline-size: min(100%, 430px);
+}
+
 .cta-band .btn {
-  flex: 1 1 184px;
-  min-width: min(100%, 164px);
+  inline-size: 100%;
+  min-width: 0;
   min-inline-size: 0;
   max-inline-size: 100%;
-  padding-inline: 14px;
-  font-size: clamp(0.9rem, 4vw, 1rem);
+  min-block-size: 48px;
+  padding-inline: 18px;
+  font-size: clamp(0.9rem, 1vw, 0.98rem);
   line-height: 1.12;
   white-space: normal;
   text-wrap: balance;

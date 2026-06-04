@@ -485,7 +485,8 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.cta-band\s*\{(?=[^}]*container:\s*cta-band\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*width:\s*100%)(?=[^}]*margin-left:\s*0)(?=[^}]*isolation:\s*isolate)[^}]*\}/s.test(stylesheetText), "landing final CTA can still overflow its container");
   requireCondition(/\.cta-band\s*>\s*\*\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "landing final CTA children can still force overflow");
   requireCondition(/\.cta-section\s+\.section-inner\s*\{(?=[^}]*width:\s*min\(100%\s*,\s*1240px\))(?=[^}]*overflow:\s*visible)[^}]*\}/s.test(stylesheetText), "landing final CTA section still uses unsafe full-bleed padding math");
-  requireCondition(/\.cta-band\s+\.btn\s*\{(?=[^}]*flex:\s*(?:1\s+1\s+)?184px)(?=[^}]*min-width:\s*min\(100%,\s*164px\))(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "landing final CTA buttons can still render cramped labels");
+  requireCondition(/\.cta-band\s+\.cta-cluster\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1\.08fr\)\s+minmax\(0,\s*0\.92fr\))(?=[^}]*inline-size:\s*min\(100%,\s*430px\))[^}]*\}/s.test(stylesheetText), "landing final CTA buttons can still stretch into oversized slabs");
+  requireCondition(/\.cta-band\s+\.btn\s*\{(?=[^}]*inline-size:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*min-block-size:\s*48px)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "landing final CTA buttons can still render cramped labels");
   requireCondition(/\.cta-visual\s*\{(?=[^}]*(?:justify-self:\s*center|justify-self:\s*end|place-self:\s*center\s+end))(?=[^}]*width:\s*min\(100%\s*,\s*430px\))(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "landing final CTA visual can still spill out");
   requireCondition(/@container\s+cta-band\s*\(max-width:\s*980px\)\s*\{[\s\S]*?\.cta-band\s*\{(?=[^}]*grid-template-columns:\s*1fr)(?=[^}]*padding:\s*clamp\(28px,\s*5cqi,\s*48px\))[^}]*\}/s.test(stylesheetText), "landing final CTA is missing container-based tablet stacking");
   requireCondition(/@container\s+cta-band\s*\(max-width:\s*980px\)\s*\{[\s\S]*?\.cta-visual\s+\.resume-card\s*\{(?=[^}]*left:\s*50%)(?=[^}]*transform:\s*translate(?:X)?\(-18%\)\s*rotate\(5deg\))[^}]*\}/s.test(stylesheetText), "landing final CTA front resume art can still clip on tablet widths");
@@ -627,10 +628,12 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.settings-export-item\s+span\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*line-height:\s*1\.18)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "settings export labels can still render cramped");
   requireCondition(/\.settings-export-item\s+small\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*line-height:\s*1\.18)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "settings export descriptions can still squeeze rows");
   requireCondition(
-    /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(220px,\s*0\.95fr\)\s+minmax\(360px,\s*1\.35fr\))[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-stage-controls\s*\{(?=[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-kit-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-kit-item\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText) &&
+    /\.settings-project-list\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0\.92fr\)\s+minmax\(min\(100%,\s*300px\),\s*1\.08fr\))(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-stage-controls\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*118px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-kit-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*118px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-kit-item\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText) &&
+      /@container\s+settings-section\s+\(max-width:\s*960px\)\s*\{[\s\S]*?\.settings-project-item\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText) &&
       /\.settings-project-item\s+small\s*\{(?=[^}]*justify-self:\s*start)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-item\s+small\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText),
     "settings saved-project status and application-kit controls can still squeeze or overflow",
