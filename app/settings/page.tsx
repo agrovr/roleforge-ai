@@ -529,6 +529,57 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
           detail: "Ask about checkout, invoices, or Premium access from a support request linked to this page.",
         },
       ];
+  const premiumDocumentExportsActive = entitlement.exportFormats.docx && entitlement.exportFormats.txt;
+  const planAccessItems: Array<{
+    icon: RoleForgeIconName;
+    label: string;
+    value: string;
+    detail: string;
+    tone: "good" | "ready" | "warn";
+  }> = [
+    {
+      icon: "check",
+      label: "Tailoring runs",
+      value: usage.monthlyRunLimit === null ? "Unlimited" : `${usage.remainingRuns} ${remainingRunWord} left`,
+      detail: usage.monthlyRunLimit === null
+        ? `${usage.monthlyRuns} ${usedRunWord} completed this month with no plan cap.`
+        : monthlyRunAllowanceSentence(usage.monthlyRunLimit),
+      tone: usage.monthlyRunLimit === null ? "good" : (usage.remainingRuns ?? 0) > 0 ? "ready" : "warn",
+    },
+    {
+      icon: entitlement.exportFormats.pdf ? "check" : "lock",
+      label: "PDF export",
+      value: entitlement.exportFormats.pdf ? "Active" : "Unavailable",
+      detail: entitlement.exportFormats.pdf
+        ? "Completed runs can export PDF from Studio, History, and Settings."
+        : "PDF export is not available for the current entitlement.",
+      tone: entitlement.exportFormats.pdf ? "good" : "warn",
+    },
+    {
+      icon: premiumDocumentExportsActive ? "check" : "lock",
+      label: "DOCX and TXT",
+      value: premiumDocumentExportsActive ? "Active" : "Premium",
+      detail: premiumDocumentExportsActive
+        ? "Premium document formats are available for completed runs."
+        : checkoutReady
+          ? "Upgrade to unlock DOCX and TXT exports for completed runs."
+          : "DOCX and TXT remain locked while this account is on Free.",
+      tone: premiumDocumentExportsActive ? "good" : "warn",
+    },
+    {
+      icon: portalReady || showCheckoutHeaderAction ? "settings" : "mail",
+      label: "Billing path",
+      value: portalReady ? "Portal ready" : showCheckoutHeaderAction ? "Checkout ready" : premiumActive ? "Support needed" : "Free plan",
+      detail: portalReady
+        ? "Stripe billing management can open from this panel."
+        : showCheckoutHeaderAction
+          ? "Secure Stripe checkout can open from this panel."
+          : premiumActive
+            ? "Premium access is active, but billing management needs support right now."
+            : "Free access is active; contact support if billing looks wrong.",
+      tone: portalReady || showCheckoutHeaderAction ? "good" : premiumActive ? "warn" : "ready",
+    },
+  ];
   const hasDisplayName = Boolean(accountProfile?.displayName?.trim());
   const accountHealthItems: Array<{
     icon: RoleForgeIconName;
@@ -1523,6 +1574,27 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   </article>
                 </div>
               )}
+              <div className="settings-plan-access" aria-label="Plan access checklist">
+                <div className="settings-plan-access-head">
+                  <span className="settings-price-kicker">Access checklist</span>
+                  <strong>What is active right now</strong>
+                  <small>{premiumEnding && premiumEndLabel ? `Premium access remains active until ${premiumEndLabel}.` : billingDetail}</small>
+                </div>
+                <div className="settings-plan-access-grid">
+                  {planAccessItems.map((item) => (
+                    <article className={`settings-plan-access-item ${item.tone}`} key={item.label}>
+                      <span className="settings-plan-access-icon" aria-hidden="true">
+                        <RoleForgeIcon name={item.icon} size={15} />
+                      </span>
+                      <div>
+                        <span>{item.label}</span>
+                        <strong>{item.value}</strong>
+                        <small>{item.detail}</small>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
               <div className="settings-plan-info" aria-label="Plan information">
                 {planInformationItems.map((item) => (
                   <div className="settings-plan-info-item" key={item.label}>

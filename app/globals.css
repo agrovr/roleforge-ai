@@ -11146,6 +11146,137 @@ html[data-theme="dark"] input::file-selector-button {
   white-space: normal;
 }
 
+.settings-plan-access {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--brand) 22%, var(--line));
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 34%, transparent), transparent 64%),
+    color-mix(in srgb, var(--surface) 90%, var(--bg-alt));
+}
+
+.settings-plan-access-head {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.settings-plan-access-head strong,
+.settings-plan-access-head small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.settings-plan-access-head strong {
+  color: var(--ink-0);
+  font-size: 1.02rem;
+  font-weight: 950;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.settings-plan-access-head small {
+  color: var(--ink-2);
+  font-size: 0.82rem;
+  font-weight: 760;
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.settings-plan-access-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 178px), 1fr));
+  gap: 9px;
+  min-width: 0;
+}
+
+.settings-plan-access-item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+  min-height: 128px;
+  padding: 11px;
+  border: 1px solid color-mix(in srgb, var(--sky) 16%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 86%, var(--sky-soft));
+}
+
+.settings-plan-access-item.good {
+  border-color: color-mix(in srgb, var(--good) 26%, var(--line));
+  background: color-mix(in srgb, var(--surface) 84%, var(--good-soft));
+}
+
+.settings-plan-access-item.warn {
+  border-color: color-mix(in srgb, var(--warn) 30%, var(--line));
+  background: color-mix(in srgb, var(--surface) 84%, var(--warn-soft));
+}
+
+.settings-plan-access-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--sky) 24%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--sky-soft) 58%, var(--surface));
+  color: var(--sky);
+}
+
+.settings-plan-access-item.good .settings-plan-access-icon {
+  border-color: color-mix(in srgb, var(--good) 28%, var(--line));
+  background: color-mix(in srgb, var(--good-soft) 62%, var(--surface));
+  color: var(--good);
+}
+
+.settings-plan-access-item.warn .settings-plan-access-icon {
+  border-color: color-mix(in srgb, var(--warn) 34%, var(--line));
+  background: color-mix(in srgb, var(--warn-soft) 62%, var(--surface));
+  color: var(--warn);
+}
+
+.settings-plan-access-item > div,
+.settings-plan-access-item span:not(.settings-plan-access-icon),
+.settings-plan-access-item strong,
+.settings-plan-access-item small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.settings-plan-access-item span:not(.settings-plan-access-icon) {
+  display: block;
+  color: var(--ink-3);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1.12;
+  text-transform: uppercase;
+}
+
+.settings-plan-access-item strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--ink-0);
+  font-size: 1.02rem;
+  font-weight: 950;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.settings-plan-access-item small {
+  display: block;
+  margin-top: 7px;
+  color: var(--ink-2);
+  font-size: 0.76rem;
+  font-weight: 720;
+  line-height: 1.32;
+  text-wrap: pretty;
+}
+
 .settings-plan-active-card {
   display: flex;
   align-items: center;
@@ -15635,6 +15766,56 @@ html[data-theme="dark"] .settings-price-card.featured {
     linear-gradient(180deg, rgba(222, 162, 79, 0.14), rgba(255, 247, 233, 0.04)),
     rgba(15, 20, 35, 0.78);
   border-color: rgba(222, 162, 79, 0.34);
+}
+
+html[data-theme="dark"] .settings-plan-access {
+  border-color: rgba(222, 162, 79, 0.26);
+  background:
+    linear-gradient(135deg, rgba(222, 162, 79, 0.1), transparent 64%),
+    rgba(15, 20, 35, 0.82);
+}
+
+html[data-theme="dark"] .settings-plan-access-head strong,
+html[data-theme="dark"] .settings-plan-access-item strong {
+  color: var(--ink-0);
+}
+
+html[data-theme="dark"] .settings-plan-access-head small,
+html[data-theme="dark"] .settings-plan-access-item small {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .settings-plan-access-item {
+  border-color: rgba(142, 183, 240, 0.22);
+  background: rgba(142, 183, 240, 0.08);
+}
+
+html[data-theme="dark"] .settings-plan-access-item.good {
+  border-color: rgba(137, 209, 190, 0.26);
+  background: rgba(137, 209, 190, 0.1);
+}
+
+html[data-theme="dark"] .settings-plan-access-item.warn {
+  border-color: rgba(231, 188, 111, 0.3);
+  background: rgba(231, 188, 111, 0.11);
+}
+
+html[data-theme="dark"] .settings-plan-access-icon {
+  border-color: rgba(142, 183, 240, 0.28);
+  background: rgba(142, 183, 240, 0.14);
+  color: #8eb7f0;
+}
+
+html[data-theme="dark"] .settings-plan-access-item.good .settings-plan-access-icon {
+  border-color: rgba(137, 209, 190, 0.28);
+  background: rgba(137, 209, 190, 0.15);
+  color: #a6ead2;
+}
+
+html[data-theme="dark"] .settings-plan-access-item.warn .settings-plan-access-icon {
+  border-color: rgba(231, 188, 111, 0.34);
+  background: rgba(231, 188, 111, 0.15);
+  color: #ffe6ac;
 }
 
 html[data-theme="dark"] .settings-plan-active-card {

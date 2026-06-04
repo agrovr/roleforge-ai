@@ -351,6 +351,8 @@ const PAGE_CHECKS = [
       ".settings-metric-row",
       ".settings-export-list",
       ".settings-billing-head",
+      ".settings-plan-access",
+      ".settings-plan-access-item",
     ],
     textFitSelectors: [
       ".settings-page-actions .btn",
@@ -368,6 +370,11 @@ const PAGE_CHECKS = [
       ".settings-export-actions .btn",
       ".settings-billing-head .ghost-button",
       ".settings-plan-active-card .settings-inline-link",
+      ".settings-plan-access-head strong",
+      ".settings-plan-access-head small",
+      ".settings-plan-access-item span",
+      ".settings-plan-access-item strong",
+      ".settings-plan-access-item small",
       ".settings-section-copy h2",
     ],
     containedSelectors: [
@@ -375,6 +382,9 @@ const PAGE_CHECKS = [
       { container: "closest:.settings-metric", selector: ".settings-metric span", tolerance: 4 },
       { container: "closest:.settings-price-card", selector: ".settings-price-card .primary-button", tolerance: 4 },
       { container: "closest:.settings-plan-active-card", selector: ".settings-plan-active-card .settings-inline-link", tolerance: 4 },
+      { container: "closest:.settings-plan-access-item", selector: ".settings-plan-access-item span", tolerance: 4 },
+      { container: "closest:.settings-plan-access-item", selector: ".settings-plan-access-item strong", tolerance: 4 },
+      { container: "closest:.settings-plan-access-item", selector: ".settings-plan-access-item small", tolerance: 4 },
     ],
   },
 ];

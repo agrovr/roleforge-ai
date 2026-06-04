@@ -59,6 +59,30 @@ test("settings billing panel surfaces plan renewal and status information", () =
   assert.match(stylesheet, /\.settings-plan-info-item span,\s*\.settings-plan-info-item strong,\s*\.settings-plan-info-item small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
 });
 
+test("settings billing panel audits current plan access", () => {
+  assert.match(settingsPage, /premiumDocumentExportsActive\s*=\s*entitlement\.exportFormats\.docx\s*&&\s*entitlement\.exportFormats\.txt/);
+  assert.match(settingsPage, /planAccessItems/);
+  assert.match(settingsPage, /aria-label="Plan access checklist"/);
+  assert.match(settingsPage, /Access checklist/);
+  assert.match(settingsPage, /What is active right now/);
+  assert.match(settingsPage, /label:\s*"Tailoring runs"/);
+  assert.match(settingsPage, /label:\s*"PDF export"/);
+  assert.match(settingsPage, /label:\s*"DOCX and TXT"/);
+  assert.match(settingsPage, /label:\s*"Billing path"/);
+  assert.match(settingsPage, /value:\s*usage\.monthlyRunLimit === null \? "Unlimited"/);
+  assert.match(settingsPage, /Completed runs can export PDF from Studio, History, and Settings\./);
+  assert.match(settingsPage, /Upgrade to unlock DOCX and TXT exports for completed runs\./);
+  assert.match(settingsPage, /Stripe billing management can open from this panel\./);
+  assert.match(settingsPage, /className=\{`settings-plan-access-item \$\{item\.tone\}`\}/);
+  assert.match(stylesheet, /\.settings-plan-access\s*\{(?=[^}]*display:\s*grid)(?=[^}]*border:\s*1px solid color-mix\(in srgb,\s*var\(--brand\) 22%,\s*var\(--line\)\))[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-plan-access-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*178px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-plan-access-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*34px minmax\(0,\s*1fr\))(?=[^}]*min-height:\s*128px)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-plan-access-item > div,\s*\.settings-plan-access-item span:not\(\.settings-plan-access-icon\),\s*\.settings-plan-access-item strong,\s*\.settings-plan-access-item small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-plan-access/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-plan-access-item\.good/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-plan-access-item\.warn/);
+});
+
 test("settings account panel includes an editable profile display name", () => {
   assert.match(settingsPage, /updateAccountProfileAction/);
   assert.match(settingsPage, /saveAccountProfile\(supabase,\s*user/);
