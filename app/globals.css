@@ -11284,6 +11284,60 @@ html[data-theme="dark"] input::file-selector-button {
   overflow-wrap: anywhere;
 }
 
+.settings-account-email-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.settings-account-email-line > span {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.settings-account-email-copy {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 30px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--ink-1);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1;
+  overflow-wrap: anywhere;
+  text-align: center;
+  text-wrap: balance;
+  white-space: normal;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.settings-account-email-copy:hover,
+.settings-account-email-copy:focus-visible {
+  border-color: color-mix(in srgb, var(--brand) 45%, var(--line));
+  background: color-mix(in srgb, var(--brand) 10%, var(--surface-soft));
+  color: var(--ink-0);
+  outline: none;
+}
+
+.settings-account-email-copy:focus-visible {
+  box-shadow: 0 0 0 4px rgba(188, 113, 47, 0.16);
+}
+
 .settings-profile-form {
   display: grid;
   gap: 8px;
@@ -16096,6 +16150,19 @@ html[data-theme="dark"] .settings-account-health-action {
   border-color: rgba(222, 162, 79, 0.28);
   background: rgba(222, 162, 79, 0.16);
   color: #f3c16d;
+}
+
+html[data-theme="dark"] .settings-account-email-copy {
+  border-color: rgba(255, 247, 233, 0.22);
+  background: rgba(255, 247, 233, 0.08);
+  color: #f1eadc;
+}
+
+html[data-theme="dark"] .settings-account-email-copy:hover,
+html[data-theme="dark"] .settings-account-email-copy:focus-visible {
+  border-color: rgba(231, 188, 111, 0.44);
+  background: rgba(231, 188, 111, 0.12);
+  color: #fff7e9;
 }
 
 html[data-theme="dark"] .settings-card-head span,

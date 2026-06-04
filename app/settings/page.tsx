@@ -44,6 +44,7 @@ import {
   usageProgressPercent,
 } from "../lib/usage";
 import { BillingSubmitButton } from "./BillingSubmitButton";
+import { AccountEmailCopyButton } from "./AccountEmailCopyButton";
 import { SettingsSectionNav } from "./SettingsSectionNav";
 
 type CountResult = { count: number | null; error: unknown };
@@ -1020,7 +1021,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 </div>
                 <div>
                   <strong>{displayName || "RoleForge user"}</strong>
-                  <span>{user.email}</span>
+                  <span className="settings-account-email-line">
+                    <span>{user.email}</span>
+                    {user.email ? <AccountEmailCopyButton email={user.email} /> : null}
+                  </span>
                 </div>
               </div>
               <form className="settings-profile-form" action={updateAccountProfileAction}>
