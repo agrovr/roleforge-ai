@@ -14,6 +14,13 @@ test("public account menu turns static topbars into signed-in command centers", 
   assert.match(publicAccountMenu, /"use client"/);
   assert.match(publicAccountMenu, /fetch\("\/api\/auth\/status"/);
   assert.match(publicAccountMenu, /credentials:\s*"same-origin"/);
+  assert.match(publicAccountMenu, /useState<PublicAccountStatus \| null \| undefined>\(undefined\)/);
+  assert.match(publicAccountMenu, /const loading = status === undefined/);
+  assert.match(publicAccountMenu, /if \(loading\)/);
+  assert.match(publicAccountMenu, /public-account-loading/);
+  assert.match(publicAccountMenu, /aria-busy="true"/);
+  assert.match(publicAccountMenu, /aria-label="Loading account menu"/);
+  assert.match(publicAccountMenu, /Loading account menu/);
   assert.match(publicAccountMenu, /currentPagePath/);
   assert.match(publicAccountMenu, /window\.location\.pathname/);
   assert.match(publicAccountMenu, /window\.location\.search/);
@@ -81,6 +88,11 @@ test("help status support and updates mount the public account menu", () => {
 test("public account menu topbar layout is overflow safe", () => {
   assert.match(stylesheet, /\.public-account-menu\s*\{(?=[^}]*z-index:\s*32)[^}]*\}/s);
   assert.match(stylesheet, /\.public-account-signin\s*\{(?=[^}]*flex:\s*0\s+0\s+auto)[^}]*\}/s);
+  assert.match(stylesheet, /\.public-account-loading\s*\{(?=[^}]*flex:\s*0\s+0\s+auto)(?=[^}]*cursor:\s*wait)(?=[^}]*pointer-events:\s*none)[^}]*\}/s);
+  assert.match(stylesheet, /\.public-account-loading\s+>\s+span\[aria-hidden="true"\]\s*\{(?=[^}]*width:\s*15px)(?=[^}]*height:\s*15px)(?=[^}]*animation:\s*public-account-loading-spin)[^}]*\}/s);
+  assert.match(stylesheet, /@keyframes\s+public-account-loading-spin/);
+  assert.match(stylesheet, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.public-account-loading\s+>\s+span\[aria-hidden="true"\]\s*\{[^}]*animation:\s*none/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.public-account-loading/);
   assert.match(stylesheet, /\.public-topbar-avatar\s*\{(?=[^}]*width:\s*40px)(?=[^}]*height:\s*40px)[^}]*\}/s);
   assert.match(stylesheet, /\.public-account-popover\s*\{(?=[^}]*width:\s*min\(420px,\s*calc\(100vw\s*-\s*30px\)\))[^}]*\}/s);
   assert.match(stylesheet, /\.studio-account-next-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);

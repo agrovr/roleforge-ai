@@ -10293,6 +10293,26 @@ html[data-theme="dark"] input::file-selector-button {
   flex: 0 0 auto;
 }
 
+.public-account-loading {
+  position: relative;
+  flex: 0 0 auto;
+  overflow: hidden;
+  cursor: wait;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 62%, white), color-mix(in srgb, var(--brand) 32%, var(--surface)));
+  box-shadow: 0 14px 28px -22px rgba(14, 20, 48, 0.42);
+}
+
+.public-account-loading > span[aria-hidden="true"] {
+  width: 15px;
+  height: 15px;
+  border: 2px solid color-mix(in srgb, var(--brand-dark) 24%, transparent);
+  border-top-color: var(--brand-dark);
+  border-radius: 999px;
+  animation: public-account-loading-spin 820ms linear infinite;
+}
+
 .public-topbar-avatar {
   width: 40px;
   height: 40px;
@@ -10315,6 +10335,18 @@ html[data-theme="dark"] input::file-selector-button {
   overflow-wrap: anywhere;
   text-wrap: balance;
   white-space: normal;
+}
+
+@keyframes public-account-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-account-loading > span[aria-hidden="true"] {
+    animation: none;
+  }
 }
 
 .settings-account-menu {
@@ -15751,6 +15783,19 @@ html[data-theme="dark"] .studio-account-button:focus-visible {
 
 html[data-theme="dark"] .landing-account-button {
   border-color: rgba(255, 247, 233, 0.22);
+}
+
+html[data-theme="dark"] .public-account-loading {
+  border: 1px solid rgba(255, 247, 233, 0.16);
+  background:
+    linear-gradient(135deg, rgba(239, 184, 99, 0.26), rgba(255, 247, 233, 0.07)),
+    #111725;
+  box-shadow: 0 16px 32px -22px rgba(0, 0, 0, 0.82);
+}
+
+html[data-theme="dark"] .public-account-loading > span[aria-hidden="true"] {
+  border-color: rgba(255, 247, 233, 0.24);
+  border-top-color: #efb863;
 }
 
 html[data-theme="dark"] .studio-account-popover {

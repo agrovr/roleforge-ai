@@ -58,7 +58,7 @@ function currentPagePath() {
 }
 
 export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMenuProps) {
-  const [status, setStatus] = useState<PublicAccountStatus | null>(null);
+  const [status, setStatus] = useState<PublicAccountStatus | null | undefined>(undefined);
 
   useEffect(() => {
     let alive = true;
@@ -78,6 +78,7 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
   }, []);
 
   const user = status?.user ?? null;
+  const loading = status === undefined;
   const signedIn = Boolean(user);
   const accountName = user?.name || user?.email || "RoleForge account";
   const accountEmail = user?.email || "Signed in";
@@ -111,6 +112,15 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
   const projectActionHref = typeof savedProjectCount === "number" && savedProjectCount > 0 ? "/settings#projects" : "/app";
   const supportActionLabel = typeof supportRequestCount === "number" && supportRequestCount > 0 ? "Support history" : "Contact support";
   const supportActionHref = typeof supportRequestCount === "number" && supportRequestCount > 0 ? "/settings#support" : supportHref;
+
+  if (loading) {
+    return (
+      <span className="studio-account-button settings-topbar-avatar public-topbar-avatar public-account-loading" aria-busy="true" aria-label="Loading account menu">
+        <span aria-hidden="true" />
+        <span className="sr-only">Loading account menu</span>
+      </span>
+    );
+  }
 
   if (!signedIn) {
     return (
