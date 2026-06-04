@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 
 const settingsSections = [
@@ -33,6 +33,7 @@ export function SettingsSectionNav() {
   const [activeSection, setActiveSection] = useState<SettingsSectionId>("account");
   const [query, setQuery] = useState("");
   const navRef = useRef<HTMLDivElement | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
   const scrollSpyLockUntilRef = useRef(0);
   const normalizedQuery = query.trim().toLowerCase();
@@ -64,7 +65,12 @@ export function SettingsSectionNav() {
     focusSectionLink(sectionId);
   }, [focusSectionLink, navigateToSection]);
 
-  function onSectionKeyDown(event: KeyboardEvent<HTMLAnchorElement>, sectionId: SettingsSectionId) {
+  const selectSection = useCallback((sectionId: SettingsSectionId) => {
+    if (query) setQuery("");
+    navigateToSection(sectionId);
+  }, [navigateToSection, query]);
+
+  function onSectionKeyDown(event: ReactKeyboardEvent<HTMLAnchorElement>, sectionId: SettingsSectionId) {
     const currentIndex = visibleSections.findIndex((section) => section.id === sectionId);
     if (currentIndex < 0) return;
     const previousSection = visibleSections[(currentIndex - 1 + visibleSections.length) % visibleSections.length].id;
@@ -87,11 +93,31 @@ export function SettingsSectionNav() {
     setQuery("");
   }
 
-  function onSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+  function onSearchKeyDown(event: ReactKeyboardEvent<HTMLInputElement>) {
     if (event.key !== "Escape" || !query) return;
     event.preventDefault();
     clearSettingsSearch();
   }
+
+  useEffect(() => {
+    function targetAcceptsText(target: EventTarget | null) {
+      if (!(target instanceof HTMLElement)) return false;
+      const tagName = target.tagName.toLowerCase();
+      return target.isContentEditable || tagName === "input" || tagName === "textarea" || tagName === "select";
+    }
+
+    function onDocumentKeyDown(event: KeyboardEvent) {
+      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey || targetAcceptsText(event.target)) return;
+      const input = searchInputRef.current;
+      if (!input) return;
+      event.preventDefault();
+      input.focus();
+      input.select();
+    }
+
+    document.addEventListener("keydown", onDocumentKeyDown);
+    return () => document.removeEventListener("keydown", onDocumentKeyDown);
+  }, []);
 
   useEffect(() => {
     let frame = 0;
@@ -175,6 +201,7 @@ export function SettingsSectionNav() {
         <div>
           <RoleForgeIcon name="search" size={14} />
           <input
+            ref={searchInputRef}
             type="search"
             value={query}
             onChange={(event) => setQuery(event.currentTarget.value)}
@@ -214,7 +241,7 @@ export function SettingsSectionNav() {
             aria-current={activeSection === section.id ? "location" : undefined}
             onClick={(event) => {
               event.preventDefault();
-              navigateToSection(section.id);
+              selectSection(section.id);
             }}
             onKeyDown={(event) => onSectionKeyDown(event, section.id)}
             ref={(element) => {

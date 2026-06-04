@@ -21,7 +21,9 @@ test("settings section nav mirrors the settings page sections", () => {
 
 test("settings section nav can filter by common account tasks", () => {
   assert.match(settingsNav, /const \[query,\s*setQuery\] = useState\(""\)/);
+  assert.match(settingsNav, /const searchInputRef = useRef<HTMLInputElement \| null>\(null\)/);
   assert.match(settingsNav, /type="search"/);
+  assert.match(settingsNav, /ref=\{searchInputRef\}/);
   assert.match(settingsNav, /onKeyDown=\{onSearchKeyDown\}/);
   assert.match(settingsNav, /placeholder="Billing, exports, saved projects\.\.\."/);
   assert.match(settingsNav, /settings-section-search/);
@@ -34,6 +36,13 @@ test("settings section nav can filter by common account tasks", () => {
   assert.match(settingsNav, /setQuery\(""\)/);
   assert.match(settingsNav, /function onSearchKeyDown/);
   assert.match(settingsNav, /event\.key !== "Escape" \|\| !query/);
+  assert.match(settingsNav, /document\.addEventListener\("keydown",\s*onDocumentKeyDown\)/);
+  assert.match(settingsNav, /document\.removeEventListener\("keydown",\s*onDocumentKeyDown\)/);
+  assert.match(settingsNav, /event\.key !== "\/"/);
+  assert.match(settingsNav, /event\.metaKey \|\| event\.ctrlKey \|\| event\.altKey/);
+  assert.match(settingsNav, /target\.isContentEditable \|\| tagName === "input" \|\| tagName === "textarea" \|\| tagName === "select"/);
+  assert.match(settingsNav, /input\.focus\(\)/);
+  assert.match(settingsNav, /input\.select\(\)/);
   assert.match(settingsNav, /settings-section-list/);
   assert.match(settingsNav, /visibleSections\.map/);
   assert.match(settingsNav, /No settings match\./);
@@ -42,6 +51,13 @@ test("settings section nav can filter by common account tasks", () => {
   assert.match(settingsNav, /keywords:\s*"history restore rename remove applications"/);
   assert.match(settingsNav, /visibleSections\.findIndex/);
   assert.match(icons, /\|\s*"search"/);
+});
+
+test("settings section nav exits task-filter mode on normal section selection", () => {
+  assert.match(settingsNav, /const selectSection = useCallback/);
+  assert.match(settingsNav, /if \(query\) setQuery\(""\)/);
+  assert.match(settingsNav, /selectSection\(section\.id\)/);
+  assert.doesNotMatch(settingsNav, /onClick=\{\(event\) => \{\s*event\.preventDefault\(\);\s*navigateToSection\(section\.id\);/s);
 });
 
 test("settings section nav exposes common task shortcuts", () => {
