@@ -61,3 +61,22 @@ test("templates page explains the selected template without cramped status pills
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.templates-fit-guide article/);
   assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.templates-fit-guide,[\s\S]*?grid-template-columns:\s*1fr/s);
 });
+
+test("templates page includes a real decision guide with visible dark selected states", () => {
+  assert.match(templateLibrary, /TEMPLATE_DECISION_GROUPS/);
+  assert.match(templateLibrary, /Broad applications/);
+  assert.match(templateLibrary, /Technical evidence/);
+  assert.match(templateLibrary, /Narrative roles/);
+  assert.match(templateLibrary, /className="templates-decision-guide"/);
+  assert.match(templateLibrary, /aria-labelledby="templates-decision-title"/);
+  assert.match(templateLibrary, /These groups use the same template directions available in the studio/);
+  assert.match(templateLibrary, /className=\{`templates-guide-option\$\{selected \? " selected" : ""\}`\}/);
+  assert.match(templateLibrary, /aria-pressed=\{selected\}/);
+  assert.match(stylesheet, /\.templates-decision-guide\s*\{(?=[^}]*display:\s*grid)(?=[^}]*overflow:\s*hidden)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.templates-decision-head\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0\.88fr\)\s+minmax\(260px,\s*0\.72fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.templates-guide-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(min\(100%,\s*240px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.templates-guide-option\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)(?=[^}]*text-align:\s*left)[^}]*\}/s);
+  assert.match(stylesheet, /\.templates-guide-option\.selected\s*\{(?=[^}]*border-color:\s*color-mix\(in srgb,\s*var\(--success\)\s*48%,\s*var\(--line\)\))[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.templates-guide-option\.selected\s*\{(?=[^}]*border-color:\s*rgba\(166,\s*239,\s*184,\s*0\.62\))(?=[^}]*color:\s*#dfffe6)[^}]*\}/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.templates-decision-head,[\s\S]*?\.templates-guide-grid,[\s\S]*?grid-template-columns:\s*1fr/s);
+});

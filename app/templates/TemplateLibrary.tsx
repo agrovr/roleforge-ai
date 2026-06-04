@@ -17,6 +17,27 @@ import {
   type ResumeTemplateVariant,
 } from "../lib/resumeTemplates";
 
+const TEMPLATE_DECISION_GROUPS = [
+  {
+    title: "Broad applications",
+    detail: "Start here when the role does not need a specialized layout.",
+    icon: "file",
+    slugs: ["classic", "compact"],
+  },
+  {
+    title: "Technical evidence",
+    detail: "Use these when skills, tools, and projects need to scan quickly.",
+    icon: "scan",
+    slugs: ["modern", "engineer"],
+  },
+  {
+    title: "Narrative roles",
+    detail: "Use these when leadership, presentation, or a role story matters.",
+    icon: "sparkle",
+    slugs: ["editorial", "executive"],
+  },
+] as const;
+
 function rememberTemplate(slug: ResumeTemplateSlug) {
   window.localStorage.setItem(RESUME_TEMPLATE_STORAGE_KEY, slug);
   document.cookie = `${RESUME_TEMPLATE_COOKIE}=${encodeURIComponent(slug)}; Path=/; Max-Age=31536000; SameSite=Lax`;
@@ -97,6 +118,53 @@ export function TemplateLibrary({
             <small>New PDF and premium DOCX exports use this direction; older saved exports stay unchanged.</small>
           </div>
         </article>
+      </section>
+
+      <section className="templates-decision-guide" aria-labelledby="templates-decision-title">
+        <div className="templates-decision-head">
+          <div>
+            <span className="eyebrow">Template decision guide</span>
+            <h2 id="templates-decision-title">Choose by resume shape.</h2>
+          </div>
+          <p>
+            These groups use the same template directions available in the studio, so the choice you make here carries into the next export.
+          </p>
+        </div>
+        <div className="templates-guide-grid">
+          {TEMPLATE_DECISION_GROUPS.map((group) => (
+            <article className="templates-guide-card" key={group.title}>
+              <div className="templates-guide-card-head">
+                <span aria-hidden="true"><RoleForgeIcon name={group.icon} size={16} /></span>
+                <div>
+                  <strong>{group.title}</strong>
+                  <small>{group.detail}</small>
+                </div>
+              </div>
+              <div className="templates-guide-options">
+                {group.slugs.map((slug) => {
+                  const template = getResumeTemplate(slug);
+                  const selected = template.slug === selectedSlug;
+                  return (
+                    <button
+                      className={`templates-guide-option${selected ? " selected" : ""}`}
+                      key={template.slug}
+                      type="button"
+                      onClick={() => {
+                        setSelectedSlug(template.slug);
+                        rememberTemplate(template.slug);
+                      }}
+                      aria-pressed={selected}
+                    >
+                      <span>{template.name}</span>
+                      <small>{template.tag}</small>
+                      <RoleForgeIcon name={selected ? "check" : "arrow"} size={12} />
+                    </button>
+                  );
+                })}
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="templates-page-grid" aria-label="Resume template directions">
