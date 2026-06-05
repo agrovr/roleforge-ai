@@ -7442,9 +7442,10 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-item {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 0.88fr) minmax(min(100%, 360px), 1.12fr);
   align-items: start;
   gap: 14px;
+  container: settings-project-card / inline-size;
   overflow: hidden;
   color: inherit;
   transition:
@@ -7486,6 +7487,8 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-project-controls {
+  justify-self: stretch;
+  inline-size: 100%;
   gap: 10px;
   max-width: 100%;
   overflow: hidden;
@@ -7634,7 +7637,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-stage-controls {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 118px), 1fr));
   gap: 8px;
   min-width: 0;
   padding-top: 2px;
@@ -7695,7 +7698,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-rename-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 78px;
+  grid-template-columns: minmax(0, 1fr) minmax(68px, auto);
   gap: 8px;
   min-width: 0;
 }
@@ -7751,6 +7754,7 @@ html[data-theme="dark"] input::file-selector-button {
 .settings-project-downloads .btn {
   width: auto;
   min-width: 0;
+  max-width: 100%;
   min-height: 38px;
   justify-content: center;
   padding: 8px 10px;
@@ -7763,6 +7767,7 @@ html[data-theme="dark"] input::file-selector-button {
   display: grid;
   gap: 8px;
   min-width: 0;
+  overflow: hidden;
   padding: 10px;
   border: 1px solid color-mix(in srgb, var(--brand) 16%, var(--line));
   border-radius: 10px;
@@ -7808,7 +7813,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-kit-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 138px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 126px), 1fr));
   gap: 7px;
   min-width: 0;
 }
@@ -7850,6 +7855,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-delete {
   min-width: 0;
+  overflow: hidden;
   border-top: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
   padding-top: 2px;
 }
@@ -7894,7 +7900,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-delete-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 96px;
+  grid-template-columns: minmax(0, 1fr) minmax(84px, auto);
   gap: 8px;
   min-width: 0;
 }
@@ -7961,6 +7967,13 @@ html[data-theme="dark"] input::file-selector-button {
 
   .settings-document-actions {
     grid-column: 1 / -1;
+  }
+}
+
+@container settings-project-card (max-width: 680px) {
+  .settings-project-stage-controls,
+  .settings-project-kit-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 112px), 1fr));
   }
 }
 
