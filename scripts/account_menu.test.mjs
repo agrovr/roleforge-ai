@@ -100,6 +100,20 @@ test("settings topbar exposes account, project, usage, and billing controls", ()
   assert.match(settingsPage, /recentProjectSummaries\.map/);
   assert.match(settingsPage, /href=\{project\.href\}/);
   assert.match(settingsPage, /settings-account-utilities/);
+  assert.match(settingsPage, /settingsAccountNextActions/);
+  assert.match(settingsPage, /settings-account-next-actions/);
+  assert.match(settingsPage, /Recommended account actions/);
+  assert.match(settingsPage, /settingsAccountBillingActionLabel/);
+  assert.match(settingsPage, /Manage billing/);
+  assert.match(settingsPage, /View Premium/);
+  assert.match(settingsPage, /Billing status/);
+  assert.match(settingsPage, /settingsAccountProjectActionLabel/);
+  assert.match(settingsPage, /Restore project/);
+  assert.match(settingsPage, /Start project/);
+  assert.match(settingsPage, /settingsAccountSupportActionLabel/);
+  assert.match(settingsPage, /Support history/);
+  assert.match(settingsPage, /Contact support/);
+  assert.match(settingsPage, /settingsAccountNextActions\.map/);
   assert.match(settingsPage, /href="\/api\/account\/export"/);
   assert.match(settingsPage, /Export account record/);
   assert.match(settingsPage, /href="#security"/);
@@ -151,6 +165,9 @@ test("settings account recent projects inherit overflow-safe menu layout", () =>
   assert.match(globalsCss, /\.settings-account-recent\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(globalsCss, /\.settings-account-recent-link\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(globalsCss, /\.settings-account-recent-link\s+strong\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
+  assert.match(globalsCss, /\.settings-account-next-actions\s*\{(?=[^}]*margin-bottom:\s*12px)[^}]*\}/s);
+  assert.match(globalsCss, /\.settings-account-next-actions\s+a\s*\{(?=[^}]*min-height:\s*40px)[^}]*\}/s);
+  assert.match(globalsCss, /html\[data-theme="dark"\]\s+\.studio-account-next-actions\s+a/);
 });
 
 test("settings saved project management rows avoid squeezed action columns", () => {

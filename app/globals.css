@@ -10420,6 +10420,14 @@ html[data-theme="dark"] input::file-selector-button {
   margin-top: 10px;
 }
 
+.settings-account-next-actions {
+  margin-bottom: 12px;
+}
+
+.settings-account-next-actions a {
+  min-height: 40px;
+}
+
 .settings-account-shortcuts {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-bottom: 0;

@@ -463,6 +463,22 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     : `${usage.remainingRuns} ${remainingRunWord} left this month`;
   const settingsAccountExportValue = entitlement.exportFormats.docx ? "PDF DOCX TXT" : "PDF";
   const settingsAccountExportCaption = entitlement.exportFormats.docx ? "Premium exports active" : "DOCX and TXT need Premium";
+  const settingsAccountBillingActionLabel = premiumActive
+    ? "Manage billing"
+    : checkoutReady
+      ? "View Premium"
+      : "Billing status";
+  const settingsAccountBillingActionHref = premiumActive || checkoutReady ? "#billing" : "/status";
+  const settingsAccountProjectActionLabel = projectCount ? "Restore project" : "Start project";
+  const settingsAccountProjectActionHref = projectCount ? "#projects" : "/app";
+  const settingsAccountSupportActionLabel = supportRequestCount ? "Support history" : "Contact support";
+  const settingsAccountSupportActionHref = supportRequestCount ? "#support" : supportHistoryHref;
+  const settingsAccountNextActions: Array<{ href: string; icon: RoleForgeIconName; label: string }> = [
+    { href: "/app", icon: "file", label: "Resume work" },
+    { href: settingsAccountBillingActionHref, icon: "lock", label: settingsAccountBillingActionLabel },
+    { href: settingsAccountProjectActionHref, icon: "chart", label: settingsAccountProjectActionLabel },
+    { href: settingsAccountSupportActionHref, icon: "mail", label: settingsAccountSupportActionLabel },
+  ];
   const billingDateLabel = premiumEnding ? premiumEndLabel : formatPlanDate(entitlement.currentPeriodEnd);
   const billingDateTitle = premiumEnding ? "Access ends" : premiumActive ? "Next renewal" : "Billing date";
   const billingDateDetail = billingDateLabel
@@ -793,6 +809,13 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <strong>{settingsAccountExportValue}</strong>
                   <span>{settingsAccountExportCaption}</span>
                 </a>
+              </div>
+              <div className="studio-account-next-actions settings-account-next-actions" aria-label="Recommended account actions">
+                {settingsAccountNextActions.map((action) => (
+                  <Link href={action.href} key={action.label}>
+                    <RoleForgeIcon name={action.icon} size={14} /> {action.label}
+                  </Link>
+                ))}
               </div>
               <div className="studio-account-shortcuts settings-account-shortcuts">
                 <Link href="/app"><RoleForgeIcon name="file" size={14} /> Studio</Link>
