@@ -13,6 +13,7 @@ test("rendered layout smoke supports targeted page and viewport filters", () => 
   assert.match(smokeLayout, /const narrowDesktopWidths = args\.narrowDesktopWidths \|\| NARROW_DESKTOP_VIEWPORTS/);
   assert.match(smokeLayout, /anchorClearanceChecks/);
   assert.match(smokeLayout, /anchor-covered-by-sticky-guard/);
+  assert.match(smokeLayout, /rule\.minWidth && window\.innerWidth < Number\(rule\.minWidth\)/);
 });
 
 test("rendered layout smoke prints progress for long browser passes", () => {

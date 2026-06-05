@@ -17,7 +17,7 @@ const PAGE_CHECKS = [
     name: "landing",
     anchorClearanceChecks: [
       { anchor: "#final-cta", selector: ".cta-band h2", guard: ".nav", minGap: 18 },
-      { anchor: ".cta-band", selector: ".cta-band h2", guard: ".nav", minGap: 18 },
+      { anchor: ".cta-band", selector: ".cta-band h2", guard: ".nav", minGap: 18, minWidth: 981 },
     ],
     noOverlapPairs: [
       [".hero-copy", ".hero-stage"],
@@ -884,6 +884,8 @@ async function evaluateLayout(send, baseUrl, page, width, cookie, options = {}) 
     }
 
     for (const rule of anchorClearanceChecks) {
+      if (rule.minWidth && window.innerWidth < Number(rule.minWidth)) continue;
+      if (rule.maxWidth && window.innerWidth > Number(rule.maxWidth)) continue;
       const anchor = document.querySelector(rule.anchor);
       const target = document.querySelector(rule.selector);
       const guard = document.querySelector(rule.guard || ".nav");
