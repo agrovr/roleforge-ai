@@ -36,6 +36,15 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /supportLifecycle/);
   assert.match(supportPage, /Support request lifecycle/);
   assert.match(supportPage, /supportStatusLabel\(item\.status\)/);
+  assert.match(supportPage, /latestSupportRequest/);
+  assert.match(supportPage, /supportRequestPacket/);
+  assert.match(supportPage, /Support request packet/);
+  assert.match(supportPage, /What gets attached/);
+  assert.match(supportPage, /Account email/);
+  assert.match(supportPage, /Request history/);
+  assert.match(supportPage, /Page context/);
+  assert.match(supportPage, /Private data/);
+  assert.match(supportPage, /Do not paste card numbers, passwords, or secret keys/);
   assert.match(supportPage, /status:\s*"open"/);
   assert.match(supportPage, /status:\s*"reviewing"/);
   assert.match(supportPage, /status:\s*"closed"/);
@@ -141,6 +150,7 @@ test("support page is discoverable across public and account surfaces", () => {
   assert.match(sitemapRoute, /`\$\{siteUrl\}\/support`/);
   assert.match(smokeFrontend, /sitemap\.text\.includes\(`\$\{canonicalUrl\}\/support`\)/);
   assert.match(smokeLayout, /path: "\/support"/);
+  assert.match(smokeLayout, /\.support-packet-card/);
 });
 
 test("contextual support links prefill workflow, export, and billing details", () => {
@@ -174,6 +184,12 @@ test("support page has overflow-safe responsive form layout", () => {
   assert.match(stylesheet, /\.support-request-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*gap:\s*16px)[^}]*\}/s);
   assert.match(stylesheet, /\.support-prefill-note\s*\{(?=[^}]*border-color:)(?=[^}]*background:)[^}]*\}/s);
   assert.match(stylesheet, /\.support-notice-content\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-packet-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*gap:\s*12px)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-packet-list\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-packet-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*32px\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-packet-item\s+div,\s*\.support-packet-item\s+small,\s*\.support-packet-item\s+strong,\s*\.support-packet-item\s+p\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-packet-item\.good/);
+  assert.match(stylesheet, /\.support-packet-item\.warn/);
   assert.match(stylesheet, /\.support-response-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*gap:\s*12px)[^}]*\}/s);
   assert.match(stylesheet, /\.support-response-list\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.support-response-item\s+small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*pretty)[^}]*\}/s);
@@ -183,11 +199,15 @@ test("support page has overflow-safe responsive form layout", () => {
   assert.match(stylesheet, /\.support-status-badge\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /\.support-reference-copy\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.support-layout\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.support-packet-list\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.support-response-list\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.support-history-item,\s*\.settings-support-item\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.support-history-actions\s*\{[^}]*justify-items:\s*start/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-request-card/);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-triage-card/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-packet-card/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-packet-item\.good/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-packet-item\.warn/);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-response-card/);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-reference-copy/);
 });

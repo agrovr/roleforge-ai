@@ -172,6 +172,49 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
   const recentSupportRequests = supabase && user
     ? await loadSupportRequests(supabase, user.id, { limit: 5 }).catch(() => [])
     : [];
+  const latestSupportRequest = recentSupportRequests[0] ?? null;
+  const supportRequestPacket: Array<{
+    label: string;
+    value: string;
+    detail: string;
+    tone: "good" | "neutral" | "warn";
+    icon: "mail" | "chart" | "link" | "lock";
+  }> = [
+    {
+      label: signedIn ? "Account email" : "Account session",
+      value: signedIn ? accountEmail || "Signed in account" : "Sign in required",
+      detail: signedIn
+        ? "Used for follow-up and account-safe context."
+        : "Sign in so requests attach to plan and saved-project state.",
+      tone: signedIn ? "good" : "warn",
+      icon: "mail",
+    },
+    {
+      label: "Request history",
+      value: latestSupportRequest ? latestSupportRequest.referenceLabel : "No recent request",
+      detail: latestSupportRequest
+        ? `${latestSupportRequest.statusLabel} · ${latestSupportRequest.createdLabel}`
+        : "New requests will appear here and in Settings.",
+      tone: latestSupportRequest ? "good" : "neutral",
+      icon: "chart",
+    },
+    {
+      label: "Page context",
+      value: prefill.hasPrefill ? "Included" : "Optional",
+      detail: prefill.hasPrefill
+        ? "Prefilled from the page that sent you here."
+        : "Add a page path or request id when it helps trace the issue.",
+      tone: prefill.hasPrefill ? "good" : "neutral",
+      icon: "link",
+    },
+    {
+      label: "Private data",
+      value: "Keep out",
+      detail: "Do not paste card numbers, passwords, or secret keys.",
+      tone: "warn",
+      icon: "lock",
+    },
+  ];
 
   return (
     <main className="legal-shell support-shell">
@@ -267,6 +310,26 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
               <span>Support details were prefilled from the page where you asked for help.</span>
             </div>
           ) : null}
+
+          <section className="support-packet-card" aria-label="Support request packet">
+            <div className="support-packet-head">
+              <span className="eyebrow">Request packet</span>
+              <strong>What gets attached</strong>
+              <p>RoleForge saves only account-safe context with your request.</p>
+            </div>
+            <div className="support-packet-list">
+              {supportRequestPacket.map((item) => (
+                <article className={`support-packet-item ${item.tone}`} key={item.label}>
+                  <span aria-hidden="true"><RoleForgeIcon name={item.icon} size={14} /></span>
+                  <div>
+                    <small>{item.label}</small>
+                    <strong>{item.value}</strong>
+                    <p>{item.detail}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
 
           <section className="support-response-card" aria-label="Support request lifecycle">
             <div className="support-response-head">
