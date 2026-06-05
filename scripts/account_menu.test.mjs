@@ -94,6 +94,9 @@ test("settings topbar exposes account, project, usage, and billing controls", ()
   assert.match(settingsPage, /aria-label="Open account menu"/);
   assert.match(settingsPage, /aria-haspopup="menu"/);
   assert.match(settingsPage, /aria-expanded="false"/);
+  assert.match(settingsPage, /title=\{displayName \|\| user\.email \|\| "RoleForge account"\}/);
+  assert.match(settingsPage, /\{displayName \|\| "RoleForge account"\}/);
+  assert.match(settingsPage, /\$\{user\.email\} · \$\{displayPlanLabel\}/);
   assert.match(settingsPage, /recentProjectSummaries/);
   assert.match(settingsPage, /settings-account-recent/);
   assert.match(settingsPage, /Recent projects/);
@@ -133,6 +136,8 @@ test("settings topbar exposes account, project, usage, and billing controls", ()
   assert.match(settingsPage, /settings-account-support-recent/);
   assert.match(settingsPage, /supportRequestCount/);
   assert.match(settingsPage, /supportOverviewValue/);
+  assert.match(settingsPage, /projectCount \? `\$\{projectCountLabel\} saved` : "Start first project"/);
+  assert.match(settingsPage, /<strong>\{supportOverviewValue\}<\/strong>/);
   assert.match(settingsPage, /href="\/app#history"/);
   assert.match(settingsPage, /action="\/auth\/signout"/);
 });

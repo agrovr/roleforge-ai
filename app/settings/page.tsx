@@ -845,8 +845,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
                 </div>
                 <div>
-                  <strong className="studio-account-email" title={user.email || "Signed in"}>{user.email || "Signed in"}</strong>
-                  <span>{displayPlanLabel}</span>
+                  <strong className="studio-account-email" title={displayName || user.email || "RoleForge account"}>{displayName || "RoleForge account"}</strong>
+                  <span title={user.email ? `${user.email} · ${displayPlanLabel}` : displayPlanLabel}>
+                    {user.email ? `${user.email} · ${displayPlanLabel}` : displayPlanLabel}
+                  </span>
                 </div>
               </div>
               <div className="studio-account-insights" aria-label="Account status summary">
@@ -861,6 +863,14 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 <a href="#exports">
                   <strong>{settingsAccountExportValue}</strong>
                   <span>{settingsAccountExportCaption}</span>
+                </a>
+                <a href="#projects">
+                  <strong>{projectCount}</strong>
+                  <span>{projectCount ? `${projectCountLabel} saved` : "Start first project"}</span>
+                </a>
+                <a href="#support">
+                  <strong>{supportOverviewValue}</strong>
+                  <span>{supportOverviewCaption}</span>
                 </a>
               </div>
               <div className="studio-account-next-actions settings-account-next-actions" aria-label="Recommended account actions">
