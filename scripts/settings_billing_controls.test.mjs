@@ -59,6 +59,25 @@ test("settings billing panel surfaces plan renewal and status information", () =
   assert.match(stylesheet, /\.settings-plan-info-item span,\s*\.settings-plan-info-item strong,\s*\.settings-plan-info-item small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
 });
 
+test("settings billing panel shows a clear subscription timeline", () => {
+  assert.match(settingsPage, /billingTimelineItems/);
+  assert.match(settingsPage, /aria-label="Billing timeline"/);
+  assert.match(settingsPage, /settings-billing-timeline/);
+  assert.match(settingsPage, /label:\s*"Today"/);
+  assert.match(settingsPage, /value:\s*premiumEnding \? "Premium ending" : premiumActive \? "Premium active" : checkoutReady \? "Free plan" : "Free studio"/);
+  assert.match(settingsPage, /label:\s*premiumEnding \? "Access end" : premiumActive \? "Renewal" : "Upgrade"/);
+  assert.match(settingsPage, /Stripe shows the next charge date, receipts, and payment method details\./);
+  assert.match(settingsPage, /Manage billing opens Stripe for cancellation, invoices, and payment methods\./);
+  assert.match(settingsPage, /Support requests from this panel include account context and safe references\./);
+  assert.match(settingsPage, /className=\{`settings-billing-timeline-item \$\{item\.tone\}`\}/);
+  assert.match(stylesheet, /\.settings-billing-timeline\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*178px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-billing-timeline-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*34px minmax\(0,\s*1fr\))(?=[^}]*min-height:\s*132px)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-billing-timeline-item > div,\s*\.settings-billing-timeline-item span:not\(\.settings-billing-timeline-icon\),\s*\.settings-billing-timeline-item strong,\s*\.settings-billing-timeline-item small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-billing-timeline-item/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-billing-timeline-item\.good/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-billing-timeline-item\.warn/);
+});
+
 test("settings billing panel audits current plan access", () => {
   assert.match(settingsPage, /premiumDocumentExportsActive\s*=\s*entitlement\.exportFormats\.docx\s*&&\s*entitlement\.exportFormats\.txt/);
   assert.match(settingsPage, /planAccessItems/);

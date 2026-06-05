@@ -530,6 +530,60 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
           detail: "Ask about checkout, invoices, or Premium access from a support request linked to this page.",
         },
       ];
+  const billingTimelineItems: Array<{
+    icon: RoleForgeIconName;
+    label: string;
+    value: string;
+    detail: string;
+    tone: "good" | "ready" | "warn";
+  }> = [
+    {
+      icon: premiumActive ? "check" : checkoutReady ? "lock" : "mail",
+      label: "Today",
+      value: premiumEnding ? "Premium ending" : premiumActive ? "Premium active" : checkoutReady ? "Free plan" : "Free studio",
+      detail: premiumActive
+        ? "Premium access is active on this account."
+        : checkoutReady
+          ? "Free access is active; Premium can start from secure Stripe checkout."
+          : "Free access is active while Premium checkout is unavailable.",
+      tone: premiumEnding ? "warn" : premiumActive || checkoutReady ? "good" : "ready",
+    },
+    {
+      icon: premiumEnding ? "lock" : premiumActive ? "download" : "check",
+      label: premiumEnding ? "Access end" : premiumActive ? "Renewal" : "Upgrade",
+      value: billingDateLabel || (premiumActive ? "Open billing" : checkoutReady ? "Optional" : "Unavailable"),
+      detail: premiumEnding && premiumEndLabel
+        ? `DOCX, TXT, and unlimited runs remain available until ${premiumEndLabel}.`
+        : premiumActive
+          ? "Stripe shows the next charge date, receipts, and payment method details."
+          : checkoutReady
+            ? "Monthly and yearly Premium options are available from this panel."
+            : "The signed-in free studio remains available without billing.",
+      tone: premiumEnding ? "warn" : premiumActive || checkoutReady ? "good" : "ready",
+    },
+    {
+      icon: "settings",
+      label: premiumActive ? "Billing portal" : "Checkout",
+      value: portalReady ? "Ready" : showCheckoutHeaderAction ? "Ready" : "Unavailable",
+      detail: portalReady
+        ? "Manage billing opens Stripe for cancellation, invoices, and payment methods."
+        : showCheckoutHeaderAction
+          ? "Start Premium opens Stripe checkout and returns here after payment."
+          : premiumActive
+            ? "Contact support if Stripe billing management should be available."
+            : "Contact support if Premium checkout should be available.",
+      tone: portalReady || showCheckoutHeaderAction ? "good" : premiumActive ? "warn" : "ready",
+    },
+    {
+      icon: "mail",
+      label: "Support trail",
+      value: latestSupportRequest ? latestSupportRequest.referenceLabel : "Ready",
+      detail: latestSupportRequest
+        ? `${latestSupportRequest.statusLabel} billing or account context is saved for support.`
+        : "Support requests from this panel include account context and safe references.",
+      tone: latestSupportRequest ? "good" : "ready",
+    },
+  ];
   const premiumDocumentExportsActive = entitlement.exportFormats.docx && entitlement.exportFormats.txt;
   const planAccessItems: Array<{
     icon: RoleForgeIconName;
@@ -1606,6 +1660,20 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     <strong>{item.value}</strong>
                     <small>{item.detail}</small>
                   </div>
+                ))}
+              </div>
+              <div className="settings-billing-timeline" aria-label="Billing timeline">
+                {billingTimelineItems.map((item) => (
+                  <article className={`settings-billing-timeline-item ${item.tone}`} key={item.label}>
+                    <span className="settings-billing-timeline-icon" aria-hidden="true">
+                      <RoleForgeIcon name={item.icon} size={14} />
+                    </span>
+                    <div>
+                      <span>{item.label}</span>
+                      <strong>{item.value}</strong>
+                      <small>{item.detail}</small>
+                    </div>
+                  </article>
                 ))}
               </div>
               <div className="settings-billing-control-list" aria-label="Billing controls and access details">
