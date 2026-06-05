@@ -85,8 +85,8 @@ test("settings section search stays compact across breakpoints", () => {
   assert.match(stylesheet, /\.settings-task-shortcuts\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-task-shortcuts\s+a\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-section-list\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
-  assert.match(stylesheet, /@media\s*\(max-width:\s*1120px\)\s*\{[\s\S]*?\.settings-section-list\s*\{(?=[^}]*display:\s*flex)(?=[^}]*overflow-x:\s*auto)[^}]*\}/s);
-  assert.match(stylesheet, /@media\s*\(max-width:\s*1120px\)\s*\{[\s\S]*?\.settings-section-list\s+a\s*\{(?=[^}]*flex:\s*0\s+0\s+auto)(?=[^}]*white-space:\s*nowrap)[^}]*\}/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?\.settings-section-list\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*overflow:\s*visible)[^}]*\}/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?\.settings-section-list\s+a\s*\{(?=[^}]*flex:\s*initial)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.settings-page-nav\s*\{[^}]*grid-template-columns:\s*1fr[^}]*\}[\s\S]*?\.settings-section-list\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\)/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.settings-section-list\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*overflow:\s*visible)[^}]*\}/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-section-search\s*>\s*div/);

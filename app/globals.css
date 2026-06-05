@@ -17283,16 +17283,17 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   .settings-page-nav {
     position: static;
     display: grid;
+    grid-template-columns: 1fr;
     gap: 8px;
     overflow: visible;
     padding: 8px;
   }
 
   .settings-section-list {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
-    overflow-x: auto;
-    scrollbar-width: none;
+    overflow: visible;
   }
 
   .settings-section-list::-webkit-scrollbar {
@@ -17300,8 +17301,14 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
   }
 
   .settings-section-list a {
-    flex: 0 0 auto;
-    white-space: nowrap;
+    flex: initial;
+    justify-content: center;
+    min-width: 0;
+    line-height: 1.12;
+    overflow-wrap: anywhere;
+    text-align: center;
+    text-wrap: balance;
+    white-space: normal;
   }
 
   .settings-page-hero,
