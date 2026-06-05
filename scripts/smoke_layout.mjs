@@ -15,6 +15,10 @@ const PAGE_CHECKS = [
   {
     path: "/",
     name: "landing",
+    anchorClearanceChecks: [
+      { anchor: "#final-cta", selector: ".cta-band h2", guard: ".nav", minGap: 18 },
+      { anchor: ".cta-band", selector: ".cta-band h2", guard: ".nav", minGap: 18 },
+    ],
     noOverlapPairs: [
       [".hero-copy", ".hero-stage"],
       [".hero-copy", ".hero-stage .resume-card-front"],
@@ -736,6 +740,7 @@ async function evaluateLayout(send, baseUrl, page, width, cookie, options = {}) 
     const textFitSelectors = ${JSON.stringify(page.textFitSelectors || [])};
     const noOverlapPairs = ${JSON.stringify(page.noOverlapPairs || [])};
     const containedSelectors = ${JSON.stringify(page.containedSelectors || [])};
+    const anchorClearanceChecks = ${JSON.stringify(page.anchorClearanceChecks || [])};
     const failures = [];
     const viewportWidth = document.documentElement.clientWidth;
     const overflow = document.documentElement.scrollWidth - viewportWidth;
@@ -878,6 +883,47 @@ async function evaluateLayout(send, baseUrl, page, width, cookie, options = {}) 
       });
     }
 
+    for (const rule of anchorClearanceChecks) {
+      const anchor = document.querySelector(rule.anchor);
+      const target = document.querySelector(rule.selector);
+      const guard = document.querySelector(rule.guard || ".nav");
+      if (!anchor || !target || !guard) {
+        failures.push({
+          selector: rule.selector,
+          anchor: rule.anchor,
+          reason: "anchor-clearance-missing",
+          anchorFound: Boolean(anchor),
+          targetFound: Boolean(target),
+          guardFound: Boolean(guard),
+        });
+        continue;
+      }
+
+      anchor.scrollIntoView({ block: "start", inline: "nearest" });
+      const targetRect = target.getBoundingClientRect();
+      const guardRect = guard.getBoundingClientRect();
+      const anchorRect = anchor.getBoundingClientRect();
+      const anchorStyle = window.getComputedStyle(anchor);
+      const minGap = Number(rule.minGap || 0);
+      const requiredTop = guardRect.bottom + minGap;
+      if (targetRect.top < requiredTop) {
+        failures.push({
+          selector: rule.selector,
+          anchor: rule.anchor,
+          reason: "anchor-covered-by-sticky-guard",
+          top: Math.round(targetRect.top),
+          requiredTop: Math.round(requiredTop),
+          guardBottom: Math.round(guardRect.bottom),
+          anchorTop: Math.round(anchorRect.top),
+          anchorWidth: Math.round(anchorRect.width),
+          anchorPaddingTop: anchorStyle.paddingTop,
+          anchorPaddingBlockStart: anchorStyle.paddingBlockStart,
+          minGap,
+          text: target.textContent.trim().replace(/\\s+/g, " ").slice(0, 80),
+        });
+      }
+    }
+
     return JSON.stringify({
       page: ${JSON.stringify(page.name)},
       theme: ${JSON.stringify(theme)},
@@ -891,7 +937,12 @@ async function evaluateLayout(send, baseUrl, page, width, cookie, options = {}) 
     const result = await send("Runtime.evaluate", { expression, returnByValue: true });
     if (result.error) throw new Error(result.error.message);
     if (result.result.exceptionDetails) {
-      throw new Error(result.result.exceptionDetails.text || "Rendered layout evaluation failed");
+      throw new Error(
+        result.result.exceptionDetails.exception?.description ||
+          result.result.exceptionDetails.exception?.value ||
+          result.result.exceptionDetails.text ||
+          "Rendered layout evaluation failed",
+      );
     }
     reports.push(JSON.parse(result.result.result.value));
   }

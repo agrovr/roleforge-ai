@@ -2558,19 +2558,18 @@ html.rf-custom-pointer [contenteditable=""] {
 }
 
 .price-status.current {
-  border-color: rgba(255, 250, 240, 0.98);
-  background: linear-gradient(135deg, #fffdf8 0%, #ffe3a0 48%, #d99b3c 100%);
-  color: #120903;
+  border-color: rgba(166, 102, 38, 0.34);
+  background: rgba(221, 160, 74, 0.14);
+  color: #74460f;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.86),
-    0 0 0 1px rgba(47, 27, 10, 0.22),
-    0 14px 30px -16px rgba(87, 48, 14, 0.78);
+    inset 0 1px 0 rgba(255, 255, 255, 0.58),
+    0 10px 22px -18px rgba(87, 48, 14, 0.52);
   text-shadow: none;
 }
 
 .price-status.current::before {
-  background: #7a450d;
-  box-shadow: 0 0 0 3px rgba(122, 69, 13, 0.14);
+  background: #a66626;
+  box-shadow: 0 0 0 3px rgba(166, 102, 38, 0.13);
 }
 
 .price-status.upgrade {
@@ -2618,14 +2617,18 @@ html.rf-custom-pointer [contenteditable=""] {
 }
 
 .price-card.featured .price-status.current {
-  border-color: #fffaf0;
-  background: linear-gradient(135deg, #fffdf8 0%, #ffe3a0 48%, #d99b3c 100%);
-  color: #0b0601;
+  border-color: rgba(255, 247, 233, 0.52);
+  background: rgba(255, 247, 233, 0.14);
+  color: #fff7e9;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 0 0 1px rgba(255, 247, 233, 0.5),
-    0 0 0 2px rgba(8, 12, 24, 0.28),
-    0 18px 38px -14px rgba(255, 196, 117, 0.92);
+    inset 0 0 0 1px rgba(255, 247, 233, 0.12),
+    0 12px 28px -20px rgba(0, 0, 0, 0.52);
+  text-shadow: 0 1px 1px rgba(8, 12, 24, 0.42);
+}
+
+.price-card.featured .price-status.current::before {
+  background: #dda04a;
+  box-shadow: 0 0 0 3px rgba(221, 160, 74, 0.18);
 }
 
 .price-amount .v {
@@ -3566,14 +3569,12 @@ html[data-theme="dark"] .price-card.featured .price-status {
 }
 
 html[data-theme="dark"] .price-status.current {
-  border-color: rgba(255, 250, 240, 0.98);
-  background: linear-gradient(135deg, #fffdf8 0%, #ffe3a0 48%, #d99b3c 100%);
-  color: #0b0601;
+  border-color: rgba(255, 213, 143, 0.48);
+  background: rgba(255, 213, 143, 0.14);
+  color: #ffedc9;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.86),
-    0 0 0 1px rgba(255, 247, 233, 0.52),
-    0 0 0 2px rgba(8, 12, 24, 0.32),
-    0 16px 36px -15px rgba(255, 196, 117, 0.78);
+    inset 0 0 0 1px rgba(255, 247, 233, 0.1),
+    0 12px 28px -20px rgba(0, 0, 0, 0.64);
   text-shadow: none;
 }
 
@@ -3590,15 +3591,13 @@ html[data-theme="dark"] .price-status.paused {
 }
 
 html[data-theme="dark"] .price-card.featured .price-status.current {
-  border-color: #fffaf0;
-  background: linear-gradient(135deg, #fffdf8 0%, #ffe3a0 48%, #d99b3c 100%);
-  color: #080401;
+  border-color: rgba(255, 247, 233, 0.58);
+  background: rgba(255, 247, 233, 0.15);
+  color: #fff7e9;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 0 0 1px rgba(255, 247, 233, 0.68),
-    0 0 0 2px rgba(8, 12, 24, 0.34),
-    0 20px 42px -14px rgba(255, 194, 117, 0.86);
-  text-shadow: none;
+    inset 0 0 0 1px rgba(255, 247, 233, 0.13),
+    0 14px 30px -20px rgba(0, 0, 0, 0.76);
+  text-shadow: 0 1px 1px rgba(8, 12, 24, 0.46);
 }
 
 html[data-theme="dark"] .price-card.featured .price-status.upgrade {
@@ -19612,6 +19611,10 @@ body,
 }
 
 /* Final CTA screenshot fix: keep this block at the end of the CTA cascade. */
+.cta-section {
+  scroll-margin-top: clamp(128px, 9vw, 172px);
+}
+
 .cta-section .section-inner {
   width: min(100%, 1240px);
   inline-size: min(100%, 1180px);
@@ -19633,6 +19636,7 @@ body,
   overflow: hidden;
   isolation: isolate;
   padding: clamp(38px, 4.6vw, 56px);
+  padding-block-start: clamp(72px, 6vw, 112px);
 }
 
 .cta-band > * {
@@ -19710,6 +19714,7 @@ body,
     grid-template-columns: minmax(0, 1fr);
     min-height: auto;
     padding: clamp(36px, 5vw, 58px);
+    padding-block-start: clamp(82px, 7vw, 112px);
   }
 
   .cta-visual {
@@ -19728,6 +19733,7 @@ body,
     width: min(100%, calc(100vw - 32px));
     margin-left: 0;
     padding: 44px 28px;
+    padding-block-start: 72px;
   }
 }
 

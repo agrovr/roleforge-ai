@@ -11,6 +11,8 @@ test("rendered layout smoke supports targeted page and viewport filters", () => 
   assert.match(smokeLayout, /PAGE_CHECKS\.filter\(\(pageCheck\) => pageFilters\.has\(pageCheck\.name\.toLowerCase\(\)\)/);
   assert.match(smokeLayout, /const viewportWidths = args\.widths \|\| VIEWPORTS/);
   assert.match(smokeLayout, /const narrowDesktopWidths = args\.narrowDesktopWidths \|\| NARROW_DESKTOP_VIEWPORTS/);
+  assert.match(smokeLayout, /anchorClearanceChecks/);
+  assert.match(smokeLayout, /anchor-covered-by-sticky-guard/);
 });
 
 test("rendered layout smoke prints progress for long browser passes", () => {
