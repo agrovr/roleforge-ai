@@ -6,6 +6,7 @@ import {
   checkSignedInBackendWorkflowBridge,
   cookieHeaderFromSession,
   createCookieChunks,
+  hasCompactFinalCtaCluster,
   mergeSetCookieHeaders,
   parseSmokeArgs,
   parseCookieHeader,
@@ -131,6 +132,18 @@ test("parses frontend smoke CLI target options", () => {
 test("rejects unknown frontend smoke CLI options", () => {
   assert.throws(() => parseSmokeArgs(["--not-real"]), /Unknown argument/);
   assert.throws(() => parseSmokeArgs(["--base-url"]), /requires a value/);
+});
+
+test("frontend smoke accepts source and minified final CTA cluster CSS", () => {
+  const sourceCss = ".cta-band .cta-cluster { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr); inline-size: min(100%, 430px); }";
+  const minifiedCss = ".cta-band .cta-cluster{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);inline-size:min(100%,430px)}";
+
+  assert.equal(hasCompactFinalCtaCluster(sourceCss), true);
+  assert.equal(hasCompactFinalCtaCluster(minifiedCss), true);
+  assert.equal(
+    hasCompactFinalCtaCluster(".cta-band .cta-cluster{display:grid;grid-template-columns:1fr;inline-size:100%}"),
+    false,
+  );
 });
 
 function signedInStatusPayload(overrides = {}) {

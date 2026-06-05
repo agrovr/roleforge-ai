@@ -154,9 +154,9 @@ test("settings account recent projects inherit overflow-safe menu layout", () =>
 });
 
 test("settings saved project management rows avoid squeezed action columns", () => {
-  assert.match(globalsCss, /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0\.92fr\)\s+minmax\(min\(100%,\s*300px\),\s*1\.08fr\))(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
+  assert.match(globalsCss, /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
   assert.match(globalsCss, /\.settings-project-summary,\s*\.settings-project-controls\s*\{(?=[^}]*display:\s*grid)[^}]*\}/s);
   assert.match(globalsCss, /\.settings-project-item\s+small\s*\{(?=[^}]*justify-self:\s*start)(?=[^}]*max-width:\s*100%)[^}]*\}/s);
-  assert.match(globalsCss, /\.settings-project-stage-controls\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*118px\),\s*1fr\)\))[^}]*\}/s);
-  assert.match(globalsCss, /@container\s+settings-section\s+\(max-width:\s*960px\)\s*\{[\s\S]*?\.settings-project-item\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(globalsCss, /\.settings-project-stage-controls\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))[^}]*\}/s);
+  assert.match(globalsCss, /\.settings-project-kit-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*138px\),\s*1fr\)\))[^}]*\}/s);
 });

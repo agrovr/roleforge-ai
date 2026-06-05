@@ -285,6 +285,10 @@ function requireCondition(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+export function hasCompactFinalCtaCluster(stylesheetText) {
+  return /\.cta-band\s+\.cta-cluster\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1\.08fr\)\s+minmax\(0,\s*(?:0)?\.92fr\))(?=[^}]*inline-size:\s*min\(100%,\s*430px\))[^}]*\}/s.test(stylesheetText);
+}
+
 function requireHeader(response, name, expected) {
   const value = response.headers.get(name) || "";
   if (expected instanceof RegExp) {
@@ -485,7 +489,7 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.cta-band\s*\{(?=[^}]*container:\s*cta-band\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*width:\s*100%)(?=[^}]*margin-left:\s*0)(?=[^}]*isolation:\s*isolate)[^}]*\}/s.test(stylesheetText), "landing final CTA can still overflow its container");
   requireCondition(/\.cta-band\s*>\s*\*\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "landing final CTA children can still force overflow");
   requireCondition(/\.cta-section\s+\.section-inner\s*\{(?=[^}]*width:\s*min\(100%\s*,\s*1240px\))(?=[^}]*overflow:\s*visible)[^}]*\}/s.test(stylesheetText), "landing final CTA section still uses unsafe full-bleed padding math");
-  requireCondition(/\.cta-band\s+\.cta-cluster\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1\.08fr\)\s+minmax\(0,\s*0\.92fr\))(?=[^}]*inline-size:\s*min\(100%,\s*430px\))[^}]*\}/s.test(stylesheetText), "landing final CTA buttons can still stretch into oversized slabs");
+  requireCondition(hasCompactFinalCtaCluster(stylesheetText), "landing final CTA buttons can still stretch into oversized slabs");
   requireCondition(/\.cta-band\s+\.btn\s*\{(?=[^}]*inline-size:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*min-block-size:\s*48px)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "landing final CTA buttons can still render cramped labels");
   requireCondition(/\.cta-visual\s*\{(?=[^}]*(?:justify-self:\s*center|justify-self:\s*end|place-self:\s*center\s+end))(?=[^}]*width:\s*min\(100%\s*,\s*430px\))(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "landing final CTA visual can still spill out");
   requireCondition(/@container\s+cta-band\s*\(max-width:\s*980px\)\s*\{[\s\S]*?\.cta-band\s*\{(?=[^}]*grid-template-columns:\s*1fr)(?=[^}]*padding:\s*clamp\(28px,\s*5cqi,\s*48px\))[^}]*\}/s.test(stylesheetText), "landing final CTA is missing container-based tablet stacking");
@@ -499,7 +503,11 @@ async function checkPublicShell(baseUrl) {
     /@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?\.cta-band\s*\{(?=[^}]*grid-template-columns:\s*1fr)(?=[^}]*min-block-size:\s*0)[^}]*\}[\s\S]*?\.cta-band\s*>\s*div:first-child,\s*\.cta-band\s+h2,\s*\.cta-band\s+p,\s*\.cta-band\s+\.cta-cluster\s*\{(?=[^}]*inline-size:\s*100%)(?=[^}]*max-inline-size:\s*100%)[^}]*\}[\s\S]*?\.cta-band\s+\.cta-cluster\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*1fr)[^}]*\}[\s\S]*?\.cta-band\s+\.btn\s*\{(?=[^}]*inline-size:\s*100%)(?=[^}]*min-inline-size:\s*0)[^}]*\}[\s\S]*?\.cta-visual\s*\{[^}]*display:\s*none[^}]*\}/s.test(stylesheetText),
     "landing final CTA phone layout can still collapse into a narrow column",
   );
-  requireCondition(/\.cta-band\s+\.btn\s*\{(?=[^}]*min-inline-size:\s*0)(?=[^}]*padding-inline:\s*14px)(?=[^}]*font-size:\s*clamp\((?:0)?\.9rem,\s*4vw,\s*1rem\))[^}]*\}/s.test(stylesheetText), "landing final CTA mobile buttons are missing the fitted label clamp");
+  requireCondition(
+    /\.cta-band\s+\.btn\s*\{(?=[^}]*min-inline-size:\s*0)(?=[^}]*padding-inline:\s*18px)(?=[^}]*font-size:\s*clamp\((?:0)?\.9rem,\s*1vw,\s*(?:0)?\.98rem\))[^}]*\}/s.test(stylesheetText) &&
+      /@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?\.cta-band\s+\.btn\s*\{(?=[^}]*box-sizing:\s*border-box)(?=[^}]*inline-size:\s*100%)(?=[^}]*max-inline-size:\s*100%)(?=[^}]*min-inline-size:\s*0)[^}]*\}/s.test(stylesheetText),
+    "landing final CTA mobile buttons are missing fitted label containment",
+  );
   requireCondition(/html,\s*body,\s*\.page-shell,\s*\.settings-page-shell\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*overflow-x:\s*clip)[^}]*\}/s.test(stylesheetText), "page shells can still keep a horizontal-scroll layout after visual QA fixes");
   requireCondition(/@media\s*\(min-width:\s*1181px\)\s+and\s+\(max-width:\s*1320px\)\s*\{[\s\S]*?\.hero\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0?\.98fr\)\s+minmax\(390px,\s*0?\.78fr\))(?=[^}]*gap:\s*clamp\(28px,\s*3vw,\s*42px\))[^}]*\}/s.test(stylesheetText), "landing hero is missing mid-width visual containment");
   requireCondition(/@media\s*\(min-width:\s*981px\)\s+and\s+\(max-width:\s*1440px\)\s*\{[\s\S]*?\.cta-band\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))(?=[^}]*min-height:\s*auto)(?=[^}]*padding:\s*clamp\(36px,\s*5vw,\s*58px\))[^}]*\}/s.test(stylesheetText), "landing final CTA can still clip copy at desktop zoom widths");
@@ -571,7 +579,7 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.settings-page-hero,\s*\.settings-section\s*\{(?=[^}]*container:\s*settings-section\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "settings sections can still overflow their page grid");
   requireCondition(/\.settings-page-actions\s*\{(?=[^}]*justify-content:\s*flex-end)(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s.test(stylesheetText), "settings topbar actions can still crowd the brand");
   requireCondition(/\.settings-page-actions\s+\.btn\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*line-height:\s*1\.12)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText), "settings topbar action labels can still clip");
-  requireCondition(/@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.settings-page-nav\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*overflow:\s*visible)[^}]*\}[\s\S]*?\.settings-page-nav\s+a\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/.test(stylesheetText), "settings narrow-phone nav can still squeeze or clip labels");
+  requireCondition(/@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.settings-page-nav\s*\{(?=[^}]*grid-template-columns:\s*1fr)(?=[^}]*overflow:\s*visible)[^}]*\}[\s\S]*?\.settings-section-list\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*overflow:\s*visible)[^}]*\}[\s\S]*?\.settings-page-nav\s+a\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/.test(stylesheetText), "settings narrow-phone nav can still squeeze or clip labels");
   requireCondition(/\.settings-metric\s*\{(?=[^}]*container-type:\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "settings metric cards can still overflow their panel");
   requireCondition(/\.settings-metric\s+strong\s*\{(?=[^}]*font-size:\s*clamp\(1\.32rem,\s*13cqi,\s*1\.7rem\))(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings metric display text is not using fitted container-aware type");
   requireCondition(/\.settings-status-pill\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings status pills can still force narrow layout overflow");
@@ -615,7 +623,7 @@ async function checkPublicShell(baseUrl) {
     "settings active plan studio link can still collapse into cramped text",
   );
   requireCondition(
-    /@container\s*\(max-width:\s*430px\)\s*\{[\s\S]*?\.settings-profile-actions,\s*\.settings-billing-head,\s*\.settings-export-actions(?:,\s*\.settings-plan-info)?\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText),
+    /@container\s+(?:settings-section\s*)?\(max-width:\s*430px\)\s*\{[\s\S]*?\.settings-profile-actions,[\s\S]*?\.settings-billing-head,[\s\S]*?\.settings-export-actions,[\s\S]*?\{[^}]*grid-template-columns:\s*1fr[\s\S]*?\.settings-plan-info\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText),
     "settings controls are missing compact container stacking",
   );
   requireCondition(
@@ -629,11 +637,11 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.settings-export-item\s+small\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*line-height:\s*1\.18)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "settings export descriptions can still squeeze rows");
   requireCondition(
     /\.settings-project-list\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0\.92fr\)\s+minmax\(min\(100%,\s*300px\),\s*1\.08fr\))(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-stage-controls\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*118px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-kit-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*118px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-kit-item\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText) &&
-      /@container\s+settings-section\s+\(max-width:\s*960px\)\s*\{[\s\S]*?\.settings-project-item\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText) &&
+      /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-stage-controls\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-kit-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*138px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-kit-item\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-kit-item\s*\{(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-item\s+small\s*\{(?=[^}]*justify-self:\s*start)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-item\s+small\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText),
     "settings saved-project status and application-kit controls can still squeeze or overflow",

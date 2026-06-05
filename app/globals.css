@@ -7442,9 +7442,9 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-item {
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(min(100%, 300px), 1.08fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
-  gap: 16px;
+  gap: 14px;
   overflow: hidden;
   color: inherit;
   transition:
@@ -7634,7 +7634,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-stage-controls {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 118px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr));
   gap: 8px;
   min-width: 0;
   padding-top: 2px;
@@ -7808,7 +7808,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-kit-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 118px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 138px), 1fr));
   gap: 7px;
   min-width: 0;
 }
