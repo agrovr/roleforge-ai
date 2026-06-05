@@ -340,6 +340,8 @@ const PAGE_CHECKS = [
       ".rf-studio-hero h1",
       ".studio-hero-actions .primary-button",
       ".studio-hero-actions .ghost-button",
+      ".studio-run-next-action strong",
+      ".studio-run-next-action small",
       ".export-format-chip",
       ".export-format-chip small",
       ".export-readiness-copy span",
@@ -357,6 +359,8 @@ const PAGE_CHECKS = [
     containedSelectors: [
       { container: "closest:.rf-studio-stat", selector: ".rf-studio-stat-row", tolerance: 4 },
       { container: "closest:.rf-studio-stat", selector: ".rf-studio-stat p", tolerance: 4 },
+      { container: "closest:.studio-run-next-action", selector: ".studio-run-next-action strong", tolerance: 4 },
+      { container: "closest:.studio-run-next-action", selector: ".studio-run-next-action small", tolerance: 4 },
       { container: "closest:.export-readiness-item", selector: ".export-readiness-copy span", tolerance: 4 },
       { container: "closest:.export-readiness-item", selector: ".export-readiness-copy strong", tolerance: 4 },
       { container: "closest:.export-readiness-item", selector: ".export-readiness-copy small", tolerance: 4 },

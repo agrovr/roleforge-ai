@@ -7201,6 +7201,66 @@ html[data-theme="dark"] input::file-selector-button {
   flex: 0 0 auto;
 }
 
+.studio-run-next-action {
+  flex: 1 0 100%;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--brand) 28%, var(--line));
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 38%, transparent), transparent 64%),
+    color-mix(in srgb, var(--surface) 92%, var(--surface-2));
+  color: var(--ink-1);
+  text-decoration: none;
+}
+
+.studio-run-next-action.compact {
+  margin-top: 2px;
+}
+
+.studio-run-next-action > svg {
+  display: grid;
+  place-self: center;
+  width: 30px;
+  height: 30px;
+  padding: 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand) 14%, var(--surface));
+  color: var(--brand-dark);
+}
+
+.studio-run-next-action span,
+.studio-run-next-action strong,
+.studio-run-next-action small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.studio-run-next-action span {
+  display: grid;
+  gap: 2px;
+}
+
+.studio-run-next-action strong {
+  color: var(--ink-0);
+  font-size: 0.82rem;
+  font-weight: 950;
+  line-height: 1.12;
+}
+
+.studio-run-next-action small {
+  color: var(--ink-2);
+  font-size: 0.74rem;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
 .rf-studio-hero h1 {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -14041,6 +14101,27 @@ html[data-theme="dark"] .generated-list li {
 html[data-theme="dark"] .rf-readiness-track,
 html[data-theme="dark"] .rf-studio-stat-track {
   background: rgba(255, 247, 233, 0.13);
+}
+
+html[data-theme="dark"] .studio-run-next-action {
+  border-color: rgba(222, 162, 79, 0.34);
+  background:
+    linear-gradient(135deg, rgba(222, 162, 79, 0.14), transparent 64%),
+    rgba(15, 20, 35, 0.74);
+  color: #e8edf8;
+}
+
+html[data-theme="dark"] .studio-run-next-action > svg {
+  background: rgba(222, 162, 79, 0.18);
+  color: #f3c16d;
+}
+
+html[data-theme="dark"] .studio-run-next-action strong {
+  color: #fff7e9;
+}
+
+html[data-theme="dark"] .studio-run-next-action small {
+  color: #b8bed3;
 }
 
 html[data-theme="dark"] .rf-file-drop,

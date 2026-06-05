@@ -2677,6 +2677,23 @@ export default function Page() {
   const preflightStatusDetail = canRun
     ? "Resume, target, account, usage, and export settings are ready."
     : runDisabledReason || "Complete the required fields before running Tailor.";
+  const runNextAction = canRun
+    ? null
+    : !signedIn && accountStatus?.configured
+      ? { label: "Sign in", href: "/login?next=/app", detail: "Account sign-in is required before running Tailor." }
+      : limitReached
+        ? { label: "Review usage", href: "/settings#usage", detail: runDisabledReason }
+        : previewUploadState === "reading"
+          ? { label: "View resume", href: "#input", detail: "Resume reading is still in progress." }
+          : result && !file
+            ? { label: "Upload source", href: "#input", detail: "Restored runs need the source file before re-tailoring." }
+            : !fileSelected
+              ? { label: "Upload resume", href: "#input", detail: "Start by adding the resume file you want to tailor." }
+              : !hasTarget
+                ? { label: "Add target", href: "#target", detail: "Add a job description or public posting URL next." }
+                : !baseUrl
+                  ? { label: "Check status", href: "/status", detail: "Resume tailoring is unavailable right now." }
+                  : { label: "Review preflight", href: "#preflight", detail: preflightStatusDetail };
   const coverLetterWordCount = countReadableWords(coverLetterText);
   const interviewQuestionCount = interviewPrep.length;
   const hasGeneratedAssets = Boolean(coverLetterText || interviewQuestionCount);
@@ -3204,7 +3221,7 @@ export default function Page() {
               </button>
             )}
             <ThemeToggle />
-            <div className="studio-account-menu" ref={accountMenuRef}>
+            <div className="studio-account-menu" id="account" ref={accountMenuRef}>
               <button
                 className="studio-account-button"
                 type="button"
@@ -3480,6 +3497,15 @@ export default function Page() {
                   <button className="ghost-button" type="button" onClick={startNewResume} title="Clear the current resume, target, preview, and export state">
                     <RoleForgeIcon name="plus" size={14} /> New resume
                   </button>
+                ) : null}
+                {runNextAction ? (
+                  <Link className="studio-run-next-action" href={runNextAction.href}>
+                    <RoleForgeIcon name="arrow" size={13} />
+                    <span>
+                      <strong>{runNextAction.label}</strong>
+                      <small>{runNextAction.detail}</small>
+                    </span>
+                  </Link>
                 ) : null}
                 <div className="export-format-strip" aria-label="Export format availability">
                   {exportFormats.map((format) => {
@@ -3885,11 +3911,20 @@ export default function Page() {
                       </label>
                       <span className="sr-only" aria-live="polite">Workflow status: {stage}</span>
                       <button className="primary-button" type="button" onClick={onRun} disabled={!canRun} title={runDisabledReason || undefined}>{runLabel} <RoleForgeIcon name="sparkle" size={14} /></button>
+                      {runNextAction ? (
+                        <Link className="studio-run-next-action compact" href={runNextAction.href}>
+                          <RoleForgeIcon name="arrow" size={13} />
+                          <span>
+                            <strong>{runNextAction.label}</strong>
+                            <small>{runNextAction.detail}</small>
+                          </span>
+                        </Link>
+                      ) : null}
                       {copyState ? <span className="copy-state">{copyState}</span> : null}
                     </div>
                   </div>
                 </article>
-                <section className="rf-preflight-panel" aria-label="Workflow preflight">
+                <section className="rf-preflight-panel" id="preflight" aria-label="Workflow preflight">
                   <div className="rf-preflight-head">
                     <div>
                       <div className="eyebrow">Preflight</div>

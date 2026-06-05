@@ -19,6 +19,16 @@ test("studio exposes a workflow preflight checklist from real state", () => {
   assert.match(studioPage, /value:\s*selectedExportAllowed \? `\$\{selectedFormatLabel\} ready` : `\$\{selectedFormatLabel\} locked`/);
   assert.match(studioPage, /preflightReadyCount = preflightItems\.filter/);
   assert.match(studioPage, /preflightStatusLabel = canRun \? "Ready to tailor" : "Preflight needed"/);
+  assert.match(studioPage, /runNextAction = canRun/);
+  assert.match(studioPage, /label:\s*"Upload resume"/);
+  assert.match(studioPage, /label:\s*"Add target"/);
+  assert.match(studioPage, /label:\s*"Upload source"/);
+  assert.match(studioPage, /label:\s*"Review usage"/);
+  assert.match(studioPage, /label:\s*"Check status"/);
+  assert.match(studioPage, /className="studio-run-next-action"/);
+  assert.match(studioPage, /className="studio-run-next-action compact"/);
+  assert.match(studioPage, /className="studio-account-menu"\s+id="account"/);
+  assert.match(studioPage, /id="preflight"/);
   assert.match(studioPage, /aria-label="Workflow preflight"/);
   assert.match(studioPage, /className=\{`rf-preflight-item \$\{item\.tone\}`\}/);
   assert.match(studioPage, /: "#assets"/);
@@ -42,6 +52,10 @@ test("studio exposes export readiness from real entitlement and draft state", ()
 });
 
 test("studio preflight checklist is responsive and dark-mode safe", () => {
+  assert.match(stylesheet, /\.studio-run-next-action\s*\{(?=[^}]*flex:\s*1\s+0\s+100%)(?=[^}]*grid-template-columns:\s*30px\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.studio-run-next-action span,\s*\.studio-run-next-action strong,\s*\.studio-run-next-action small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.studio-run-next-action/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.studio-run-next-action small/);
   assert.match(stylesheet, /\.rf-preflight-panel\s*\{(?=[^}]*grid-column:\s*1\s*\/\s*-1)(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.rf-preflight-head\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.rf-preflight-list\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*168px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);

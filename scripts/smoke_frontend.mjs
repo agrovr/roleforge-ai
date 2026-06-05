@@ -688,6 +688,11 @@ async function checkPublicShell(baseUrl) {
     "studio hero action buttons can still overflow at tablet widths",
   );
   requireCondition(
+    /\.studio-run-next-action\s*\{(?=[^}]*flex:\s*1\s+0\s+100%)(?=[^}]*grid-template-columns:\s*30px\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText) &&
+      /\.studio-run-next-action span,\s*\.studio-run-next-action strong,\s*\.studio-run-next-action small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText),
+    "studio blocked-run next action can still overflow or hide its explanation",
+  );
+  requireCondition(
     /@media\s*\(max-width:\s*720px\)[\s\S]*?\.studio-hero-actions\s+\.ghost-button,\s*\.studio-hero-actions\s+\.primary-button\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*line-height:\s*1\.12)[^}]*\}/.test(stylesheetText),
     "studio hero action buttons can still overflow on mobile",
   );
