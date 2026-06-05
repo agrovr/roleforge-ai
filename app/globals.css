@@ -11474,6 +11474,118 @@ html[data-theme="dark"] input::file-selector-button {
   width: 100%;
 }
 
+.settings-security-review {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 224px), 1fr));
+  gap: 10px;
+  min-width: 0;
+}
+
+.settings-security-item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 88%, var(--bg-alt));
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.settings-security-item:hover,
+.settings-security-item:focus-visible {
+  border-color: color-mix(in srgb, var(--brand-dark) 38%, var(--line));
+  box-shadow: 0 14px 28px -24px var(--shadow);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.settings-security-item.good {
+  border-color: color-mix(in srgb, var(--good) 28%, var(--line));
+}
+
+.settings-security-item.warn {
+  border-color: color-mix(in srgb, var(--warn) 34%, var(--line));
+}
+
+.settings-security-icon {
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-soft) 56%, var(--surface));
+  color: var(--brand-dark);
+}
+
+.settings-security-item.good .settings-security-icon {
+  border-color: color-mix(in srgb, var(--good) 30%, var(--line));
+  background: color-mix(in srgb, var(--good-soft) 62%, var(--surface));
+  color: var(--good);
+}
+
+.settings-security-item.warn .settings-security-icon {
+  border-color: color-mix(in srgb, var(--warn) 38%, var(--line));
+  background: color-mix(in srgb, var(--warn-soft) 66%, var(--surface));
+  color: var(--warn);
+}
+
+.settings-security-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.settings-security-copy span,
+.settings-security-copy strong,
+.settings-security-copy small,
+.settings-security-action {
+  display: block;
+  min-width: 0;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.settings-security-copy span {
+  color: var(--ink-3);
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.settings-security-copy strong {
+  color: var(--ink-0);
+  font-size: 0.94rem;
+  font-weight: 950;
+}
+
+.settings-security-copy small {
+  color: var(--ink-2);
+  font-size: 0.76rem;
+  font-weight: 740;
+  line-height: 1.34;
+  text-wrap: pretty;
+}
+
+.settings-security-action {
+  grid-column: 1 / -1;
+  justify-self: start;
+  max-width: 100%;
+  padding: 7px 9px;
+  border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--line));
+  border-radius: 999px;
+  color: var(--brand-dark);
+  font-size: 0.72rem;
+  font-weight: 950;
+  text-align: center;
+}
+
 .settings-template-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 238px), 1fr));
@@ -16189,6 +16301,7 @@ html[data-theme="dark"] .settings-activity-item,
 html[data-theme="dark"] .settings-account-health,
 html[data-theme="dark"] .settings-account-health-card,
 html[data-theme="dark"] .settings-workspace-action,
+html[data-theme="dark"] .settings-security-item,
 html[data-theme="dark"] .settings-metric,
 html[data-theme="dark"] .settings-project-item,
 html[data-theme="dark"] .settings-project-empty,
@@ -16278,13 +16391,35 @@ html[data-theme="dark"] .settings-activity-item.warn {
   border-color: rgba(230, 183, 103, 0.38);
 }
 
+html[data-theme="dark"] .settings-security-item.good {
+  border-color: rgba(146, 191, 160, 0.34);
+}
+
+html[data-theme="dark"] .settings-security-item.warn {
+  border-color: rgba(230, 183, 103, 0.38);
+}
+
 html[data-theme="dark"] .settings-activity-icon,
 html[data-theme="dark"] .settings-activity-action,
 html[data-theme="dark"] .settings-account-health-icon,
-html[data-theme="dark"] .settings-account-health-action {
+html[data-theme="dark"] .settings-account-health-action,
+html[data-theme="dark"] .settings-security-icon,
+html[data-theme="dark"] .settings-security-action {
   border-color: rgba(222, 162, 79, 0.28);
   background: rgba(222, 162, 79, 0.16);
   color: #f3c16d;
+}
+
+html[data-theme="dark"] .settings-security-item.good .settings-security-icon {
+  border-color: rgba(146, 191, 160, 0.28);
+  background: rgba(146, 191, 160, 0.16);
+  color: #b7e5c4;
+}
+
+html[data-theme="dark"] .settings-security-item.warn .settings-security-icon {
+  border-color: rgba(230, 183, 103, 0.34);
+  background: rgba(230, 183, 103, 0.14);
+  color: #f0c978;
 }
 
 html[data-theme="dark"] .settings-account-email-copy {
@@ -16308,6 +16443,7 @@ html[data-theme="dark"] .settings-activity-head h2,
 html[data-theme="dark"] .settings-activity-copy strong,
 html[data-theme="dark"] .settings-account-health-head h2,
 html[data-theme="dark"] .settings-account-health-copy strong,
+html[data-theme="dark"] .settings-security-copy strong,
 html[data-theme="dark"] .settings-workspace-action strong,
 html[data-theme="dark"] .settings-metric strong,
 html[data-theme="dark"] .settings-project-item strong,
@@ -16329,6 +16465,8 @@ html[data-theme="dark"] .settings-activity-copy small,
 html[data-theme="dark"] .settings-account-health-head p,
 html[data-theme="dark"] .settings-account-health-copy span,
 html[data-theme="dark"] .settings-account-health-copy small,
+html[data-theme="dark"] .settings-security-copy span,
+html[data-theme="dark"] .settings-security-copy small,
 html[data-theme="dark"] .settings-workspace-action small,
 html[data-theme="dark"] .settings-project-item small,
 html[data-theme="dark"] .settings-template-card-copy p,

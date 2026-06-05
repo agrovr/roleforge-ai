@@ -147,6 +147,29 @@ test("settings security panel uses real Supabase account metadata", () => {
   assert.match(settingsPage, /Password, passkey, or 2FA controls appear here only after those account methods are enabled/);
 });
 
+test("settings security panel gives actionable account review steps", () => {
+  assert.match(settingsPage, /securityReviewItems/);
+  assert.match(settingsPage, /aria-label="Security review checklist"/);
+  assert.match(settingsPage, /settings-security-review/);
+  assert.match(settingsPage, /Email confirmation/);
+  assert.match(settingsPage, /Supabase marks this email as confirmed/);
+  assert.match(settingsPage, /Use a fresh confirmation link or update the email/);
+  assert.match(settingsPage, /Sign-in method/);
+  assert.match(settingsPage, /Provider metadata is unavailable/);
+  assert.match(settingsPage, /Account record/);
+  assert.match(settingsPage, /Download account, project, run, and support-reference details before major account changes/);
+  assert.match(settingsPage, /Security support/);
+  assert.match(settingsPage, /Open an account-linked request if sign-in or email access looks wrong/);
+  assert.match(settingsPage, /securityReviewItems\.map/);
+  assert.match(stylesheet, /\.settings-security-review\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*224px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-security-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*34px\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-security-copy\s+span,\s*\.settings-security-copy\s+strong,\s*\.settings-security-copy\s+small,\s*\.settings-security-action\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-security-action\s*\{(?=[^}]*grid-column:\s*1\s*\/\s*-1)(?=[^}]*max-width:\s*100%)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-security-item/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-security-item\.warn/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-security-copy\s+strong/);
+});
+
 test("settings account panel exposes guarded account deletion", () => {
   assert.match(settingsPage, /id="account-danger"/);
   assert.match(settingsPage, /action="\/api\/account\/delete"/);

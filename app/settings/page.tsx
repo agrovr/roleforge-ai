@@ -771,6 +771,58 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
       tone: latestSupportRequest ? "good" : "ready",
     },
   ];
+  const securityReviewItems: Array<{
+    icon: RoleForgeIconName;
+    label: string;
+    value: string;
+    detail: string;
+    href: string;
+    action: string;
+    tone: "good" | "ready" | "warn";
+  }> = [
+    {
+      icon: emailVerificationLabel === "Confirmed" ? "check" : "mail",
+      label: "Email confirmation",
+      value: emailVerificationLabel,
+      detail: emailVerificationLabel === "Confirmed"
+        ? "Supabase marks this email as confirmed for account notices and sign-in."
+        : "Use a fresh confirmation link or update the email if this looks wrong.",
+      href: "#account-email",
+      action: emailVerificationLabel === "Confirmed" ? "Review email" : "Update email",
+      tone: emailVerificationLabel === "Confirmed" ? "good" : "warn",
+    },
+    {
+      icon: "lock",
+      label: "Sign-in method",
+      value: signInMethodLabel,
+      detail: signInMethodLabel === "Not recorded"
+        ? "Provider metadata is unavailable; sign out and sign in again if this looks wrong."
+        : `${signInMethodLabel} is the provider Supabase reports for this account.`,
+      href: "#security",
+      action: "Review method",
+      tone: signInMethodLabel === "Not recorded" ? "warn" : "good",
+    },
+    {
+      icon: "download",
+      label: "Account record",
+      value: "Export ready",
+      detail: "Download account, project, run, and support-reference details before major account changes.",
+      href: "/api/account/export",
+      action: "Download record",
+      tone: "good",
+    },
+    {
+      icon: "mail",
+      label: "Security support",
+      value: latestSupportRequest?.referenceLabel ?? "Available",
+      detail: latestSupportRequest
+        ? `${latestSupportRequest.statusLabel} support request is already attached to this account.`
+        : "Open an account-linked request if sign-in or email access looks wrong.",
+      href: latestSupportRequest ? "#support" : accountSupportHref,
+      action: latestSupportRequest ? "View support" : "Contact support",
+      tone: latestSupportRequest ? "good" : "ready",
+    },
+  ];
 
   return (
     <main className="settings-page-shell">
@@ -1222,6 +1274,21 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               <p className="settings-billing-note">
                 RoleForge uses Supabase Auth for secure email and provider sign-in. Password, passkey, or 2FA controls appear here only after those account methods are enabled.
               </p>
+              <div className="settings-security-review" aria-label="Security review checklist">
+                {securityReviewItems.map((item) => (
+                  <a className={`settings-security-item ${item.tone}`} href={item.href} key={item.label}>
+                    <span className="settings-security-icon" aria-hidden="true">
+                      <RoleForgeIcon name={item.icon} size={15} />
+                    </span>
+                    <span className="settings-security-copy">
+                      <span>{item.label}</span>
+                      <strong>{item.value}</strong>
+                      <small>{item.detail}</small>
+                    </span>
+                    <span className="settings-security-action">{item.action}</span>
+                  </a>
+                ))}
+              </div>
               <div className="settings-profile-actions">
                 <a className="ghost-button" href="#account-email">
                   <RoleForgeIcon name="settings" size={14} /> Update email

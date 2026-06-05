@@ -584,6 +584,12 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.settings-metric\s+strong\s*\{(?=[^}]*font-size:\s*clamp\(1\.32rem,\s*13cqi,\s*1\.7rem\))(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings metric display text is not using fitted container-aware type");
   requireCondition(/\.settings-status-pill\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings status pills can still force narrow layout overflow");
   requireCondition(/\.settings-plan-includes\s+span\s*\{(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "settings plan chips can still force narrow layout overflow");
+  requireCondition(
+    /\.settings-security-review\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*224px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-security-item\s*\{(?=[^}]*grid-template-columns:\s*34px\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-security-copy\s+span,\s*\.settings-security-copy\s+strong,\s*\.settings-security-copy\s+small,\s*\.settings-security-action\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText),
+    "settings security review can still squeeze or lose action labels",
+  );
   pass("settings cards include overflow-safe plan and metric styles");
 
   requireCondition(
