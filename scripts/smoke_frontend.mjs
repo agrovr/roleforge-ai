@@ -642,10 +642,12 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.settings-export-item\s+span\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*line-height:\s*1\.18)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "settings export labels can still render cramped");
   requireCondition(/\.settings-export-item\s+small\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*line-height:\s*1\.18)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "settings export descriptions can still squeeze rows");
   requireCondition(
-    /\.settings-project-list\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-list\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
       /#projects\.settings-section\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))(?=[^}]*container:\s*settings-project-card\s*\/\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
+      /#projects\s+\.settings-section-panel\s*\{(?=[^}]*inline-size:\s*100%)(?=[^}]*max-inline-size:\s*100%)[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*(?:0)?\.88fr\)\s+minmax\(0,\s*1\.12fr\))(?=[^}]*container:\s*settings-project-card\s*\/\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-controls\s*\{(?=[^}]*justify-self:\s*stretch)(?=[^}]*inline-size:\s*100%)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*236px\),\s*1fr\)\))(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-controls\s*>\s*\*\s*\{(?=[^}]*min-inline-size:\s*0)(?=[^}]*max-inline-size:\s*100%)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-stage-form,\s*\.settings-project-kit,\s*\.settings-project-delete\s*\{(?=[^}]*grid-column:\s*1\s*\/\s*-1)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-stage-controls\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*104px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-kit\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&

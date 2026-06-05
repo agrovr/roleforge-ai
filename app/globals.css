@@ -7558,9 +7558,9 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-item {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
   align-items: start;
-  gap: 12px;
+  gap: 16px;
   container: settings-project-card / inline-size;
   overflow: hidden;
   color: inherit;
@@ -7610,6 +7610,11 @@ html[data-theme="dark"] input::file-selector-button {
   gap: 10px;
   max-width: 100%;
   overflow: hidden;
+}
+
+.settings-project-controls > * {
+  min-inline-size: 0;
+  max-inline-size: 100%;
 }
 
 .settings-project-stage-form,
@@ -7828,6 +7833,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-project-rename-row input {
+  max-width: 100%;
   min-width: 0;
   min-height: 38px;
   border: 1px solid var(--line);
@@ -7846,6 +7852,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-project-rename-row button {
+  max-width: 100%;
   min-width: 0;
   min-height: 38px;
   border: 1px solid var(--line);
@@ -7873,9 +7880,11 @@ html[data-theme="dark"] input::file-selector-button {
   flex-wrap: wrap;
   gap: 8px;
   min-width: 0;
+  max-width: 100%;
 }
 
 .settings-project-downloads .btn {
+  flex: 0 1 auto;
   width: auto;
   min-width: 0;
   max-width: 100%;
@@ -8030,6 +8039,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-project-delete-row input {
+  max-width: 100%;
   min-width: 0;
   min-height: 38px;
   border: 1px solid var(--line);
@@ -8049,6 +8059,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-project-delete-row button {
+  max-width: 100%;
   min-width: 0;
   min-height: 38px;
   border: 1px solid color-mix(in srgb, var(--danger) 32%, var(--line));
@@ -10749,6 +10760,11 @@ html[data-theme="dark"] input::file-selector-button {
 
 #projects .settings-section-copy {
   max-width: min(100%, 720px);
+}
+
+#projects .settings-section-panel {
+  inline-size: 100%;
+  max-inline-size: 100%;
 }
 
 .settings-billing-alert {
