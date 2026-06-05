@@ -7427,6 +7427,62 @@ html[data-theme="dark"] input::file-selector-button {
   overflow: hidden;
 }
 
+.settings-project-pipeline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.settings-project-pipeline-item {
+  min-width: 0;
+  overflow: hidden;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--brand) 22%, var(--line));
+  border-radius: 10px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 32%, transparent), transparent 62%),
+    color-mix(in srgb, var(--surface) 94%, var(--surface-2));
+}
+
+.settings-project-pipeline-item.muted {
+  border-color: var(--line);
+  background: color-mix(in srgb, var(--surface-2) 54%, var(--surface));
+}
+
+.settings-project-pipeline-item span,
+.settings-project-pipeline-item strong,
+.settings-project-pipeline-item small {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.settings-project-pipeline-item span {
+  color: var(--ink-3);
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.settings-project-pipeline-item strong {
+  margin-top: 8px;
+  color: var(--ink-0);
+  font-family: var(--font-display);
+  font-size: clamp(1.42rem, 8vw, 1.95rem);
+  line-height: 0.98;
+}
+
+.settings-project-pipeline-item small {
+  margin-top: 8px;
+  color: var(--ink-2);
+  font-size: 0.76rem;
+  font-weight: 760;
+  line-height: 1.22;
+}
+
 .settings-project-item,
 .settings-project-empty {
   display: flex;
@@ -16303,6 +16359,7 @@ html[data-theme="dark"] .settings-account-health-card,
 html[data-theme="dark"] .settings-workspace-action,
 html[data-theme="dark"] .settings-security-item,
 html[data-theme="dark"] .settings-metric,
+html[data-theme="dark"] .settings-project-pipeline-item,
 html[data-theme="dark"] .settings-project-item,
 html[data-theme="dark"] .settings-project-empty,
 html[data-theme="dark"] .settings-template-card,
@@ -16373,6 +16430,30 @@ html[data-theme="dark"] .settings-project-onboarding-steps span {
   border-color: rgba(222, 162, 79, 0.36);
   background: rgba(222, 162, 79, 0.16);
   color: #f3c16d;
+}
+
+html[data-theme="dark"] .settings-project-pipeline-item.ready {
+  border-color: rgba(222, 162, 79, 0.36);
+  background:
+    linear-gradient(135deg, rgba(222, 162, 79, 0.16), transparent 64%),
+    rgba(12, 17, 31, 0.88);
+}
+
+html[data-theme="dark"] .settings-project-pipeline-item.muted {
+  border-color: rgba(255, 247, 233, 0.14);
+  background: rgba(12, 17, 31, 0.7);
+}
+
+html[data-theme="dark"] .settings-project-pipeline-item span {
+  color: #c1b896;
+}
+
+html[data-theme="dark"] .settings-project-pipeline-item strong {
+  color: #fff7e9;
+}
+
+html[data-theme="dark"] .settings-project-pipeline-item small {
+  color: #b8bed3;
 }
 
 html[data-theme="dark"] .settings-account-health-card.good {

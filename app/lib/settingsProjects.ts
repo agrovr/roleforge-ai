@@ -49,6 +49,15 @@ export type SettingsDocumentCounts = {
   ready: number;
   locked: number;
 };
+export type SettingsProjectStageSummary = {
+  status: ApplicationStatus;
+  label: string;
+  count: number;
+  detail: string;
+  tone: "ready" | "muted";
+};
+
+const SETTINGS_PROJECT_PIPELINE_STATUSES: ApplicationStatus[] = ["tailored", "exported", "active", "archived"];
 
 export function formatSettingsSavedRunDate(value: string) {
   const date = new Date(value);
@@ -156,6 +165,38 @@ export function settingsProjectSummaries(
       kitSummary,
     };
   });
+}
+
+export function settingsProjectStageSummaries(projects: SettingsProjectSummary[]): SettingsProjectStageSummary[] {
+  return SETTINGS_PROJECT_PIPELINE_STATUSES.map((status) => {
+    const copy = applicationStatusCopy(status);
+    const count = projects.filter((project) => project.stageStatus === status).length;
+    const projectWord = count === 1 ? "project" : "projects";
+
+    return {
+      status,
+      label: settingsProjectStageShortLabel(status, copy.label),
+      count,
+      detail: count ? `${count} ${projectWord} ${settingsProjectStageVerb(status)}.` : copy.detail,
+      tone: count ? "ready" : "muted",
+    };
+  });
+}
+
+function settingsProjectStageShortLabel(status: ApplicationStatus, fallback: string) {
+  if (status === "exported") return "Ready";
+  if (status === "active") return "Follow-up";
+  if (status === "archived") return "Archived";
+  if (status === "tailored") return "Tailored";
+  return fallback;
+}
+
+function settingsProjectStageVerb(status: ApplicationStatus) {
+  if (status === "exported") return "ready to use";
+  if (status === "active") return "in follow-up";
+  if (status === "archived") return "archived";
+  if (status === "tailored") return "being prepared";
+  return "saved";
 }
 
 export function settingsDocumentCounts(

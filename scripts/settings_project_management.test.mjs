@@ -19,6 +19,8 @@ test("settings saved projects expose account-owned stage updates", () => {
   assert.match(settingsPage, /settings-project-downloads/);
   assert.match(settingsProjects, /kitItems/);
   assert.match(settingsProjects, /kitSummary/);
+  assert.match(settingsProjects, /settingsProjectStageSummaries/);
+  assert.match(settingsProjects, /SETTINGS_PROJECT_PIPELINE_STATUSES/);
   assert.match(settingsProjects, /historyGeneratedAssetCounts/);
   assert.match(settingsProjects, /label:\s*"Cover letter"/);
   assert.match(settingsProjects, /label:\s*"Interview prep"/);
@@ -27,6 +29,10 @@ test("settings saved projects expose account-owned stage updates", () => {
   assert.match(settingsPage, /Application kit/);
   assert.match(settingsPage, /project\.kitItems\.map/);
   assert.match(settingsPage, /project\.kitSummary/);
+  assert.match(settingsPage, /projectStageSummaries/);
+  assert.match(settingsPage, /settings-project-pipeline/);
+  assert.match(settingsPage, /aria-label="Saved project pipeline"/);
+  assert.match(settingsPage, /projectStageSummaries\.map/);
   assert.match(settingsPage, /renameSettingsProjectAction/);
   assert.match(settingsPage, /renameSavedProject\(supabase,\s*projectId,\s*title,\s*user\.id\)/);
   assert.match(settingsPage, /settings-project-rename/);
@@ -68,6 +74,11 @@ test("settings saved project empty state guides the first signed-in run", () => 
 
 test("settings saved project stage controls are compact and overflow-safe", () => {
   assert.match(stylesheet, /\.settings-project-list\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-pipeline\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-pipeline-item\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-pipeline-item\s+span,\s*\.settings-project-pipeline-item\s+strong,\s*\.settings-project-pipeline-item\s+small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-project-pipeline-item\.ready/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-project-pipeline-item\.muted/);
   assert.match(stylesheet, /#projects\.settings-section\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))(?=[^}]*container:\s*settings-project-card\s*\/\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-summary,\s*\.settings-project-controls\s*\{(?=[^}]*display:\s*grid)[^}]*\}/s);

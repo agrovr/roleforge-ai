@@ -7,6 +7,7 @@ import {
   savedRunTemplateName,
   settingsDocumentCounts,
   settingsDocumentSummaries,
+  settingsProjectStageSummaries,
   settingsProjectSummaries,
 } from "./settingsProjects";
 import type { SavedHistoryItem } from "./supabase/savedProjects";
@@ -118,6 +119,43 @@ test("settings saved project downloads respect premium export entitlement", () =
     ["PDF", "DOCX", "TXT"],
   );
   assert.match(summaries[0].kitItems.find((item) => item.label === "Exports")?.detail ?? "", /PDF, DOCX, TXT ready/);
+});
+
+test("settings saved project pipeline summarizes recent project stages", () => {
+  const projects = settingsProjectSummaries([
+    savedRun({
+      id: "ready",
+      accountRunId: "run-ready",
+      projectId: "project-ready",
+      projectTitle: "Ready application",
+      applicationStatus: "exported",
+    }),
+    savedRun({
+      id: "follow-up",
+      accountRunId: "run-follow-up",
+      projectId: "project-follow-up",
+      projectTitle: "Follow-up application",
+      applicationStatus: "active",
+    }),
+    savedRun({
+      id: "archived",
+      accountRunId: "run-archived",
+      projectId: "project-archived",
+      projectTitle: "Archived application",
+      applicationStatus: "archived",
+    }),
+  ], freeEntitlement);
+
+  assert.deepEqual(
+    settingsProjectStageSummaries(projects).map((stage) => [stage.status, stage.label, stage.count, stage.tone]),
+    [
+      ["tailored", "Tailored", 0, "muted"],
+      ["exported", "Ready", 1, "ready"],
+      ["active", "Follow-up", 1, "ready"],
+      ["archived", "Archived", 1, "ready"],
+    ],
+  );
+  assert.match(settingsProjectStageSummaries(projects)[1].detail, /1 project ready to use/);
 });
 
 test("settings document hub summarizes safe entitlement-ready downloads", () => {
