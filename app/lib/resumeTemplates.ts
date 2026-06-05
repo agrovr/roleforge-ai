@@ -21,7 +21,7 @@ export const RESUME_TEMPLATES = [
     variant: "classic",
     color: "#f5e6cb",
     detail: "A clean single-column format for broad professional applications.",
-    previewName: "Sarah Chen",
+    previewName: "Avery Stone",
   },
   {
     slug: "modern",
@@ -30,7 +30,7 @@ export const RESUME_TEMPLATES = [
     variant: "modern",
     color: "#d8e0ee",
     detail: "A denser split layout for technical skills, projects, and tooling.",
-    previewName: "Marcus Reed",
+    previewName: "Noor Vale",
   },
   {
     slug: "editorial",
@@ -39,7 +39,7 @@ export const RESUME_TEMPLATES = [
     variant: "accent",
     color: "#d9e7df",
     detail: "A lighter visual rhythm for roles where presentation matters.",
-    previewName: "Priya Patel",
+    previewName: "Mina Okafor",
   },
   {
     slug: "compact",
@@ -48,7 +48,7 @@ export const RESUME_TEMPLATES = [
     variant: "classic",
     color: "#efd8d1",
     detail: "A restrained direction for shorter resumes and quick review.",
-    previewName: "Alex Kim",
+    previewName: "Iris Calder",
   },
   {
     slug: "executive",
@@ -57,7 +57,7 @@ export const RESUME_TEMPLATES = [
     variant: "accent",
     color: "#f0dfbd",
     detail: "A more spacious format for leadership summaries and selected impact.",
-    previewName: "Daniel Cole",
+    previewName: "Rafael Ko",
   },
   {
     slug: "engineer",
@@ -66,7 +66,7 @@ export const RESUME_TEMPLATES = [
     variant: "modern",
     color: "#d8e0ee",
     detail: "A structured direction for skills-first engineering resumes.",
-    previewName: "Jen Park",
+    previewName: "Elena Voss",
   },
 ] as const satisfies readonly ResumeTemplate[];
 

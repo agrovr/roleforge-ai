@@ -242,13 +242,13 @@ function Hero({ studioHref }: Pick<LandingLinks, "studioHref">) {
 
       <div className="hero-stage" aria-label="RoleForge resume preview">
         <div className="resume-card resume-card-back-l">
-          <ResumePreview variant="modern" name="Marcus Reed" role="Software Engineer" />
+          <ResumePreview variant="modern" name="Noor Vale" role="Software Engineer" />
         </div>
         <div className="resume-card resume-card-front">
           <ResumePreview variant="classic" highlight />
         </div>
         <div className="resume-card resume-card-back-r">
-          <ResumePreview variant="accent" name="Priya Patel" role="Product Designer" />
+          <ResumePreview variant="accent" name="Mina Okafor" role="Product Designer" />
         </div>
 
         <div className="hero-badge b-score">
@@ -474,7 +474,7 @@ function Templates() {
         {templates.map(([name, tag, variant, color], index) => (
           <article className="template-card" key={name}>
             <div className="template-thumb" style={{ borderTopColor: color }}>
-              <ResumePreview variant={variant} name={["Sarah Chen", "Marcus Reed", "Priya Patel", "Alex Kim", "Daniel Cole", "Jen Park"][index]} />
+              <ResumePreview variant={variant} name={["Avery Stone", "Noor Vale", "Mina Okafor", "Iris Calder", "Rafael Ko", "Elena Voss"][index]} />
             </div>
             <div className="template-info">
               <span className="template-name">{name}</span>
@@ -704,7 +704,7 @@ function CTABand({ studioHref }: Pick<LandingLinks, "studioHref">) {
             </div>
           </div>
           <div className="cta-visual">
-            <div className="resume-card back"><ResumePreview variant="modern" name="Marcus Reed" role="Software Engineer" /></div>
+            <div className="resume-card back"><ResumePreview variant="modern" name="Noor Vale" role="Software Engineer" /></div>
             <div className="resume-card"><ResumePreview variant="classic" highlight /></div>
           </div>
         </div>

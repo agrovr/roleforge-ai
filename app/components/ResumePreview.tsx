@@ -2,7 +2,7 @@ type ResumePreviewVariant = "classic" | "modern" | "accent";
 
 export function ResumePreview({
   variant = "classic",
-  name = "Sarah Chen",
+  name = "Avery Stone",
   role = "Product Manager",
   highlight = false,
 }: {
@@ -18,11 +18,11 @@ export function ResumePreview({
           <div className="r-name">{name}</div>
           <div className="r-role">{role}</div>
           <div className="r-contact">
-            email@example.com
+            candidate@preview.test
             <br />
-            +1 555 0100
+            Portfolio available
             <br />
-            City, ST
+            Remote-friendly
           </div>
           <div className="r-section">
             <div className="r-section-title">Skills</div>
@@ -46,7 +46,7 @@ export function ResumePreview({
                 <div className="r-job-title">Product Lead</div>
                 <div className="r-job-date">Recent role</div>
               </div>
-              <div className="r-job-org">Example Org</div>
+              <div className="r-job-org">Internal product team</div>
               <div className="r-bullet">
                 Owned <span className="r-hl">cross-functional planning</span> for a product team
               </div>
@@ -58,7 +58,7 @@ export function ResumePreview({
                 <div className="r-job-title">Operations Partner</div>
                 <div className="r-job-date">Earlier role</div>
               </div>
-              <div className="r-job-org">Example Team</div>
+              <div className="r-job-org">Operations group</div>
               <div className="r-bullet">Organized planning rituals across product and support groups</div>
               <div className="r-bullet">Documented handoffs so decisions stayed easy to audit</div>
             </div>
@@ -73,7 +73,7 @@ export function ResumePreview({
       <div className="r-doc accent">
         <div className="r-name">{name}</div>
         <div className="r-role">{role}</div>
-        <div className="r-contact">email@example.com &middot; portfolio.example &middot; City, ST</div>
+        <div className="r-contact">candidate@preview.test &middot; portfolio.preview.test &middot; Remote-friendly</div>
         <div className="r-section">
           <div className="r-section-title">Summary</div>
           <p className="r-copy">
@@ -87,7 +87,7 @@ export function ResumePreview({
               <div className="r-job-title">Product Manager</div>
               <div className="r-job-date">Recent role</div>
             </div>
-            <div className="r-job-org">Example Studio</div>
+            <div className="r-job-org">Product design group</div>
             <div className="r-bullet">Shaped product priorities with research and operations partners</div>
             <div className="r-bullet">Translated ambiguous requirements into organized delivery plans</div>
             <div className="r-bullet">Partnered with design and engineering on launch readiness</div>
@@ -118,7 +118,7 @@ export function ResumePreview({
     <div className="r-doc">
       <div className="r-name">{name}</div>
       <div className="r-role">{role}</div>
-      <div className="r-contact">email@example.com &middot; +1 555 0100 &middot; City, ST &middot; linkedin.com/in/example</div>
+      <div className="r-contact">candidate@preview.test &middot; portfolio.preview.test &middot; Remote-friendly</div>
       <div className="r-section">
         <div className="r-section-title">Professional Summary</div>
         <p className="r-copy">
@@ -135,7 +135,7 @@ export function ResumePreview({
             <div className="r-job-title">Product Manager</div>
             <div className="r-job-date">Recent role</div>
           </div>
-          <div className="r-job-org">Example Company &middot; Remote</div>
+          <div className="r-job-org">Product operations team &middot; Remote</div>
           <div className="r-bullet">
             Owned <span className={highlight ? "r-hl" : ""}>cross-functional roadmap</span> delivery for a customer-facing workflow
           </div>
@@ -147,7 +147,7 @@ export function ResumePreview({
             <div className="r-job-title">Project Lead, Operations</div>
             <div className="r-job-date">Earlier role</div>
           </div>
-          <div className="r-job-org">Example Group &middot; Remote</div>
+          <div className="r-job-org">Planning group &middot; Remote</div>
           <div className="r-bullet">Created a planning process that made status and ownership easier to review</div>
           <div className="r-bullet">Organized feedback into decisions, risks, and next steps for the team</div>
         </div>
