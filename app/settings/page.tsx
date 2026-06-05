@@ -14,6 +14,7 @@ import {
   accountAvatarUrl,
   accountDisplayName,
   accountEmailVerificationLabel,
+  accountReference,
   accountSecurityDateLabel,
   accountSignInMethodLabel,
 } from "../lib/accountUser";
@@ -45,6 +46,7 @@ import {
 } from "../lib/usage";
 import { BillingSubmitButton } from "./BillingSubmitButton";
 import { AccountEmailCopyButton } from "./AccountEmailCopyButton";
+import { AccountReferenceCopyButton } from "./AccountReferenceCopyButton";
 import { SettingsSectionNav } from "./SettingsSectionNav";
 
 type CountResult = { count: number | null; error: unknown };
@@ -405,6 +407,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   });
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName = accountDisplayName(user, accountProfile?.displayName);
+  const accountReferenceLabel = accountReference(user.id);
   const accountInitials = (displayName || user.email || "RF").slice(0, 2).toUpperCase();
   const accountImageUrl = accountAvatarUrl(user);
   const signInMethodLabel = accountSignInMethodLabel(user);
@@ -1164,6 +1167,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <span className="settings-account-email-line">
                     <span>{user.email}</span>
                     {user.email ? <AccountEmailCopyButton email={user.email} /> : null}
+                  </span>
+                  <span className="settings-account-email-line settings-account-reference-line">
+                    <span>Account ref {accountReferenceLabel}</span>
+                    <AccountReferenceCopyButton referenceLabel={accountReferenceLabel} />
                   </span>
                 </div>
               </div>

@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { loadAccountProfile, type AccountProfile } from "./accountProfile";
 import type { AccountIdentitySource } from "./accountUser";
-import { accountDisplayName } from "./accountUser";
+import { accountDisplayName, accountReference } from "./accountUser";
 import { billingStateDetail, billingStateLabel } from "./billing/display";
 import type { AccountEntitlement } from "./entitlements";
 import { loadSupportRequests, type SupportRequestSummary } from "./supportRequests";
@@ -123,6 +123,7 @@ export function buildAccountExportPayload({
     generatedAt,
     account: {
       id: user.id,
+      reference: accountReference(user.id),
       email: user.email ?? profile?.email ?? "",
       displayName: accountDisplayName(user, profile?.displayName),
       createdAt: user.created_at ?? null,

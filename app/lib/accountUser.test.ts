@@ -5,6 +5,7 @@ import {
   accountAvatarUrl,
   accountDisplayName,
   accountEmailVerificationLabel,
+  accountReference,
   accountSecurityDateLabel,
   accountSignInMethodLabel,
 } from "./accountUser";
@@ -54,6 +55,13 @@ test("trims noisy provider display names", () => {
 test("returns an empty name when metadata is missing", () => {
   assert.equal(accountDisplayName({ email: "person@example.com" }), "");
   assert.equal(accountDisplayName(null), "");
+});
+
+test("builds a safe public account reference from provider ids", () => {
+  assert.equal(accountReference("4adcd15a-769a-4c2f-939f-09df6e70a225"), "RF-ACCT-70A225");
+  assert.equal(accountReference("RF-ACCT-70A225"), "RF-ACCT-70A225");
+  assert.equal(accountReference("abc"), "RF-ACCT-000ABC");
+  assert.equal(accountReference(""), "RF-ACCT-ACCOUNT");
 });
 
 test("reads safe provider avatar urls from account metadata", () => {

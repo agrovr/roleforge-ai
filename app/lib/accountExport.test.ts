@@ -75,6 +75,7 @@ test("builds a safe account summary export without protected URLs or Stripe ids"
   });
 
   assert.equal(payload.account.displayName, "Avery Stone");
+  assert.equal(payload.account.reference, "RF-ACCT-SER123");
   assert.deepEqual(payload.billingSummary, {
     accessLevel: "free",
     statusLabel: "No subscription",

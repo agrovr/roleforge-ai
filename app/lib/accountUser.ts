@@ -20,6 +20,12 @@ function cleanMetadataString(value: unknown) {
   return typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
 }
 
+export function accountReference(value: unknown) {
+  const raw = cleanMetadataString(value).toUpperCase();
+  const token = raw.replace(/[^A-Z0-9]/g, "").slice(-6);
+  return token ? `RF-ACCT-${token.padStart(6, "0")}` : "RF-ACCT-ACCOUNT";
+}
+
 const PROVIDER_LABELS: Record<string, string> = {
   apple: "Apple",
   azure: "Microsoft",

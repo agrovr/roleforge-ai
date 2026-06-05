@@ -37,6 +37,9 @@ const PAGE_CHECKS = [
       { container: ".cta-band", selector: ".cta-band h2", tolerance: 4 },
       { container: ".cta-band", selector: ".cta-band .cta-cluster", tolerance: 4 },
     ],
+    maxHeightChecks: [
+      { selector: ".cta-band", maxHeight: 720, minWidth: 1181, maxWidth: 1440 },
+    ],
     selectors: [
       ".nav",
       ".hero",
@@ -741,6 +744,7 @@ async function evaluateLayout(send, baseUrl, page, width, cookie, options = {}) 
     const noOverlapPairs = ${JSON.stringify(page.noOverlapPairs || [])};
     const containedSelectors = ${JSON.stringify(page.containedSelectors || [])};
     const anchorClearanceChecks = ${JSON.stringify(page.anchorClearanceChecks || [])};
+    const maxHeightChecks = ${JSON.stringify(page.maxHeightChecks || [])};
     const failures = [];
     const viewportWidth = document.documentElement.clientWidth;
     const overflow = document.documentElement.scrollWidth - viewportWidth;
@@ -922,6 +926,28 @@ async function evaluateLayout(send, baseUrl, page, width, cookie, options = {}) 
           anchorPaddingBlockStart: anchorStyle.paddingBlockStart,
           minGap,
           text: target.textContent.trim().replace(/\\s+/g, " ").slice(0, 80),
+        });
+      }
+    }
+
+    for (const rule of maxHeightChecks) {
+      if (rule.minWidth && window.innerWidth < Number(rule.minWidth)) continue;
+      if (rule.maxWidth && window.innerWidth > Number(rule.maxWidth)) continue;
+      const element = document.querySelector(rule.selector);
+      if (!element) {
+        failures.push({ selector: rule.selector, reason: "max-height-missing" });
+        continue;
+      }
+
+      const rect = element.getBoundingClientRect();
+      const maxHeight = Number(rule.maxHeight || 0);
+      if (rect.height > maxHeight) {
+        failures.push({
+          selector: rule.selector,
+          reason: "too-tall-at-desktop-zoom",
+          height: Math.round(rect.height),
+          maxHeight,
+          viewport: window.innerWidth,
         });
       }
     }

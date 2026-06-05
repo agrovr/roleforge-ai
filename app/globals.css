@@ -11637,6 +11637,16 @@ html[data-theme="dark"] input::file-selector-button {
   max-width: 100%;
 }
 
+.settings-account-reference-line {
+  margin-top: 6px;
+}
+
+.settings-account-reference-line > span {
+  color: var(--ink-3);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
 .settings-account-email-copy {
   display: inline-flex;
   min-width: 0;
@@ -19261,13 +19271,15 @@ body,
   }
 
   .cta-visual .resume-card {
-    inset-inline-end: auto;
+    inset-inline-end: auto !important;
+    right: auto;
     left: 52%;
     transform: translateX(-18%) rotate(5deg);
   }
 
   .cta-visual .resume-card.back {
-    inset-inline-end: auto;
+    inset-inline-end: auto !important;
+    right: auto;
     left: 52%;
     transform: translateX(-76%) rotate(-8deg);
   }
@@ -19710,21 +19722,51 @@ body,
 }
 
 @media (min-width: 981px) and (max-width: 1440px) {
+  .cta-section .section-inner {
+    inline-size: min(100%, 1160px);
+    max-inline-size: calc(100vw - clamp(40px, 5vw, 72px));
+  }
+
   .cta-band {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(min(100%, 240px), 320px);
+    align-items: center;
+    gap: clamp(20px, 3vw, 34px);
     min-height: auto;
-    padding: clamp(36px, 5vw, 58px);
-    padding-block-start: clamp(82px, 7vw, 112px);
+    padding: clamp(34px, 4.2vw, 52px);
+    padding-block-start: clamp(82px, 7vw, 104px);
+  }
+
+  .cta-band h2 {
+    max-inline-size: min(100%, 15ch);
+    font-size: clamp(2.4rem, 4.7vw, 4.05rem);
+  }
+
+  .cta-band p {
+    font-size: clamp(1rem, 1.55vw, 1.18rem);
   }
 
   .cta-visual {
-    justify-self: center;
-    inline-size: min(100%, 430px);
+    justify-self: end;
+    inline-size: min(100%, 320px);
+    min-block-size: clamp(292px, 26vw, 338px);
   }
 
   .cta-visual .resume-card {
+    inset-inline-end: auto;
     left: 52%;
-    transform: translateX(-10%) rotate(5deg);
+    inset-block-start: 12px;
+    inline-size: clamp(174px, 14vw, 206px);
+    block-size: clamp(262px, 21vw, 310px);
+    transform: translateX(-30%) rotate(5deg);
+  }
+
+  .cta-visual .resume-card.back {
+    inset-inline-end: auto;
+    left: 52%;
+    inset-block-start: 42px;
+    inline-size: clamp(146px, 12vw, 178px);
+    block-size: clamp(236px, 19vw, 282px);
+    transform: translateX(-84%) rotate(-8deg);
   }
 }
 
