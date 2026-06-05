@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { loadAccountProfile, type AccountProfile } from "./accountProfile";
 import type { AccountIdentitySource } from "./accountUser";
 import { accountDisplayName } from "./accountUser";
+import { billingStateDetail, billingStateLabel } from "./billing/display";
 import type { AccountEntitlement } from "./entitlements";
 import { loadSupportRequests, type SupportRequestSummary } from "./supportRequests";
 import type { AccountUsage } from "./usage";
@@ -57,6 +58,47 @@ export function accountExportFilename(email: string | null | undefined, now = ne
   return `roleforge-account-summary-${label}-${day}.json`;
 }
 
+function accountExportDateLabel(value: string | null | undefined) {
+  if (!value) return undefined;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+    year: "numeric",
+  }).format(date);
+}
+
+function accountBillingSummary(entitlement: AccountEntitlement) {
+  const premiumEnding = entitlement.plan === "premium" && entitlement.cancelAtPeriodEnd;
+  const accessLevel = entitlement.plan === "premium" && ["active", "trialing"].includes(entitlement.billingStatus)
+    ? "premium"
+    : "free";
+  const premiumEndLabel = accountExportDateLabel(entitlement.cancelAt || entitlement.currentPeriodEnd);
+
+  return {
+    accessLevel,
+    statusLabel: billingStateLabel(entitlement.billingStatus, { premiumEnding }),
+    statusDetail: billingStateDetail(entitlement.billingStatus, {
+      premiumEnding,
+      premiumEndLabel,
+    }),
+    currentPeriodEndLabel: accountExportDateLabel(entitlement.currentPeriodEnd),
+    cancelAtLabel: accountExportDateLabel(entitlement.cancelAt),
+    canceledAtLabel: accountExportDateLabel(entitlement.canceledAt),
+    currentPeriodEnd: entitlement.currentPeriodEnd,
+    cancelAtPeriodEnd: entitlement.cancelAtPeriodEnd,
+    cancelAt: entitlement.cancelAt,
+    canceledAt: entitlement.canceledAt,
+    billingControls: "Open Settings > Billing to manage the subscription, review invoices, or contact support with this account context.",
+    deletionRequirement: "Premium accounts must cancel billing before account deletion can continue.",
+    supportContextUrl: "/settings#billing",
+  };
+}
+
 export function buildAccountExportPayload({
   user,
   profile,
@@ -91,9 +133,12 @@ export function buildAccountExportPayload({
       billingStatus: entitlement.billingStatus,
       currentPeriodEnd: entitlement.currentPeriodEnd,
       cancelAtPeriodEnd: entitlement.cancelAtPeriodEnd,
+      cancelAt: entitlement.cancelAt,
+      canceledAt: entitlement.canceledAt,
       exportFormats: entitlement.exportFormats,
       monthlyRunLimit: entitlement.monthlyRunLimit,
     },
+    billingSummary: accountBillingSummary(entitlement),
     usage: {
       currentPeriodStart: usage.currentPeriodStart,
       currentPeriodEnd: usage.currentPeriodEnd,

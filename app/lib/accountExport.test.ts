@@ -75,6 +75,21 @@ test("builds a safe account summary export without protected URLs or Stripe ids"
   });
 
   assert.equal(payload.account.displayName, "Avery Stone");
+  assert.deepEqual(payload.billingSummary, {
+    accessLevel: "free",
+    statusLabel: "No subscription",
+    statusDetail: "Premium checkout is available when you need more exports or runs.",
+    currentPeriodEndLabel: undefined,
+    cancelAtLabel: undefined,
+    canceledAtLabel: undefined,
+    currentPeriodEnd: null,
+    cancelAtPeriodEnd: false,
+    cancelAt: null,
+    canceledAt: null,
+    billingControls: "Open Settings > Billing to manage the subscription, review invoices, or contact support with this account context.",
+    deletionRequirement: "Premium accounts must cancel billing before account deletion can continue.",
+    supportContextUrl: "/settings#billing",
+  });
   assert.equal(payload.savedProjects[0].title, "Product Manager");
   assert.equal(payload.tailoringRuns[0].downloadFilename, "tailored.pdf");
   assert.deepEqual(payload.supportRequests[0], {
@@ -92,6 +107,47 @@ test("builds a safe account summary export without protected URLs or Stripe ids"
   assert.equal(JSON.stringify(payload).includes("stripe_"), false);
   assert.equal(JSON.stringify(payload).includes("downloadUrl"), false);
   assert.equal(JSON.stringify(payload).includes("4adcd15a-769a-4c2f-939f-09df6e70a225"), false);
+});
+
+test("summarizes premium cancellation state for account records", () => {
+  const payload = buildAccountExportPayload({
+    user: {
+      id: "user_123",
+      email: "avery@example.com",
+      user_metadata: { name: "Provider Name" },
+      created_at: "2026-05-01T00:00:00.000Z",
+    },
+    profile: null,
+    entitlement: {
+      ...FREE_ENTITLEMENT,
+      plan: "premium",
+      billingStatus: "active",
+      monthlyRunLimit: null,
+      exportFormats: { pdf: true, docx: true, txt: true },
+      currentPeriodEnd: "2026-06-18T00:35:07.000Z",
+      cancelAtPeriodEnd: true,
+      cancelAt: "2026-06-18T00:35:07.000Z",
+    },
+    usage: {
+      ...usage,
+      monthlyRunLimit: null,
+      remainingRuns: 0,
+      runLimited: false,
+    },
+    generatedAt: "2026-06-01T18:00:00.000Z",
+    projects: [],
+    runs: [],
+  });
+
+  assert.equal(payload.billingSummary.accessLevel, "premium");
+  assert.equal(payload.billingSummary.statusLabel, "Canceling");
+  assert.equal(payload.billingSummary.statusDetail, "Premium access remains available until Jun 18, 2026.");
+  assert.equal(payload.billingSummary.currentPeriodEndLabel, "Jun 18, 2026");
+  assert.equal(payload.billingSummary.cancelAtLabel, "Jun 18, 2026");
+  assert.equal(payload.plan.cancelAt, "2026-06-18T00:35:07.000Z");
+  assert.equal(payload.plan.canceledAt, null);
+  assert.equal(JSON.stringify(payload).includes("stripe_"), false);
+  assert.equal(JSON.stringify(payload).includes("sub_"), false);
 });
 
 test("creates filesystem-safe account export filenames", () => {
