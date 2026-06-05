@@ -645,18 +645,20 @@ async function checkPublicShell(baseUrl) {
       /\.settings-project-list\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
       /#projects\.settings-section\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))[^}]*\}/s.test(stylesheetText) &&
       /#projects\s+\.settings-section-panel\s*\{(?=[^}]*inline-size:\s*100%)(?=[^}]*max-inline-size:\s*100%)[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*(?:0)?\.88fr\)\s+minmax\(0,\s*1\.12fr\))(?=[^}]*container:\s*settings-project-card\s*\/\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-controls\s*\{(?=[^}]*justify-self:\s*stretch)(?=[^}]*inline-size:\s*100%)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*236px\),\s*1fr\)\))(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))(?=[^}]*container:\s*settings-project-card\s*\/\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-summary\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-controls\s*\{(?=[^}]*justify-self:\s*stretch)(?=[^}]*inline-size:\s*100%)(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*overflow:\s*hidden)(?=[^}]*border-top:\s*1px\s+solid)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-controls\s*>\s*\*\s*\{(?=[^}]*min-inline-size:\s*0)(?=[^}]*max-inline-size:\s*100%)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-stage-form,\s*\.settings-project-kit,\s*\.settings-project-delete\s*\{(?=[^}]*grid-column:\s*1\s*\/\s*-1)[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-stage-controls\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*104px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-stage-controls\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-kit\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-kit-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-kit-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*148px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-kit-item\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-kit-item\s*\{(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-item\s+small\s*\{(?=[^}]*justify-self:\s*start)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-item\s+small\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText) &&
-      /@container\s+settings-project-card\s+\(max-width:\s*680px\)\s*\{[\s\S]*?\.settings-project-stage-controls,\s*\.settings-project-kit-grid\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*112px\),\s*1fr\)\)/s.test(stylesheetText),
+      /@container\s+settings-project-card\s+\(max-width:\s*680px\)\s*\{[\s\S]*?\.settings-project-stage-controls,\s*\.settings-project-kit-grid\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*128px\),\s*1fr\)\)/s.test(stylesheetText) &&
+      /@container\s+settings-project-card\s+\(max-width:\s*560px\)\s*\{[\s\S]*?\.settings-project-summary,\s*\.settings-project-controls,\s*\.settings-project-rename-row,\s*\.settings-project-delete-row\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText),
     "settings saved-project status and application-kit controls can still squeeze or overflow",
   );
   requireCondition(/\.settings-price-card\s*\{(?=[^}]*container:\s*settings-price-card\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "settings price cards were missing container sizing");

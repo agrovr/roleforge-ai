@@ -7558,11 +7558,12 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-item {
   display: grid;
-  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
-  gap: 16px;
+  gap: 12px;
   container: settings-project-card / inline-size;
   overflow: hidden;
+  padding: 14px;
   color: inherit;
   transition:
     border-color 160ms ease,
@@ -7599,17 +7600,21 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-project-summary {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   gap: 10px;
 }
 
 .settings-project-controls {
   justify-self: stretch;
   inline-size: 100%;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 236px), 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
   gap: 10px;
   max-width: 100%;
   overflow: hidden;
+  border-top: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  padding-top: 12px;
 }
 
 .settings-project-controls > * {
@@ -7766,7 +7771,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-stage-controls {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 104px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr));
   gap: 8px;
   min-width: 0;
   padding-top: 2px;
@@ -7946,7 +7951,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-kit-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 148px), 1fr));
   gap: 7px;
   min-width: 0;
 }
@@ -8087,8 +8092,13 @@ html[data-theme="dark"] input::file-selector-button {
     grid-template-columns: 1fr;
   }
 
+  .settings-project-summary,
+  .settings-project-controls {
+    grid-template-columns: 1fr;
+  }
+
   .settings-project-stage-controls {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 128px), 1fr));
   }
 
   .settings-project-rename-row,
@@ -8108,7 +8118,23 @@ html[data-theme="dark"] input::file-selector-button {
 @container settings-project-card (max-width: 680px) {
   .settings-project-stage-controls,
   .settings-project-kit-grid {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 112px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 128px), 1fr));
+  }
+}
+
+@container settings-project-card (max-width: 560px) {
+  .settings-project-summary,
+  .settings-project-controls,
+  .settings-project-rename-row,
+  .settings-project-delete-row {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-project-rename-row button,
+  .settings-project-delete-row button,
+  .settings-project-downloads .btn {
+    inline-size: 100%;
+    white-space: normal;
   }
 }
 
@@ -17819,8 +17845,13 @@ html[data-theme="dark"] .studio-account-form input::placeholder {
     gap: 10px;
   }
 
+  .settings-project-summary,
+  .settings-project-controls {
+    grid-template-columns: 1fr;
+  }
+
   .settings-project-stage-controls {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 128px), 1fr));
   }
 
   .settings-project-item small {
