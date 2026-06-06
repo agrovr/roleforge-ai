@@ -199,6 +199,13 @@ npx vercel env add ROLEFORGE_SUPPORT_WEBHOOK_URL production --scope team_kEe4HW2
 npx vercel env add ROLEFORGE_SUPPORT_WEBHOOK_SECRET production --scope team_kEe4HW272D5nYJDD92amj55H
 ```
 
+Or set them from the clipboard without printing the values:
+
+```powershell
+Get-Clipboard | npm run set:support:vercel -- ROLEFORGE_SUPPORT_WEBHOOK_URL
+Get-Clipboard | npm run set:support:vercel -- ROLEFORGE_SUPPORT_WEBHOOK_SECRET
+```
+
 `ROLEFORGE_SUPPORT_WEBHOOK_URL` must be an `https://` webhook endpoint. `ROLEFORGE_SUPPORT_WEBHOOK_SECRET` is optional but recommended; RoleForge sends it as `x-roleforge-support-secret` so the receiving workflow can verify the request. Notification failures are logged server-side but never make a saved support request look failed to the user.
 
 `npm run check:billing:vercel` reports this support notification status as a warning-only operational signal while keeping billing readiness focused on Stripe/Supabase launch blockers.

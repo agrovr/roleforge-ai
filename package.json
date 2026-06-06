@@ -18,6 +18,7 @@
     "support:inbox": "node scripts/list_support_requests.mjs",
     "support:status": "node scripts/update_support_request_status.mjs",
     "set:billing:vercel": "node scripts/set_vercel_billing_env.mjs",
+    "set:support:vercel": "node scripts/set_vercel_support_env.mjs",
     "typecheck": "tsc --noEmit",
     "wait:vercel": "node scripts/wait_for_vercel_status.mjs",
     "test": "tsx --test app/lib/*.test.ts app/lib/billing/*.test.ts app/lib/supabase/*.test.ts scripts/*.test.mjs",
