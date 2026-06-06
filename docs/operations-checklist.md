@@ -208,10 +208,11 @@ To review saved tickets without opening the Supabase table UI, run the read-only
 ```powershell
 npm run support:inbox
 npm run support:inbox -- --status all --limit 50
+npm run support:inbox -- --summary --status all
 npm run support:inbox -- --category billing --json
 ```
 
-The inbox command masks account emails by default. Use `--show-email` only when direct follow-up requires the full email address.
+The inbox command masks account emails by default. Use `--summary` for counts without subjects, messages, or emails. Use `--show-email` only when direct follow-up requires the full email address.
 
 Useful docs:
 

@@ -5,6 +5,7 @@ import {
   listSupportRequests,
   maskSupportEmail,
   parseArgs,
+  summarizeSupportInbox,
   summarizeSupportRequest,
   supportRequestReference,
 } from "./list_support_requests.mjs";
@@ -78,16 +79,33 @@ test("summarizes support request rows for operator review", () => {
 });
 
 test("parses support inbox options safely", () => {
-  assert.deepEqual(parseArgs(["--status", "all", "--limit=50", "--category", "privacy", "--json", "--show-email"]), {
+  assert.deepEqual(parseArgs(["--status", "all", "--limit=50", "--category", "privacy", "--json", "--summary", "--show-email"]), {
     limit: 50,
     status: "all",
     category: "privacy",
     json: true,
+    summary: true,
     showEmail: true,
   });
   assert.throws(() => parseArgs(["--limit", "0"]), /--limit must be an integer/);
   assert.throws(() => parseArgs(["--status", "pending"]), /--status must be/);
   assert.throws(() => parseArgs(["--category", "sales"]), /--category must be/);
+});
+
+test("summarizes support inbox counts without ticket content", () => {
+  assert.deepEqual(
+    summarizeSupportInbox([
+      { createdAt: "2026-06-06T10:00:00.000Z", status: "open", category: "billing", subject: "Hidden" },
+      { createdAt: "2026-06-06T12:00:00.000Z", status: "reviewing", category: "privacy", messagePreview: "Hidden" },
+      { createdAt: "2026-06-06T11:00:00.000Z", status: "open", category: "billing", email: "hidden@example.com" },
+    ]),
+    {
+      count: 3,
+      newestCreatedAt: "2026-06-06T12:00:00.000Z",
+      byStatus: { open: 2, reviewing: 1 },
+      byCategory: { billing: 2, privacy: 1 },
+    },
+  );
 });
 
 test("loads recent support requests with status and category filters", async () => {

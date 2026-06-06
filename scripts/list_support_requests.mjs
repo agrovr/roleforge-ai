@@ -59,6 +59,7 @@ export function parseArgs(argv) {
     status: "open",
     category: "",
     json: false,
+    summary: false,
     showEmail: false,
   };
 
@@ -74,6 +75,10 @@ export function parseArgs(argv) {
     }
     if (name === "--json") {
       options.json = true;
+      continue;
+    }
+    if (name === "--summary") {
+      options.summary = true;
       continue;
     }
     if (name === "--show-email") {
@@ -107,6 +112,7 @@ function printHelp() {
 Usage:
   npm run support:inbox
   npm run support:inbox -- --status all --limit 50
+  npm run support:inbox -- --summary --status all
   npm run support:inbox -- --category billing --json
 
 Required environment:
@@ -116,6 +122,7 @@ Optional environment:
   ROLEFORGE_SUPABASE_URL
 
 Emails are masked by default. Use --show-email only when needed for direct follow-up.
+Use --summary to print counts without ticket subjects, messages, or emails.
 This command reads support_requests and does not print service-role secrets.`);
 }
 
@@ -156,6 +163,38 @@ function formatSupportRequestLine(request) {
   return `${request.reference} ${request.createdAt} ${request.status}/${request.category} ${request.email} - ${request.subject}${context}\n  ${request.messagePreview}`;
 }
 
+export function summarizeSupportInbox(requests = []) {
+  const byStatus = {};
+  const byCategory = {};
+  let newestCreatedAt = null;
+
+  for (const request of requests) {
+    byStatus[request.status] = (byStatus[request.status] || 0) + 1;
+    byCategory[request.category] = (byCategory[request.category] || 0) + 1;
+    if (request.createdAt && (!newestCreatedAt || request.createdAt > newestCreatedAt)) {
+      newestCreatedAt = request.createdAt;
+    }
+  }
+
+  return {
+    count: requests.length,
+    newestCreatedAt,
+    byStatus,
+    byCategory,
+  };
+}
+
+function formatSupportInboxSummary(summary) {
+  const status = Object.entries(summary.byStatus).map(([name, count]) => `${name}=${count}`).join(", ") || "none";
+  const category = Object.entries(summary.byCategory).map(([name, count]) => `${name}=${count}`).join(", ") || "none";
+  return [
+    `Support requests: ${summary.count}`,
+    `Newest: ${summary.newestCreatedAt || "none"}`,
+    `By status: ${status}`,
+    `By category: ${category}`,
+  ].join("\n");
+}
+
 export async function runSupportInboxCli(argv = process.argv.slice(2), env = process.env) {
   const options = parseArgs(argv);
   if (options.help) {
@@ -169,6 +208,12 @@ export async function runSupportInboxCli(argv = process.argv.slice(2), env = pro
   });
 
   const requests = await listSupportRequests({ client, ...options });
+  if (options.summary) {
+    const summary = summarizeSupportInbox(requests);
+    console.log(options.json ? JSON.stringify(summary, null, 2) : formatSupportInboxSummary(summary));
+    return 0;
+  }
+
   if (options.json) {
     console.log(JSON.stringify({ count: requests.length, requests }, null, 2));
     return 0;
