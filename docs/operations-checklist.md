@@ -214,6 +214,16 @@ npm run support:inbox -- --category billing --json
 
 The inbox command masks account emails by default. Use `--summary` for counts without subjects, messages, or emails. Use `--show-email` only when direct follow-up requires the full email address.
 
+To move a saved request through the operator queue without opening Supabase, use the status updater:
+
+```powershell
+npm run support:status -- --reference RF-70A225 --status reviewing --dry-run
+npm run support:status -- --reference RF-70A225 --status reviewing
+npm run support:status -- --id <support-request-id> --status closed
+```
+
+The updater only changes `support_requests.status` and `updated_at`. It does not print ticket subjects, messages, emails, or secrets. Short `RF-...` references are resolved from recent tickets and fail closed if the reference is ambiguous; use the full row id when that happens. Status changes are visible in the signed-in Support and Settings history, but they do not send a customer email by themselves.
+
 Useful docs:
 
 - `docs/plan-rules.md`

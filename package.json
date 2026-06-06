@@ -16,6 +16,7 @@
     "check:entitlement": "node scripts/check_premium_entitlement.mjs",
     "create:promo": "node scripts/create_live_promo_code.mjs",
     "support:inbox": "node scripts/list_support_requests.mjs",
+    "support:status": "node scripts/update_support_request_status.mjs",
     "set:billing:vercel": "node scripts/set_vercel_billing_env.mjs",
     "typecheck": "tsc --noEmit",
     "wait:vercel": "node scripts/wait_for_vercel_status.mjs",
