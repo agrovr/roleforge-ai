@@ -74,12 +74,23 @@ test("settings section nav exposes common task shortcuts", () => {
   assert.match(settingsNav, /Email preferences/);
   assert.match(settingsNav, /query:\s*"product updates"/);
   assert.match(settingsNav, /sectionId:\s*"preferences"/);
+  assert.match(settingsNav, /targetId:\s*"communication-preferences"/);
   assert.match(settingsNav, /Support history/);
   assert.match(settingsNav, /query:\s*"support request"/);
   assert.match(settingsNav, /Restore projects/);
   assert.match(settingsNav, /query:\s*"restore saved projects"/);
   assert.match(settingsNav, /setQuery\(task\.query\)/);
-  assert.match(settingsNav, /navigateToSection\(task\.sectionId\)/);
+  assert.match(settingsNav, /href=\{`#\$\{task\.targetId \?\? task\.sectionId\}`\}/);
+  assert.match(settingsNav, /navigateToSection\(task\.sectionId,\s*"smooth",\s*task\.targetId\)/);
+});
+
+test("settings section nav keeps child hash targets tied to their parent section", () => {
+  assert.match(settingsNav, /const navigateToSection = useCallback\(\(sectionId: SettingsSectionId,\s*behavior: ScrollBehavior = "smooth",\s*targetId: string = sectionId\)/);
+  assert.match(settingsNav, /window\.history\.pushState\(null,\s*"",\s*`#\$\{targetId\}`\)/);
+  assert.match(settingsNav, /document\.getElementById\(targetId\)\?\.scrollIntoView\(\{ behavior,\s*block:\s*"start" \}\)/);
+  assert.match(settingsNav, /const hashChild = hash \? document\.getElementById\(hash\) : null/);
+  assert.match(settingsNav, /hashChild\?\.closest\("\.settings-section"\)/);
+  assert.match(settingsNav, /setActiveSection\(hashChildSectionId\)/);
 });
 
 test("settings section search stays compact across breakpoints", () => {

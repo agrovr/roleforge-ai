@@ -22,11 +22,12 @@ const settingsTaskShortcuts: Array<{
   label: string;
   query: string;
   sectionId: SettingsSectionId;
+  targetId?: string;
   icon: "chart" | "download" | "layers" | "lock" | "mail";
 }> = [
   { label: "Cancel Premium", query: "cancel premium", sectionId: "billing", icon: "lock" },
   { label: "Export data", query: "account export", sectionId: "data-privacy", icon: "download" },
-  { label: "Email preferences", query: "product updates", sectionId: "preferences", icon: "layers" },
+  { label: "Email preferences", query: "product updates", sectionId: "preferences", targetId: "communication-preferences", icon: "layers" },
   { label: "Support history", query: "support request", sectionId: "support", icon: "mail" },
   { label: "Restore projects", query: "restore saved projects", sectionId: "projects", icon: "chart" },
 ];
@@ -51,12 +52,12 @@ export function SettingsSectionNav() {
   const scrollToSection = useCallback((sectionId: SettingsSectionId, behavior: ScrollBehavior = "smooth") => {
     document.getElementById(sectionId)?.scrollIntoView({ behavior, block: "start" });
   }, []);
-  const navigateToSection = useCallback((sectionId: SettingsSectionId, behavior: ScrollBehavior = "smooth") => {
-    window.history.pushState(null, "", `#${sectionId}`);
+  const navigateToSection = useCallback((sectionId: SettingsSectionId, behavior: ScrollBehavior = "smooth", targetId: string = sectionId) => {
+    window.history.pushState(null, "", `#${targetId}`);
     scrollSpyLockUntilRef.current = Date.now() + 1200;
     setActiveSection(sectionId);
-    scrollToSection(sectionId, behavior);
-  }, [scrollToSection]);
+    document.getElementById(targetId)?.scrollIntoView({ behavior, block: "start" });
+  }, []);
 
   const focusSectionLink = useCallback((sectionId: SettingsSectionId) => {
     window.setTimeout(() => linkRefs.current[sectionId]?.focus({ preventScroll: true }), 40);
@@ -144,6 +145,16 @@ export function SettingsSectionNav() {
         setActiveSection(hashSection.id);
         return;
       }
+      const hashChild = hash ? document.getElementById(hash) : null;
+      const hashChildSection = hashChild?.closest(".settings-section");
+      const hashChildSectionId = hashChildSection?.id as SettingsSectionId | undefined;
+      if (hashChild && hashChildSectionId && settingsSections.some((section) => section.id === hashChildSectionId)) {
+        const rect = hashChild.getBoundingClientRect();
+        if (rect.bottom > 0 && rect.top < window.innerHeight) {
+          setActiveSection(hashChildSectionId);
+          return;
+        }
+      }
 
       const current =
         isNearPageEnd && visibleSections.length > 0
@@ -169,6 +180,17 @@ export function SettingsSectionNav() {
         setActiveSection(nextSection);
         window.requestAnimationFrame(() => scrollToSection(nextSection, "auto"));
         window.setTimeout(setActiveFromViewport, 260);
+      } else if (hash) {
+        const target = document.getElementById(hash);
+        const targetSectionId = target?.closest(".settings-section")?.id as SettingsSectionId | undefined;
+        if (target && targetSectionId && settingsSections.some((section) => section.id === targetSectionId)) {
+          scrollSpyLockUntilRef.current = Date.now() + 1200;
+          setActiveSection(targetSectionId);
+          window.requestAnimationFrame(() => target.scrollIntoView({ behavior: "auto", block: "start" }));
+          window.setTimeout(setActiveFromViewport, 260);
+        } else {
+          setActiveFromViewport();
+        }
       } else {
         setActiveFromViewport();
       }
@@ -222,12 +244,12 @@ export function SettingsSectionNav() {
       <div className="settings-task-shortcuts" aria-label="Common account tasks">
         {settingsTaskShortcuts.map((task) => (
           <a
-            href={`#${task.sectionId}`}
+            href={`#${task.targetId ?? task.sectionId}`}
             key={task.label}
             onClick={(event) => {
               event.preventDefault();
               setQuery(task.query);
-              navigateToSection(task.sectionId);
+              navigateToSection(task.sectionId, "smooth", task.targetId);
             }}
           >
             <RoleForgeIcon name={task.icon} size={14} /> {task.label}
