@@ -5,6 +5,7 @@ import test from "node:test";
 const supportPage = readFileSync("app/support/page.tsx", "utf8");
 const supportRoute = readFileSync("app/api/support-requests/route.ts", "utf8");
 const supportLib = readFileSync("app/lib/supportRequests.ts", "utf8");
+const supportNotifications = readFileSync("app/lib/supportNotifications.ts", "utf8");
 const supportReferenceCopyButton = readFileSync("app/components/SupportReferenceCopyButton.tsx", "utf8");
 const supportMigration = readFileSync("supabase/migrations/20260602013000_support_requests.sql", "utf8");
 const supportPrivacyMigration = readFileSync("supabase/migrations/20260606043000_support_requests_privacy_category.sql", "utf8");
@@ -101,12 +102,19 @@ test("support request route requires auth, validates input, and saves through Su
   assert.match(supportRoute, /login\?next=\/support&account=signin-required/);
   assert.match(supportRoute, /parseSupportRequestInput/);
   assert.match(supportRoute, /saveSupportRequest/);
+  assert.match(supportRoute, /notifySupportRequestCreated/);
   assert.match(supportRoute, /supportRequestReference/);
   assert.match(supportRoute, /withAccountDatabase/);
   assert.match(supportRoute, /supportRedirect\(request,\s*"sent",\s*saved\.id\)/);
   assert.match(supportRoute, /url\.searchParams\.set\("ref",\s*supportRequestReference\(reference\)\)/);
   assert.match(supportRoute, /supportRedirect\(request, "invalid"\)/);
   assert.match(supportRoute, /supportRedirect\(request, "unavailable"\)/);
+  assert.match(supportNotifications, /ROLEFORGE_SUPPORT_WEBHOOK_URL/);
+  assert.match(supportNotifications, /ROLEFORGE_SUPPORT_WEBHOOK_SECRET/);
+  assert.match(supportNotifications, /event: "support_request\.created"/);
+  assert.match(supportNotifications, /x-roleforge-support-secret/);
+  assert.match(supportNotifications, /status: "skipped"/);
+  assert.match(supportNotifications, /status: "failed"/);
 });
 
 test("support requests have protected Supabase ownership policies", () => {

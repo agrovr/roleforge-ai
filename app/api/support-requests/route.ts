@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { notifySupportRequestCreated } from "@/app/lib/supportNotifications";
 import { withAccountDatabase } from "@/app/lib/supabase/accountDatabase";
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
 import { parseSupportRequestInput, saveSupportRequest, supportRequestReference } from "@/app/lib/supportRequests";
@@ -60,6 +61,14 @@ export async function POST(request: Request) {
       (dbClient) => saveSupportRequest(dbClient, parsed.input, user),
       { label: "Support request save database operation" },
     );
+    const notification = await notifySupportRequestCreated({ saved, input: parsed.input, user });
+    if (notification.status === "failed") {
+      console.error("Support request notification failed", {
+        reference: supportRequestReference(saved.id),
+        statusCode: notification.statusCode,
+        bodyPreview: notification.bodyPreview,
+      });
+    }
     return withSupabaseCookies(
       NextResponse.redirect(supportRedirect(request, "sent", saved.id), 303),
       routeClient.cookiesToSet,
