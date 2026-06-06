@@ -203,6 +203,16 @@ npx vercel env add ROLEFORGE_SUPPORT_WEBHOOK_SECRET production --scope team_kEe4
 
 `npm run check:billing:vercel` reports this support notification status as a warning-only operational signal while keeping billing readiness focused on Stripe/Supabase launch blockers.
 
+To review saved tickets without opening the Supabase table UI, run the read-only support inbox command with the service-role key in the environment:
+
+```powershell
+npm run support:inbox
+npm run support:inbox -- --status all --limit 50
+npm run support:inbox -- --category billing --json
+```
+
+The inbox command masks account emails by default. Use `--show-email` only when direct follow-up requires the full email address.
+
 Useful docs:
 
 - `docs/plan-rules.md`
