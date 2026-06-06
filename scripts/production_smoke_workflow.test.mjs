@@ -5,7 +5,8 @@ import test from "node:test";
 const workflow = readFileSync(".github/workflows/production-smoke.yml", "utf8");
 
 test("production smoke workflow installs dependencies before running live checks", () => {
-  assert.match(workflow, /uses:\s*actions\/setup-node@v4[\s\S]*node-version:\s*22[\s\S]*cache:\s*npm/);
+  assert.match(workflow, /uses:\s*actions\/checkout@v6/);
+  assert.match(workflow, /uses:\s*actions\/setup-node@v6[\s\S]*node-version:\s*22[\s\S]*cache:\s*npm/);
   assert.match(workflow, /- name:\s*Install dependencies\s*\n\s*run:\s*npm ci/);
   assert.match(workflow, /Install dependencies[\s\S]*Smoke live frontend/);
   assert.match(workflow, /Install dependencies[\s\S]*Smoke rendered live layout/);
