@@ -3,7 +3,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export type AccountProfile = {
   displayName: string;
   email: string;
+  communicationPreferences: CommunicationPreferences;
   updatedAt: string;
+};
+
+export type CommunicationPreferences = {
+  productUpdates: boolean;
 };
 
 export type AccountProfileUser = {
@@ -12,10 +17,14 @@ export type AccountProfileUser = {
 };
 
 const MAX_DISPLAY_NAME_LENGTH = 80;
+export const DEFAULT_COMMUNICATION_PREFERENCES: CommunicationPreferences = {
+  productUpdates: false,
+};
 
 type ProfileRow = {
   display_name: string | null;
   email: string | null;
+  communication_preferences?: unknown;
   updated_at: string | null;
 };
 
@@ -28,21 +37,46 @@ export function normalizeProfileDisplayName(value: unknown) {
   return cleanName;
 }
 
+export function normalizeCommunicationPreferences(value: unknown): CommunicationPreferences {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return { ...DEFAULT_COMMUNICATION_PREFERENCES };
+  }
+
+  const record = value as Record<string, unknown>;
+  return {
+    productUpdates: record.productUpdates === true,
+  };
+}
+
+function profileFromRow(row: ProfileRow): AccountProfile {
+  return {
+    displayName: row.display_name ?? "",
+    email: row.email ?? "",
+    communicationPreferences: normalizeCommunicationPreferences(row.communication_preferences),
+    updatedAt: row.updated_at ?? "",
+  };
+}
+
 export async function loadAccountProfile(client: SupabaseClient, userId: string): Promise<AccountProfile | null> {
-  const { data, error } = await client
+  const result = await client
+    .from("profiles")
+    .select("display_name, email, communication_preferences, updated_at")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (!result.error && result.data) {
+    return profileFromRow(result.data as ProfileRow);
+  }
+
+  const fallback = await client
     .from("profiles")
     .select("display_name, email, updated_at")
     .eq("id", userId)
     .maybeSingle();
 
-  if (error || !data) return null;
+  if (fallback.error || !fallback.data) return null;
 
-  const row = data as ProfileRow;
-  return {
-    displayName: row.display_name ?? "",
-    email: row.email ?? "",
-    updatedAt: row.updated_at ?? "",
-  };
+  return profileFromRow(fallback.data as ProfileRow);
 }
 
 export async function saveAccountProfile(
@@ -73,6 +107,32 @@ export async function saveAccountProfile(
 
   return {
     displayName,
+    updatedAt,
+  };
+}
+
+export async function saveCommunicationPreferences(
+  client: SupabaseClient,
+  user: AccountProfileUser,
+  preferences: CommunicationPreferences,
+) {
+  const normalized = normalizeCommunicationPreferences(preferences);
+  const updatedAt = new Date().toISOString();
+
+  const { error } = await client.from("profiles").upsert(
+    {
+      id: user.id,
+      email: user.email ?? null,
+      communication_preferences: normalized,
+      updated_at: updatedAt,
+    },
+    { onConflict: "id" },
+  );
+
+  if (error) throw error;
+
+  return {
+    communicationPreferences: normalized,
     updatedAt,
   };
 }

@@ -24,6 +24,7 @@ test("builds a safe account summary export without protected URLs or Stripe ids"
     profile: {
       displayName: "Avery Stone",
       email: "avery@example.com",
+      communicationPreferences: { productUpdates: true },
       updatedAt: "2026-06-01T12:00:00.000Z",
     },
     entitlement: FREE_ENTITLEMENT,
@@ -76,6 +77,14 @@ test("builds a safe account summary export without protected URLs or Stripe ids"
 
   assert.equal(payload.account.displayName, "Avery Stone");
   assert.equal(payload.account.reference, "RF-ACCT-SER123");
+  assert.deepEqual(payload.account.communicationPreferences, {
+    productUpdates: true,
+    requiredNotices: [
+      "Account and security notices",
+      "Billing and subscription notices",
+      "Support request follow-up",
+    ],
+  });
   assert.deepEqual(payload.billingSummary, {
     accessLevel: "free",
     statusLabel: "No subscription",

@@ -9,7 +9,12 @@ import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIc
 import { SupportReferenceCopyButton } from "../components/SupportReferenceCopyButton";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { validateAccountEmail } from "../lib/accountEmail";
-import { loadAccountProfile, saveAccountProfile } from "../lib/accountProfile";
+import {
+  DEFAULT_COMMUNICATION_PREFERENCES,
+  loadAccountProfile,
+  saveAccountProfile,
+  saveCommunicationPreferences,
+} from "../lib/accountProfile";
 import {
   accountAvatarUrl,
   accountDisplayName,
@@ -102,6 +107,10 @@ function accountNotice(value: string | undefined) {
       return { tone: "success" as const, text: "Resume direction saved." };
     case "template-invalid":
       return { tone: "warn" as const, text: "Choose a supported resume direction." };
+    case "communication-saved":
+      return { tone: "success" as const, text: "Communication preferences saved." };
+    case "communication-unavailable":
+      return { tone: "warn" as const, text: "Communication preferences could not be saved." };
     case "project-stage-saved":
       return { tone: "success" as const, text: "Saved project stage updated." };
     case "project-stage-invalid":
@@ -234,6 +243,33 @@ async function updateTemplatePreferenceAction(formData: FormData) {
   });
 
   redirect("/settings?account=template-saved#preferences");
+}
+
+async function updateCommunicationPreferenceAction(formData: FormData) {
+  "use server";
+
+  const supabase = await createRoleForgeServerClient();
+  if (!supabase) {
+    redirect("/login?next=/settings&account=signin-required");
+  }
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?next=/settings&account=signin-required");
+  }
+
+  try {
+    await saveCommunicationPreferences(supabase, user, {
+      productUpdates: formData.get("productUpdates") === "on",
+    });
+  } catch {
+    redirect("/settings?account=communication-unavailable#communication-preferences");
+  }
+
+  redirect("/settings?account=communication-saved#communication-preferences");
 }
 
 async function updateSettingsProjectStatusAction(formData: FormData) {
@@ -410,6 +446,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const accountReferenceLabel = accountReference(user.id);
   const accountInitials = (displayName || user.email || "RF").slice(0, 2).toUpperCase();
   const accountImageUrl = accountAvatarUrl(user);
+  const communicationPreferences = accountProfile?.communicationPreferences ?? DEFAULT_COMMUNICATION_PREFERENCES;
   const signInMethodLabel = accountSignInMethodLabel(user);
   const emailVerificationLabel = accountEmailVerificationLabel(user);
   const lastSignInLabel = accountSecurityDateLabel(user.last_sign_in_at);
@@ -1436,6 +1473,33 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               <div className="settings-export-actions">
                 <span>{selectedTemplate.name} is selected for new exports and studio runs.</span>
                 <Link className="btn btn-soft btn-sm settings-inline-link" href={resumeTemplateStudioHref(selectedTemplate.slug)}>Open in studio</Link>
+              </div>
+              <div className="settings-communication-card" id="communication-preferences">
+                <div>
+                  <h3>Communication preferences</h3>
+                  <p>Choose optional RoleForge product email. Account, billing, security, and support messages stay available because they keep the service working.</p>
+                </div>
+                <form className="settings-communication-form" action={updateCommunicationPreferenceAction}>
+                  <label className="settings-toggle-row">
+                    <input
+                      type="checkbox"
+                      name="productUpdates"
+                      defaultChecked={communicationPreferences.productUpdates}
+                    />
+                    <span>
+                      <strong>Product updates</strong>
+                      <small>Occasional RoleForge release notes, workflow improvements, and template updates.</small>
+                    </span>
+                  </label>
+                  <div className="settings-required-notices" aria-label="Required account communications">
+                    <span><RoleForgeIcon name="lock" size={13} /> Account and security notices</span>
+                    <span><RoleForgeIcon name="settings" size={13} /> Billing and subscription notices</span>
+                    <span><RoleForgeIcon name="mail" size={13} /> Support request follow-up</span>
+                  </div>
+                  <button className="primary-button" type="submit">
+                    Save communication preferences
+                  </button>
+                </form>
               </div>
             </div>
           </section>

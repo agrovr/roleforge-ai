@@ -12245,6 +12245,114 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--ink-0);
 }
 
+.settings-communication-card {
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(280px, 1.12fr);
+  gap: clamp(14px, 2vw, 22px);
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--brand) 7%, transparent), transparent 58%),
+    color-mix(in srgb, var(--surface) 90%, white);
+}
+
+.settings-communication-card h3 {
+  margin: 0 0 8px;
+  color: var(--ink-0);
+  font-size: 1.02rem;
+}
+
+.settings-communication-card p {
+  margin: 0;
+  color: var(--ink-2);
+  line-height: 1.48;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.settings-communication-form {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.settings-toggle-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 82%, white);
+}
+
+.settings-toggle-row input {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  accent-color: var(--brand-dark);
+}
+
+.settings-toggle-row span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.settings-toggle-row strong,
+.settings-toggle-row small,
+.settings-required-notices span {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.settings-toggle-row strong {
+  color: var(--ink-0);
+  font-weight: 950;
+}
+
+.settings-toggle-row small {
+  color: var(--ink-2);
+  line-height: 1.4;
+}
+
+.settings-required-notices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.settings-required-notices span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  color: var(--ink-2);
+  font-size: 0.82rem;
+  font-weight: 820;
+}
+
+.settings-required-notices svg {
+  flex: 0 0 auto;
+  color: var(--brand-dark);
+}
+
+.settings-communication-form .primary-button {
+  width: fit-content;
+  min-width: min(100%, 260px);
+  justify-content: center;
+}
+
 .settings-danger-zone {
   display: grid;
   gap: 12px;
@@ -12918,6 +13026,7 @@ html[data-theme="dark"] input::file-selector-button {
   .settings-danger-actions,
   .settings-profile-actions,
   .settings-billing-head,
+  .settings-communication-card,
   .settings-export-actions,
   .settings-document-actions {
     grid-template-columns: 1fr;
@@ -12945,6 +13054,7 @@ html[data-theme="dark"] input::file-selector-button {
   .settings-danger-button,
   .settings-billing-head form,
   .settings-billing-head .ghost-button,
+  .settings-communication-form .primary-button,
   .settings-inline-link {
     width: 100%;
   }
@@ -17581,6 +17691,28 @@ html[data-theme="dark"] .settings-export-actions span {
   color: var(--ink-2);
 }
 
+html[data-theme="dark"] .settings-communication-card {
+  border-color: rgba(255, 247, 233, 0.14);
+  background:
+    linear-gradient(135deg, rgba(221, 160, 74, 0.12), transparent 58%),
+    rgba(15, 20, 35, 0.82);
+}
+
+html[data-theme="dark"] .settings-toggle-row {
+  border-color: rgba(255, 213, 143, 0.18);
+  background: rgba(255, 247, 233, 0.055);
+}
+
+html[data-theme="dark"] .settings-required-notices span {
+  border-color: rgba(146, 191, 160, 0.16);
+  background: rgba(146, 191, 160, 0.08);
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .settings-required-notices svg {
+  color: #b7e5c4;
+}
+
 html[data-theme="dark"] .settings-export-item.enabled {
   border-color: rgba(146, 191, 160, 0.26);
   background:
@@ -19363,6 +19495,9 @@ html[data-theme="dark"] .nav {
 .settings-billing-head,
 .settings-plan-active-card,
 .settings-profile-actions,
+.settings-communication-card,
+.settings-communication-form,
+.settings-required-notices,
 .settings-export-actions,
 .templates-page-hero,
 .templates-page-actions,
@@ -19421,6 +19556,7 @@ html[data-theme="dark"] .nav {
 .history-version-more,
 .settings-profile-actions .primary-button,
 .settings-profile-actions .ghost-button,
+.settings-communication-form .primary-button,
 .settings-billing-head .ghost-button,
 .settings-plan-active-card .settings-inline-link,
 .settings-export-actions .btn,

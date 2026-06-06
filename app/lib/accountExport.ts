@@ -128,6 +128,14 @@ export function buildAccountExportPayload({
       displayName: accountDisplayName(user, profile?.displayName),
       createdAt: user.created_at ?? null,
       profileUpdatedAt: profile?.updatedAt || null,
+      communicationPreferences: {
+        productUpdates: profile?.communicationPreferences.productUpdates ?? false,
+        requiredNotices: [
+          "Account and security notices",
+          "Billing and subscription notices",
+          "Support request follow-up",
+        ],
+      },
     },
     plan: {
       name: entitlement.plan,
