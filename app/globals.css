@@ -8765,9 +8765,11 @@ html[data-theme="dark"] input::file-selector-button {
   overflow-x: clip;
   padding: 28px clamp(18px, 4vw, 54px) 54px;
   background:
-    radial-gradient(circle at 86% 8%, rgba(137, 209, 190, 0.14), transparent 21rem),
-    radial-gradient(circle at 8% 76%, rgba(222, 162, 79, 0.1), transparent 24rem),
+    linear-gradient(90deg, color-mix(in srgb, var(--brand-soft) 20%, transparent) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 86% 8%, rgba(137, 209, 190, 0.1), transparent 21rem),
+    radial-gradient(circle at 8% 76%, rgba(222, 162, 79, 0.08), transparent 24rem),
     linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
+  background-size: 44px 44px, auto, auto, auto;
 }
 
 .legal-topbar {
@@ -8777,6 +8779,8 @@ html[data-theme="dark"] input::file-selector-button {
 
 .legal-hero,
 .legal-grid,
+.legal-summary-strip,
+.updates-overview,
 .legal-footer-card {
   width: min(1280px, 100%);
   max-width: 100%;
@@ -8787,8 +8791,8 @@ html[data-theme="dark"] input::file-selector-button {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(min(100%, 330px), 390px);
   gap: clamp(22px, 4vw, 44px);
-  align-items: end;
-  padding: clamp(52px, 8vw, 92px) 0 clamp(24px, 4vw, 38px);
+  align-items: center;
+  padding: 72px 0 34px;
 }
 
 .legal-hero > * {
@@ -8799,7 +8803,7 @@ html[data-theme="dark"] input::file-selector-button {
   max-width: 850px;
   margin: 8px 0 14px;
   color: var(--ink-0);
-  font-size: clamp(3.25rem, 7vw, 6.25rem);
+  font-size: 5.25rem;
   line-height: 0.96;
   overflow-wrap: anywhere;
   text-wrap: balance;
@@ -8809,7 +8813,7 @@ html[data-theme="dark"] input::file-selector-button {
   max-width: 760px;
   margin: 0;
   color: var(--ink-2);
-  font-size: clamp(1rem, 2vw, 1.18rem);
+  font-size: 1.08rem;
   line-height: 1.62;
   overflow-wrap: anywhere;
   text-wrap: pretty;
@@ -8819,11 +8823,11 @@ html[data-theme="dark"] input::file-selector-button {
   display: grid;
   gap: 10px;
   min-width: 0;
-  padding: 18px;
+  padding: 20px;
   border: 1px solid color-mix(in srgb, var(--good) 22%, var(--line));
-  border-radius: 18px;
+  border-radius: 16px;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--good) 10%, transparent), transparent),
+    linear-gradient(135deg, color-mix(in srgb, var(--good) 8%, transparent), transparent),
     color-mix(in srgb, var(--surface) 84%, var(--bg-alt));
   box-shadow: 0 18px 46px -34px var(--shadow);
 }
@@ -8833,12 +8837,71 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .legal-hero-card span {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr);
+  gap: 10px;
   min-width: 0;
   color: var(--ink-1);
   font-size: 0.92rem;
   font-weight: 800;
   line-height: 1.35;
   overflow-wrap: anywhere;
+}
+
+.legal-hero-card span::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-top: 0.42em;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.62;
+}
+
+.legal-summary-strip,
+.updates-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  min-width: 0;
+  margin-bottom: 16px;
+  padding: 18px;
+  border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line));
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--sky-soft) 30%, transparent), transparent),
+    color-mix(in srgb, var(--surface) 90%, var(--bg-alt));
+  box-shadow: 0 18px 48px -42px var(--shadow);
+}
+
+.legal-summary-strip > *,
+.updates-overview > * {
+  min-width: 0;
+}
+
+.legal-summary-strip strong,
+.updates-overview strong {
+  display: block;
+  margin-top: 5px;
+  color: var(--ink-0);
+  font-family: var(--font-display);
+  font-size: 1.72rem;
+  font-weight: 680;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.legal-summary-strip p,
+.updates-overview p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.96rem;
+  font-weight: 700;
+  line-height: 1.52;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
 }
 
 .help-action-routes {
@@ -9530,6 +9593,7 @@ html[data-theme="dark"] input::file-selector-button {
   width: min(1280px, 100%);
   max-width: 100%;
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
   min-width: 0;
   margin: 0 auto;
@@ -9539,13 +9603,13 @@ html[data-theme="dark"] input::file-selector-button {
   container: updates-card / inline-size;
   min-width: 0;
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 14px;
   align-items: start;
   overflow: hidden;
   padding: 18px;
   border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line));
-  border-radius: 14px;
+  border-radius: 16px;
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--bg-alt) 72%, transparent)),
     var(--surface);
@@ -9553,8 +9617,8 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .updates-card-icon {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
   border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
@@ -9591,8 +9655,8 @@ html[data-theme="dark"] input::file-selector-button {
   margin: 8px 0 8px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(1.65rem, 6cqi, 2.32rem);
-  line-height: 1.02;
+  font-size: 1.9rem;
+  line-height: 1.04;
   overflow-wrap: anywhere;
   text-wrap: balance;
 }
@@ -9617,7 +9681,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .updates-card li {
   display: grid;
-  grid-template-columns: 18px minmax(0, 1fr);
+  grid-template-columns: 16px minmax(0, 1fr);
   gap: 8px;
   color: var(--ink-2);
   font-size: 0.9rem;
@@ -10380,7 +10444,7 @@ html[data-theme="dark"] input::file-selector-button {
   }
 
   .updates-card h2 {
-    font-size: clamp(1.48rem, 13cqi, 1.92rem);
+    font-size: 1.58rem;
   }
 }
 
@@ -10388,8 +10452,10 @@ html[data-theme="dark"] input::file-selector-button {
 .legal-footer-card {
   min-width: 0;
   border: 1px solid var(--line);
-  border-radius: 18px;
-  background: color-mix(in srgb, var(--surface) 90%, var(--bg-alt));
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, transparent), color-mix(in srgb, var(--bg-alt) 72%, transparent)),
+    var(--surface);
   box-shadow: 0 20px 54px -44px var(--shadow);
 }
 
@@ -10404,7 +10470,7 @@ html[data-theme="dark"] input::file-selector-button {
   margin: 0;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(1.7rem, 3vw, 2.25rem);
+  font-size: 1.95rem;
   line-height: 1.04;
   overflow-wrap: anywhere;
   text-wrap: balance;
@@ -10446,6 +10512,7 @@ html[data-theme="dark"] input::file-selector-button {
 @media (max-width: 900px) {
   .legal-hero {
     grid-template-columns: 1fr;
+    padding-top: 52px;
   }
 
   .help-action-head,
@@ -10456,6 +10523,12 @@ html[data-theme="dark"] input::file-selector-button {
   .legal-grid {
     grid-template-columns: 1fr;
     min-width: 0;
+  }
+
+  .legal-summary-strip,
+  .updates-overview,
+  .updates-timeline {
+    grid-template-columns: 1fr;
   }
 
   .support-layout {
@@ -10488,7 +10561,6 @@ html[data-theme="dark"] input::file-selector-button {
 
   .legal-hero {
     align-items: start;
-    padding-top: 42px;
   }
 
   .legal-hero-card {
@@ -10534,11 +10606,13 @@ html[data-theme="dark"] input::file-selector-button {
   }
 
   .legal-hero h1 {
-    font-size: clamp(2.7rem, 16vw, 3.6rem);
+    font-size: 3.1rem;
   }
 
   .legal-card,
   .legal-footer-card,
+  .legal-summary-strip,
+  .updates-overview,
   .help-search-card,
   .help-search-empty,
   .support-guide-card,

@@ -26,149 +26,87 @@ type UpdateItem = {
   actionLabel: string;
 };
 
+const updatePrinciples = [
+  "Published only after behavior ships",
+  "Grouped by release theme, not every small patch",
+  "No unsupported claims or roadmap promises",
+] as const;
+
 const updates: readonly UpdateItem[] = [
   {
-    title: "Communication preferences are now account-backed",
-    date: "June 5, 2026",
-    eyebrow: "Settings",
+    title: "Account controls are now more complete",
+    date: "June 2026",
+    eyebrow: "Account workspace",
     icon: "mail",
-    summary: "Settings now saves optional product update email preferences to the account profile.",
+    summary: "Settings now feels like the home for profile, preferences, support history, and privacy controls.",
     details: [
-      "The Preferences section includes an account-backed product updates toggle instead of a cosmetic-only setting.",
-      "Account exports include communication preference records and clearly list required account, billing, security, and support notices.",
-      "The Privacy page explains how communication preferences are collected and used.",
+      "Communication preferences are saved to the account profile and included in account exports.",
+      "Data and privacy controls route export, deletion, policy, and support questions to the right place.",
     ],
-    actionHref: "/settings#preferences",
-    actionLabel: "Open preferences",
+    actionHref: "/settings",
+    actionLabel: "Open settings",
   },
   {
-    title: "Account support actions are easier to find",
-    date: "June 3, 2026",
-    eyebrow: "Account support",
+    title: "Support and status paths are clearer",
+    date: "June 2026",
+    eyebrow: "Support",
     icon: "mail",
-    summary: "Settings and Support now make common account tasks and saved support references faster to use.",
+    summary: "Help, Status, Support, and Settings now send common issues to the surface that owns the live state.",
     details: [
-      "Settings includes task shortcuts for canceling Premium, exporting account data, reviewing support history, and restoring saved projects.",
-      "Support and Settings histories include a copy control for the safe RF support reference shown to the user.",
-      "The account menus now use consistent account export and support-history actions across public and signed-in surfaces.",
+      "Support requests are saved to the signed-in account with a safe RF reference and visible request history.",
+      "Common workflow, export, billing, saved-project, and privacy questions open prefilled support requests.",
     ],
     actionHref: "/support",
     actionLabel: "Open support",
   },
   {
-    title: "Public sign-in keeps your place",
-    date: "June 2, 2026",
-    eyebrow: "Account",
-    icon: "lock",
-    summary: "The public account menu now sends signed-out users back to the page they started from after login.",
+    title: "Premium and export behavior is explicit",
+    date: "June 2026",
+    eyebrow: "Billing and exports",
+    icon: "layers",
+    summary: "The site now separates free PDF export from Premium DOCX/TXT access and uses real billing state.",
     details: [
-      "Sign-in links from Help, Status, Support, Updates, and other public surfaces preserve the current path, query, and hash.",
-      "Public account controls still fall back to Studio when the current page cannot be read safely.",
+      "Checkout and billing management use Stripe, while Settings explains subscription sync and cancellation state.",
+      "Saved projects and restored downloads respect the current account entitlement instead of exposing stale premium links.",
     ],
-    actionHref: "/help",
-    actionLabel: "Open help",
+    actionHref: "/settings#billing",
+    actionLabel: "Open billing",
   },
   {
-    title: "Quick actions now support keyboard shortcuts",
-    date: "June 2, 2026",
-    eyebrow: "Navigation",
+    title: "Saved work is easier to recover",
+    date: "June 2026",
+    eyebrow: "Projects",
     icon: "settings",
-    summary: "The RoleForge quick-action menu can now open from the keyboard and its visible shortcut letters perform real actions.",
+    summary: "Signed-in runs can be restored, renamed, staged, and managed from a cleaner account workspace.",
     details: [
-      "Ctrl or Command+K opens quick actions when focus is not inside a form field.",
-      "The quick-action menu now honors S, T, A, D, C, and R for Studio, Templates, Account settings, theme, copy link, and refresh.",
-    ],
-    actionHref: "/help",
-    actionLabel: "Open help",
-  },
-  {
-    title: "Help Center is searchable",
-    date: "June 2, 2026",
-    eyebrow: "Help",
-    icon: "scan",
-    summary: "Help now filters account, billing, export, saved-project, and workflow guidance from one search field.",
-    details: [
-      "The Help page filters both topic cards and quick actions as you type, so billing, export, account, and saved-project answers are easier to find.",
-      "When there is no match, Help points users toward an account-linked support request instead of leaving them at a dead end.",
-    ],
-    actionHref: "/help",
-    actionLabel: "Search help",
-  },
-  {
-    title: "Settings project controls are cleaner",
-    date: "June 2, 2026",
-    eyebrow: "Saved projects",
-    icon: "chart",
-    summary: "Saved project controls in Settings now stack into readable action rows instead of squeezing labels.",
-    details: [
-      "Project stage buttons, rename controls, downloads, and removal controls now sit in full-width rows with wider labels.",
-      "The production smoke guard now checks the new saved-project layout so status pills and action labels do not collapse into vertical text.",
+      "Project rows now keep stage controls, downloads, restore actions, and removal controls readable.",
+      "Eligible browser-history runs can be saved into the signed-in account for later restore.",
     ],
     actionHref: "/settings#projects",
     actionLabel: "Open projects",
   },
   {
-    title: "Status and Support now guide next steps",
-    date: "June 2, 2026",
-    eyebrow: "Support",
-    icon: "mail",
-    summary: "Status and Support now point users toward the right workflow, billing, account, or saved-project action.",
-    details: [
-      "The Status page includes next-step cards for checking the workflow, reviewing account controls, and opening prefilled support requests.",
-      "The Support page topic cards now prefill the request category, subject, and related page before a signed-in request is sent.",
-    ],
-    actionHref: "/support",
-    actionLabel: "Open support",
-  },
-  {
-    title: "Profile controls now follow you across the site",
-    date: "June 2, 2026",
-    eyebrow: "Account menus",
-    icon: "settings",
-    summary: "Signed-in users can reach the same account controls from the landing page, Studio, Templates, and Settings.",
-    details: [
-      "The landing page, Studio, Templates, and Settings expose account menus with plan, export, billing, status, security, and sign-out controls.",
-      "Signed-in users can reach account export, preferences, saved projects, Help, and System status without leaving the current surface.",
-    ],
-    actionHref: "/settings",
-    actionLabel: "Open settings",
-  },
-  {
-    title: "System status is public",
-    date: "June 2, 2026",
-    eyebrow: "Operations",
+    title: "Public guidance is easier to scan",
+    date: "June 2026",
+    eyebrow: "Public pages",
     icon: "scan",
-    summary: "The Status page reports account, workflow, export, and Premium billing readiness from the current deployment.",
+    summary: "Help, Status, Templates, Support, Updates, Privacy, and Terms are now discoverable and consistent.",
     details: [
-      "Status reports account access, resume workflow capabilities, export availability, and Premium billing readiness from live configuration and backend capabilities.",
-      "Robots and sitemap now expose public Help, Status, Updates, legal, and template pages while protected routes stay excluded.",
+      "Help includes searchable guidance and direct routes for common account, billing, export, and workflow issues.",
+      "Public account menus preserve the destination through sign-in when a protected page is required.",
     ],
-    actionHref: "/status",
-    actionLabel: "Open status",
+    actionHref: "/help",
+    actionLabel: "Open help",
   },
   {
-    title: "Settings is now an account workspace",
-    date: "June 1, 2026",
-    eyebrow: "Settings",
-    icon: "lock",
-    summary: "Settings now covers profile, security, preferences, saved projects, usage, exports, and billing in one signed-in workspace.",
+    title: "Template direction is visible before Studio",
+    date: "May 2026",
+    eyebrow: "Templates",
+    icon: "file",
+    summary: "The Templates page makes the selected resume direction visible before starting a new run.",
     details: [
-      "Settings includes profile display name, email update controls, account export, guarded deletion, security metadata, saved projects, usage, export preferences, and billing actions.",
-      "Saved projects can be renamed, restored, staged, and removed from the account area.",
-    ],
-    actionHref: "/settings",
-    actionLabel: "Open settings",
-  },
-  {
-    title: "Free and Premium export rules are explicit",
-    date: "May 31, 2026",
-    eyebrow: "Exports",
-    icon: "layers",
-    summary: "Template selection is visible before opening the Studio, and export access is tied to the active plan.",
-    details: [
-      "Free accounts keep PDF export.",
-      "Premium access unlocks DOCX and TXT while the subscription is active.",
-      "Template direction can be chosen before new studio runs and exports.",
+      "Template choices carry into new studio runs and exports.",
+      "The public template gallery explains available directions without promising unsupported outcomes.",
     ],
     actionHref: "/templates",
     actionLabel: "Browse templates",
@@ -204,10 +142,20 @@ export default function UpdatesPage() {
         </div>
         <div className="legal-hero-card updates-hero-card" aria-label="Updates summary">
           <RoleForgeIcon name="sparkle" size={18} />
-          <span>Updates describe shipped product behavior</span>
-          <span>Status has the current operational view</span>
-          <span>No fake launch stats or unsupported roadmap promises</span>
+          {updatePrinciples.map((principle) => (
+            <span key={principle}>{principle}</span>
+          ))}
         </div>
+      </section>
+
+      <section className="updates-overview" aria-label="Updates publishing standard">
+        <div>
+          <span className="eyebrow">Release notes</span>
+          <strong>Short, grouped, and shipped.</strong>
+        </div>
+        <p>
+          This page highlights material product changes. Operational availability stays on Status, and account-specific state stays in Settings.
+        </p>
       </section>
 
       <section className="updates-timeline" aria-label="Recent product updates">

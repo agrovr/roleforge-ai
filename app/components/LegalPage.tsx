@@ -44,6 +44,16 @@ export function LegalPage({
         </div>
       </section>
 
+      <section className="legal-summary-strip" aria-label="Policy reading guide">
+        <div>
+          <span className="eyebrow">Plain-language summary</span>
+          <strong>Designed to be readable before you use the app.</strong>
+        </div>
+        <p>
+          These pages summarize current product behavior. Settings contains the live account controls for exports, billing, privacy, and account deletion.
+        </p>
+      </section>
+
       <section className="legal-grid" aria-label={`${title} sections`}>
         {sections.map((section) => (
           <article className="legal-card" key={section.title}>

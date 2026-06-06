@@ -132,7 +132,7 @@ const supportLifecycle: Array<{
 }> = [
   {
     status: "open",
-    detail: "Your request is saved with an RF reference and visible in Support history.",
+    detail: "Your request is saved with an RF reference and visible in Support and Settings history.",
   },
   {
     status: "reviewing",
@@ -261,6 +261,7 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
         <div className="legal-hero-card support-hero-card" aria-label="Support summary">
           <RoleForgeIcon name="mail" size={18} />
           <span>Signed-in requests are saved to your account</span>
+          <span>Requests appear in Support and Settings history</span>
           <span>Include request IDs from Studio when available</span>
           <span>Never paste full payment card details or private credentials</span>
         </div>
