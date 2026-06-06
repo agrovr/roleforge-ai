@@ -198,13 +198,14 @@ async function cleanupTestUser({ supabaseUrl, serviceRoleKey, stripeSecretKey, u
   const cleanup = {
     userIdMasked: maskId(resolvedUserId),
     subscriptionCanceled: false,
-    subscriptionCancelSkipped: false,
     userDeleted: false,
   };
 
   if (subscriptionId) {
     if (!stripeSecretKey?.startsWith("sk_live_")) {
-      cleanup.subscriptionCancelSkipped = true;
+      throw new Error(
+        "Refusing to delete the proof user because a Stripe subscription exists but no live Stripe secret key is available to cancel it first.",
+      );
     } else {
       const stripe = new Stripe(stripeSecretKey, {
         appInfo: {

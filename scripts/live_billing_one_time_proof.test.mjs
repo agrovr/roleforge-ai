@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const script = readFileSync("scripts/live_billing_one_time_proof.ps1", "utf8");
+const entitlementScript = readFileSync("scripts/live_checkout_entitlement_test.mjs", "utf8");
 const stripeDocs = readFileSync("docs/stripe-billing-foundation.md", "utf8");
 const operationsDocs = readFileSync("docs/operations-checklist.md", "utf8");
 
@@ -19,6 +20,15 @@ test("one-shot live billing proof clears copied Stripe secrets", () => {
   assert.match(script, /Clear-SecretClipboard\s*\r?\n/);
   assert.match(script, /Remove-Item Env:\\STRIPE_SECRET_KEY/);
   assert.match(script, /Remove-Item Env:\\ROLEFORGE_STRIPE_SECRET_KEY/);
+});
+
+test("live proof cleanup refuses to orphan live Stripe subscriptions", () => {
+  assert.match(entitlementScript, /if \(subscriptionId\) \{/);
+  assert.match(entitlementScript, /!stripeSecretKey\?\.startsWith\("sk_live_"\)/);
+  assert.match(entitlementScript, /Refusing to delete the proof user because a Stripe subscription exists/);
+  assert.match(entitlementScript, /await stripe\.subscriptions\.cancel\(subscriptionId\)/);
+  assert.match(entitlementScript, /await client\.auth\.admin\.deleteUser\(resolvedUserId\)/);
+  assert.doesNotMatch(entitlementScript, /subscriptionCancelSkipped/);
 });
 
 test("cache-only mode writes the encrypted one-time Stripe cache", () => {
