@@ -8,6 +8,7 @@ const stylesheet = readFileSync("app/globals.css", "utf8");
 test("landing nav exposes a signed-in account menu from real account data", () => {
   assert.match(landingPage, /import \{ AccountAvatar \}/);
   assert.match(landingPage, /accountDisplayName\(user,\s*profile\?\.displayName\)/);
+  assert.match(landingPage, /accountReference\(user\.id\)/);
   assert.match(landingPage, /accountAvatarUrl\(user\)/);
   assert.match(landingPage, /loadAccountProfile\(supabase,\s*user\.id\)/);
   assert.match(landingPage, /className="landing-account-menu"/);
@@ -15,6 +16,10 @@ test("landing nav exposes a signed-in account menu from real account data", () =
   assert.match(landingPage, /aria-label="Open account menu"/);
   assert.match(landingPage, /aria-haspopup="menu"/);
   assert.match(landingPage, /aria-expanded="false"/);
+  assert.match(landingPage, /accountReferenceLabel/);
+  assert.match(landingPage, /Account ref \{accountReferenceLabel\}/);
+  assert.match(landingPage, /className="studio-account-reference"/);
+  assert.match(landingPage, /className="studio-account-reference-copy"/);
   assert.match(landingPage, /aria-label="Landing account summary"/);
   assert.match(landingPage, /href="\/settings#billing"/);
   assert.match(landingPage, /href="\/status"/);
@@ -41,6 +46,8 @@ test("landing account menu stays compact in the nav", () => {
   assert.match(stylesheet, /\.landing-account-menu\s*\{(?=[^}]*position:\s*relative)(?=[^}]*display:\s*inline-flex)[^}]*\}/s);
   assert.match(stylesheet, /\.landing-account-button\s*\{(?=[^}]*width:\s*42px)(?=[^}]*height:\s*42px)[^}]*\}/s);
   assert.match(stylesheet, /\.landing-account-popover\s*\{(?=[^}]*width:\s*min\(430px,\s*calc\(100vw\s*-\s*36px\)\))[^}]*\}/s);
+  assert.match(stylesheet, /\.studio-account-reference\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s);
+  assert.match(stylesheet, /\.studio-account-reference-copy\s*\{(?=[^}]*min-height:\s*26px)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /\.landing-account-insights\s*\{[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/s);
   assert.match(stylesheet, /\.studio-account-next-actions\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.studio-account-next-actions\s+a\s*\{(?=[^}]*min-height:\s*42px)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
@@ -74,13 +81,30 @@ test("landing pricing status pills stay readable on dark featured cards", () => 
   assert.match(stylesheet, /\.price-status::before\s*\{(?=[^}]*content:\s*"";)(?=[^}]*width:\s*7px)(?=[^}]*height:\s*7px)[^}]*\}/s);
   assert.match(stylesheet, /\.price-card\.featured\s+\.price-status\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.62\))(?=[^}]*background:\s*rgba\(255,\s*247,\s*233,\s*0\.2\))(?=[^}]*color:\s*#fffaf0)(?=[^}]*text-shadow:\s*0 1px 1px rgba\(8,\s*12,\s*24,\s*0\.35\))[^}]*\}/s);
   assert.match(stylesheet, /\.price-status\.current\s*\{(?=[^}]*border-color:\s*rgba\(166,\s*102,\s*38,\s*0\.34\))(?=[^}]*background:\s*rgba\(221,\s*160,\s*74,\s*0\.14\))(?=[^}]*color:\s*#74460f)(?=[^}]*text-shadow:\s*none)[^}]*\}/s);
-  assert.match(stylesheet, /\.price-card\.featured\s+\.price-status\.current\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.52\))(?=[^}]*background:\s*rgba\(255,\s*247,\s*233,\s*0\.14\))(?=[^}]*color:\s*#fff7e9)(?=[^}]*text-shadow:\s*0 1px 1px rgba\(8,\s*12,\s*24,\s*0\.42\))[^}]*\}/s);
+  assert.match(stylesheet, /\.price-card\.featured\s+\.price-status\.current\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.34\))(?=[^}]*linear-gradient\(180deg,\s*rgba\(255,\s*247,\s*233,\s*0\.11\),\s*rgba\(255,\s*247,\s*233,\s*0\.055\)\))(?=[^}]*color:\s*#fff1d6)(?=[^}]*text-shadow:\s*none)[^}]*\}/s);
   assert.match(stylesheet, /\.price-card\.featured\s+\.price-status\.upgrade,\s*\.price-card\.featured\s+\.price-status\.paused\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.52\))(?=[^}]*background:\s*rgba\(255,\s*247,\s*233,\s*0\.16\))(?=[^}]*color:\s*#fff7e9)[^}]*\}/s);
   assert.match(stylesheet, /\.price-card\.featured\s+\.price-status\.upgrade\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*210,\s*118,\s*0\.58\))(?=[^}]*background:\s*rgba\(255,\s*210,\s*118,\s*0\.18\))(?=[^}]*color:\s*#fff4da)[^}]*\}/s);
   assert.match(stylesheet, /\.price-card\.featured\s+\.price-status\.paused\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*186,\s*170,\s*0\.48\))(?=[^}]*background:\s*rgba\(237,\s*127,\s*105,\s*0\.16\))(?=[^}]*color:\s*#ffd7ce)[^}]*\}/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-status\.current\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*213,\s*143,\s*0\.48\))(?=[^}]*background:\s*rgba\(255,\s*213,\s*143,\s*0\.14\))(?=[^}]*color:\s*#ffedc9)(?=[^}]*text-shadow:\s*none)[^}]*\}/s);
-  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-card\.featured\s+\.price-status\.current\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.58\))(?=[^}]*background:\s*rgba\(255,\s*247,\s*233,\s*0\.15\))(?=[^}]*color:\s*#fff7e9)(?=[^}]*text-shadow:\s*0 1px 1px rgba\(8,\s*12,\s*24,\s*0\.46\))[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-card\.featured\s+\.price-status\.current\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.34\))(?=[^}]*linear-gradient\(180deg,\s*rgba\(255,\s*247,\s*233,\s*0\.1\),\s*rgba\(255,\s*247,\s*233,\s*0\.045\)\))(?=[^}]*color:\s*#fff1d6)(?=[^}]*text-shadow:\s*none)[^}]*\}/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-card\.featured\s+\.price-status\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.7\))(?=[^}]*linear-gradient\(180deg,\s*rgba\(255,\s*247,\s*233,\s*0\.26\),\s*rgba\(255,\s*247,\s*233,\s*0\.13\)\))(?=[^}]*color:\s*#fffaf0)(?=[^}]*text-shadow:\s*0 1px 1px rgba\(8,\s*12,\s*24,\s*0\.45\))[^}]*\}/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-card\.featured\s+\.price-status\.upgrade\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*213,\s*143,\s*0\.72\))(?=[^}]*background:\s*rgba\(255,\s*213,\s*143,\s*0\.24\))(?=[^}]*color:\s*#fff0ce)[^}]*\}/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-card\.featured\s+\.price-status\.paused\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*203,\s*155,\s*0\.62\))(?=[^}]*background:\s*rgba\(237,\s*127,\s*105,\s*0\.2\))(?=[^}]*color:\s*#ffe0d8)[^}]*\}/s);
+});
+
+test("landing footer reads as a complete product footer", () => {
+  assert.match(landingPage, /const currentYear = new Date\(\)\.getFullYear\(\);/);
+  assert.match(landingPage, /className="footer-brand-block"/);
+  assert.match(landingPage, /real Stripe-backed Premium access/);
+  assert.match(landingPage, /Free PDF workflow/);
+  assert.match(landingPage, /Premium DOCX\/TXT/);
+  assert.match(landingPage, /<h3>Account<\/h3>/);
+  assert.match(landingPage, /href="\/settings#billing"/);
+  assert.match(landingPage, /&copy; \{currentYear\} RoleForge AI\. All rights reserved\./);
+  assert.match(stylesheet, /\.footer-inner\s*\{(?=[^}]*grid-template-columns:\s*minmax\(280px,\s*1\.45fr\)\s+repeat\(3,\s*minmax\(138px,\s*0\.7fr\)\))(?=[^}]*align-items:\s*start)[^}]*\}/s);
+  assert.match(stylesheet, /\.footer-brand-block\s*\{(?=[^}]*display:\s*grid)(?=[^}]*gap:\s*18px)(?=[^}]*max-width:\s*520px)[^}]*\}/s);
+  assert.match(stylesheet, /\.footer-product-note\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*gap:\s*8px)[^}]*\}/s);
+  assert.match(stylesheet, /\.footer-product-note\s+span\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*border-radius:\s*999px)(?=[^}]*font-weight:\s*760)[^}]*\}/s);
+  assert.match(stylesheet, /\.footer-meta\s*\{(?=[^}]*justify-content:\s*space-between)(?=[^}]*align-items:\s*center)(?=[^}]*border-top:\s*1px solid var\(--line\))[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.footer-product-note span/);
 });

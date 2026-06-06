@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { AccountAvatar } from "./AccountAvatar";
+import { AccountReferenceCopyButton } from "./AccountReferenceCopyButton";
 import { RoleForgeIcon } from "./RoleForgeIcons";
-import { writeClipboardText } from "../lib/clipboard";
 
 type PublicAccountStatus = {
   configured?: boolean;
@@ -61,7 +61,6 @@ function currentPagePath() {
 
 export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMenuProps) {
   const [status, setStatus] = useState<PublicAccountStatus | null | undefined>(undefined);
-  const [referenceCopyState, setReferenceCopyState] = useState<"idle" | "copied" | "failed">("idle");
 
   useEffect(() => {
     let alive = true;
@@ -116,14 +115,6 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
   const projectActionHref = typeof savedProjectCount === "number" && savedProjectCount > 0 ? "/settings#projects" : "/app";
   const supportActionLabel = typeof supportRequestCount === "number" && supportRequestCount > 0 ? "Support history" : "Contact support";
   const supportActionHref = typeof supportRequestCount === "number" && supportRequestCount > 0 ? "/settings#support" : supportHref;
-  const referenceCopyLabel = referenceCopyState === "copied" ? "Copied" : referenceCopyState === "failed" ? "Copy failed" : "Copy ref";
-
-  async function copyAccountReference() {
-    if (!accountReferenceLabel) return;
-    const copied = await writeClipboardText(accountReferenceLabel);
-    setReferenceCopyState(copied ? "copied" : "failed");
-    window.setTimeout(() => setReferenceCopyState("idle"), 1800);
-  }
 
   if (loading) {
     return (
@@ -168,15 +159,7 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
             {accountReferenceLabel ? (
               <span className="public-account-reference">
                 <span>Account ref {accountReferenceLabel}</span>
-                <button
-                  type="button"
-                  className="public-account-reference-copy"
-                  aria-label={`Copy account reference ${accountReferenceLabel}`}
-                  onClick={() => void copyAccountReference()}
-                >
-                  <RoleForgeIcon name={referenceCopyState === "copied" ? "check" : "copy"} size={12} />
-                  {referenceCopyLabel}
-                </button>
+                <AccountReferenceCopyButton className="public-account-reference-copy" iconSize={12} referenceLabel={accountReferenceLabel} />
               </span>
             ) : null}
           </div>

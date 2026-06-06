@@ -2,9 +2,10 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 
 import { AccountAvatar } from "../components/AccountAvatar";
+import { AccountReferenceCopyButton } from "../components/AccountReferenceCopyButton";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
-import { accountAvatarUrl, accountDisplayName } from "../lib/accountUser";
+import { accountAvatarUrl, accountDisplayName, accountReference } from "../lib/accountUser";
 import { RESUME_TEMPLATE_COOKIE, getResumeTemplate, resumeTemplateStudioHref } from "../lib/resumeTemplates";
 import { supportRequestHref } from "../lib/supportRequests";
 import { ThemeToggle } from "../components/ThemeToggle";
@@ -31,6 +32,7 @@ async function getTemplateLinks() {
     accountImageUrl: accountAvatarUrl(user),
     accountInitials,
     accountName: displayName || user?.email || "RoleForge user",
+    accountReferenceLabel: user ? accountReference(user.id) : "",
     email: user?.email ?? "",
     signedIn,
     initialTemplateSlug,
@@ -41,7 +43,7 @@ async function getTemplateLinks() {
 }
 
 export default async function TemplatesPage() {
-  const { accountImageUrl, accountInitials, accountName, email, signedIn, initialTemplateSlug, billingSupportHref, studioHref, settingsHref } = await getTemplateLinks();
+  const { accountImageUrl, accountInitials, accountName, accountReferenceLabel, email, signedIn, initialTemplateSlug, billingSupportHref, studioHref, settingsHref } = await getTemplateLinks();
   const selectedTemplate = getResumeTemplate(initialTemplateSlug);
 
   return (
@@ -67,6 +69,12 @@ export default async function TemplatesPage() {
                   <div>
                     <strong className="studio-account-email" title={email}>{accountName}</strong>
                     <span>{selectedTemplate.name} direction</span>
+                    {accountReferenceLabel ? (
+                      <span className="studio-account-reference">
+                        <span>Account ref {accountReferenceLabel}</span>
+                        <AccountReferenceCopyButton className="studio-account-reference-copy" iconSize={12} referenceLabel={accountReferenceLabel} />
+                      </span>
+                    ) : null}
                   </div>
                 </div>
                 <div className="studio-account-insights" aria-label="Template account summary">

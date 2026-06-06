@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const publicAccountMenu = readFileSync("app/components/PublicAccountMenu.tsx", "utf8");
+const accountReferenceCopyButton = readFileSync("app/components/AccountReferenceCopyButton.tsx", "utf8");
 const authStatusRoute = readFileSync("app/api/auth/status/route.ts", "utf8");
 const helpPage = readFileSync("app/help/page.tsx", "utf8");
 const statusPage = readFileSync("app/status/page.tsx", "utf8");
@@ -14,9 +15,9 @@ test("public account menu turns static topbars into signed-in command centers", 
   assert.match(publicAccountMenu, /"use client"/);
   assert.match(publicAccountMenu, /fetch\("\/api\/auth\/status"/);
   assert.match(publicAccountMenu, /credentials:\s*"same-origin"/);
-  assert.match(publicAccountMenu, /writeClipboardText/);
+  assert.match(publicAccountMenu, /AccountReferenceCopyButton/);
+  assert.match(accountReferenceCopyButton, /writeClipboardText\(referenceLabel\)/);
   assert.match(publicAccountMenu, /useState<PublicAccountStatus \| null \| undefined>\(undefined\)/);
-  assert.match(publicAccountMenu, /useState<"idle" \| "copied" \| "failed">\("idle"\)/);
   assert.match(publicAccountMenu, /const loading = status === undefined/);
   assert.match(publicAccountMenu, /if \(loading\)/);
   assert.match(publicAccountMenu, /public-account-loading/);
@@ -37,8 +38,7 @@ test("public account menu turns static topbars into signed-in command centers", 
   assert.match(publicAccountMenu, /reference\?: string/);
   assert.match(publicAccountMenu, /accountReferenceLabel/);
   assert.match(publicAccountMenu, /Account ref \{accountReferenceLabel\}/);
-  assert.match(publicAccountMenu, /Copy account reference \$\{accountReferenceLabel\}/);
-  assert.match(publicAccountMenu, /writeClipboardText\(accountReferenceLabel\)/);
+  assert.match(publicAccountMenu, /referenceLabel=\{accountReferenceLabel\}/);
   assert.match(publicAccountMenu, /public-account-reference-copy/);
   assert.match(publicAccountMenu, /Public page account summary/);
   assert.match(publicAccountMenu, /href="\/settings#billing"/);
@@ -109,9 +109,9 @@ test("public account menu topbar layout is overflow safe", () => {
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.public-account-loading/);
   assert.match(stylesheet, /\.public-topbar-avatar\s*\{(?=[^}]*width:\s*40px)(?=[^}]*height:\s*40px)[^}]*\}/s);
   assert.match(stylesheet, /\.public-account-popover\s*\{(?=[^}]*width:\s*min\(420px,\s*calc\(100vw\s*-\s*30px\)\))[^}]*\}/s);
-  assert.match(stylesheet, /\.public-account-reference\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*max-width:\s*100%)[^}]*\}/s);
-  assert.match(stylesheet, /\.public-account-reference\s*>\s*span\s*\{(?=[^}]*font-size:\s*0\.74rem)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
-  assert.match(stylesheet, /\.public-account-reference-copy\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*min-height:\s*26px)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
+  assert.match(stylesheet, /\.public-account-reference,\s*\.studio-account-reference\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*max-width:\s*100%)[^}]*\}/s);
+  assert.match(stylesheet, /\.public-account-reference\s*>\s*span,\s*\.studio-account-reference\s*>\s*span\s*\{(?=[^}]*font-size:\s*0\.74rem)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
+  assert.match(stylesheet, /\.public-account-reference-copy,\s*\.studio-account-reference-copy\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*min-height:\s*26px)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /\.studio-account-next-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.studio-account-next-actions\s+a\s*\{(?=[^}]*min-height:\s*42px)(?=[^}]*min-width:\s*0)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /@container\s+studio-account-popover\s+\(max-width:\s*360px\)\s*\{[\s\S]*?\.studio-account-insights,\s*\.studio-account-next-actions\s*\{[^}]*grid-template-columns:\s*1fr/s);

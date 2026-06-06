@@ -46,7 +46,7 @@ import {
 } from "../lib/usage";
 import { BillingSubmitButton } from "./BillingSubmitButton";
 import { AccountEmailCopyButton } from "./AccountEmailCopyButton";
-import { AccountReferenceCopyButton } from "./AccountReferenceCopyButton";
+import { AccountReferenceCopyButton } from "../components/AccountReferenceCopyButton";
 import { SettingsSectionNav } from "./SettingsSectionNav";
 
 type CountResult = { count: number | null; error: unknown };
@@ -851,6 +851,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <strong className="studio-account-email" title={displayName || user.email || "RoleForge account"}>{displayName || "RoleForge account"}</strong>
                   <span title={user.email ? `${user.email} · ${displayPlanLabel}` : displayPlanLabel}>
                     {user.email ? `${user.email} · ${displayPlanLabel}` : displayPlanLabel}
+                  </span>
+                  <span className="studio-account-reference">
+                    <span>Account ref {accountReferenceLabel}</span>
+                    <AccountReferenceCopyButton className="studio-account-reference-copy" iconSize={12} referenceLabel={accountReferenceLabel} />
                   </span>
                 </div>
               </div>

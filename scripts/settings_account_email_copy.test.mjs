@@ -4,7 +4,7 @@ import test from "node:test";
 
 const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
 const accountEmailCopyButton = readFileSync("app/settings/AccountEmailCopyButton.tsx", "utf8");
-const accountReferenceCopyButton = readFileSync("app/settings/AccountReferenceCopyButton.tsx", "utf8");
+const accountReferenceCopyButton = readFileSync("app/components/AccountReferenceCopyButton.tsx", "utf8");
 const stylesheet = readFileSync("app/globals.css", "utf8");
 
 test("settings account panel can copy the signed-in email and safe account reference", () => {
@@ -15,6 +15,8 @@ test("settings account panel can copy the signed-in email and safe account refer
   assert.match(settingsPage, /className="settings-account-email-line"/);
   assert.match(settingsPage, /className="settings-account-email-line settings-account-reference-line"/);
   assert.match(settingsPage, /<AccountEmailCopyButton email=\{user\.email\} \/>/);
+  assert.match(settingsPage, /className="studio-account-reference"/);
+  assert.match(settingsPage, /className="studio-account-reference-copy"/);
   assert.match(settingsPage, /<AccountReferenceCopyButton referenceLabel=\{accountReferenceLabel\} \/>/);
   assert.match(accountEmailCopyButton, /writeClipboardText\(email\)/);
   assert.match(accountEmailCopyButton, /aria-label=\{`Copy account email \$\{email\}`\}/);
@@ -25,6 +27,7 @@ test("settings account panel can copy the signed-in email and safe account refer
   assert.match(accountReferenceCopyButton, /aria-label=\{`Copy account reference \$\{referenceLabel\}`\}/);
   assert.match(accountReferenceCopyButton, /Copy ref/);
   assert.match(accountReferenceCopyButton, /settings-account-reference-copy/);
+  assert.match(accountReferenceCopyButton, /className = "settings-account-email-copy settings-account-reference-copy"/);
 });
 
 test("settings account email copy control is compact and dark-mode safe", () => {
@@ -33,6 +36,9 @@ test("settings account email copy control is compact and dark-mode safe", () => 
   assert.match(stylesheet, /\.settings-account-reference-line\s*\{(?=[^}]*margin-top:\s*6px)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-account-reference-line\s*>\s*span\s*\{(?=[^}]*font-size:\s*0\.82rem)(?=[^}]*font-weight:\s*850)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-account-email-copy\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*min-width:\s*0)(?=[^}]*min-height:\s*30px)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
+  assert.match(stylesheet, /\.public-account-reference,\s*\.studio-account-reference\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*max-width:\s*100%)[^}]*\}/s);
+  assert.match(stylesheet, /\.public-account-reference-copy,\s*\.studio-account-reference-copy\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*min-height:\s*26px)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-account-email-copy\s*\{/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.public-account-reference-copy,\s*html\[data-theme="dark"\]\s+\.studio-account-reference-copy\s*\{/);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-account-email-copy:hover,\s*html\[data-theme="dark"\]\s+\.settings-account-email-copy:focus-visible\s*\{/);
 });

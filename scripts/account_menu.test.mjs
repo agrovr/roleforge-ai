@@ -11,7 +11,12 @@ const globalsCss = readFileSync("app/globals.css", "utf8");
 test("studio account menu acts as a workspace command center", () => {
   assert.match(studioPage, /AccountAvatar/);
   assert.match(studioPage, /imageUrl\?: string/);
+  assert.match(studioPage, /reference\?: string/);
   assert.match(studioPage, /studio-account-identity/);
+  assert.match(studioPage, /accountReferenceLabel/);
+  assert.match(studioPage, /Account ref \{accountReferenceLabel\}/);
+  assert.match(studioPage, /className="studio-account-reference"/);
+  assert.match(studioPage, /className="studio-account-reference-copy"/);
   assert.match(studioPage, /studio-account-insights/);
   assert.match(studioPage, /Account status summary/);
   assert.match(studioPage, /accountMenuNextStep/);
@@ -66,6 +71,8 @@ test("studio account menu acts as a workspace command center", () => {
 test("account menu layout has responsive status cards", () => {
   assert.match(globalsCss, /\.account-avatar-photo\s*\{/);
   assert.match(globalsCss, /\.account-avatar-initials\s*\{/);
+  assert.match(globalsCss, /\.public-account-reference,\s*\.studio-account-reference\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*max-width:\s*100%)[^}]*\}/s);
+  assert.match(globalsCss, /\.public-account-reference-copy,\s*\.studio-account-reference-copy\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*min-height:\s*26px)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
   assert.match(globalsCss, /\.studio-account-insights\s*\{/);
   assert.match(globalsCss, /\.studio-account-insights strong,\s*\.studio-account-insights span\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
   assert.doesNotMatch(globalsCss, /\.studio-account-insights strong,\s*\.studio-account-insights span\s*\{[^}]*text-overflow:\s*ellipsis/s);
@@ -97,6 +104,10 @@ test("settings topbar exposes account, project, usage, and billing controls", ()
   assert.match(settingsPage, /title=\{displayName \|\| user\.email \|\| "RoleForge account"\}/);
   assert.match(settingsPage, /\{displayName \|\| "RoleForge account"\}/);
   assert.match(settingsPage, /\$\{user\.email\} · \$\{displayPlanLabel\}/);
+  assert.match(settingsPage, /accountReference\(user\.id\)/);
+  assert.match(settingsPage, /Account ref \{accountReferenceLabel\}/);
+  assert.match(settingsPage, /className="studio-account-reference"/);
+  assert.match(settingsPage, /className="studio-account-reference-copy"/);
   assert.match(settingsPage, /recentProjectSummaries/);
   assert.match(settingsPage, /settings-account-recent/);
   assert.match(settingsPage, /Recent projects/);

@@ -10,12 +10,17 @@ test("templates page keeps signed-in account controls in the topbar", () => {
   assert.match(templatesPage, /AccountAvatar/);
   assert.match(templatesPage, /accountAvatarUrl\(user\)/);
   assert.match(templatesPage, /accountDisplayName\(user/);
+  assert.match(templatesPage, /accountReference\(user\.id\)/);
   assert.match(templatesPage, /supportRequestHref/);
   assert.match(templatesPage, /templates-account-menu/);
   assert.match(templatesPage, /data-account-menu="true"/);
   assert.match(templatesPage, /aria-label="Open account menu"/);
   assert.match(templatesPage, /aria-haspopup="menu"/);
   assert.match(templatesPage, /aria-expanded="false"/);
+  assert.match(templatesPage, /accountReferenceLabel/);
+  assert.match(templatesPage, /Account ref \{accountReferenceLabel\}/);
+  assert.match(templatesPage, /className="studio-account-reference"/);
+  assert.match(templatesPage, /className="studio-account-reference-copy"/);
   assert.match(templatesPage, /selectedTemplate\.name/);
   assert.match(templatesPage, /href=\{resumeTemplateStudioHref\(initialTemplateSlug\)\}/);
   assert.match(templatesPage, /href="\/settings#billing"/);

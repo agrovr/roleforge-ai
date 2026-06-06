@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { AccountAvatar } from "./components/AccountAvatar";
+import { AccountReferenceCopyButton } from "./components/AccountReferenceCopyButton";
 import { Brand } from "./components/Brand";
 import { FaqAccordion } from "./components/FaqAccordion";
 import { ResumePreview } from "./components/ResumePreview";
 import { RoleForgeIcon } from "./components/RoleForgeIcons";
 import { ThemeToggle } from "./components/ThemeToggle";
-import { accountAvatarUrl, accountDisplayName } from "./lib/accountUser";
+import { accountAvatarUrl, accountDisplayName, accountReference } from "./lib/accountUser";
 import { billingReadiness } from "./lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "./lib/billing/stripe";
 import { FREE_ENTITLEMENT, loadAccountEntitlement } from "./lib/entitlements";
@@ -23,6 +24,7 @@ type LandingLinks = {
   premiumHref: string;
   accountName: string;
   accountEmail: string;
+  accountReferenceLabel: string;
   accountInitials: string;
   accountImageUrl: string;
   planLabel: string;
@@ -55,6 +57,7 @@ async function getLandingLinks(): Promise<LandingLinks> {
   const displayName = user ? accountDisplayName(user, profile?.displayName) : "";
   const accountName = displayName || user?.email || "RoleForge account";
   const accountEmail = user?.email || "Signed in";
+  const accountReferenceLabel = user ? accountReference(user.id) : "";
   const accountInitials = (displayName || accountEmail || "RF").slice(0, 2).toUpperCase();
   const planLabel = premiumActive ? "Premium" : "Free";
   const planCaption = premiumActive
@@ -72,6 +75,7 @@ async function getLandingLinks(): Promise<LandingLinks> {
     premiumHref,
     accountName,
     accountEmail,
+    accountReferenceLabel,
     accountInitials,
     accountImageUrl: accountAvatarUrl(user),
     planLabel,
@@ -87,6 +91,7 @@ function Nav({
   studioHref,
   accountName,
   accountEmail,
+  accountReferenceLabel,
   accountInitials,
   accountImageUrl,
   planLabel,
@@ -104,6 +109,7 @@ function Nav({
   | "checkoutReady"
   | "accountName"
   | "accountEmail"
+  | "accountReferenceLabel"
   | "accountInitials"
   | "accountImageUrl"
   | "planLabel"
@@ -142,6 +148,12 @@ function Nav({
                   <div>
                     <strong className="studio-account-email" title={accountEmail}>{accountName}</strong>
                     <span>{accountEmail}</span>
+                    {accountReferenceLabel ? (
+                      <span className="studio-account-reference">
+                        <span>Account ref {accountReferenceLabel}</span>
+                        <AccountReferenceCopyButton className="studio-account-reference-copy" iconSize={12} referenceLabel={accountReferenceLabel} />
+                      </span>
+                    ) : null}
                   </div>
                 </div>
                 <div className="studio-account-insights landing-account-insights" aria-label="Landing account summary">
@@ -714,24 +726,33 @@ function CTABand({ studioHref }: Pick<LandingLinks, "studioHref">) {
 }
 
 function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className="footer">
       <div className="footer-inner">
-        <div>
+        <div className="footer-brand-block">
           <Brand />
-          <p className="footer-tag">The AI-assisted resume studio for clearer role targeting and cleaner exports.</p>
+          <p className="footer-tag">A focused resume tailoring workspace for cleaner drafts, saved application work, and real Stripe-backed Premium access.</p>
+          <div className="footer-product-note" aria-label="RoleForge availability summary">
+            <span><RoleForgeIcon name="check" size={13} /> Free PDF workflow</span>
+            <span><RoleForgeIcon name="lock" size={13} /> Premium DOCX/TXT</span>
+            <span><RoleForgeIcon name="chart" size={13} /> Saved projects</span>
+          </div>
         </div>
         <div className="footer-col">
           <h3>Product</h3>
-          <a href="#features">Tailoring</a>
-          <a href="#features">Formatting review</a>
+          <Link href="/app">Resume studio</Link>
           <Link href="/templates">Templates</Link>
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
         </div>
         <div className="footer-col">
-          <h3>Available now</h3>
-          <span>Protected studio access</span>
-          <span>Saved project history</span>
-          <span>Settings and account controls</span>
+          <h3>Account</h3>
+          <Link href="/login?next=/app">Sign in</Link>
+          <Link href="/settings">Settings</Link>
+          <Link href="/settings#projects">Saved projects</Link>
+          <Link href="/settings#billing">Billing</Link>
         </div>
         <div className="footer-col">
           <h3>Trust</h3>
@@ -744,7 +765,7 @@ function Footer() {
         </div>
       </div>
       <div className="footer-meta">
-        <span>RoleForge AI</span>
+        <span>&copy; {currentYear} RoleForge AI. All rights reserved.</span>
         <span>Focused resume tailoring for real applications.</span>
       </div>
     </footer>
@@ -761,6 +782,7 @@ export default async function Landing() {
         studioHref={links.studioHref}
         accountName={links.accountName}
         accountEmail={links.accountEmail}
+        accountReferenceLabel={links.accountReferenceLabel}
         accountInitials={links.accountInitials}
         accountImageUrl={links.accountImageUrl}
         premiumActive={links.premiumActive}

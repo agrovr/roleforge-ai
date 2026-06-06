@@ -3,6 +3,7 @@
 import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AccountAvatar } from "../components/AccountAvatar";
+import { AccountReferenceCopyButton } from "../components/AccountReferenceCopyButton";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
@@ -2748,6 +2749,7 @@ export default function Page() {
   ];
   const accountButtonLabel = signedIn ? accountInitials(accountUser) : "IN";
   const accountImageUrl = signedIn ? accountUser?.imageUrl || "" : "";
+  const accountReferenceLabel = accountUser?.reference || "";
   const accountPremiumActive = Boolean(
     accountStatus?.entitlement?.plan === "premium" &&
       ["active", "trialing"].includes(accountStatus.entitlement.billingStatus),
@@ -3250,6 +3252,12 @@ export default function Page() {
                         <div>
                           <strong className="studio-account-email" title={accountUser?.email || "Signed in"}>{accountUser?.email || "Signed in"}</strong>
                           <span>{accountPlanValue} workspace</span>
+                          {accountReferenceLabel ? (
+                            <span className="studio-account-reference">
+                              <span>Account ref {accountReferenceLabel}</span>
+                              <AccountReferenceCopyButton className="studio-account-reference-copy" iconSize={12} referenceLabel={accountReferenceLabel} />
+                            </span>
+                          ) : null}
                         </div>
                       </div>
                       <div className="studio-account-insights" aria-label="Account status summary">
