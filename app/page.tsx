@@ -733,41 +733,41 @@ function Footer() {
       <div className="footer-inner">
         <div className="footer-brand-block">
           <Brand />
-          <p className="footer-tag">A focused resume tailoring workspace for cleaner drafts, saved application work, and real Stripe-backed Premium access.</p>
-          <div className="footer-product-note" aria-label="RoleForge availability summary">
-            <span><RoleForgeIcon name="check" size={13} /> Free PDF workflow</span>
+          <p className="footer-tag">AI-assisted resume tailoring with protected studio access, saved project history, and real Stripe-backed Premium billing.</p>
+          <div className="footer-product-note" aria-label="RoleForge product safeguards">
+            <span><RoleForgeIcon name="check" size={13} /> Free PDF exports</span>
             <span><RoleForgeIcon name="lock" size={13} /> Premium DOCX/TXT</span>
-            <span><RoleForgeIcon name="chart" size={13} /> Saved projects</span>
-          </div>
-          <div className="footer-trust-row" aria-label="Account and billing safeguards">
-            <span><RoleForgeIcon name="lock" size={13} /> Secure Stripe billing</span>
-            <span><RoleForgeIcon name="download" size={13} /> Account export available</span>
-            <span><RoleForgeIcon name="mail" size={13} /> Support request history</span>
+            <span><RoleForgeIcon name="download" size={13} /> Account data export</span>
           </div>
         </div>
-        <div className="footer-col">
+        <nav className="footer-col" aria-label="Product links">
           <h3>Product</h3>
           <Link href="/app">Resume studio</Link>
           <Link href="/templates">Templates</Link>
           <a href="#features">Features</a>
           <a href="#pricing">Pricing</a>
-        </div>
-        <div className="footer-col">
+        </nav>
+        <nav className="footer-col" aria-label="Account links">
           <h3>Account</h3>
           <Link href="/login?next=/app">Sign in</Link>
           <Link href="/settings">Settings</Link>
           <Link href="/settings#projects">Saved projects</Link>
           <Link href="/settings#billing">Billing</Link>
-        </div>
-        <div className="footer-col">
-          <h3>Trust</h3>
+        </nav>
+        <nav className="footer-col" aria-label="Support links">
+          <h3>Support</h3>
           <Link href="/help">Help</Link>
           <Link href="/support">Support</Link>
           <Link href="/status">Status</Link>
           <Link href="/updates">Updates</Link>
+        </nav>
+        <nav className="footer-col" aria-label="Legal links">
+          <h3>Legal</h3>
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
-        </div>
+          <span>Payments by Stripe</span>
+          <span>Google sign-in supported</span>
+        </nav>
       </div>
       <div className="footer-meta">
         <span>&copy; {currentYear} RoleForge AI. All rights reserved.</span>

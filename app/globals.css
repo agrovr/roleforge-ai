@@ -3056,17 +3056,17 @@ html.rf-custom-pointer [contenteditable=""] {
 
 .footer {
   background:
-    linear-gradient(180deg, rgba(17, 20, 37, 0.025), rgba(17, 20, 37, 0)),
+    linear-gradient(180deg, rgba(17, 20, 37, 0.035), rgba(17, 20, 37, 0)),
     var(--bg-alt);
-  padding-block: 72px 28px;
+  padding-block: clamp(42px, 5vw, 64px) 24px;
   border-top: 1px solid var(--line);
 }
 
 .footer-inner {
   display: grid;
-  grid-template-columns: minmax(280px, 1.45fr) repeat(3, minmax(138px, 0.7fr));
+  grid-template-columns: minmax(300px, 1.35fr) repeat(4, minmax(122px, 0.56fr));
   align-items: start;
-  gap: clamp(28px, 4vw, 64px);
+  gap: clamp(22px, 3vw, 48px);
   min-width: 0;
 }
 
@@ -3077,9 +3077,9 @@ html.rf-custom-pointer [contenteditable=""] {
 
 .footer-brand-block {
   display: grid;
-  gap: 18px;
+  gap: 16px;
   align-content: start;
-  max-width: 520px;
+  max-width: 560px;
 }
 
 .footer-tag,
@@ -3106,7 +3106,7 @@ html.rf-custom-pointer [contenteditable=""] {
 }
 
 .footer-tag {
-  max-width: 44ch;
+  max-width: 48ch;
   margin: 0;
   font-size: 1.02rem;
 }
@@ -3115,7 +3115,7 @@ html.rf-custom-pointer [contenteditable=""] {
   display: flex;
   max-width: 100%;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 9px;
 }
 
 .footer-trust-row {
@@ -3132,10 +3132,10 @@ html.rf-custom-pointer [contenteditable=""] {
   min-height: 34px;
   align-items: center;
   gap: 8px;
-  padding: 7px 11px;
+  padding: 7px 12px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface) 74%, transparent);
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
   color: var(--ink-2);
   font-size: 0.82rem;
   font-weight: 760;
@@ -3156,17 +3156,24 @@ html.rf-custom-pointer [contenteditable=""] {
 .footer-col {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
 }
 
-.footer-col a {
+.footer-col a,
+.footer-col span {
   display: inline-flex;
   align-items: center;
-  min-height: 34px;
+  min-height: 30px;
   width: fit-content;
   color: var(--ink-2);
+  font-size: 0.96rem;
   text-decoration: none;
   transition: color 160ms ease, transform 160ms ease;
+}
+
+.footer-col span {
+  width: auto;
+  color: color-mix(in srgb, var(--ink-2) 74%, transparent);
 }
 
 .footer-col a:hover,
@@ -3178,8 +3185,8 @@ html.rf-custom-pointer [contenteditable=""] {
 .footer-col h3 {
   margin: 0 0 8px;
   color: var(--ink-3);
-  font-size: 0.82rem;
-  letter-spacing: 0.1em;
+  font-size: 0.78rem;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
 }
 
@@ -3189,8 +3196,8 @@ html.rf-custom-pointer [contenteditable=""] {
   align-items: center;
   gap: 18px;
   flex-wrap: wrap;
-  margin-top: 54px;
-  padding-top: 22px;
+  margin-top: clamp(30px, 4vw, 42px);
+  padding-top: 18px;
   border-top: 1px solid var(--line);
   font-size: 0.88rem;
 }
