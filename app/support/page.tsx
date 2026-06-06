@@ -21,7 +21,7 @@ import { createRoleForgeServerClient } from "../lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Support",
-  description: "Contact RoleForge AI support for account, billing, export, saved project, and resume workflow help.",
+  description: "Contact RoleForge AI support for account, billing, privacy, export, saved project, and resume workflow help.",
   alternates: {
     canonical: "/support",
   },
@@ -51,13 +51,23 @@ const supportGuides = [
     }),
   },
   {
-    title: "Saved project or account issue",
-    detail: "Share the project name, account email, and whether the issue appears in Studio, Settings, or Templates.",
+    title: "Saved project issue",
+    detail: "Share the project name and whether restore, rename, stage, delete, or exports look wrong.",
     icon: "settings" as const,
     href: supportRequestHref({
       category: "saved-projects",
-      subject: "Saved project or account issue",
+      subject: "Saved project issue",
       contextUrl: "/settings#projects",
+    }),
+  },
+  {
+    title: "Privacy or data request",
+    detail: "Use this for account exports, communication preferences, deletion questions, or privacy policy follow-up.",
+    icon: "lock" as const,
+    href: supportRequestHref({
+      category: "privacy",
+      subject: "Privacy or data request",
+      contextUrl: "/settings#data-privacy",
     }),
   },
   {
@@ -94,6 +104,12 @@ const supportTriageItems: Array<{
     category: "billing",
     detail: "Checkout, billing management, cancellation, or Premium access does not match the account state.",
     evidence: "Include whether the issue is checkout, portal, subscription status, or Premium entitlement sync.",
+    icon: "lock",
+  },
+  {
+    category: "privacy",
+    detail: "Account exports, communication preferences, deletion controls, or privacy policy details need review.",
+    evidence: "Include the settings section, requested data action, and whether you already downloaded your account record.",
     icon: "lock",
   },
   {

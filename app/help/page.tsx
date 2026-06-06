@@ -150,6 +150,18 @@ const helpActionRoutes: readonly HelpActionRoute[] = [
     }),
     icon: "settings",
   },
+  {
+    title: "Privacy, data, or deletion question",
+    issue: "Account export, communication preference, privacy policy, or deletion controls need clarification.",
+    firstStep: "Open Data and privacy in Settings, then download your account record if you need a safe summary.",
+    href: "/settings#data-privacy",
+    supportHref: supportRequestHref({
+      category: "privacy",
+      subject: "Privacy or data request",
+      contextUrl: "/settings#data-privacy",
+    }),
+    icon: "lock",
+  },
 ] as const;
 
 export default function HelpPage() {

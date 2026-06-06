@@ -436,6 +436,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     subject: "Billing or Premium access",
     contextUrl: "/settings#billing",
   });
+  const privacySupportHref = supportRequestHref({
+    category: "privacy",
+    subject: "Privacy or data request",
+    contextUrl: "/settings#data-privacy",
+  });
   const supportHistoryHref = supportRequestHref({
     category: "workflow",
     subject: "Workflow or export issue",
@@ -902,7 +907,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
       detail: latestSupportRequest
         ? `${latestSupportRequest.referenceLabel} is the latest account-linked support request.`
         : "Open support with account context when an export, deletion, or privacy question needs help.",
-      href: latestSupportRequest ? "#support" : accountSupportHref,
+      href: latestSupportRequest ? "#support" : privacySupportHref,
       action: latestSupportRequest ? "View request" : "Contact support",
       tone: latestSupportRequest ? "good" : "ready",
     },

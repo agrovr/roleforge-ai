@@ -7,6 +7,7 @@ const supportRoute = readFileSync("app/api/support-requests/route.ts", "utf8");
 const supportLib = readFileSync("app/lib/supportRequests.ts", "utf8");
 const supportReferenceCopyButton = readFileSync("app/components/SupportReferenceCopyButton.tsx", "utf8");
 const supportMigration = readFileSync("supabase/migrations/20260602013000_support_requests.sql", "utf8");
+const supportPrivacyMigration = readFileSync("supabase/migrations/20260606043000_support_requests_privacy_category.sql", "utf8");
 const landingPage = readFileSync("app/page.tsx", "utf8");
 const helpPage = readFileSync("app/help/page.tsx", "utf8");
 const statusPage = readFileSync("app/status/page.tsx", "utf8");
@@ -24,6 +25,7 @@ const smokeLayout = readFileSync("scripts/smoke_layout.mjs", "utf8");
 test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /title: "Support"/);
   assert.match(supportPage, /canonical: "\/support"/);
+  assert.match(supportPage, /account, billing, privacy, export/);
   assert.match(supportPage, /Get help with your workflow/);
   assert.match(supportPage, /Signed-in requests are saved to your account/);
   assert.match(supportPage, /supportGuides\.map/);
@@ -81,9 +83,13 @@ test("support topic cards prefill the right request category", () => {
   assert.match(supportPage, /category:\s*"billing"/);
   assert.match(supportPage, /subject:\s*"Billing or Premium access"/);
   assert.match(supportPage, /contextUrl:\s*"\/settings#billing"/);
-  assert.match(supportPage, /title: "Saved project or account issue"/);
+  assert.match(supportPage, /title: "Saved project issue"/);
   assert.match(supportPage, /category:\s*"saved-projects"/);
   assert.match(supportPage, /contextUrl:\s*"\/settings#projects"/);
+  assert.match(supportPage, /title: "Privacy or data request"/);
+  assert.match(supportPage, /category:\s*"privacy"/);
+  assert.match(supportPage, /subject:\s*"Privacy or data request"/);
+  assert.match(supportPage, /contextUrl:\s*"\/settings#data-privacy"/);
   assert.match(supportPage, /title: "Sign-in or profile access"/);
   assert.match(supportPage, /category:\s*"account"/);
   assert.match(supportPage, /contextUrl:\s*"\/settings#account"/);
@@ -107,6 +113,8 @@ test("support requests have protected Supabase ownership policies", () => {
   assert.match(supportMigration, /create table if not exists public\.support_requests/);
   assert.match(supportMigration, /user_id uuid not null references auth\.users\(id\) on delete cascade/);
   assert.match(supportMigration, /support_requests_category_check/);
+  assert.match(supportPrivacyMigration, /drop constraint if exists support_requests_category_check/);
+  assert.match(supportPrivacyMigration, /'privacy'/);
   assert.match(supportMigration, /alter table public\.support_requests enable row level security/);
   assert.match(supportMigration, /support_requests_select_own/);
   assert.match(supportMigration, /support_requests_insert_own/);
@@ -124,6 +132,7 @@ test("settings exposes account support request history", () => {
   assert.match(settingsPage, /loadSupportRequests\(supabase,\s*user\.id,\s*\{ limit: 4 \}\)/);
   assert.match(settingsPage, /supportRequestHref/);
   assert.match(settingsPage, /Billing or Premium access/);
+  assert.match(settingsPage, /Privacy or data request/);
   assert.match(settingsPage, /Workflow or export issue/);
   assert.match(settingsPage, /supportRequestCountLabel/);
   assert.match(settingsPage, /supportOverviewCaption/);
@@ -161,6 +170,8 @@ test("contextual support links prefill workflow, export, and billing details", (
   assert.match(settingsPage, /billingSupportHref/);
   assert.match(settingsPage, /contextUrl:\s*"\/settings#billing"/);
   assert.match(helpPage, /supportRequestHref\(\{[\s\S]*?category:\s*"workflow"[\s\S]*?Workflow or export issue/);
+  assert.match(helpPage, /Privacy, data, or deletion question/);
+  assert.match(helpPage, /supportRequestHref\(\{[\s\S]*?category:\s*"privacy"[\s\S]*?Privacy or data request/);
 });
 
 test("support request references can be copied without exposing raw ids", () => {

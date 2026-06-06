@@ -182,6 +182,9 @@ test("settings data privacy panel exposes exports, policies, support, and guarde
   assert.match(settingsPage, /Terms/);
   assert.match(settingsPage, /href:\s*"\/terms"/);
   assert.match(settingsPage, /Privacy support/);
+  assert.match(settingsPage, /category:\s*"privacy"/);
+  assert.match(settingsPage, /Privacy or data request/);
+  assert.match(settingsPage, /contextUrl:\s*"\/settings#data-privacy"/);
   assert.match(settingsPage, /id="account-danger"/);
   assert.match(settingsPage, /action="\/api\/account\/delete"/);
   assert.match(settingsPage, /name="confirmation"/);

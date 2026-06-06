@@ -4,6 +4,7 @@ export const SUPPORT_REQUEST_CATEGORIES = [
   "workflow",
   "exports",
   "billing",
+  "privacy",
   "account",
   "saved-projects",
   "other",
@@ -82,6 +83,8 @@ export function supportCategoryLabel(category: SupportRequestCategory) {
       return "Exports";
     case "billing":
       return "Billing";
+    case "privacy":
+      return "Privacy";
     case "account":
       return "Account";
     case "saved-projects":

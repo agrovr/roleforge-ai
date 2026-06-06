@@ -28,6 +28,21 @@ test("parses valid support request input", () => {
   }
 });
 
+test("accepts privacy support requests", () => {
+  const result = parseSupportRequestInput({
+    category: "privacy",
+    subject: "Account data export",
+    message: "I need help understanding the account export and deletion controls in Settings.",
+    contextUrl: "/settings#data-privacy",
+  });
+
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.equal(result.input.category, "privacy");
+    assert.equal(result.input.contextUrl, "/settings#data-privacy");
+  }
+});
+
 test("rejects incomplete support request input", () => {
   assert.equal(parseSupportRequestInput({ category: "bad", subject: "Export", message: "This message is long enough." }).ok, false);
   assert.equal(parseSupportRequestInput({ category: "exports", subject: "A", message: "This message is long enough." }).ok, false);
@@ -93,6 +108,7 @@ test("builds compact support request hrefs for contextual links", () => {
 test("labels support request categories for the form", () => {
   assert.equal(supportCategoryLabel("saved-projects"), "Saved projects");
   assert.equal(supportCategoryLabel("billing"), "Billing");
+  assert.equal(supportCategoryLabel("privacy"), "Privacy");
   assert.equal(supportStatusLabel("reviewing"), "Reviewing");
 });
 
