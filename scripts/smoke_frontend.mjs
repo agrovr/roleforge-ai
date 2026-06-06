@@ -1326,7 +1326,8 @@ export function validateSignedInAuthStatusPayload(payload, options = {}) {
   const premiumActive = entitlement?.plan === "premium" && ["active", "trialing"].includes(entitlement?.billingStatus);
 
   requireCondition(payload?.configured === true && payload?.enabled === true, "auth status did not report enabled Supabase auth");
-  requireCondition(payload?.user?.id, "auth status did not include a signed-in user");
+  requireCondition(payload?.user?.reference, "auth status did not include a safe signed-in account reference");
+  requireCondition(!("id" in (payload?.user ?? {})), "auth status exposed the raw account id");
   requireCondition(entitlement?.plan, "auth status did not include an account plan");
   requireCondition(entitlement?.exportFormats?.pdf === true, "auth status did not include PDF export access");
   requireCondition(

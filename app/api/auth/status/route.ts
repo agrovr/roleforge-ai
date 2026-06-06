@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { loadAccountProfile } from "@/app/lib/accountProfile";
-import { accountAvatarUrl, accountDisplayName } from "@/app/lib/accountUser";
+import { accountAvatarUrl, accountDisplayName, accountReference } from "@/app/lib/accountUser";
 import { reconcileUserSubscriptionEntitlement } from "@/app/lib/billing/entitlements";
 import { billingReadiness } from "@/app/lib/billing/readiness";
 import { getStripeBillingConfig } from "@/app/lib/billing/stripe";
@@ -46,27 +46,28 @@ export async function GET() {
   const profile = !error && data.user && supabase
     ? await loadAccountProfile(supabase, data.user.id).catch(() => null)
     : null;
-  const user = !error && data.user
+  const userId = !error && data.user ? data.user.id : "";
+  const user = userId && data.user
     ? {
-        id: data.user.id,
+        reference: accountReference(userId),
         email: data.user.email ?? "",
         name: accountDisplayName(data.user, profile?.displayName),
         imageUrl: accountAvatarUrl(data.user),
       }
     : null;
 
-  if (user) {
-    await reconcileUserSubscriptionEntitlement(user.id).catch(() => false);
+  if (userId) {
+    await reconcileUserSubscriptionEntitlement(userId).catch(() => false);
   }
 
-  const entitlement = user && supabase ? await loadAccountEntitlement(supabase, user.id) : FREE_ENTITLEMENT;
-  const usage = user && supabase
-    ? await loadAccountUsage(supabase, user.id, entitlement).catch(() => null)
+  const entitlement = userId && supabase ? await loadAccountEntitlement(supabase, userId) : FREE_ENTITLEMENT;
+  const usage = userId && supabase
+    ? await loadAccountUsage(supabase, userId, entitlement).catch(() => null)
     : null;
-  const accountSummary = user && supabase
+  const accountSummary = userId && supabase
     ? await Promise.all([
-        countAccountRows(supabase, "resume_projects", user.id).catch(() => null),
-        countAccountRows(supabase, "support_requests", user.id).catch(() => null),
+        countAccountRows(supabase, "resume_projects", userId).catch(() => null),
+        countAccountRows(supabase, "support_requests", userId).catch(() => null),
       ]).then(([savedProjectCount, supportRequestCount]) => ({
         savedProjectCount,
         supportRequestCount,

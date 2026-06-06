@@ -10661,6 +10661,57 @@ html[data-theme="dark"] input::file-selector-button {
   width: min(420px, calc(100vw - 30px));
 }
 
+.public-account-reference {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  max-width: 100%;
+}
+
+.public-account-reference > span {
+  min-width: 0;
+  max-width: 100%;
+  color: var(--ink-3);
+  font-size: 0.74rem;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
+.public-account-reference-copy {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 26px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1.1;
+  padding: 4px 8px;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+  white-space: normal;
+  cursor: pointer;
+}
+
+.public-account-reference-copy:hover,
+.public-account-reference-copy:focus-visible {
+  border-color: color-mix(in srgb, var(--brand) 46%, var(--line));
+  background: color-mix(in srgb, var(--brand-soft) 66%, var(--surface));
+  color: var(--brand-dark);
+}
+
+.public-account-reference-copy:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--brand) 24%, transparent);
+  outline-offset: 2px;
+}
+
 .public-account-shortcuts,
 .public-account-utilities {
   min-width: 0;
@@ -16788,6 +16839,23 @@ html[data-theme="dark"] .settings-account-email-copy {
 
 html[data-theme="dark"] .settings-account-email-copy:hover,
 html[data-theme="dark"] .settings-account-email-copy:focus-visible {
+  border-color: rgba(231, 188, 111, 0.44);
+  background: rgba(231, 188, 111, 0.12);
+  color: #fff7e9;
+}
+
+html[data-theme="dark"] .public-account-reference > span {
+  color: #cfc8da;
+}
+
+html[data-theme="dark"] .public-account-reference-copy {
+  border-color: rgba(255, 247, 233, 0.2);
+  background: rgba(255, 247, 233, 0.08);
+  color: #f1eadc;
+}
+
+html[data-theme="dark"] .public-account-reference-copy:hover,
+html[data-theme="dark"] .public-account-reference-copy:focus-visible {
   border-color: rgba(231, 188, 111, 0.44);
   background: rgba(231, 188, 111, 0.12);
   color: #fff7e9;

@@ -177,7 +177,7 @@ type SavedRunSnapshot = {
   templateName?: string;
 };
 type HistoryItem = BaseHistoryItem<SavedRunSnapshot>;
-type AccountUser = { id: string; email?: string; name?: string; imageUrl?: string };
+type AccountUser = { reference?: string; email?: string; name?: string; imageUrl?: string };
 type AccountUsage = {
   currentPeriodStart: string;
   currentPeriodEnd: string;

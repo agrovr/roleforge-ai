@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { AccountAvatar } from "./AccountAvatar";
 import { RoleForgeIcon } from "./RoleForgeIcons";
+import { writeClipboardText } from "../lib/clipboard";
 
 type PublicAccountStatus = {
   configured?: boolean;
@@ -12,6 +13,7 @@ type PublicAccountStatus = {
     email?: string;
     name?: string;
     imageUrl?: string;
+    reference?: string;
   } | null;
   entitlement?: {
     plan?: string;
@@ -59,6 +61,7 @@ function currentPagePath() {
 
 export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMenuProps) {
   const [status, setStatus] = useState<PublicAccountStatus | null | undefined>(undefined);
+  const [referenceCopyState, setReferenceCopyState] = useState<"idle" | "copied" | "failed">("idle");
 
   useEffect(() => {
     let alive = true;
@@ -82,6 +85,7 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
   const signedIn = Boolean(user);
   const accountName = user?.name || user?.email || "RoleForge account";
   const accountEmail = user?.email || "Signed in";
+  const accountReferenceLabel = user?.reference || "";
   const accountInitials = useMemo(() => {
     const source = accountName || accountEmail || "RF";
     return source.slice(0, 2).toUpperCase();
@@ -112,6 +116,14 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
   const projectActionHref = typeof savedProjectCount === "number" && savedProjectCount > 0 ? "/settings#projects" : "/app";
   const supportActionLabel = typeof supportRequestCount === "number" && supportRequestCount > 0 ? "Support history" : "Contact support";
   const supportActionHref = typeof supportRequestCount === "number" && supportRequestCount > 0 ? "/settings#support" : supportHref;
+  const referenceCopyLabel = referenceCopyState === "copied" ? "Copied" : referenceCopyState === "failed" ? "Copy failed" : "Copy ref";
+
+  async function copyAccountReference() {
+    if (!accountReferenceLabel) return;
+    const copied = await writeClipboardText(accountReferenceLabel);
+    setReferenceCopyState(copied ? "copied" : "failed");
+    window.setTimeout(() => setReferenceCopyState("idle"), 1800);
+  }
 
   if (loading) {
     return (
@@ -153,6 +165,20 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
           <div>
             <strong className="studio-account-email" title={accountEmail}>{accountName}</strong>
             <span>{accountEmail}</span>
+            {accountReferenceLabel ? (
+              <span className="public-account-reference">
+                <span>Account ref {accountReferenceLabel}</span>
+                <button
+                  type="button"
+                  className="public-account-reference-copy"
+                  aria-label={`Copy account reference ${accountReferenceLabel}`}
+                  onClick={() => void copyAccountReference()}
+                >
+                  <RoleForgeIcon name={referenceCopyState === "copied" ? "check" : "copy"} size={12} />
+                  {referenceCopyLabel}
+                </button>
+              </span>
+            ) : null}
           </div>
         </div>
         <div className="studio-account-insights public-account-insights" aria-label="Public page account summary">

@@ -14,7 +14,9 @@ test("public account menu turns static topbars into signed-in command centers", 
   assert.match(publicAccountMenu, /"use client"/);
   assert.match(publicAccountMenu, /fetch\("\/api\/auth\/status"/);
   assert.match(publicAccountMenu, /credentials:\s*"same-origin"/);
+  assert.match(publicAccountMenu, /writeClipboardText/);
   assert.match(publicAccountMenu, /useState<PublicAccountStatus \| null \| undefined>\(undefined\)/);
+  assert.match(publicAccountMenu, /useState<"idle" \| "copied" \| "failed">\("idle"\)/);
   assert.match(publicAccountMenu, /const loading = status === undefined/);
   assert.match(publicAccountMenu, /if \(loading\)/);
   assert.match(publicAccountMenu, /public-account-loading/);
@@ -32,6 +34,12 @@ test("public account menu turns static topbars into signed-in command centers", 
   assert.match(publicAccountMenu, /aria-label="Open account menu"/);
   assert.match(publicAccountMenu, /aria-haspopup="menu"/);
   assert.match(publicAccountMenu, /aria-expanded="false"/);
+  assert.match(publicAccountMenu, /reference\?: string/);
+  assert.match(publicAccountMenu, /accountReferenceLabel/);
+  assert.match(publicAccountMenu, /Account ref \{accountReferenceLabel\}/);
+  assert.match(publicAccountMenu, /Copy account reference \$\{accountReferenceLabel\}/);
+  assert.match(publicAccountMenu, /writeClipboardText\(accountReferenceLabel\)/);
+  assert.match(publicAccountMenu, /public-account-reference-copy/);
   assert.match(publicAccountMenu, /Public page account summary/);
   assert.match(publicAccountMenu, /href="\/settings#billing"/);
   assert.match(publicAccountMenu, /href="\/settings#exports"/);
@@ -65,12 +73,16 @@ test("public account menu turns static topbars into signed-in command centers", 
 });
 
 test("auth status exposes safe account counts for public menus", () => {
+  assert.match(authStatusRoute, /accountReference/);
+  assert.match(authStatusRoute, /const userId = !error && data\.user \? data\.user\.id : ""/);
+  assert.match(authStatusRoute, /reference:\s*accountReference\(userId\)/);
+  assert.doesNotMatch(authStatusRoute, /\n\s*id:\s*data\.user\.id/);
   assert.match(authStatusRoute, /countAccountRows/);
   assert.match(authStatusRoute, /table:\s*"resume_projects"\s*\|\s*"support_requests"/);
   assert.match(authStatusRoute, /\.select\("id",\s*\{\s*count:\s*"exact",\s*head:\s*true\s*\}\)/);
   assert.match(authStatusRoute, /\.eq\("user_id",\s*userId\)/);
-  assert.match(authStatusRoute, /countAccountRows\(supabase,\s*"resume_projects",\s*user\.id\)/);
-  assert.match(authStatusRoute, /countAccountRows\(supabase,\s*"support_requests",\s*user\.id\)/);
+  assert.match(authStatusRoute, /countAccountRows\(supabase,\s*"resume_projects",\s*userId\)/);
+  assert.match(authStatusRoute, /countAccountRows\(supabase,\s*"support_requests",\s*userId\)/);
   assert.match(authStatusRoute, /accountSummary/);
   assert.match(authStatusRoute, /savedProjectCount/);
   assert.match(authStatusRoute, /supportRequestCount/);
@@ -97,6 +109,9 @@ test("public account menu topbar layout is overflow safe", () => {
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.public-account-loading/);
   assert.match(stylesheet, /\.public-topbar-avatar\s*\{(?=[^}]*width:\s*40px)(?=[^}]*height:\s*40px)[^}]*\}/s);
   assert.match(stylesheet, /\.public-account-popover\s*\{(?=[^}]*width:\s*min\(420px,\s*calc\(100vw\s*-\s*30px\)\))[^}]*\}/s);
+  assert.match(stylesheet, /\.public-account-reference\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*max-width:\s*100%)[^}]*\}/s);
+  assert.match(stylesheet, /\.public-account-reference\s*>\s*span\s*\{(?=[^}]*font-size:\s*0\.74rem)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
+  assert.match(stylesheet, /\.public-account-reference-copy\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*min-height:\s*26px)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /\.studio-account-next-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.studio-account-next-actions\s+a\s*\{(?=[^}]*min-height:\s*42px)(?=[^}]*min-width:\s*0)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /@container\s+studio-account-popover\s+\(max-width:\s*360px\)\s*\{[\s\S]*?\.studio-account-insights,\s*\.studio-account-next-actions\s*\{[^}]*grid-template-columns:\s*1fr/s);
@@ -104,4 +119,5 @@ test("public account menu topbar layout is overflow safe", () => {
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.studio-account-next-actions a:first-child/);
   assert.match(stylesheet, /\.public-account-shortcuts,\s*\.public-account-utilities\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.public-account-shortcuts\s+a,\s*\.public-account-utilities\s+a\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.public-account-reference-copy/);
 });

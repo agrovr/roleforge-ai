@@ -151,7 +151,7 @@ function signedInStatusPayload(overrides = {}) {
     configured: true,
     enabled: true,
     provider: "supabase",
-    user: { id: "user-id", email: "smoke@example.com", name: "Smoke User" },
+    user: { reference: "RF-ACCT-SER123", email: "smoke@example.com", name: "Smoke User" },
     entitlement: {
       plan: "free",
       billingStatus: "none",
