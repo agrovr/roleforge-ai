@@ -16,6 +16,8 @@ const VERCEL_PRODUCTION_NAMES = [
   "STRIPE_PREMIUM_MONTHLY_PRICE_ID",
   "STRIPE_PREMIUM_YEARLY_PRICE_ID",
   "STRIPE_WEBHOOK_SECRET",
+  "ROLEFORGE_SUPPORT_WEBHOOK_URL",
+  "ROLEFORGE_SUPPORT_WEBHOOK_SECRET",
 ];
 
 export function stripeKeyMode(secretKey = "") {
@@ -45,11 +47,23 @@ function webhookSecretLooksValid(value = "") {
   return value.startsWith("whsec_");
 }
 
+function supportWebhookUrlLooksValid(value = "") {
+  if (!value) return false;
+  if (value === VERCEL_ENCRYPTED_VALUE) return true;
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export function evaluateBillingLaunchReadiness(env = process.env) {
   const secretKey = env.STRIPE_SECRET_KEY?.trim() || "";
   const webhookSecret = env.STRIPE_WEBHOOK_SECRET?.trim() || "";
   const monthlyPriceId = env.STRIPE_PREMIUM_MONTHLY_PRICE_ID?.trim() || "";
   const yearlyPriceId = env.STRIPE_PREMIUM_YEARLY_PRICE_ID?.trim() || "";
+  const supportWebhookUrl = env.ROLEFORGE_SUPPORT_WEBHOOK_URL?.trim() || "";
+  const supportWebhookSecret = env.ROLEFORGE_SUPPORT_WEBHOOK_SECRET?.trim() || "";
   const mode = stripeKeyMode(secretKey);
   const liveKeyRequired = productionRequiresLiveStripeKey(env);
   const findings = [];
@@ -116,9 +130,44 @@ export function evaluateBillingLaunchReadiness(env = process.env) {
     message: "STRIPE_WEBHOOK_SECRET is configured",
   });
 
+  if (!supportWebhookUrl) {
+    findings.push({
+      ok: true,
+      level: "warn",
+      message: "ROLEFORGE_SUPPORT_WEBHOOK_URL is not configured; support requests save to Supabase but do not send ops notifications",
+    });
+  } else if (!supportWebhookUrlLooksValid(supportWebhookUrl)) {
+    findings.push({
+      ok: true,
+      level: "warn",
+      message: "ROLEFORGE_SUPPORT_WEBHOOK_URL should be an https webhook URL",
+    });
+  } else {
+    findings.push({
+      ok: true,
+      level: "pass",
+      message: "ROLEFORGE_SUPPORT_WEBHOOK_URL is configured for support request notifications",
+    });
+  }
+
+  if (supportWebhookUrl && !supportWebhookSecret) {
+    findings.push({
+      ok: true,
+      level: "warn",
+      message: "ROLEFORGE_SUPPORT_WEBHOOK_SECRET is optional but recommended for verifying support notification webhooks",
+    });
+  } else if (supportWebhookSecret) {
+    findings.push({
+      ok: true,
+      level: "pass",
+      message: "ROLEFORGE_SUPPORT_WEBHOOK_SECRET is configured",
+    });
+  }
+
   const productionKeyReady = !liveKeyRequired || mode === "live" || mode === "encrypted";
   const checkoutReady = Boolean(secretKey && priceIdLooksValid(monthlyPriceId) && priceIdLooksValid(yearlyPriceId) && productionKeyReady);
   const webhookReady = Boolean(secretKey && webhookSecretLooksValid(webhookSecret) && productionKeyReady);
+  const supportNotificationsReady = Boolean(supportWebhookUrlLooksValid(supportWebhookUrl));
   const ready = checkoutReady && webhookReady && valuePresent(env, "SUPABASE_SERVICE_ROLE_KEY") && valuePresent(env, "NEXT_PUBLIC_SITE_URL");
 
   return {
@@ -126,6 +175,7 @@ export function evaluateBillingLaunchReadiness(env = process.env) {
     mode,
     checkoutReady,
     webhookReady,
+    supportNotificationsReady,
     ready,
     findings,
   };
@@ -157,6 +207,7 @@ export function safeValueKind(name, value = "") {
   if (value === VERCEL_ENCRYPTED_VALUE) return "encrypted";
   if (name === "STRIPE_SECRET_KEY") return stripeKeyMode(value);
   if (name === "STRIPE_WEBHOOK_SECRET") return value.startsWith("whsec_") ? "webhook-secret" : "present";
+  if (name === "ROLEFORGE_SUPPORT_WEBHOOK_SECRET") return "present";
   if (name.includes("PRICE_ID")) return value.startsWith("price_") ? "price" : "present";
   if (name.includes("URL")) return /^https?:\/\//i.test(value) ? "url" : "present";
   return "present";

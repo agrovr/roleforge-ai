@@ -31,6 +31,8 @@ test("billing readiness treats live production settings as ready", () => {
   assert.equal(result.ready, true);
   assert.equal(result.checkoutReady, true);
   assert.equal(result.webhookReady, true);
+  assert.equal(result.supportNotificationsReady, false);
+  assert.match(result.findings.map((finding) => finding.message).join("\n"), /support requests save to Supabase but do not send ops notifications/);
 });
 
 test("billing readiness blocks test keys on the production domain", () => {
@@ -74,12 +76,17 @@ test("billing readiness parses pulled env files without exposing values", () => 
     "STRIPE_PREMIUM_YEARLY_PRICE_ID=price_yearly_live",
     "STRIPE_WEBHOOK_SECRET=whsec_live_secret",
     "SUPABASE_SERVICE_ROLE_KEY=service_role_secret",
+    "ROLEFORGE_SUPPORT_WEBHOOK_URL=https://hooks.example.com/roleforge",
+    "ROLEFORGE_SUPPORT_WEBHOOK_SECRET=do_not_print",
   ].join("\n"));
 
   assert.equal(env.STRIPE_SECRET_KEY, "sk_live_secret_value");
   assert.equal(safeValueKind("STRIPE_SECRET_KEY", env.STRIPE_SECRET_KEY), "live");
   assert.equal(safeValueKind("STRIPE_PREMIUM_MONTHLY_PRICE_ID", env.STRIPE_PREMIUM_MONTHLY_PRICE_ID), "price");
+  assert.equal(safeValueKind("ROLEFORGE_SUPPORT_WEBHOOK_URL", env.ROLEFORGE_SUPPORT_WEBHOOK_URL), "url");
+  assert.equal(safeValueKind("ROLEFORGE_SUPPORT_WEBHOOK_SECRET", env.ROLEFORGE_SUPPORT_WEBHOOK_SECRET), "present");
   assert.equal(evaluateBillingLaunchReadiness(env).ready, true);
+  assert.equal(evaluateBillingLaunchReadiness(env).supportNotificationsReady, true);
 });
 
 test("billing readiness treats Vercel encrypted production vars as configured without exposing values", () => {
@@ -91,12 +98,16 @@ test("billing readiness treats Vercel encrypted production vars as configured wi
  STRIPE_WEBHOOK_SECRET                      Encrypted           Production                          3d ago
  SUPABASE_SERVICE_ROLE_KEY                  Encrypted           Production                          3d ago
  NEXT_PUBLIC_SITE_URL                       Encrypted           Production                          18d ago
+ ROLEFORGE_SUPPORT_WEBHOOK_URL              Encrypted           Production                          5m ago
+ ROLEFORGE_SUPPORT_WEBHOOK_SECRET           Encrypted           Production                          5m ago
 `);
 
   const result = evaluateBillingLaunchReadiness(env);
   assert.equal(safeValueKind("STRIPE_SECRET_KEY", env.STRIPE_SECRET_KEY), "encrypted");
+  assert.equal(safeValueKind("ROLEFORGE_SUPPORT_WEBHOOK_URL", env.ROLEFORGE_SUPPORT_WEBHOOK_URL), "encrypted");
   assert.equal(result.mode, "encrypted");
   assert.equal(result.ready, true);
+  assert.equal(result.supportNotificationsReady, true);
   assert.match(result.findings.map((finding) => finding.message).join("\n"), /prove live mode with a live checkout proof/);
 });
 
@@ -126,5 +137,17 @@ test("billing readiness fills blank pulled Vercel secrets from encrypted env lis
 test("safe value kinds never include secret values", () => {
   assert.equal(safeValueKind("STRIPE_SECRET_KEY", "sk_test_do_not_print"), "test");
   assert.equal(safeValueKind("STRIPE_WEBHOOK_SECRET", "whsec_do_not_print"), "webhook-secret");
+  assert.equal(safeValueKind("ROLEFORGE_SUPPORT_WEBHOOK_SECRET", "support_secret_do_not_print"), "present");
   assert.equal(safeValueKind("SUPABASE_SERVICE_ROLE_KEY", "service_role_do_not_print"), "present");
+});
+
+test("support notification readiness warns for invalid optional webhook configuration", () => {
+  const result = evaluateBillingLaunchReadiness(baseEnv({
+    STRIPE_SECRET_KEY: "sk_live_secret_value",
+    ROLEFORGE_SUPPORT_WEBHOOK_URL: "http://hooks.example.com/not-secure",
+  }));
+
+  assert.equal(result.ready, true);
+  assert.equal(result.supportNotificationsReady, false);
+  assert.match(result.findings.map((finding) => finding.message).join("\n"), /should be an https webhook URL/);
 });
