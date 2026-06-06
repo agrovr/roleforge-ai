@@ -515,7 +515,10 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/@media\s*\(min-width:\s*981px\)\s+and\s+\(max-width:\s*1440px\)\s*\{[\s\S]*?\.cta-band\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*240px\),\s*320px\))(?=[^}]*min-height:\s*auto)(?=[^}]*padding:\s*clamp\(34px,\s*4\.2vw,\s*52px\))(?=[^}]*padding-block-start:\s*clamp\(82px,\s*7vw,\s*104px\))[^}]*\}/s.test(stylesheetText), "landing final CTA can still stack into a too-tall desktop-zoom card");
   requireCondition(/@media\s*\(min-width:\s*981px\)\s+and\s+\(max-width:\s*1440px\)\s*\{[\s\S]*?\.cta-visual\s*\{(?=[^}]*justify-self:\s*end)(?=[^}]*inline-size:\s*min\(100%,\s*320px\))(?=[^}]*min-block-size:\s*clamp\(292px,\s*26vw,\s*338px\))[^}]*\}[\s\S]*?\.cta-visual\s+\.resume-card\s*\{(?=[^}]*left:\s*52%)(?=[^}]*transform:\s*translate(?:X)?\(-30%\)\s*rotate\(5deg\))[^}]*\}/s.test(stylesheetText), "landing final CTA front resume art is missing desktop-zoom containment");
   requireCondition(/\.footer-inner\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "footer columns can still force overflow");
-  requireCondition(/\.footer-tag,\s*\.footer-col\s+a,\s*\.footer-col\s+span,\s*\.footer-meta\s+span\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText), "footer copy can still overflow narrow columns");
+  requireCondition(
+    /\.footer-tag,\s*\.footer-product-note\s+span,\s*\.footer-col\s+a,\s*\.footer-col\s+span,\s*\.footer-meta\s+span\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText),
+    "footer copy can still overflow narrow columns",
+  );
   pass("landing final CTA and footer include overflow-safe layout guards");
 
   requireCondition(
