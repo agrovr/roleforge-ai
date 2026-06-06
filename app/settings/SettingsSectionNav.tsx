@@ -6,8 +6,8 @@ import { RoleForgeIcon } from "../components/RoleForgeIcons";
 const settingsSections = [
   { id: "account", label: "Account", icon: "settings", keywords: "profile name email avatar" },
   { id: "security", label: "Security", icon: "lock", keywords: "sign in login verification created metadata" },
-  { id: "data-privacy", label: "Data & privacy", icon: "download", keywords: "privacy terms export data delete account record personal information" },
-  { id: "preferences", label: "Preferences", icon: "layers", keywords: "template resume direction default style" },
+  { id: "data-privacy", label: "Data & privacy", icon: "download", keywords: "privacy terms export data delete account record personal information communication preferences" },
+  { id: "preferences", label: "Preferences", icon: "layers", keywords: "template resume direction default style communication email product updates notices" },
   { id: "projects", label: "Saved projects", icon: "chart", keywords: "history restore rename remove applications" },
   { id: "usage", label: "Usage", icon: "sparkle", keywords: "runs monthly allowance limits premium" },
   { id: "exports", label: "Exports", icon: "download", keywords: "pdf docx txt downloads formats premium" },
@@ -22,10 +22,11 @@ const settingsTaskShortcuts: Array<{
   label: string;
   query: string;
   sectionId: SettingsSectionId;
-  icon: "chart" | "download" | "lock" | "mail";
+  icon: "chart" | "download" | "layers" | "lock" | "mail";
 }> = [
   { label: "Cancel Premium", query: "cancel premium", sectionId: "billing", icon: "lock" },
   { label: "Export data", query: "account export", sectionId: "data-privacy", icon: "download" },
+  { label: "Email preferences", query: "product updates", sectionId: "preferences", icon: "layers" },
   { label: "Support history", query: "support request", sectionId: "support", icon: "mail" },
   { label: "Restore projects", query: "restore saved projects", sectionId: "projects", icon: "chart" },
 ];

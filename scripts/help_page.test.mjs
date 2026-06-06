@@ -15,6 +15,7 @@ test("help page covers account, exports, billing, and saved project guidance", (
   assert.match(helpPage, /Use RoleForge with fewer surprises/);
   assert.match(helpPage, /Start a resume run/);
   assert.match(helpPage, /Account and profile/);
+  assert.match(helpPage, /manage optional product update email/);
   assert.match(helpPage, /Saved projects/);
   assert.match(helpPage, /Exports and templates/);
   assert.match(helpPage, /Premium and billing/);

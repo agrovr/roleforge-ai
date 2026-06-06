@@ -49,7 +49,7 @@ const helpSections: readonly HelpSection[] = [
     title: "Account and profile",
     body: [
       "Use the profile button in Studio, Templates, or Settings to reach saved projects, usage, billing, security, account export, and sign-out controls.",
-      "Settings lets you save a display name, update your email when Supabase allows it, download an account summary, and delete the account after active Premium billing is canceled.",
+      "Settings lets you save a display name, update your email when Supabase allows it, manage optional product update email, download an account summary, and delete the account after active Premium billing is canceled.",
     ],
   },
   {

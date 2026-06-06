@@ -22,6 +22,12 @@ test("updates page is a factual public product log", () => {
   assert.match(updatesPage, /canonical: "\/updates"/);
   assert.match(updatesPage, /What changed in RoleForge/);
   assert.match(updatesPage, /A factual log of shipped workflow, account, export, and billing improvements/);
+  assert.match(updatesPage, /June 5, 2026/);
+  assert.match(updatesPage, /Communication preferences are now account-backed/);
+  assert.match(updatesPage, /Settings now saves optional product update email preferences to the account profile/);
+  assert.match(updatesPage, /account-backed product updates toggle/);
+  assert.match(updatesPage, /Account exports include communication preference records/);
+  assert.match(updatesPage, /Privacy page explains how communication preferences are collected and used/);
   assert.match(updatesPage, /June 3, 2026/);
   assert.match(updatesPage, /Account support actions are easier to find/);
   assert.match(updatesPage, /Settings includes task shortcuts for canceling Premium, exporting account data, reviewing support history, and restoring saved projects/);
@@ -49,6 +55,7 @@ test("updates page is a factual public product log", () => {
   assert.match(updatesPage, /Free accounts keep PDF export/);
   assert.match(updatesPage, /Premium access unlocks DOCX and TXT/);
   assert.match(updatesPage, /actionHref: "\/settings#projects"/);
+  assert.match(updatesPage, /actionHref: "\/settings#preferences"/);
   assert.match(updatesPage, /actionHref: "\/help"/);
   assert.match(updatesPage, /actionHref: "\/support"/);
   assert.match(updatesPage, /actionHref: "\/status"/);

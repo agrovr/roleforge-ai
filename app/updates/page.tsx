@@ -28,6 +28,20 @@ type UpdateItem = {
 
 const updates: readonly UpdateItem[] = [
   {
+    title: "Communication preferences are now account-backed",
+    date: "June 5, 2026",
+    eyebrow: "Settings",
+    icon: "mail",
+    summary: "Settings now saves optional product update email preferences to the account profile.",
+    details: [
+      "The Preferences section includes an account-backed product updates toggle instead of a cosmetic-only setting.",
+      "Account exports include communication preference records and clearly list required account, billing, security, and support notices.",
+      "The Privacy page explains how communication preferences are collected and used.",
+    ],
+    actionHref: "/settings#preferences",
+    actionLabel: "Open preferences",
+  },
+  {
     title: "Account support actions are easier to find",
     date: "June 3, 2026",
     eyebrow: "Account support",

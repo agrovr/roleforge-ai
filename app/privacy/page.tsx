@@ -14,7 +14,7 @@ const sections = [
   {
     title: "What RoleForge collects",
     body: [
-      "RoleForge AI collects the account information needed to sign you in, such as your email address and provider profile name when available.",
+      "RoleForge AI collects the account information needed to sign you in, such as your email address, provider profile name when available, saved display name, and communication preference choices.",
       "When you use the studio, the app receives the resume file or text you provide, the job target you enter, generated results, export choices, and saved project details tied to your account.",
     ],
   },
@@ -22,6 +22,7 @@ const sections = [
     title: "How your data is used",
     body: [
       "Your resume and job target are used to run the tailoring workflow, show previews, create exports, save completed projects, and help you restore prior runs.",
+      "Communication preferences are used to remember whether optional product update email is enabled. Account, billing, security, and support messages may still be sent when needed to provide the service.",
       "Generated content can be processed by the backend and AI service providers that power the workflow. You should review all output before using it in an application.",
     ],
   },
@@ -43,7 +44,7 @@ const sections = [
     title: "Sharing and retention",
     body: [
       "RoleForge does not sell personal resume data. Data is shared with service providers only as needed to provide auth, storage, AI processing, exports, billing, security, and hosting.",
-      "You can download an account summary from Settings. You can delete a signed-in account from Settings after canceling any active Premium subscription.",
+      "You can download an account summary from Settings, including profile and communication preference records. You can delete a signed-in account from Settings after canceling any active Premium subscription.",
       "Account and saved project data may remain while your account is active or as needed for security, billing, operations, and legal obligations.",
     ],
   },
