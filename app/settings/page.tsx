@@ -827,6 +827,49 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
       tone: latestSupportRequest ? "good" : "ready",
     },
   ];
+  const dataPrivacyItems: Array<{
+    icon: RoleForgeIconName;
+    title: string;
+    detail: string;
+    href: string;
+    action: string;
+    tone: "good" | "ready" | "warn";
+  }> = [
+    {
+      icon: "download",
+      title: "Export account record",
+      detail: "Download a safe summary of account, project, run, entitlement, and support-reference details.",
+      href: "/api/account/export",
+      action: "Download",
+      tone: "good",
+    },
+    {
+      icon: "file",
+      title: "Privacy policy",
+      detail: "Review what RoleForge stores, how account data is used, and where protected exports are handled.",
+      href: "/privacy",
+      action: "Open policy",
+      tone: "ready",
+    },
+    {
+      icon: "doc",
+      title: "Terms",
+      detail: "Check the current service terms before major account, billing, or deletion changes.",
+      href: "/terms",
+      action: "Open terms",
+      tone: "ready",
+    },
+    {
+      icon: "mail",
+      title: "Privacy support",
+      detail: latestSupportRequest
+        ? `${latestSupportRequest.referenceLabel} is the latest account-linked support request.`
+        : "Open support with account context when an export, deletion, or privacy question needs help.",
+      href: latestSupportRequest ? "#support" : accountSupportHref,
+      action: latestSupportRequest ? "View request" : "Contact support",
+      tone: latestSupportRequest ? "good" : "ready",
+    },
+  ];
 
   return (
     <main className="settings-page-shell">
@@ -1236,34 +1279,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 <a className="ghost-button" href="/api/account/export">
                   <RoleForgeIcon name="download" size={14} /> Export account record
                 </a>
+                <a className="ghost-button" href="#data-privacy">
+                  <RoleForgeIcon name="lock" size={14} /> Data & privacy
+                </a>
                 <form action="/auth/signout" method="post">
                   <input type="hidden" name="next" value="/login?account=signed-out" />
                   <button className="ghost-button" type="submit">Sign out</button>
-                </form>
-              </div>
-              <div className="settings-danger-zone" id="account-danger">
-                <div>
-                  <strong>Delete account</strong>
-                  <span>
-                    Permanently removes your RoleForge account and saved projects. Download your summary first. Premium accounts must cancel billing before deletion.
-                  </span>
-                </div>
-                <form action="/api/account/delete" method="post">
-                  <label htmlFor="settings-delete-confirmation">Type DELETE</label>
-                  <div className="settings-danger-actions">
-                    <input
-                      id="settings-delete-confirmation"
-                      name="confirmation"
-                      type="text"
-                      autoComplete="off"
-                      inputMode="text"
-                      spellCheck={false}
-                      required
-                    />
-                    <button className="ghost-button settings-danger-button" type="submit">
-                      Delete account
-                    </button>
-                  </div>
                 </form>
               </div>
             </div>
@@ -1318,6 +1339,54 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                 <form action="/auth/signout" method="post">
                   <input type="hidden" name="next" value="/login?account=signed-out" />
                   <button className="ghost-button" type="submit">Sign out</button>
+                </form>
+              </div>
+            </div>
+          </section>
+
+          <section className="settings-section" id="data-privacy">
+            <div className="settings-section-copy">
+              <h2>Data & privacy</h2>
+              <p>Export your account record, review legal policies, and manage destructive account actions from one place.</p>
+            </div>
+            <div className="settings-section-panel">
+              <div className="settings-data-privacy-grid" aria-label="Data and privacy actions">
+                {dataPrivacyItems.map((item) => (
+                  <a className={`settings-data-privacy-item ${item.tone}`} href={item.href} key={item.title}>
+                    <span className="settings-data-privacy-icon" aria-hidden="true">
+                      <RoleForgeIcon name={item.icon} size={15} />
+                    </span>
+                    <span className="settings-data-privacy-copy">
+                      <strong>{item.title}</strong>
+                      <small>{item.detail}</small>
+                    </span>
+                    <span className="settings-data-privacy-action">{item.action}</span>
+                  </a>
+                ))}
+              </div>
+              <div className="settings-danger-zone" id="account-danger">
+                <div>
+                  <strong>Delete account</strong>
+                  <span>
+                    Permanently removes your RoleForge account and saved projects. Download your summary first. Premium accounts must cancel billing before deletion.
+                  </span>
+                </div>
+                <form action="/api/account/delete" method="post">
+                  <label htmlFor="settings-delete-confirmation">Type DELETE</label>
+                  <div className="settings-danger-actions">
+                    <input
+                      id="settings-delete-confirmation"
+                      name="confirmation"
+                      type="text"
+                      autoComplete="off"
+                      inputMode="text"
+                      spellCheck={false}
+                      required
+                    />
+                    <button className="ghost-button settings-danger-button" type="submit">
+                      Delete account
+                    </button>
+                  </div>
                 </form>
               </div>
             </div>

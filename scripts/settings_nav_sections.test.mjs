@@ -48,6 +48,7 @@ test("settings section nav can filter by common account tasks", () => {
   assert.match(settingsNav, /No settings match\./);
   assert.match(settingsNav, /keywords:\s*"premium stripe checkout portal plan invoices cancel"/);
   assert.match(settingsNav, /keywords:\s*"pdf docx txt downloads formats premium"/);
+  assert.match(settingsNav, /keywords:\s*"privacy terms export data delete account record personal information"/);
   assert.match(settingsNav, /keywords:\s*"history restore rename remove applications"/);
   assert.match(settingsNav, /visibleSections\.findIndex/);
   assert.match(icons, /\|\s*"search"/);
@@ -68,6 +69,7 @@ test("settings section nav exposes common task shortcuts", () => {
   assert.match(settingsNav, /sectionId:\s*"billing"/);
   assert.match(settingsNav, /Export data/);
   assert.match(settingsNav, /query:\s*"account export"/);
+  assert.match(settingsNav, /sectionId:\s*"data-privacy"/);
   assert.match(settingsNav, /Support history/);
   assert.match(settingsNav, /query:\s*"support request"/);
   assert.match(settingsNav, /Restore projects/);

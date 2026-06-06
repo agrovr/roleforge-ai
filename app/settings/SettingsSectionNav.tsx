@@ -4,8 +4,9 @@ import { useCallback, useEffect, useRef, useState, type KeyboardEvent as ReactKe
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 
 const settingsSections = [
-  { id: "account", label: "Account", icon: "settings", keywords: "profile name email avatar export delete" },
+  { id: "account", label: "Account", icon: "settings", keywords: "profile name email avatar" },
   { id: "security", label: "Security", icon: "lock", keywords: "sign in login verification created metadata" },
+  { id: "data-privacy", label: "Data & privacy", icon: "download", keywords: "privacy terms export data delete account record personal information" },
   { id: "preferences", label: "Preferences", icon: "layers", keywords: "template resume direction default style" },
   { id: "projects", label: "Saved projects", icon: "chart", keywords: "history restore rename remove applications" },
   { id: "usage", label: "Usage", icon: "sparkle", keywords: "runs monthly allowance limits premium" },
@@ -24,7 +25,7 @@ const settingsTaskShortcuts: Array<{
   icon: "chart" | "download" | "lock" | "mail";
 }> = [
   { label: "Cancel Premium", query: "cancel premium", sectionId: "billing", icon: "lock" },
-  { label: "Export data", query: "account export", sectionId: "account", icon: "download" },
+  { label: "Export data", query: "account export", sectionId: "data-privacy", icon: "download" },
   { label: "Support history", query: "support request", sectionId: "support", icon: "mail" },
   { label: "Restore projects", query: "restore saved projects", sectionId: "projects", icon: "chart" },
 ];

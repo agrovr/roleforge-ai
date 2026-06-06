@@ -516,7 +516,7 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/@media\s*\(min-width:\s*981px\)\s+and\s+\(max-width:\s*1440px\)\s*\{[\s\S]*?\.cta-visual\s*\{(?=[^}]*justify-self:\s*end)(?=[^}]*inline-size:\s*min\(100%,\s*320px\))(?=[^}]*min-block-size:\s*clamp\(292px,\s*26vw,\s*338px\))[^}]*\}[\s\S]*?\.cta-visual\s+\.resume-card\s*\{(?=[^}]*left:\s*52%)(?=[^}]*transform:\s*translate(?:X)?\(-30%\)\s*rotate\(5deg\))[^}]*\}/s.test(stylesheetText), "landing final CTA front resume art is missing desktop-zoom containment");
   requireCondition(/\.footer-inner\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "footer columns can still force overflow");
   requireCondition(
-    /\.footer-tag,\s*\.footer-product-note\s+span,\s*\.footer-col\s+a,\s*\.footer-col\s+span,\s*\.footer-meta\s+span\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText),
+    /\.footer-tag,\s*\.footer-product-note\s+span,\s*\.footer-trust-row\s+span,\s*\.footer-col\s+a,\s*\.footer-col\s+span,\s*\.footer-meta\s+span,\s*\.footer-meta-links\s+a\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s.test(stylesheetText),
     "footer copy can still overflow narrow columns",
   );
   pass("landing final CTA and footer include overflow-safe layout guards");
@@ -651,13 +651,12 @@ async function checkPublicShell(baseUrl) {
       /#projects\.settings-section\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))[^}]*\}/s.test(stylesheetText) &&
       /#projects\s+\.settings-section-panel\s*\{(?=[^}]*inline-size:\s*100%)(?=[^}]*max-inline-size:\s*100%)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))(?=[^}]*container:\s*settings-project-card\s*\/\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-summary\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-controls\s*\{(?=[^}]*justify-self:\s*stretch)(?=[^}]*inline-size:\s*100%)(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*overflow:\s*hidden)(?=[^}]*border-top:\s*1px\s+solid)[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-summary\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-controls\s*\{(?=[^}]*justify-self:\s*stretch)(?=[^}]*inline-size:\s*100%)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))(?=[^}]*overflow:\s*hidden)(?=[^}]*border-top:\s*1px\s+solid)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-controls\s*>\s*\*\s*\{(?=[^}]*min-inline-size:\s*0)(?=[^}]*max-inline-size:\s*100%)[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-stage-form,\s*\.settings-project-kit,\s*\.settings-project-delete\s*\{(?=[^}]*grid-column:\s*1\s*\/\s*-1)[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-stage-controls\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-stage-controls\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*118px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-kit\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText) &&
-      /\.settings-project-kit-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*148px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
+      /\.settings-project-kit-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-kit-item\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-kit-item\s*\{(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-item\s+small\s*\{(?=[^}]*justify-self:\s*start)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText) &&

@@ -170,7 +170,18 @@ test("settings security panel gives actionable account review steps", () => {
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-security-copy\s+strong/);
 });
 
-test("settings account panel exposes guarded account deletion", () => {
+test("settings data privacy panel exposes exports, policies, support, and guarded deletion", () => {
+  assert.match(settingsPage, /id="data-privacy"/);
+  assert.match(settingsPage, /dataPrivacyItems/);
+  assert.match(settingsPage, /settings-data-privacy-grid/);
+  assert.match(settingsPage, /aria-label="Data and privacy actions"/);
+  assert.match(settingsPage, /Export account record/);
+  assert.match(settingsPage, /href:\s*"\/api\/account\/export"/);
+  assert.match(settingsPage, /Privacy policy/);
+  assert.match(settingsPage, /href:\s*"\/privacy"/);
+  assert.match(settingsPage, /Terms/);
+  assert.match(settingsPage, /href:\s*"\/terms"/);
+  assert.match(settingsPage, /Privacy support/);
   assert.match(settingsPage, /id="account-danger"/);
   assert.match(settingsPage, /action="\/api\/account\/delete"/);
   assert.match(settingsPage, /name="confirmation"/);
@@ -178,6 +189,12 @@ test("settings account panel exposes guarded account deletion", () => {
   assert.match(settingsPage, /Cancel Premium from Manage billing before deleting this account\./);
   assert.match(stylesheet, /\.settings-danger-zone\s*\{/);
   assert.match(stylesheet, /\.settings-danger-button\s*\{/);
+  assert.match(stylesheet, /\.settings-data-privacy-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*230px\),\s*1fr\)\))[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-data-privacy-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*36px minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-data-privacy-copy strong,\s*\.settings-data-privacy-copy small,\s*\.settings-data-privacy-action\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-data-privacy-item/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-data-privacy-copy strong/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-data-privacy-copy small/);
 });
 
 test("inactive settings billing action does not animate like a clickable control", () => {

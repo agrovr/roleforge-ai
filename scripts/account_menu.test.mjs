@@ -191,13 +191,12 @@ test("settings saved project management rows avoid squeezed action columns", () 
   assert.match(globalsCss, /#projects\s+\.settings-section-panel\s*\{(?=[^}]*inline-size:\s*100%)(?=[^}]*max-inline-size:\s*100%)[^}]*\}/s);
   assert.match(globalsCss, /\.settings-project-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))(?=[^}]*container:\s*settings-project-card\s*\/\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
   assert.match(globalsCss, /\.settings-project-summary,\s*\.settings-project-controls\s*\{(?=[^}]*display:\s*grid)[^}]*\}/s);
-  assert.match(globalsCss, /\.settings-project-summary\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto)(?=[^}]*align-items:\s*start)[^}]*\}/s);
-  assert.match(globalsCss, /\.settings-project-controls\s*\{(?=[^}]*inline-size:\s*100%)(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*overflow:\s*hidden)(?=[^}]*border-top:\s*1px\s+solid)[^}]*\}/s);
+  assert.match(globalsCss, /\.settings-project-summary\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))(?=[^}]*align-items:\s*start)[^}]*\}/s);
+  assert.match(globalsCss, /\.settings-project-controls\s*\{(?=[^}]*inline-size:\s*100%)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))(?=[^}]*overflow:\s*hidden)(?=[^}]*border-top:\s*1px\s+solid)[^}]*\}/s);
   assert.match(globalsCss, /\.settings-project-controls\s*>\s*\*\s*\{(?=[^}]*min-inline-size:\s*0)(?=[^}]*max-inline-size:\s*100%)[^}]*\}/s);
-  assert.match(globalsCss, /\.settings-project-stage-form,\s*\.settings-project-kit,\s*\.settings-project-delete\s*\{(?=[^}]*grid-column:\s*1\s*\/\s*-1)[^}]*\}/s);
   assert.match(globalsCss, /\.settings-project-item\s+small\s*\{(?=[^}]*justify-self:\s*start)(?=[^}]*max-width:\s*100%)[^}]*\}/s);
-  assert.match(globalsCss, /\.settings-project-stage-controls\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))[^}]*\}/s);
-  assert.match(globalsCss, /\.settings-project-kit-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*148px\),\s*1fr\)\))[^}]*\}/s);
+  assert.match(globalsCss, /\.settings-project-stage-controls\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*118px\),\s*1fr\)\))[^}]*\}/s);
+  assert.match(globalsCss, /\.settings-project-kit-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))[^}]*\}/s);
   assert.match(globalsCss, /@container\s+settings-project-card\s+\(max-width:\s*680px\)\s*\{[\s\S]*?\.settings-project-stage-controls,\s*\.settings-project-kit-grid\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*128px\),\s*1fr\)\)/s);
   assert.match(globalsCss, /@container\s+settings-project-card\s+\(max-width:\s*560px\)\s*\{[\s\S]*?\.settings-project-summary,\s*\.settings-project-controls,\s*\.settings-project-rename-row,\s*\.settings-project-delete-row\s*\{[^}]*grid-template-columns:\s*1fr/s);
 });

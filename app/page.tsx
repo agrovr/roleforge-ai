@@ -739,6 +739,11 @@ function Footer() {
             <span><RoleForgeIcon name="lock" size={13} /> Premium DOCX/TXT</span>
             <span><RoleForgeIcon name="chart" size={13} /> Saved projects</span>
           </div>
+          <div className="footer-trust-row" aria-label="Account and billing safeguards">
+            <span><RoleForgeIcon name="lock" size={13} /> Secure Stripe billing</span>
+            <span><RoleForgeIcon name="download" size={13} /> Account export available</span>
+            <span><RoleForgeIcon name="mail" size={13} /> Support request history</span>
+          </div>
         </div>
         <div className="footer-col">
           <h3>Product</h3>
@@ -766,6 +771,11 @@ function Footer() {
       </div>
       <div className="footer-meta">
         <span>&copy; {currentYear} RoleForge AI. All rights reserved.</span>
+        <div className="footer-meta-links" aria-label="Footer legal links">
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+          <Link href="/status">Status</Link>
+        </div>
         <span>Focused resume tailoring for real applications.</span>
       </div>
     </footer>

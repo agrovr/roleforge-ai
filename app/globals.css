@@ -2617,20 +2617,20 @@ html.rf-custom-pointer [contenteditable=""] {
 }
 
 .price-card.featured .price-status.current {
-  border-color: rgba(255, 247, 233, 0.34);
+  border-color: rgba(146, 191, 160, 0.46);
   background:
-    linear-gradient(180deg, rgba(255, 247, 233, 0.11), rgba(255, 247, 233, 0.055)),
-    rgba(8, 12, 28, 0.34);
-  color: #fff1d6;
+    linear-gradient(180deg, rgba(146, 191, 160, 0.16), rgba(146, 191, 160, 0.075)),
+    rgba(8, 12, 28, 0.48);
+  color: #e8f5df;
   box-shadow:
-    inset 0 1px 0 rgba(255, 247, 233, 0.1),
-    0 10px 24px -22px rgba(0, 0, 0, 0.7);
+    inset 0 1px 0 rgba(255, 247, 233, 0.08),
+    0 10px 24px -22px rgba(0, 0, 0, 0.76);
   text-shadow: none;
 }
 
 .price-card.featured .price-status.current::before {
-  background: #e8bd73;
-  box-shadow: 0 0 0 3px rgba(232, 189, 115, 0.14);
+  background: #b7e5c4;
+  box-shadow: 0 0 0 3px rgba(183, 229, 196, 0.15);
 }
 
 .price-amount .v {
@@ -3084,18 +3084,22 @@ html.rf-custom-pointer [contenteditable=""] {
 
 .footer-tag,
 .footer-product-note span,
+.footer-trust-row span,
 .footer-col a,
 .footer-col span,
-.footer-meta {
+.footer-meta,
+.footer-meta-links a {
   color: var(--ink-2);
   line-height: 1.58;
 }
 
 .footer-tag,
 .footer-product-note span,
+.footer-trust-row span,
 .footer-col a,
 .footer-col span,
-.footer-meta span {
+.footer-meta span,
+.footer-meta-links a {
   max-width: 100%;
   overflow-wrap: anywhere;
   text-wrap: pretty;
@@ -3114,7 +3118,16 @@ html.rf-custom-pointer [contenteditable=""] {
   gap: 8px;
 }
 
-.footer-product-note span {
+.footer-trust-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+  gap: 8px;
+  max-width: 100%;
+  padding-top: 4px;
+}
+
+.footer-product-note span,
+.footer-trust-row span {
   display: inline-flex;
   min-height: 34px;
   align-items: center;
@@ -3128,7 +3141,14 @@ html.rf-custom-pointer [contenteditable=""] {
   font-weight: 760;
 }
 
-.footer-product-note svg {
+.footer-trust-row span {
+  justify-content: flex-start;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 58%, transparent);
+}
+
+.footer-product-note svg,
+.footer-trust-row svg {
   color: var(--brand-dark);
   flex: 0 0 auto;
 }
@@ -3173,6 +3193,24 @@ html.rf-custom-pointer [contenteditable=""] {
   padding-top: 22px;
   border-top: 1px solid var(--line);
   font-size: 0.88rem;
+}
+
+.footer-meta-links {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.footer-meta-links a {
+  color: var(--ink-2);
+  font-weight: 760;
+  text-decoration: none;
+}
+
+.footer-meta-links a:hover,
+.footer-meta-links a:focus-visible {
+  color: var(--ink-0);
 }
 
 html[data-theme="dark"] .brand-mark {
@@ -3373,6 +3411,7 @@ html[data-theme="dark"] .faq-a,
 html[data-theme="dark"] .logos-row > *,
 html[data-theme="dark"] .footer-tag,
 html[data-theme="dark"] .footer-product-note span,
+html[data-theme="dark"] .footer-trust-row span,
 html[data-theme="dark"] .footer-col a,
 html[data-theme="dark"] .footer-col span,
 html[data-theme="dark"] .footer-meta {
@@ -3391,7 +3430,13 @@ html[data-theme="dark"] .footer-product-note span {
   background: rgba(255, 247, 233, 0.055);
 }
 
-html[data-theme="dark"] .footer-product-note svg {
+html[data-theme="dark"] .footer-trust-row span {
+  border-color: rgba(146, 191, 160, 0.16);
+  background: rgba(146, 191, 160, 0.08);
+}
+
+html[data-theme="dark"] .footer-product-note svg,
+html[data-theme="dark"] .footer-trust-row svg {
   color: #f0bb69;
 }
 
@@ -3658,11 +3703,11 @@ html[data-theme="dark"] .price-status.paused {
 }
 
 html[data-theme="dark"] .price-card.featured .price-status.current {
-  border-color: rgba(255, 247, 233, 0.34);
+  border-color: rgba(183, 229, 196, 0.48);
   background:
-    linear-gradient(180deg, rgba(255, 247, 233, 0.1), rgba(255, 247, 233, 0.045)),
-    rgba(8, 12, 28, 0.54);
-  color: #fff1d6;
+    linear-gradient(180deg, rgba(183, 229, 196, 0.16), rgba(183, 229, 196, 0.065)),
+    rgba(8, 12, 28, 0.72);
+  color: #e6f7df;
   box-shadow:
     inset 0 1px 0 rgba(255, 247, 233, 0.08),
     0 12px 28px -22px rgba(0, 0, 0, 0.82);
@@ -7668,7 +7713,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .settings-project-summary {
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   gap: 10px;
 }
@@ -7676,7 +7721,7 @@ html[data-theme="dark"] input::file-selector-button {
 .settings-project-controls {
   justify-self: stretch;
   inline-size: 100%;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   gap: 10px;
   max-width: 100%;
@@ -7688,12 +7733,6 @@ html[data-theme="dark"] input::file-selector-button {
 .settings-project-controls > * {
   min-inline-size: 0;
   max-inline-size: 100%;
-}
-
-.settings-project-stage-form,
-.settings-project-kit,
-.settings-project-delete {
-  grid-column: 1 / -1;
 }
 
 .settings-project-item strong,
@@ -7839,7 +7878,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-stage-controls {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 118px), 1fr));
   gap: 8px;
   min-width: 0;
   padding-top: 2px;
@@ -8019,7 +8058,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .settings-project-kit-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 148px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr));
   gap: 7px;
   min-width: 0;
 }
@@ -12019,6 +12058,101 @@ html[data-theme="dark"] input::file-selector-button {
   border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--line));
   border-radius: 999px;
   color: var(--brand-dark);
+  font-size: 0.72rem;
+  font-weight: 950;
+  text-align: center;
+}
+
+.settings-data-privacy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 10px;
+  min-width: 0;
+}
+
+.settings-data-privacy-item {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 11px;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--line));
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent-soft) 24%, transparent), transparent 72%),
+    color-mix(in srgb, var(--surface) 90%, var(--bg-alt));
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.settings-data-privacy-item:hover,
+.settings-data-privacy-item:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+  box-shadow: 0 14px 28px -24px var(--shadow);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.settings-data-privacy-item.good {
+  border-color: color-mix(in srgb, var(--good) 28%, var(--line));
+}
+
+.settings-data-privacy-icon {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent-soft) 58%, var(--surface));
+  color: var(--accent);
+}
+
+.settings-data-privacy-item.good .settings-data-privacy-icon {
+  border-color: color-mix(in srgb, var(--good) 30%, var(--line));
+  background: color-mix(in srgb, var(--good-soft) 62%, var(--surface));
+  color: var(--good);
+}
+
+.settings-data-privacy-copy {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.settings-data-privacy-copy strong,
+.settings-data-privacy-copy small,
+.settings-data-privacy-action {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.settings-data-privacy-copy strong {
+  color: var(--ink-0);
+  font-size: 0.95rem;
+  font-weight: 950;
+  line-height: 1.12;
+}
+
+.settings-data-privacy-copy small {
+  color: var(--ink-2);
+  font-size: 0.78rem;
+  font-weight: 720;
+  line-height: 1.36;
+  text-wrap: pretty;
+}
+
+.settings-data-privacy-action {
+  grid-column: 1 / -1;
+  justify-self: start;
+  max-width: 100%;
+  padding: 7px 9px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border-radius: 999px;
+  color: var(--accent);
   font-size: 0.72rem;
   font-weight: 950;
   text-align: center;
@@ -16761,6 +16895,7 @@ html[data-theme="dark"] .settings-account-health,
 html[data-theme="dark"] .settings-account-health-card,
 html[data-theme="dark"] .settings-workspace-action,
 html[data-theme="dark"] .settings-security-item,
+html[data-theme="dark"] .settings-data-privacy-item,
 html[data-theme="dark"] .settings-metric,
 html[data-theme="dark"] .settings-project-pipeline-item,
 html[data-theme="dark"] .settings-project-item,
@@ -16883,12 +17018,18 @@ html[data-theme="dark"] .settings-security-item.warn {
   border-color: rgba(230, 183, 103, 0.38);
 }
 
+html[data-theme="dark"] .settings-data-privacy-item.good {
+  border-color: rgba(146, 191, 160, 0.34);
+}
+
 html[data-theme="dark"] .settings-activity-icon,
 html[data-theme="dark"] .settings-activity-action,
 html[data-theme="dark"] .settings-account-health-icon,
 html[data-theme="dark"] .settings-account-health-action,
 html[data-theme="dark"] .settings-security-icon,
-html[data-theme="dark"] .settings-security-action {
+html[data-theme="dark"] .settings-security-action,
+html[data-theme="dark"] .settings-data-privacy-icon,
+html[data-theme="dark"] .settings-data-privacy-action {
   border-color: rgba(222, 162, 79, 0.28);
   background: rgba(222, 162, 79, 0.16);
   color: #f3c16d;
@@ -16904,6 +17045,12 @@ html[data-theme="dark"] .settings-security-item.warn .settings-security-icon {
   border-color: rgba(230, 183, 103, 0.34);
   background: rgba(230, 183, 103, 0.14);
   color: #f0c978;
+}
+
+html[data-theme="dark"] .settings-data-privacy-item.good .settings-data-privacy-icon {
+  border-color: rgba(146, 191, 160, 0.28);
+  background: rgba(146, 191, 160, 0.16);
+  color: #b7e5c4;
 }
 
 html[data-theme="dark"] .settings-account-email-copy {
@@ -16949,6 +17096,7 @@ html[data-theme="dark"] .settings-activity-copy strong,
 html[data-theme="dark"] .settings-account-health-head h2,
 html[data-theme="dark"] .settings-account-health-copy strong,
 html[data-theme="dark"] .settings-security-copy strong,
+html[data-theme="dark"] .settings-data-privacy-copy strong,
 html[data-theme="dark"] .settings-workspace-action strong,
 html[data-theme="dark"] .settings-metric strong,
 html[data-theme="dark"] .settings-project-item strong,
@@ -16972,6 +17120,7 @@ html[data-theme="dark"] .settings-account-health-copy span,
 html[data-theme="dark"] .settings-account-health-copy small,
 html[data-theme="dark"] .settings-security-copy span,
 html[data-theme="dark"] .settings-security-copy small,
+html[data-theme="dark"] .settings-data-privacy-copy small,
 html[data-theme="dark"] .settings-workspace-action small,
 html[data-theme="dark"] .settings-project-item small,
 html[data-theme="dark"] .settings-template-card-copy p,
@@ -18874,6 +19023,10 @@ body,
   overflow-x: clip;
 }
 
+html {
+  scroll-padding-top: clamp(96px, 8vw, 136px);
+}
+
 html,
 body,
 .page-shell,
@@ -18901,6 +19054,16 @@ body,
   box-sizing: border-box;
   min-inline-size: 0;
   max-inline-size: 100%;
+}
+
+.nav {
+  background: color-mix(in srgb, var(--bg) 98%, #ffffff 2%);
+  box-shadow: 0 14px 34px -30px rgba(18, 21, 38, 0.48);
+}
+
+html[data-theme="dark"] .nav {
+  background: rgba(10, 14, 34, 0.96);
+  box-shadow: 0 16px 36px -28px rgba(0, 0, 0, 0.84);
 }
 
 .btn,
