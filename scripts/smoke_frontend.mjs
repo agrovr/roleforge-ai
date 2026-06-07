@@ -661,7 +661,7 @@ async function checkPublicShell(baseUrl) {
       /\.settings-project-kit-item\s*\{(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-item\s+small\s*\{(?=[^}]*justify-self:\s*start)(?=[^}]*max-width:\s*100%)[^}]*\}/s.test(stylesheetText) &&
       /\.settings-project-item\s+small\s*\{(?=[^}]*line-height:\s*1\.12)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s.test(stylesheetText) &&
-      /@container\s+settings-project-card\s+\(max-width:\s*680px\)\s*\{[\s\S]*?\.settings-project-stage-controls,\s*\.settings-project-kit-grid\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*128px\),\s*1fr\)\)/s.test(stylesheetText) &&
+      /@container\s+settings-project-card\s+\(max-width:\s*680px\)\s*\{[\s\S]*?\.settings-project-stage-controls,\s*\.settings-project-kit-grid,\s*\.settings-project-operations\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*128px\),\s*1fr\)\)/s.test(stylesheetText) &&
       /@container\s+settings-project-card\s+\(max-width:\s*560px\)\s*\{[\s\S]*?\.settings-project-summary,\s*\.settings-project-controls,\s*\.settings-project-rename-row,\s*\.settings-project-delete-row\s*\{[^}]*grid-template-columns:\s*1fr/s.test(stylesheetText),
     "settings saved-project status and application-kit controls can still squeeze or overflow",
   );
