@@ -16,9 +16,10 @@ import {
 } from "./launch_readiness_audit.mjs";
 
 test("parses launch audit options", () => {
-  assert.deepEqual(parseArgs(["--json", "--skip-live", "--skip-support-inbox", "--proof-evidence=.tmp/proof.json", "--proof-fresh-days=7", "--scope", "team_123", "--production-url=https://example.com"]), {
+  assert.deepEqual(parseArgs(["--json", "--skip-live", "--skip-live-proof", "--skip-support-inbox", "--proof-evidence=.tmp/proof.json", "--proof-fresh-days=7", "--scope", "team_123", "--production-url=https://example.com"]), {
     json: true,
     skipLive: true,
+    skipLiveProof: true,
     skipSupportInbox: true,
     proofEvidencePath: ".tmp/proof.json",
     proofFreshDays: 7,
@@ -59,11 +60,13 @@ test("classifies local live checkout proof evidence", () => {
   });
 
   assert.equal(classifyLiveBillingProofEvidence(freshEvidence, { now, freshDays: 14 }).status, "pass");
-  assert.equal(classifyLiveBillingProofEvidence(null, { now, freshDays: 14 }).status, "warn");
+  assert.equal(classifyLiveBillingProofEvidence(null, { now, freshDays: 14 }).status, "fail");
+  assert.equal(classifyLiveBillingProofEvidence({ ...freshEvidence, premiumActive: false }, { now, freshDays: 14 }).status, "fail");
   assert.match(
     classifyLiveBillingProofEvidence({ ...freshEvidence, premiumActive: false }, { now, freshDays: 14 }).detail,
     /incomplete/,
   );
+  assert.equal(classifyLiveBillingProofEvidence({ ...freshEvidence, completedAt: "2026-05-01T00:00:00.000Z" }, { now, freshDays: 14 }).status, "fail");
   assert.match(
     classifyLiveBillingProofEvidence({ ...freshEvidence, completedAt: "2026-05-01T00:00:00.000Z" }, { now, freshDays: 14 }).detail,
     /older than 14 days/,

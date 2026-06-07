@@ -20,6 +20,7 @@ export function parseArgs(argv) {
   const options = {
     json: false,
     skipLive: false,
+    skipLiveProof: false,
     skipSupportInbox: false,
     proofEvidencePath: DEFAULT_PROOF_EVIDENCE_PATH,
     proofFreshDays: DEFAULT_PROOF_FRESH_DAYS,
@@ -45,6 +46,10 @@ export function parseArgs(argv) {
     }
     if (name === "--skip-live") {
       options.skipLive = true;
+      continue;
+    }
+    if (name === "--skip-live-proof") {
+      options.skipLiveProof = true;
       continue;
     }
     if (name === "--skip-support-inbox") {
@@ -88,6 +93,7 @@ Usage:
   npm run audit:launch
   npm run audit:launch -- --json
   npm run audit:launch -- --skip-live
+  npm run audit:launch -- --skip-live-proof
   npm run audit:launch -- --skip-support-inbox
 
 Runs a concise operator audit over smoke readiness, billing readiness,
@@ -272,7 +278,7 @@ export function summarizeLiveBillingProofEvidence(evidence = {}, { now = new Dat
 export function classifyLiveBillingProofEvidence(evidence, { now = new Date(), freshDays = DEFAULT_PROOF_FRESH_DAYS } = {}) {
   if (!evidence) {
     return {
-      status: "warn",
+      status: "fail",
       detail: "No local live checkout proof evidence file was found.",
       warnings: ["Run `./scripts/live_billing_one_time_proof.ps1 -AutoPoll -CopyPromoCode` after Stripe secret rotation or before launch."],
     };
@@ -288,7 +294,7 @@ export function classifyLiveBillingProofEvidence(evidence, { now = new Date(), f
 
   if (!complete) {
     return {
-      status: "warn",
+      status: "fail",
       detail: "Local live checkout proof evidence is incomplete.",
       warnings: ["Rerun the one-shot live billing proof so the audit can confirm live checkout, webhook Premium activation, and cleanup evidence."],
       proofEvidence: summary,
@@ -297,7 +303,7 @@ export function classifyLiveBillingProofEvidence(evidence, { now = new Date(), f
 
   if (!summary.fresh) {
     return {
-      status: "warn",
+      status: "fail",
       detail: `Live checkout proof evidence is older than ${freshDays} days.`,
       warnings: ["Rerun the one-shot live billing proof before launch if Stripe keys, webhooks, prices, or billing code changed."],
       proofEvidence: summary,
@@ -354,15 +360,19 @@ export async function runLaunchReadinessAudit(options = {}) {
     classifyBillingReadiness,
   ));
 
-  try {
-    checks.push({ name: "Live checkout proof", warnings: [], ...classifyLiveBillingProofEvidence(readJsonFile(options.proofEvidencePath), { freshDays: options.proofFreshDays }) });
-  } catch (error) {
-    checks.push({
-      name: "Live checkout proof",
-      status: "warn",
-      detail: `Could not read local live checkout proof evidence: ${error instanceof Error ? error.message : String(error)}`,
-      warnings: [],
-    });
+  if (options.skipLiveProof) {
+    checks.push({ name: "Live checkout proof", status: "warn", detail: "Skipped by --skip-live-proof.", warnings: [] });
+  } else {
+    try {
+      checks.push({ name: "Live checkout proof", warnings: [], ...classifyLiveBillingProofEvidence(readJsonFile(options.proofEvidencePath), { freshDays: options.proofFreshDays }) });
+    } catch (error) {
+      checks.push({
+        name: "Live checkout proof",
+        status: "fail",
+        detail: `Could not read local live checkout proof evidence: ${error instanceof Error ? error.message : String(error)}`,
+        warnings: [],
+      });
+    }
   }
 
   if (!options.skipLive) {

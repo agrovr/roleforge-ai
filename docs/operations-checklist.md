@@ -68,7 +68,7 @@ Concise launch audit across smoke readiness, billing readiness, live checkout pr
 npm run audit:launch
 ```
 
-The live checkout proof portion reads `.codex-qa/live-billing-proof.json` when present. The support inbox portion prints only counts/status/category summaries. Neither portion prints ticket subjects, messages, emails, raw row ids, Stripe secrets, or service-role secrets.
+The live checkout proof portion reads `.codex-qa/live-billing-proof.json` and fails the launch audit when that evidence is missing, incomplete, or stale. Use `npm run audit:launch -- --skip-live-proof` only for non-payment diagnostics. The support inbox portion prints only counts/status/category summaries. Neither portion prints ticket subjects, messages, emails, raw row ids, Stripe secrets, or service-role secrets.
 
 If readiness is incomplete, the command prints safe `gh secret set` and `gh variable set` commands with placeholders for the missing values.
 
