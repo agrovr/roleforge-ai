@@ -20,6 +20,8 @@ export function LegalPage({
   intro: string;
   sections: readonly LegalSection[];
 }) {
+  const currentYear = new Date().getFullYear();
+
   return (
     <main className="legal-shell">
       <header className="settings-page-topbar legal-topbar">
@@ -67,8 +69,9 @@ export function LegalPage({
 
       <section className="legal-footer-card" aria-label="Policy footer">
         <div>
-          <span className="eyebrow">Last updated</span>
-          <strong>May 31, 2026</strong>
+          <span className="eyebrow">Policy center</span>
+          <strong>Current public terms and privacy guidance.</strong>
+          <small>&copy; {currentYear} RoleForge AI. All rights reserved.</small>
         </div>
         <div className="legal-footer-actions">
           <Link className="btn btn-soft btn-sm" href="/status">Status</Link>

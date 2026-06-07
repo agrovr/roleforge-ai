@@ -20,6 +20,9 @@ test("help page covers account, exports, billing, and saved project guidance", (
   assert.match(helpPage, /Exports and templates/);
   assert.match(helpPage, /Premium and billing/);
   assert.match(helpPage, /When something looks stuck/);
+  assert.match(helpPage, /Support requests/);
+  assert.match(helpPage, /Signed-in support requests are saved to your account with an RF reference/);
+  assert.match(helpPage, /If support notifications are configured/);
   assert.match(helpPage, /HelpSearch/);
   assert.match(helpPage, /quickLinks=\{quickLinks\}/);
   assert.match(helpPage, /helpSections=\{helpSections\}/);
@@ -32,6 +35,7 @@ test("help page covers account, exports, billing, and saved project guidance", (
   assert.match(helpPage, /Contact support/);
   assert.match(helpPage, /href: "\/updates"/);
   assert.match(helpPage, /Product updates/);
+  assert.match(helpPage, /Support requests keep an account-visible RF reference/);
 });
 
 test("help page routes common issues to self-service and prefilled support", () => {

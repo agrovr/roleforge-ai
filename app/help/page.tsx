@@ -80,6 +80,13 @@ const helpSections: readonly HelpSection[] = [
       "For exports, confirm the selected format is allowed for your plan and that the latest run has finished before downloading.",
     ],
   },
+  {
+    title: "Support requests",
+    body: [
+      "Signed-in support requests are saved to your account with an RF reference so you can find them again from Support or Settings.",
+      "If support notifications are configured, the request is also sent to the operator channel. The account history remains the source you can see.",
+    ],
+  },
 ] as const;
 
 const quickLinks: readonly HelpQuickLink[] = [
@@ -187,14 +194,14 @@ export default function HelpPage() {
           <div className="eyebrow">Help center</div>
           <h1 id="help-title" className="display">Use RoleForge with fewer surprises.</h1>
           <p>
-            Practical answers for account access, saved work, exports, templates, and Premium billing.
+            Compact guidance for account access, saved work, exports, templates, Premium billing, and support.
           </p>
         </div>
         <div className="legal-hero-card help-hero-card" aria-label="Help summary">
           <RoleForgeIcon name="settings" size={18} />
-          <span>Profile menu links to saved work, billing, security, and Help</span>
+          <span>Start with the page that owns the live state</span>
           <span>Free export is PDF; Premium adds DOCX and TXT</span>
-          <span>Review generated output before using it in an application</span>
+          <span>Support requests keep an account-visible RF reference</span>
         </div>
       </section>
 
@@ -231,7 +238,7 @@ export default function HelpPage() {
       <section className="legal-footer-card" aria-label="Help footer">
         <div>
           <span className="eyebrow">Need account controls?</span>
-          <strong>Settings has the live account state.</strong>
+          <strong>Settings has the live account and plan state.</strong>
         </div>
         <div className="legal-footer-actions">
           <Link className="btn btn-soft btn-sm" href="/settings">Open settings</Link>

@@ -29,6 +29,7 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /account, billing, privacy, export/);
   assert.match(supportPage, /Get help with your workflow/);
   assert.match(supportPage, /Signed-in requests are saved to your account/);
+  assert.match(supportPage, /Operator review uses the account-safe request packet/);
   assert.match(supportPage, /supportGuides\.map/);
   assert.match(supportPage, /href=\{guide\.href\}/);
   assert.match(supportPage, /Prefill request/);
@@ -37,6 +38,7 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /Send the details that make the issue traceable/);
   assert.match(supportPage, /supportCategoryLabel\(item\.category\)/);
   assert.match(supportPage, /supportLifecycle/);
+  assert.match(supportPage, /supportAfterSubmit/);
   assert.match(supportPage, /Support request lifecycle/);
   assert.match(supportPage, /supportStatusLabel\(item\.status\)/);
   assert.match(supportPage, /latestSupportRequest/);
@@ -68,6 +70,11 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /SupportReferenceCopyButton referenceLabel=\{notice\.referenceLabel\}/);
   assert.match(supportPage, /support-notice-content/);
   assert.match(supportPage, /support-status-badge/);
+  assert.match(supportPage, /support-after-submit-list/);
+  assert.match(supportPage, /The request is saved to your signed-in account with an RF reference/);
+  assert.match(supportPage, /Support history appears on this page and in Settings/);
+  assert.match(supportPage, /If the support channel is configured, RoleForge sends the request details for operator review/);
+  assert.match(supportPage, /When notification routing is configured/);
   assert.match(supportPage, /name="category"/);
   assert.match(supportPage, /name="subject"/);
   assert.match(supportPage, /name="message"/);
@@ -210,6 +217,8 @@ test("support page has overflow-safe responsive form layout", () => {
   assert.match(stylesheet, /\.support-packet-item\.good/);
   assert.match(stylesheet, /\.support-packet-item\.warn/);
   assert.match(stylesheet, /\.support-response-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*gap:\s*12px)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-after-submit-list\s*\{(?=[^}]*display:\s*grid)(?=[^}]*list-style:\s*none)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-after-submit-list\s+li\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*16px\s+minmax\(0,\s*1fr\))(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
   assert.match(stylesheet, /\.support-response-list\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.support-response-item\s+small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*pretty)[^}]*\}/s);
   assert.match(stylesheet, /\.support-form\s+input,\s*\.support-form\s+select,\s*\.support-form\s+textarea\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);
@@ -228,5 +237,6 @@ test("support page has overflow-safe responsive form layout", () => {
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-packet-item\.good/);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-packet-item\.warn/);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-response-card/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-after-submit-list li/);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.support-reference-copy/);
 });

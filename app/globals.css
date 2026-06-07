@@ -8763,11 +8763,11 @@ html[data-theme="dark"] input::file-selector-button {
 .legal-shell {
   min-height: 100dvh;
   overflow-x: clip;
-  padding: 28px clamp(18px, 4vw, 54px) 54px;
+  padding: 24px clamp(18px, 4vw, 54px) 54px;
   background:
-    linear-gradient(90deg, color-mix(in srgb, var(--brand-soft) 20%, transparent) 0 1px, transparent 1px 100%),
-    radial-gradient(circle at 86% 8%, rgba(137, 209, 190, 0.1), transparent 21rem),
-    radial-gradient(circle at 8% 76%, rgba(222, 162, 79, 0.08), transparent 24rem),
+    linear-gradient(90deg, color-mix(in srgb, var(--brand-soft) 12%, transparent) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 86% 8%, rgba(137, 209, 190, 0.08), transparent 21rem),
+    radial-gradient(circle at 8% 76%, rgba(222, 162, 79, 0.06), transparent 24rem),
     linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
   background-size: 44px 44px, auto, auto, auto;
 }
@@ -8789,10 +8789,10 @@ html[data-theme="dark"] input::file-selector-button {
 
 .legal-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 330px), 390px);
+  grid-template-columns: minmax(0, 1fr) minmax(min(100%, 300px), 370px);
   gap: clamp(22px, 4vw, 44px);
   align-items: center;
-  padding: 72px 0 34px;
+  padding: clamp(42px, 6vw, 64px) 0 28px;
 }
 
 .legal-hero > * {
@@ -8803,8 +8803,8 @@ html[data-theme="dark"] input::file-selector-button {
   max-width: 850px;
   margin: 8px 0 14px;
   color: var(--ink-0);
-  font-size: 5.25rem;
-  line-height: 0.96;
+  font-size: clamp(3.35rem, 7vw, 4.65rem);
+  line-height: 1;
   overflow-wrap: anywhere;
   text-wrap: balance;
 }
@@ -8823,9 +8823,9 @@ html[data-theme="dark"] input::file-selector-button {
   display: grid;
   gap: 10px;
   min-width: 0;
-  padding: 20px;
+  padding: 18px;
   border: 1px solid color-mix(in srgb, var(--good) 22%, var(--line));
-  border-radius: 16px;
+  border-radius: 14px;
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--good) 8%, transparent), transparent),
     color-mix(in srgb, var(--surface) 84%, var(--bg-alt));
@@ -8868,7 +8868,7 @@ html[data-theme="dark"] input::file-selector-button {
   margin-bottom: 16px;
   padding: 18px;
   border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line));
-  border-radius: 16px;
+  border-radius: 14px;
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--sky-soft) 30%, transparent), transparent),
     color-mix(in srgb, var(--surface) 90%, var(--bg-alt));
@@ -8886,9 +8886,9 @@ html[data-theme="dark"] input::file-selector-button {
   margin-top: 5px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: 1.72rem;
+  font-size: 1.48rem;
   font-weight: 680;
-  line-height: 1.05;
+  line-height: 1.08;
   overflow-wrap: anywhere;
   text-wrap: balance;
 }
@@ -8914,7 +8914,7 @@ html[data-theme="dark"] input::file-selector-button {
   padding: 18px;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--brand) 20%, var(--line));
-  border-radius: 16px;
+  border-radius: 14px;
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 34%, transparent), transparent),
     color-mix(in srgb, var(--surface) 92%, var(--bg-alt));
@@ -9064,7 +9064,7 @@ html[data-theme="dark"] input::file-selector-button {
   min-width: 0;
   padding: 16px;
   border: 1px solid color-mix(in srgb, var(--brand) 20%, var(--line));
-  border-radius: 16px;
+  border-radius: 14px;
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 36%, transparent), transparent),
     color-mix(in srgb, var(--surface) 90%, var(--bg-alt));
@@ -9609,7 +9609,7 @@ html[data-theme="dark"] input::file-selector-button {
   overflow: hidden;
   padding: 18px;
   border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line));
-  border-radius: 16px;
+  border-radius: 14px;
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--bg-alt) 72%, transparent)),
     var(--surface);
@@ -9655,7 +9655,7 @@ html[data-theme="dark"] input::file-selector-button {
   margin: 8px 0 8px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: 1.9rem;
+  font-size: 1.72rem;
   line-height: 1.04;
   overflow-wrap: anywhere;
   text-wrap: balance;
@@ -10118,6 +10118,33 @@ html[data-theme="dark"] input::file-selector-button {
     color-mix(in srgb, var(--surface) 92%, var(--bg-alt));
 }
 
+.support-after-submit-list {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.support-after-submit-list li {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 8px;
+  min-width: 0;
+  color: var(--ink-2);
+  font-size: 0.84rem;
+  font-weight: 760;
+  line-height: 1.36;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.support-after-submit-list svg {
+  margin-top: 2px;
+  color: var(--good);
+}
+
 .support-response-head {
   display: grid;
   gap: 6px;
@@ -10452,7 +10479,7 @@ html[data-theme="dark"] input::file-selector-button {
 .legal-footer-card {
   min-width: 0;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 14px;
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, transparent), color-mix(in srgb, var(--bg-alt) 72%, transparent)),
     var(--surface);
@@ -10470,7 +10497,7 @@ html[data-theme="dark"] input::file-selector-button {
   margin: 0;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: 1.95rem;
+  font-size: 1.72rem;
   line-height: 1.04;
   overflow-wrap: anywhere;
   text-wrap: balance;
@@ -10499,8 +10526,17 @@ html[data-theme="dark"] input::file-selector-button {
   margin-top: 4px;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   line-height: 1.05;
+}
+
+.legal-footer-card small {
+  display: block;
+  margin-top: 7px;
+  color: var(--ink-3);
+  font-size: 0.84rem;
+  font-weight: 760;
+  line-height: 1.35;
 }
 
 .legal-footer-actions {
@@ -17593,6 +17629,14 @@ html[data-theme="dark"] .support-response-card {
 html[data-theme="dark"] .support-response-item {
   border-color: rgba(137, 209, 190, 0.22);
   background: rgba(137, 209, 190, 0.08);
+}
+
+html[data-theme="dark"] .support-after-submit-list li {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .support-after-submit-list svg {
+  color: #aee7d8;
 }
 
 html[data-theme="dark"] .support-form input,

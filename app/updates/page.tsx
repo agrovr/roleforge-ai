@@ -9,7 +9,7 @@ import { supportRequestHref } from "../lib/supportRequests";
 
 export const metadata: Metadata = {
   title: "Product Updates",
-  description: "Recent RoleForge AI product updates for account controls, saved projects, exports, billing readiness, and workflow status.",
+  description: "Material RoleForge AI product updates for account controls, saved projects, exports, billing, support, and public guidance.",
   alternates: {
     canonical: "/updates",
   },
@@ -27,89 +27,63 @@ type UpdateItem = {
 };
 
 const updatePrinciples = [
-  "Published only after behavior ships",
-  "Grouped by release theme, not every small patch",
-  "No unsupported claims or roadmap promises",
+  "Material changes only",
+  "Grouped by product area",
+  "Published after behavior ships",
 ] as const;
 
 const updates: readonly UpdateItem[] = [
   {
-    title: "Account controls are now more complete",
+    title: "Account workspace, support history, and preferences",
     date: "June 2026",
-    eyebrow: "Account workspace",
+    eyebrow: "Account",
     icon: "mail",
-    summary: "Settings now feels like the home for profile, preferences, support history, and privacy controls.",
+    summary: "Settings is now the account home for profile details, preferences, saved work, support references, and privacy controls.",
     details: [
-      "Communication preferences are saved to the account profile and included in account exports.",
-      "Data and privacy controls route export, deletion, policy, and support questions to the right place.",
+      "Communication preferences are account-backed and included in account exports.",
+      "Support requests now keep a visible RF reference in Support and Settings history.",
     ],
     actionHref: "/settings",
     actionLabel: "Open settings",
   },
   {
-    title: "Support and status paths are clearer",
+    title: "Premium billing and export access are clearer",
     date: "June 2026",
-    eyebrow: "Support",
-    icon: "mail",
-    summary: "Help, Status, Support, and Settings now send common issues to the surface that owns the live state.",
-    details: [
-      "Support requests are saved to the signed-in account with a safe RF reference and visible request history.",
-      "Common workflow, export, billing, saved-project, and privacy questions open prefilled support requests.",
-    ],
-    actionHref: "/support",
-    actionLabel: "Open support",
-  },
-  {
-    title: "Premium and export behavior is explicit",
-    date: "June 2026",
-    eyebrow: "Billing and exports",
+    eyebrow: "Billing",
     icon: "layers",
-    summary: "The site now separates free PDF export from Premium DOCX/TXT access and uses real billing state.",
+    summary: "Free PDF export and Premium DOCX/TXT access are separated across Studio, Settings, and saved project downloads.",
     details: [
-      "Checkout and billing management use Stripe, while Settings explains subscription sync and cancellation state.",
-      "Saved projects and restored downloads respect the current account entitlement instead of exposing stale premium links.",
+      "Checkout and billing management use Stripe-hosted flows.",
+      "Restored projects respect the current plan instead of exposing stale Premium-only links.",
     ],
     actionHref: "/settings#billing",
     actionLabel: "Open billing",
   },
   {
-    title: "Saved work is easier to recover",
+    title: "Saved project recovery is easier to scan",
     date: "June 2026",
     eyebrow: "Projects",
     icon: "settings",
-    summary: "Signed-in runs can be restored, renamed, staged, and managed from a cleaner account workspace.",
+    summary: "Signed-in runs can be restored, renamed, staged, exported, and removed from a more organized project view.",
     details: [
-      "Project rows now keep stage controls, downloads, restore actions, and removal controls readable.",
-      "Eligible browser-history runs can be saved into the signed-in account for later restore.",
+      "Project rows group restore, stage, export, and delete actions more predictably.",
+      "Eligible browser-history runs can be saved into the signed-in account.",
     ],
     actionHref: "/settings#projects",
     actionLabel: "Open projects",
   },
   {
-    title: "Public guidance is easier to scan",
+    title: "Templates and public guidance were consolidated",
     date: "June 2026",
-    eyebrow: "Public pages",
+    eyebrow: "Guidance",
     icon: "scan",
-    summary: "Help, Status, Templates, Support, Updates, Privacy, and Terms are now discoverable and consistent.",
+    summary: "The public pages now route common questions to Help, Status, Support, Settings, Privacy, Terms, and Updates.",
     details: [
-      "Help includes searchable guidance and direct routes for common account, billing, export, and workflow issues.",
-      "Public account menus preserve the destination through sign-in when a protected page is required.",
+      "Help includes searchable answers and short issue routing.",
+      "Templates make the selected resume direction visible before Studio.",
     ],
     actionHref: "/help",
     actionLabel: "Open help",
-  },
-  {
-    title: "Template direction is visible before Studio",
-    date: "May 2026",
-    eyebrow: "Templates",
-    icon: "file",
-    summary: "The Templates page makes the selected resume direction visible before starting a new run.",
-    details: [
-      "Template choices carry into new studio runs and exports.",
-      "The public template gallery explains available directions without promising unsupported outcomes.",
-    ],
-    actionHref: "/templates",
-    actionLabel: "Browse templates",
   },
 ];
 
@@ -135,9 +109,9 @@ export default function UpdatesPage() {
       <section className="legal-hero updates-hero" aria-labelledby="updates-title">
         <div>
           <div className="eyebrow">Product updates</div>
-          <h1 id="updates-title" className="display">What changed in RoleForge.</h1>
+          <h1 id="updates-title" className="display">RoleForge product notes.</h1>
           <p>
-            A factual log of shipped workflow, account, export, and billing improvements.
+            Short release notes for shipped account, workflow, export, billing, and support improvements.
           </p>
         </div>
         <div className="legal-hero-card updates-hero-card" aria-label="Updates summary">
@@ -151,10 +125,10 @@ export default function UpdatesPage() {
       <section className="updates-overview" aria-label="Updates publishing standard">
         <div>
           <span className="eyebrow">Release notes</span>
-          <strong>Short, grouped, and shipped.</strong>
+          <strong>Useful signal, not a patch-by-patch feed.</strong>
         </div>
         <p>
-          This page highlights material product changes. Operational availability stays on Status, and account-specific state stays in Settings.
+          Updates stay grouped around product behavior. Operational availability belongs on Status, and account-specific state belongs in Settings.
         </p>
       </section>
 
@@ -188,8 +162,8 @@ export default function UpdatesPage() {
 
       <section className="legal-footer-card" aria-label="Updates footer">
         <div>
-          <span className="eyebrow">Need current state?</span>
-          <strong>Status and Settings stay live.</strong>
+          <span className="eyebrow">Current state</span>
+          <strong>Status and Settings stay authoritative.</strong>
         </div>
         <div className="legal-footer-actions">
           <Link className="btn btn-soft btn-sm" href="/status">Open status</Link>

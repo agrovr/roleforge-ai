@@ -95,10 +95,11 @@ test("landing pricing status pills stay readable on dark featured cards", () => 
 test("landing footer reads as a complete product footer", () => {
   assert.match(landingPage, /const currentYear = new Date\(\)\.getFullYear\(\);/);
   assert.match(landingPage, /className="footer-brand-block"/);
-  assert.match(landingPage, /real Stripe-backed Premium billing/);
-  assert.match(landingPage, /Free PDF exports/);
+  assert.match(landingPage, /A focused resume tailoring workspace/);
+  assert.match(landingPage, /Stripe-backed Premium billing/);
+  assert.match(landingPage, /Protected studio/);
   assert.match(landingPage, /Premium DOCX\/TXT/);
-  assert.match(landingPage, /Account data export/);
+  assert.match(landingPage, /Account exports/);
   assert.match(landingPage, /Payments by Stripe/);
   assert.match(landingPage, /Google sign-in supported/);
   assert.match(landingPage, /className="footer-meta-links"/);

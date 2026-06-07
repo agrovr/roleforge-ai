@@ -144,6 +144,12 @@ const supportLifecycle: Array<{
   },
 ];
 
+const supportAfterSubmit = [
+  "The request is saved to your signed-in account with an RF reference.",
+  "Support history appears on this page and in Settings.",
+  "If the support channel is configured, RoleForge sends the request details for operator review.",
+] as const;
+
 function getParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
@@ -255,14 +261,14 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
           <div className="eyebrow">Support</div>
           <h1 id="support-title" className="display">Get help with your workflow.</h1>
           <p>
-            Send account-linked details for saved projects, billing, exports, or resume runs so the issue can be traced without exposing private files in public channels.
+            Send account-linked details for saved projects, billing, exports, or resume runs so the issue can be traced without posting private files publicly.
           </p>
         </div>
         <div className="legal-hero-card support-hero-card" aria-label="Support summary">
           <RoleForgeIcon name="mail" size={18} />
           <span>Signed-in requests are saved to your account</span>
           <span>Requests appear in Support and Settings history</span>
-          <span>Include request IDs from Studio when available</span>
+          <span>Operator review uses the account-safe request packet</span>
           <span>Never paste full payment card details or private credentials</span>
         </div>
       </section>
@@ -352,8 +358,13 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
             <div className="support-response-head">
               <span className="eyebrow">After submit</span>
               <strong>Track the request from your account.</strong>
-              <p>Support requests are stored with account-safe context and an RF reference. Status changes appear here and in Settings.</p>
+              <p>Support requests keep a visible account history first. When notification routing is configured, the same request is also sent for operator review.</p>
             </div>
+            <ul className="support-after-submit-list" aria-label="What happens after sending a support request">
+              {supportAfterSubmit.map((item) => (
+                <li key={item}><RoleForgeIcon name="check" size={13} />{item}</li>
+              ))}
+            </ul>
             <div className="support-response-list">
               {supportLifecycle.map((item) => (
                 <article className="support-response-item" key={item.status}>

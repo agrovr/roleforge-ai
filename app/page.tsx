@@ -733,11 +733,11 @@ function Footer() {
       <div className="footer-inner">
         <div className="footer-brand-block">
           <Brand />
-          <p className="footer-tag">AI-assisted resume tailoring with protected studio access, saved project history, and real Stripe-backed Premium billing.</p>
+          <p className="footer-tag">A focused resume tailoring workspace with protected studio access, saved project history, and Stripe-backed Premium billing.</p>
           <div className="footer-product-note" aria-label="RoleForge product safeguards">
-            <span><RoleForgeIcon name="check" size={13} /> Free PDF exports</span>
-            <span><RoleForgeIcon name="lock" size={13} /> Premium DOCX/TXT</span>
-            <span><RoleForgeIcon name="download" size={13} /> Account data export</span>
+            <span><RoleForgeIcon name="lock" size={13} /> Protected studio</span>
+            <span><RoleForgeIcon name="download" size={13} /> Account exports</span>
+            <span><RoleForgeIcon name="layers" size={13} /> Premium DOCX/TXT</span>
           </div>
         </div>
         <nav className="footer-col" aria-label="Product links">
