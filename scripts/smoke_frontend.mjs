@@ -522,7 +522,7 @@ async function checkPublicShell(baseUrl) {
   pass("landing final CTA and footer include overflow-safe layout guards");
 
   requireCondition(
-    /\.legal-hero\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*330px\),\s*390px\))[^}]*\}/s.test(stylesheetText),
+    /\.legal-hero\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*300px\),\s*370px\))[^}]*\}/s.test(stylesheetText),
     "legal hero is missing stable desktop columns",
   );
   requireCondition(
