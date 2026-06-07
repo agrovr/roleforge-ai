@@ -62,11 +62,13 @@ cd C:\Users\ashmi\Downloads\Project_v1\resume-tailor-ui-github
 npm run smoke:readiness
 ```
 
-Concise launch audit across smoke readiness, billing readiness, recent CI, backend production smoke, and the Vercel production alias:
+Concise launch audit across smoke readiness, billing readiness, support inbox volume, recent CI, backend production smoke, and the Vercel production alias:
 
 ```bash
 npm run audit:launch
 ```
+
+The support inbox portion prints only counts/status/category summaries. It never prints ticket subjects, messages, emails, raw row ids, or service-role secrets.
 
 If readiness is incomplete, the command prints safe `gh secret set` and `gh variable set` commands with placeholders for the missing values.
 

@@ -4,17 +4,20 @@ import test from "node:test";
 import {
   classifyBillingReadiness,
   classifySmokeReadiness,
+  classifySupportInbox,
   classifyVercelInspect,
   classifyWorkflowRun,
   parseArgs,
+  parseSupportInboxSummary,
   parseWorkflowRuns,
   summarizeLaunchAudit,
 } from "./launch_readiness_audit.mjs";
 
 test("parses launch audit options", () => {
-  assert.deepEqual(parseArgs(["--json", "--skip-live", "--scope", "team_123", "--production-url=https://example.com"]), {
+  assert.deepEqual(parseArgs(["--json", "--skip-live", "--skip-support-inbox", "--scope", "team_123", "--production-url=https://example.com"]), {
     json: true,
     skipLive: true,
+    skipSupportInbox: true,
     teamId: "team_123",
     frontendRepo: "agrovr/roleforge-ai",
     backendRepo: "agrovr/roleforge-ai-backend",
@@ -22,6 +25,46 @@ test("parses launch audit options", () => {
   });
   assert.throws(() => parseArgs(["--scope"]), /--scope requires a value/);
   assert.throws(() => parseArgs(["--unknown"]), /Unknown argument/);
+});
+
+test("classifies support inbox summaries without ticket content", () => {
+  assert.deepEqual(parseSupportInboxSummary([
+    "Support requests: 3",
+    "Newest: 2026-06-06T12:00:00.000Z",
+    "By status: open=1, reviewing=2",
+    "By category: billing=1, privacy=2",
+  ].join("\n")), {
+    count: 3,
+    newestCreatedAt: "2026-06-06T12:00:00.000Z",
+    byStatus: { open: 1, reviewing: 2 },
+    byCategory: { billing: 1, privacy: 2 },
+  });
+
+  assert.deepEqual(classifySupportInbox([
+    "Support requests: 0",
+    "Newest: none",
+    "By status: none",
+    "By category: none",
+  ].join("\n")), {
+    status: "pass",
+    detail: "Support inbox has no saved requests.",
+    supportInbox: {
+      count: 0,
+      newestCreatedAt: "none",
+      byStatus: {},
+      byCategory: {},
+    },
+  });
+
+  const open = classifySupportInbox([
+    "Support requests: 1",
+    "Newest: 2026-06-06T12:00:00.000Z",
+    "By status: open=1",
+    "By category: billing=1",
+  ].join("\n"));
+  assert.equal(open.status, "warn");
+  assert.match(open.detail, /1 open support request/);
+  assert.doesNotMatch(JSON.stringify(open), /person@example\.com|Checkout completed/);
 });
 
 test("classifies smoke and billing readiness output", () => {

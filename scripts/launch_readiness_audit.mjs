@@ -17,6 +17,7 @@ export function parseArgs(argv) {
   const options = {
     json: false,
     skipLive: false,
+    skipSupportInbox: false,
     teamId: DEFAULT_VERCEL_TEAM_ID,
     frontendRepo: DEFAULT_FRONTEND_REPO,
     backendRepo: DEFAULT_BACKEND_REPO,
@@ -39,6 +40,10 @@ export function parseArgs(argv) {
     }
     if (name === "--skip-live") {
       options.skipLive = true;
+      continue;
+    }
+    if (name === "--skip-support-inbox") {
+      options.skipSupportInbox = true;
       continue;
     }
     if (["--scope", "--team", "--frontend-repo", "--backend-repo", "--production-url"].includes(name)) {
@@ -64,10 +69,11 @@ Usage:
   npm run audit:launch
   npm run audit:launch -- --json
   npm run audit:launch -- --skip-live
+  npm run audit:launch -- --skip-support-inbox
 
 Runs a concise operator audit over smoke readiness, billing readiness,
-recent GitHub Actions, and the Vercel production deployment. Output avoids
-printing secret values.`);
+support inbox volume, recent GitHub Actions, and the Vercel production
+deployment. Output avoids printing secret values and support ticket content.`);
 }
 
 function runCommand(command, args, { cwd = process.cwd() } = {}) {
@@ -150,17 +156,72 @@ export function classifyVercelInspect(output = "") {
   return { status: "fail", detail: "Vercel production deployment is not confirmed Ready." };
 }
 
-function checkFromCommand(name, commandResult, classifier) {
+function checkFromCommand(name, commandResult, classifier, { failureStatus = "fail" } = {}) {
   const output = `${commandResult.stdout}\n${commandResult.stderr}`;
   if (commandResult.exitCode !== 0) {
     return {
       name,
-      status: "fail",
+      status: failureStatus,
       detail: compactOutput(output || `${name} command failed.`),
       warnings: [],
     };
   }
   return { name, warnings: [], ...classifier(output) };
+}
+
+export function parseSupportInboxSummary(output = "") {
+  const countMatch = output.match(/Support requests:\s*(\d+)/i);
+  const newestMatch = output.match(/Newest:\s*([^\n\r]+)/i);
+  const statusMatch = output.match(/By status:\s*([^\n\r]+)/i);
+  const categoryMatch = output.match(/By category:\s*([^\n\r]+)/i);
+  const byStatus = {};
+  const byCategory = {};
+
+  for (const part of (statusMatch?.[1] || "").split(",")) {
+    const match = part.trim().match(/^([a-z-]+)=(\d+)$/i);
+    if (match) byStatus[match[1]] = Number.parseInt(match[2], 10);
+  }
+
+  for (const part of (categoryMatch?.[1] || "").split(",")) {
+    const match = part.trim().match(/^([a-z-]+)=(\d+)$/i);
+    if (match) byCategory[match[1]] = Number.parseInt(match[2], 10);
+  }
+
+  return {
+    count: countMatch ? Number.parseInt(countMatch[1], 10) : null,
+    newestCreatedAt: newestMatch?.[1]?.trim() || "",
+    byStatus,
+    byCategory,
+  };
+}
+
+export function classifySupportInbox(output = "") {
+  const summary = parseSupportInboxSummary(output);
+  if (!Number.isInteger(summary.count)) {
+    return { status: "warn", detail: "Support inbox summary could not be parsed.", warnings: [] };
+  }
+
+  const openCount = summary.byStatus.open || 0;
+  if (openCount > 0) {
+    const noun = openCount === 1 ? "request" : "requests";
+    const verb = openCount === 1 ? "needs" : "need";
+    return {
+      status: "warn",
+      detail: `${openCount} open support ${noun} ${verb} operator review.`,
+      warnings: [
+        "Run `npm run support:inbox` for masked details, then `npm run support:status` when triaged.",
+      ],
+      supportInbox: summary,
+    };
+  }
+
+  return {
+    status: "pass",
+    detail: summary.count > 0
+      ? `Support inbox has ${summary.count} saved request${summary.count === 1 ? "" : "s"} and no open queue.`
+      : "Support inbox has no saved requests.",
+    supportInbox: summary,
+  };
 }
 
 export function summarizeLaunchAudit(checks) {
@@ -202,6 +263,13 @@ export async function runLaunchReadinessAudit(options = {}) {
   ));
 
   if (!options.skipLive) {
+    if (!options.skipSupportInbox) {
+      const supportInbox = runCommand(process.execPath, ["scripts/list_support_requests.mjs", "--summary", "--status", "all", "--limit", "50"], { cwd });
+      checks.push(checkFromCommand("Support inbox", supportInbox, classifySupportInbox, { failureStatus: "warn" }));
+    } else {
+      checks.push({ name: "Support inbox", status: "warn", detail: "Skipped by --skip-support-inbox.", warnings: [] });
+    }
+
     const frontendRuns = runCommand("gh", ["api", `repos/${options.frontendRepo}/actions/runs?branch=main&per_page=5`], { cwd });
     checks.push(checkFromCommand("Frontend CI", frontendRuns, (output) => classifyWorkflowRun(parseWorkflowRuns(output, "Frontend CI"), "Frontend CI")));
 
