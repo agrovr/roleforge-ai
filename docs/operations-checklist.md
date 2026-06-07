@@ -169,10 +169,11 @@ The setter rejects test keys for `STRIPE_SECRET_KEY`, so production cannot be ac
 For a one-shot live proof after rotating `STRIPE_SECRET_KEY`, copy the live secret key once and run:
 
 ```powershell
+.\scripts\live_billing_one_time_proof.ps1 -PreflightOnly
 .\scripts\live_billing_one_time_proof.ps1
 ```
 
-The runner clears any `sk_live_...` clipboard value immediately and again during cleanup, updates Vercel Production, redeploys, creates a one-use 100% off live promo code, opens Stripe Checkout for a temporary proof user, verifies Premium activation in Supabase, cleans up the proof user/subscription, and writes non-secret evidence to `.codex-qa/live-billing-proof.json`. Use `-PromptForSecret` to paste the Stripe key into a hidden prompt without using the clipboard, `-PromptForSupabaseServiceRole` if Supabase CLI is not logged in, `-SkipVercelUpdate`, `-SkipRedeploy`, `-CopyPromoCode`, or `-AutoPoll` for those specific variants.
+The preflight reports whether local Node, a live Stripe secret source, a Supabase admin credential source, and proof evidence are available without updating Vercel, creating a promo code, opening Checkout, or clearing the clipboard. The full runner clears any `sk_live_...` clipboard value immediately and again during cleanup, updates Vercel Production, redeploys, creates a one-use 100% off live promo code, opens Stripe Checkout for a temporary proof user, verifies Premium activation in Supabase, cleans up the proof user/subscription, and writes non-secret evidence to `.codex-qa/live-billing-proof.json`. Use `-PromptForSecret` to paste the Stripe key into a hidden prompt without using the clipboard, `-PromptForSupabaseServiceRole` if Supabase CLI is not logged in, `-SkipVercelUpdate`, `-SkipRedeploy`, `-CopyPromoCode`, or `-AutoPoll` for those specific variants.
 
 If a copied secret will be needed after the clipboard is cleared, cache it for a single proof retry first:
 

@@ -48,6 +48,20 @@ test("cache-only mode supports one-time Supabase admin credentials", () => {
   assert.match(script, /Clear-OneTimeSupabaseCredential/);
 });
 
+test("preflight mode checks proof readiness without consuming live resources", () => {
+  assert.match(script, /\[switch\]\$PreflightOnly/);
+  assert.match(script, /function Test-LiveBillingProofPreflight/);
+  assert.match(script, /RoleForge live billing proof preflight/);
+  assert.match(script, /Test-NodeRuntimeAvailable/);
+  assert.match(script, /Test-OneTimeSecretCache -Path \$OneTimeStripeSecretCachePath -Kind "stripe"/);
+  assert.match(script, /Test-OneTimeSecretCache -Path \$OneTimeSupabaseCredentialCachePath -Kind "supabase"/);
+  assert.match(script, /clipboard contains a live-looking key; value was not printed or cleared/);
+  assert.match(script, /if \(\$PreflightOnly\) \{/);
+  assert.match(script, /exit 1/);
+  const preflightBlock = script.slice(script.indexOf("function Test-LiveBillingProofPreflight"), script.indexOf("Push-Location $RepoRoot"));
+  assert.doesNotMatch(preflightBlock, /Invoke-Vercel|create_live_promo_code|live_checkout_entitlement_test\.mjs", "start"|Start-Process|Set-Clipboard|Clear-SecretClipboard/);
+});
+
 test("one-shot live billing proof can load server-only local proof secrets", () => {
   assert.match(script, /function Import-LocalProofEnv/);
   assert.match(script, /Join-Path \$RepoRoot ".env.local"/);
@@ -59,8 +73,10 @@ test("one-shot live billing proof can load server-only local proof secrets", () 
 test("live billing proof docs mention autopoll and promo-code clipboard handoff", () => {
   assert.match(stripeDocs, /-CopyPromoCode/);
   assert.match(stripeDocs, /-AutoPoll/);
+  assert.match(stripeDocs, /-PreflightOnly/);
   assert.match(operationsDocs, /-CopyPromoCode/);
   assert.match(operationsDocs, /-AutoPoll/);
+  assert.match(operationsDocs, /-PreflightOnly/);
 });
 
 test("successful live billing proof writes non-secret local evidence", () => {

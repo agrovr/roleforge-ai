@@ -16,6 +16,7 @@ param(
   [switch]$PromptForSupabaseServiceRole,
   [switch]$CacheStripeSecretOnly,
   [switch]$CacheSupabaseCredentialOnly,
+  [switch]$PreflightOnly,
   [switch]$DisableOneTimeSecretCache
 )
 
@@ -395,6 +396,105 @@ function Read-LiveStripeSecret {
   }
 
   throw "No live Stripe secret key was available. Put exactly one sk_live_ value on the clipboard, set ROLEFORGE_STRIPE_SECRET_KEY, or rerun with -PromptForSecret. Secret value was not printed."
+}
+
+function Test-NodeRuntimeAvailable {
+  if (Test-Path -LiteralPath $NodePath) {
+    return $true
+  }
+  return [bool](Get-Command $NodePath -ErrorAction SilentlyContinue)
+}
+
+function Test-OneTimeSecretCache {
+  param(
+    [Parameter(Mandatory = $true)][string]$Path,
+    [Parameter(Mandatory = $true)][string]$Kind
+  )
+
+  if ($DisableOneTimeSecretCache) {
+    return [ordered]@{ present = $false; usable = $false; status = "disabled" }
+  }
+  if (-not (Test-Path -LiteralPath $Path)) {
+    return [ordered]@{ present = $false; usable = $false; status = "absent" }
+  }
+
+  Add-Type -AssemblyName System.Security
+  try {
+    $protected = [Convert]::FromBase64String((Get-Content -LiteralPath $Path -Raw).Trim())
+    $bytes = [Security.Cryptography.ProtectedData]::Unprotect(
+      $protected,
+      $null,
+      [Security.Cryptography.DataProtectionScope]::CurrentUser
+    )
+    $value = [Text.Encoding]::UTF8.GetString($bytes).Trim()
+  } catch {
+    return [ordered]@{ present = $true; usable = $false; status = "unreadable" }
+  }
+
+  if ($Kind -eq "stripe") {
+    return [ordered]@{
+      present = $true
+      usable = [bool]($value -match "^sk_live_[A-Za-z0-9_\-]+$")
+      status = if ($value -match "^sk_live_[A-Za-z0-9_\-]+$") { "live" } else { "invalid" }
+    }
+  }
+
+  return [ordered]@{
+    present = $true
+    usable = [bool]($value -match "^(sb_secret_|sbp_|eyJ)[A-Za-z0-9_\-.]+$")
+    status = if ($value -match "^sbp_[A-Za-z0-9_\-.]+$") { "access-token" } elseif ($value -match "^(sb_secret_|eyJ)[A-Za-z0-9_\-.]+$") { "service-role" } else { "invalid" }
+  }
+}
+
+function Write-PreflightLine {
+  param(
+    [Parameter(Mandatory = $true)][bool]$Ok,
+    [Parameter(Mandatory = $true)][string]$Label,
+    [Parameter(Mandatory = $true)][string]$Detail
+  )
+
+  $prefix = if ($Ok) { "PASS" } else { "FAIL" }
+  Write-Host "$prefix ${Label}: $Detail"
+}
+
+function Test-LiveBillingProofPreflight {
+  $nodeOk = Test-NodeRuntimeAvailable
+  $clipboard = (Get-ClipboardTextSafe).Trim()
+  $stripeCache = Test-OneTimeSecretCache -Path $OneTimeStripeSecretCachePath -Kind "stripe"
+  $supabaseCache = Test-OneTimeSecretCache -Path $OneTimeSupabaseCredentialCachePath -Kind "supabase"
+
+  $stripeEnvReady = [bool]((@($env:ROLEFORGE_STRIPE_SECRET_KEY, $env:STRIPE_SECRET_KEY) | Where-Object { $_ -and $_.Trim() -match "^sk_live_[A-Za-z0-9_\-]+$" } | Select-Object -First 1))
+  $stripeClipboardReady = [bool]($clipboard -match "^sk_live_[A-Za-z0-9_\-]+$")
+  $stripeReady = $stripeEnvReady -or [bool]$stripeCache.usable -or $stripeClipboardReady
+
+  $supabaseEnvReady = [bool]((@($env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY, $env:SUPABASE_SERVICE_ROLE_KEY, $env:SUPABASE_ACCESS_TOKEN) | Where-Object { $_ -and $_.Trim() -match "^(sb_secret_|sbp_|eyJ)[A-Za-z0-9_\-.]+$" } | Select-Object -First 1))
+  $supabaseClipboardReady = [bool]($clipboard -match "^(sb_secret_|sbp_|eyJ)[A-Za-z0-9_\-.]+$")
+  $supabaseReady = $supabaseEnvReady -or [bool]$supabaseCache.usable -or $supabaseClipboardReady
+
+  $evidenceExists = Test-Path -LiteralPath $LiveBillingProofEvidencePath
+
+  Write-Host "RoleForge live billing proof preflight"
+  Write-PreflightLine -Ok $nodeOk -Label "Node runtime" -Detail $(if ($nodeOk) { "available" } else { "not found at configured path" })
+  Write-PreflightLine -Ok $stripeReady -Label "Live Stripe secret source" -Detail $(if ($stripeEnvReady) { "server-only environment variable present" } elseif ($stripeCache.usable) { "Windows-encrypted one-time cache is usable" } elseif ($stripeClipboardReady) { "clipboard contains a live-looking key; value was not printed or cleared" } elseif ($stripeCache.present) { "cache is present but $($stripeCache.status)" } else { "missing; use -CacheStripeSecretOnly or set ROLEFORGE_STRIPE_SECRET_KEY" })
+  Write-PreflightLine -Ok $supabaseReady -Label "Supabase admin source" -Detail $(if ($supabaseEnvReady) { "server-only environment variable or access token present" } elseif ($supabaseCache.usable) { "Windows-encrypted one-time cache is usable as $($supabaseCache.status)" } elseif ($supabaseClipboardReady) { "clipboard contains a service-role key or access token; value was not printed or cleared" } elseif ($supabaseCache.present) { "cache is present but $($supabaseCache.status)" } else { "missing; use -CacheSupabaseCredentialOnly, set a service-role env var, or ensure Supabase CLI auth is available for the full proof" })
+  Write-PreflightLine -Ok $evidenceExists -Label "Existing proof evidence" -Detail $(if ($evidenceExists) { ".codex-qa\live-billing-proof.json exists; audit will verify freshness" } else { "not found; a completed checkout proof still needs to write it" })
+
+  if ($clipboard -match "^sk_test_[A-Za-z0-9_\-]+$") {
+    Write-Host "WARN Clipboard contains a Stripe test key. It was not printed or cleared by preflight."
+  }
+  if (-not $SkipVercelUpdate) {
+    Write-Host "INFO Full proof will update Vercel STRIPE_SECRET_KEY and redeploy unless -SkipVercelUpdate or -SkipRedeploy is used."
+  }
+
+  return ($nodeOk -and $stripeReady -and $supabaseReady)
+}
+
+if ($PreflightOnly) {
+  $ok = Test-LiveBillingProofPreflight
+  if (-not $ok) {
+    exit 1
+  }
+  exit 0
 }
 
 Push-Location $RepoRoot
