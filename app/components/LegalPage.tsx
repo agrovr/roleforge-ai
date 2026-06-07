@@ -37,6 +37,11 @@ export function LegalPage({
           <div className="eyebrow">{eyebrow}</div>
           <h1 id="legal-title" className="display">{title}</h1>
           <p>{intro}</p>
+          <div className="legal-hero-meta" aria-label="Policy page notes">
+            <span>Plain language</span>
+            <span>Current product behavior</span>
+            <span>Account controls in Settings</span>
+          </div>
         </div>
         <div className="legal-hero-card" aria-label="Policy summary">
           <RoleForgeIcon name="lock" size={18} />

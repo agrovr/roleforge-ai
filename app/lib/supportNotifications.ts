@@ -35,7 +35,12 @@ export type SupportRequestNotificationPayload = {
 };
 
 export type SupportNotificationResult =
-  | { status: "skipped"; reason: "missing-webhook" | "invalid-webhook" | "missing-fetch" }
+  | { status: "skipped"; reason: "missing-destination" | "invalid-webhook" | "invalid-email" | "missing-fetch" }
+  | { status: "sent" }
+  | { status: "failed"; statusCode: number; bodyPreview: string };
+
+export type SupportReplyEmailResult =
+  | { status: "skipped"; reason: "invalid-email" | "missing-fetch" }
   | { status: "sent" }
   | { status: "failed"; statusCode: number; bodyPreview: string };
 
@@ -54,6 +59,23 @@ export function normalizeSupportWebhookUrl(value: unknown) {
   } catch {
     return null;
   }
+}
+
+function normalizeSupportEmail(value: unknown) {
+  if (typeof value !== "string") return null;
+  const candidate = value.trim();
+  if (!candidate) return null;
+  const match = candidate.match(/<([^<>@\s]+@[^<>@\s]+\.[^<>@\s]+)>$/);
+  const email = (match?.[1] ?? candidate).trim();
+  return /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email) ? candidate : null;
+}
+
+function normalizeSupportEmailRecipients(value: unknown) {
+  if (typeof value !== "string") return [];
+  return value
+    .split(/[;,]/)
+    .map((entry) => normalizeSupportEmail(entry))
+    .filter((entry): entry is string => Boolean(entry));
 }
 
 export function buildSupportRequestNotificationPayload({
@@ -81,6 +103,116 @@ export function buildSupportRequestNotificationPayload({
   };
 }
 
+function normalizeSupportSiteUrl(value: unknown) {
+  if (typeof value !== "string") return "";
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "https:" || url.protocol === "http:" ? url.origin : "";
+  } catch {
+    return "";
+  }
+}
+
+function buildSupportRequestEmailText(payload: SupportRequestNotificationPayload, adminInboxUrl = "") {
+  return [
+    `RoleForge support request ${payload.reference}`,
+    "",
+    `Status: open`,
+    `Created: ${payload.createdAt}`,
+    `Category: ${payload.categoryLabel}`,
+    `Subject: ${payload.subject}`,
+    `Customer email: ${payload.account.email ?? "Not available"}`,
+    payload.contextUrl ? `Context: ${payload.contextUrl}` : "Context: Not provided",
+    "",
+    "Message:",
+    payload.message,
+    "",
+    "Operator actions:",
+    adminInboxUrl ? `- Open the support inbox: ${adminInboxUrl}` : "- Open the support inbox from /admin/support.",
+    `- Reply to the customer by email and keep ${payload.reference} in the subject.`,
+    "- Mark the request reviewing or closed from the web inbox.",
+  ].join("\n");
+}
+
+function buildSupportReplyEmailText({
+  message,
+  reference,
+}: {
+  message: string;
+  reference: string;
+}) {
+  return [
+    message.trim(),
+    "",
+    "--",
+    "RoleForge Support",
+    `Request: ${reference}`,
+  ].join("\n");
+}
+
+export async function sendSupportReplyEmail({
+  to,
+  subject,
+  message,
+  reference,
+  env = process.env,
+  fetcher = globalThis.fetch as SupportNotificationFetch | undefined,
+}: {
+  to: string;
+  subject: string;
+  message: string;
+  reference: string;
+  env?: SupportNotificationEnv;
+  fetcher?: SupportNotificationFetch;
+}): Promise<SupportReplyEmailResult> {
+  const resendApiKey = env.RESEND_API_KEY?.trim() ?? "";
+  const emailFrom = normalizeSupportEmail(env.ROLEFORGE_SUPPORT_EMAIL_FROM);
+  const emailTo = normalizeSupportEmail(to);
+
+  if (!resendApiKey || !emailFrom || !emailTo || !message.trim()) return { status: "skipped", reason: "invalid-email" };
+  if (!fetcher) return { status: "skipped", reason: "missing-fetch" };
+
+  const headers: Record<string, string> = {
+    "content-type": "application/json",
+    authorization: `Bearer ${resendApiKey}`,
+  };
+
+  const abortController = typeof AbortController === "function" ? new AbortController() : null;
+  const timeout = abortController ? setTimeout(() => abortController.abort(), 3500) : null;
+
+  let response: { ok: boolean; status: number; text?: () => Promise<string> };
+  try {
+    response = await fetcher("https://api.resend.com/emails", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        from: emailFrom,
+        to: [emailTo],
+        subject: `Re: ${subject} (${reference})`,
+        text: buildSupportReplyEmailText({ message, reference }),
+      }),
+      signal: abortController?.signal,
+    });
+  } catch (error) {
+    return {
+      status: "failed",
+      statusCode: 0,
+      bodyPreview: compactPreview(error instanceof Error ? error.message : "Support reply email failed"),
+    };
+  } finally {
+    if (timeout) clearTimeout(timeout);
+  }
+
+  if (response.ok) return { status: "sent" };
+
+  const body = typeof response.text === "function" ? await response.text().catch(() => "") : "";
+  return {
+    status: "failed",
+    statusCode: response.status,
+    bodyPreview: compactPreview(body),
+  };
+}
+
 export async function notifySupportRequestCreated({
   saved,
   input,
@@ -94,30 +226,84 @@ export async function notifySupportRequestCreated({
   env?: SupportNotificationEnv;
   fetcher?: SupportNotificationFetch;
 }): Promise<SupportNotificationResult> {
+  const payload = buildSupportRequestNotificationPayload({ saved, input, user });
+  const adminInboxUrl = normalizeSupportSiteUrl(env.NEXT_PUBLIC_SITE_URL) ? `${normalizeSupportSiteUrl(env.NEXT_PUBLIC_SITE_URL)}/admin/support` : "";
   const configuredWebhook = env.ROLEFORGE_SUPPORT_WEBHOOK_URL?.trim() ?? "";
-  if (!configuredWebhook) return { status: "skipped", reason: "missing-webhook" };
+  const resendApiKey = env.RESEND_API_KEY?.trim() ?? "";
+  const emailFrom = normalizeSupportEmail(env.ROLEFORGE_SUPPORT_EMAIL_FROM);
+  const emailTo = normalizeSupportEmailRecipients(env.ROLEFORGE_SUPPORT_EMAIL_TO);
+  const emailConfigured = Boolean(resendApiKey || env.ROLEFORGE_SUPPORT_EMAIL_FROM || env.ROLEFORGE_SUPPORT_EMAIL_TO);
+  const emailReady = Boolean(resendApiKey && emailFrom && emailTo.length);
+
+  if (!configuredWebhook && !emailConfigured) return { status: "skipped", reason: "missing-destination" };
+  if (emailConfigured && !emailReady && !configuredWebhook) return { status: "skipped", reason: "invalid-email" };
 
   const webhookUrl = normalizeSupportWebhookUrl(configuredWebhook);
-  if (!webhookUrl) return { status: "skipped", reason: "invalid-webhook" };
+  if (configuredWebhook && !webhookUrl && !emailReady) return { status: "skipped", reason: "invalid-webhook" };
 
   if (!fetcher) return { status: "skipped", reason: "missing-fetch" };
 
+  if (webhookUrl) {
+    const headers: Record<string, string> = {
+      "content-type": "application/json",
+      "user-agent": "RoleForge-Support/1.0",
+    };
+    const webhookSecret = env.ROLEFORGE_SUPPORT_WEBHOOK_SECRET?.trim();
+    if (webhookSecret) headers["x-roleforge-support-secret"] = webhookSecret;
+
+    const abortController = typeof AbortController === "function" ? new AbortController() : null;
+    const timeout = abortController ? setTimeout(() => abortController.abort(), 3500) : null;
+
+    let response: { ok: boolean; status: number; text?: () => Promise<string> };
+    try {
+      response = await fetcher(webhookUrl, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload),
+        signal: abortController?.signal,
+      });
+    } catch (error) {
+      return {
+        status: "failed",
+        statusCode: 0,
+        bodyPreview: compactPreview(error instanceof Error ? error.message : "Support notification request failed"),
+      };
+    } finally {
+      if (timeout) clearTimeout(timeout);
+    }
+
+    if (!response.ok) {
+      const body = typeof response.text === "function" ? await response.text().catch(() => "") : "";
+      return {
+        status: "failed",
+        statusCode: response.status,
+        bodyPreview: compactPreview(body),
+      };
+    }
+  }
+
+  if (!emailReady) return { status: "sent" };
+
   const headers: Record<string, string> = {
     "content-type": "application/json",
-    "user-agent": "RoleForge-Support/1.0",
+    authorization: `Bearer ${resendApiKey}`,
   };
-  const webhookSecret = env.ROLEFORGE_SUPPORT_WEBHOOK_SECRET?.trim();
-  if (webhookSecret) headers["x-roleforge-support-secret"] = webhookSecret;
 
   const abortController = typeof AbortController === "function" ? new AbortController() : null;
   const timeout = abortController ? setTimeout(() => abortController.abort(), 3500) : null;
 
   let response: { ok: boolean; status: number; text?: () => Promise<string> };
   try {
-    response = await fetcher(webhookUrl, {
+    response = await fetcher("https://api.resend.com/emails", {
       method: "POST",
       headers,
-      body: JSON.stringify(buildSupportRequestNotificationPayload({ saved, input, user })),
+      body: JSON.stringify({
+        from: emailFrom,
+        to: emailTo,
+        reply_to: user.email ? [user.email] : undefined,
+        subject: `[RoleForge Support] ${payload.reference} ${payload.categoryLabel}: ${payload.subject}`,
+        text: buildSupportRequestEmailText(payload, adminInboxUrl),
+      }),
       signal: abortController?.signal,
     });
   } catch (error) {

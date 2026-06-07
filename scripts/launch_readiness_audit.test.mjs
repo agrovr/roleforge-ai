@@ -121,12 +121,19 @@ test("classifies smoke and billing readiness output", () => {
   const billing = classifyBillingReadiness([
     "PASS Premium checkout is ready with these live billing settings.",
     "WARN STRIPE_SECRET_KEY is encrypted in Vercel and cannot be inspected by the CLI; prove live mode with a live checkout proof",
-    "WARN ROLEFORGE_SUPPORT_WEBHOOK_URL is not configured; support requests save to Supabase but do not send ops notifications",
+    "WARN Support notification destination is not configured; support requests save to Supabase but do not send ops notifications",
   ].join("\n"));
 
   assert.equal(billing.status, "pass");
   assert.equal(billing.supportNotifications, "missing");
   assert.equal(billing.warnings.length, 2);
+
+  const billingWithEmail = classifyBillingReadiness([
+    "PASS Premium checkout is ready with these live billing settings.",
+    "PASS Resend support email notifications are configured",
+  ].join("\n"));
+  assert.equal(billingWithEmail.supportNotifications, "configured");
+  assert.equal(billingWithEmail.warnings.length, 0);
 });
 
 test("parses and classifies workflow runs", () => {

@@ -21,7 +21,38 @@ const SUPPORT_ENV_VALIDATORS = {
     label: "support webhook verification secret",
     test: (value) => value.length >= 16,
   },
+  ROLEFORGE_SUPPORT_EMAIL_TO: {
+    label: "support notification recipient email",
+    test: (value) => value
+      .split(/[;,]/)
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+      .every((entry) => looksLikeEmail(entry)),
+  },
+  ROLEFORGE_SUPPORT_EMAIL_FROM: {
+    label: "verified Resend sender email",
+    test: (value) => looksLikeEmail(value),
+  },
+  RESEND_API_KEY: {
+    label: "Resend API key",
+    test: (value) => value.startsWith("re_") && value.length >= 16,
+  },
+  ROLEFORGE_ADMIN_EMAILS: {
+    label: "support admin email allow-list",
+    test: (value) => value
+      .split(/[;,]/)
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+      .every((entry) => looksLikeEmail(entry)),
+  },
 };
+
+function looksLikeEmail(value) {
+  const candidate = String(value || "").trim();
+  const match = candidate.match(/<([^<>@\s]+@[^<>@\s]+\.[^<>@\s]+)>$/);
+  const email = (match?.[1] ?? candidate).trim();
+  return /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email);
+}
 
 function printHelp() {
   console.log(`RoleForge AI Vercel support env setter
@@ -29,6 +60,10 @@ function printHelp() {
 Usage:
   node scripts/set_vercel_support_env.mjs ROLEFORGE_SUPPORT_WEBHOOK_URL
   node scripts/set_vercel_support_env.mjs ROLEFORGE_SUPPORT_WEBHOOK_SECRET
+  node scripts/set_vercel_support_env.mjs ROLEFORGE_SUPPORT_EMAIL_TO
+  node scripts/set_vercel_support_env.mjs ROLEFORGE_SUPPORT_EMAIL_FROM
+  node scripts/set_vercel_support_env.mjs RESEND_API_KEY
+  node scripts/set_vercel_support_env.mjs ROLEFORGE_ADMIN_EMAILS
 
 Pipe exactly one value on stdin. Values are validated and are never printed.
 Defaults to Vercel Production for the RoleForge AI team.`);
@@ -101,8 +136,7 @@ export function validateSupportEnvValue(name, value) {
 export function setVercelSupportEnv({ name, value, teamId = DEFAULT_VERCEL_TEAM_ID, environment = "production" }) {
   validateSupportEnvValue(name, value);
 
-  runVercel(["env", "rm", name, environment, "--yes", "--scope", teamId]);
-  runVercel(["env", "add", name, environment, "--scope", teamId], {
+  runVercel(["env", "add", name, environment, "--force", "--yes", "--scope", teamId], {
     input: `${value}\n`,
     stdio: ["pipe", "pipe", "pipe"],
   });

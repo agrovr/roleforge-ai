@@ -6,6 +6,7 @@ import { reconcileUserSubscriptionEntitlement } from "@/app/lib/billing/entitlem
 import { billingReadiness } from "@/app/lib/billing/readiness";
 import { getStripeBillingConfig } from "@/app/lib/billing/stripe";
 import { FREE_ENTITLEMENT, loadAccountEntitlement } from "@/app/lib/entitlements";
+import { isSupportAdminUser } from "@/app/lib/supportAdmin";
 import { getSupabaseConfig } from "@/app/lib/supabase/config";
 import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
 import { loadAccountUsage } from "@/app/lib/usage";
@@ -86,6 +87,9 @@ export async function GET() {
     entitlement,
     usage,
     accountSummary,
+    operations: {
+      supportAdmin: Boolean(data.user && isSupportAdminUser(data.user)),
+    },
     billing,
     next: user
       ? usage

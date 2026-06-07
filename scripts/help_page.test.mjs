@@ -36,6 +36,11 @@ test("help page covers account, exports, billing, and saved project guidance", (
   assert.match(helpPage, /href: "\/updates"/);
   assert.match(helpPage, /Product updates/);
   assert.match(helpPage, /Support requests keep an account-visible RF reference/);
+  assert.match(helpPage, /helpSignals/);
+  assert.match(helpPage, /Self-service first/);
+  assert.match(helpPage, /Prefilled support/);
+  assert.match(helpPage, /Plan clarity/);
+  assert.match(helpPage, /help-signal-strip/);
 });
 
 test("help page routes common issues to self-service and prefilled support", () => {
@@ -74,6 +79,8 @@ test("help page is discoverable from public navigation and crawler metadata", ()
 
 test("help quick links are compact and overflow-safe", () => {
   assert.match(stylesheet, /\.help-action-routes\s*\{(?=[^}]*display:\s*grid)(?=[^}]*overflow:\s*hidden)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.help-signal-strip,\s*\.updates-signal-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\))[^}]*\}/s);
+  assert.match(stylesheet, /\.help-signal-card,\s*\.updates-signal-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\))[^}]*\}/s);
   assert.match(stylesheet, /\.help-action-head\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0\.9fr\)\s+minmax\(260px,\s*0\.72fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.help-action-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(min\(100%,\s*220px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.help-action-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\))(?=[^}]*overflow:\s*hidden)[^}]*\}/s);

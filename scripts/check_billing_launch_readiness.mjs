@@ -18,6 +18,10 @@ const VERCEL_PRODUCTION_NAMES = [
   "STRIPE_WEBHOOK_SECRET",
   "ROLEFORGE_SUPPORT_WEBHOOK_URL",
   "ROLEFORGE_SUPPORT_WEBHOOK_SECRET",
+  "ROLEFORGE_SUPPORT_EMAIL_TO",
+  "ROLEFORGE_SUPPORT_EMAIL_FROM",
+  "RESEND_API_KEY",
+  "ROLEFORGE_ADMIN_EMAILS",
 ];
 
 export function stripeKeyMode(secretKey = "") {
@@ -57,6 +61,24 @@ function supportWebhookUrlLooksValid(value = "") {
   }
 }
 
+function supportEmailLooksValid(value = "") {
+  if (!value) return false;
+  if (value === VERCEL_ENCRYPTED_VALUE) return true;
+  const match = value.trim().match(/<([^<>@\s]+@[^<>@\s]+\.[^<>@\s]+)>$/);
+  const email = (match?.[1] ?? value.trim()).trim();
+  return /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email);
+}
+
+function supportEmailRecipientsLookValid(value = "") {
+  if (!value) return false;
+  if (value === VERCEL_ENCRYPTED_VALUE) return true;
+  return value
+    .split(/[;,]/)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .every((entry) => supportEmailLooksValid(entry));
+}
+
 export function evaluateBillingLaunchReadiness(env = process.env) {
   const secretKey = env.STRIPE_SECRET_KEY?.trim() || "";
   const webhookSecret = env.STRIPE_WEBHOOK_SECRET?.trim() || "";
@@ -64,6 +86,10 @@ export function evaluateBillingLaunchReadiness(env = process.env) {
   const yearlyPriceId = env.STRIPE_PREMIUM_YEARLY_PRICE_ID?.trim() || "";
   const supportWebhookUrl = env.ROLEFORGE_SUPPORT_WEBHOOK_URL?.trim() || "";
   const supportWebhookSecret = env.ROLEFORGE_SUPPORT_WEBHOOK_SECRET?.trim() || "";
+  const supportEmailTo = env.ROLEFORGE_SUPPORT_EMAIL_TO?.trim() || "";
+  const supportEmailFrom = env.ROLEFORGE_SUPPORT_EMAIL_FROM?.trim() || "";
+  const resendApiKey = env.RESEND_API_KEY?.trim() || "";
+  const supportAdminEmails = env.ROLEFORGE_ADMIN_EMAILS?.trim() || "";
   const mode = stripeKeyMode(secretKey);
   const liveKeyRequired = productionRequiresLiveStripeKey(env);
   const findings = [];
@@ -130,24 +156,47 @@ export function evaluateBillingLaunchReadiness(env = process.env) {
     message: "STRIPE_WEBHOOK_SECRET is configured",
   });
 
-  if (!supportWebhookUrl) {
+  const supportWebhookReady = supportWebhookUrlLooksValid(supportWebhookUrl);
+  const supportEmailReady = Boolean(
+    resendApiKey && supportEmailRecipientsLookValid(supportEmailTo) && supportEmailLooksValid(supportEmailFrom),
+  );
+
+  if (!supportWebhookUrl && !supportEmailTo && !supportEmailFrom && !resendApiKey) {
     findings.push({
       ok: true,
       level: "warn",
-      message: "ROLEFORGE_SUPPORT_WEBHOOK_URL is not configured; support requests save to Supabase but do not send ops notifications",
+      message: "Support notification destination is not configured; support requests save to Supabase but do not send ops notifications",
     });
   } else if (!supportWebhookUrlLooksValid(supportWebhookUrl)) {
-    findings.push({
-      ok: true,
-      level: "warn",
-      message: "ROLEFORGE_SUPPORT_WEBHOOK_URL should be an https webhook URL",
-    });
+    if (supportWebhookUrl) {
+      findings.push({
+        ok: true,
+        level: "warn",
+        message: "ROLEFORGE_SUPPORT_WEBHOOK_URL should be an https webhook URL",
+      });
+    }
   } else {
     findings.push({
       ok: true,
       level: "pass",
       message: "ROLEFORGE_SUPPORT_WEBHOOK_URL is configured for support request notifications",
     });
+  }
+
+  if (supportEmailTo || supportEmailFrom || resendApiKey) {
+    if (supportEmailReady) {
+      findings.push({
+        ok: true,
+        level: "pass",
+        message: "Resend support email notifications are configured",
+      });
+    } else {
+      findings.push({
+        ok: true,
+        level: "warn",
+        message: "Resend support email notifications need RESEND_API_KEY, ROLEFORGE_SUPPORT_EMAIL_TO, and ROLEFORGE_SUPPORT_EMAIL_FROM",
+      });
+    }
   }
 
   if (supportWebhookUrl && !supportWebhookSecret) {
@@ -164,10 +213,30 @@ export function evaluateBillingLaunchReadiness(env = process.env) {
     });
   }
 
+  if (!supportAdminEmails) {
+    findings.push({
+      ok: true,
+      level: "warn",
+      message: "ROLEFORGE_ADMIN_EMAILS is not configured; the web support inbox stays closed",
+    });
+  } else if (!supportEmailRecipientsLookValid(supportAdminEmails)) {
+    findings.push({
+      ok: true,
+      level: "warn",
+      message: "ROLEFORGE_ADMIN_EMAILS should be a comma-separated list of admin email addresses",
+    });
+  } else {
+    findings.push({
+      ok: true,
+      level: "pass",
+      message: "ROLEFORGE_ADMIN_EMAILS is configured for the web support inbox",
+    });
+  }
+
   const productionKeyReady = !liveKeyRequired || mode === "live" || mode === "encrypted";
   const checkoutReady = Boolean(secretKey && priceIdLooksValid(monthlyPriceId) && priceIdLooksValid(yearlyPriceId) && productionKeyReady);
   const webhookReady = Boolean(secretKey && webhookSecretLooksValid(webhookSecret) && productionKeyReady);
-  const supportNotificationsReady = Boolean(supportWebhookUrlLooksValid(supportWebhookUrl));
+  const supportNotificationsReady = Boolean(supportWebhookReady || supportEmailReady);
   const ready = checkoutReady && webhookReady && valuePresent(env, "SUPABASE_SERVICE_ROLE_KEY") && valuePresent(env, "NEXT_PUBLIC_SITE_URL");
 
   return {
@@ -208,6 +277,8 @@ export function safeValueKind(name, value = "") {
   if (name === "STRIPE_SECRET_KEY") return stripeKeyMode(value);
   if (name === "STRIPE_WEBHOOK_SECRET") return value.startsWith("whsec_") ? "webhook-secret" : "present";
   if (name === "ROLEFORGE_SUPPORT_WEBHOOK_SECRET") return "present";
+  if (name === "RESEND_API_KEY") return "present";
+  if (name.includes("EMAIL")) return "email";
   if (name.includes("PRICE_ID")) return value.startsWith("price_") ? "price" : "present";
   if (name.includes("URL")) return /^https?:\/\//i.test(value) ? "url" : "present";
   return "present";

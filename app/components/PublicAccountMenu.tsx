@@ -33,6 +33,9 @@ type PublicAccountStatus = {
     savedProjectCount?: number | null;
     supportRequestCount?: number | null;
   } | null;
+  operations?: {
+    supportAdmin?: boolean;
+  } | null;
   billing?: {
     checkoutReady?: boolean;
     portalReady?: boolean;
@@ -105,6 +108,7 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
   const savedProjectCaption = typeof savedProjectCount === "number" ? "Saved to account" : "Manage in Settings";
   const supportRequestLabel = countLabel(supportRequestCount, "request", "requests");
   const supportRequestCaption = typeof supportRequestCount === "number" ? "Support history" : "Track from Support";
+  const supportAdmin = Boolean(status?.operations?.supportAdmin);
   const billingActionLabel = premiumActive
     ? "Manage billing"
     : status?.billing?.checkoutReady
@@ -191,6 +195,7 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
           <Link href={billingActionHref}><RoleForgeIcon name="lock" size={14} /> {billingActionLabel}</Link>
           <Link href={projectActionHref}><RoleForgeIcon name="chart" size={14} /> {projectActionLabel}</Link>
           <Link href={supportActionHref}><RoleForgeIcon name="mail" size={14} /> {supportActionLabel}</Link>
+          {supportAdmin ? <Link href="/admin/support"><RoleForgeIcon name="mail" size={14} /> Support inbox</Link> : null}
         </div>
         <div className="studio-account-shortcuts settings-account-shortcuts public-account-shortcuts">
           <Link href="/app"><RoleForgeIcon name="file" size={14} /> Studio</Link>
@@ -212,6 +217,11 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
           <Link href="/settings#support">
             <RoleForgeIcon name="mail" size={14} /> Support history
           </Link>
+          {supportAdmin ? (
+            <Link href="/admin/support">
+              <RoleForgeIcon name="mail" size={14} /> Support inbox
+            </Link>
+          ) : null}
           <Link href="/help">
             <RoleForgeIcon name="mail" size={14} /> Help center
           </Link>

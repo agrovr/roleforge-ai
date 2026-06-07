@@ -66,6 +66,11 @@ test("public account menu turns static topbars into signed-in command centers", 
   assert.match(publicAccountMenu, /Support history/);
   assert.match(publicAccountMenu, /savedProjectCount/);
   assert.match(publicAccountMenu, /supportRequestCount/);
+  assert.match(publicAccountMenu, /operations\?:/);
+  assert.match(publicAccountMenu, /supportAdmin\?: boolean/);
+  assert.match(publicAccountMenu, /const supportAdmin = Boolean\(status\?\.operations\?\.supportAdmin\)/);
+  assert.match(publicAccountMenu, /supportAdmin \? <Link href="\/admin\/support">/);
+  assert.match(publicAccountMenu, /Support inbox/);
   assert.match(publicAccountMenu, /countLabel/);
   assert.match(publicAccountMenu, /action="\/auth\/signout"/);
   assert.match(publicAccountMenu, /href="\/login\?next=\/app&account=signin-required"/);
@@ -86,6 +91,10 @@ test("auth status exposes safe account counts for public menus", () => {
   assert.match(authStatusRoute, /accountSummary/);
   assert.match(authStatusRoute, /savedProjectCount/);
   assert.match(authStatusRoute, /supportRequestCount/);
+  assert.match(authStatusRoute, /isSupportAdminUser/);
+  assert.match(authStatusRoute, /operations/);
+  assert.match(authStatusRoute, /supportAdmin:\s*Boolean\(data\.user && isSupportAdminUser\(data\.user\)\)/);
+  assert.doesNotMatch(authStatusRoute, /ROLEFORGE_ADMIN_EMAILS[^;]*json/i);
 });
 
 test("help status support and updates mount the public account menu", () => {

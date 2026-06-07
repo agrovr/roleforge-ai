@@ -5,6 +5,7 @@ import {
   buildSupportRequestNotificationPayload,
   normalizeSupportWebhookUrl,
   notifySupportRequestCreated,
+  sendSupportReplyEmail,
 } from "./supportNotifications";
 
 const saved = {
@@ -50,7 +51,7 @@ test("builds a traceable support request notification payload", () => {
   );
 });
 
-test("skips support notifications when no webhook is configured", async () => {
+test("skips support notifications when no destination is configured", async () => {
   const result = await notifySupportRequestCreated({
     saved,
     input,
@@ -59,7 +60,7 @@ test("skips support notifications when no webhook is configured", async () => {
     fetcher: async () => ({ ok: true, status: 204 }),
   });
 
-  assert.deepEqual(result, { status: "skipped", reason: "missing-webhook" });
+  assert.deepEqual(result, { status: "skipped", reason: "missing-destination" });
 });
 
 test("posts support notifications with an optional secret header", async () => {
@@ -85,6 +86,116 @@ test("posts support notifications with an optional secret header", async () => {
   assert.equal(calls[0]?.init?.headers?.["x-roleforge-support-secret"], "secret-value");
   assert.match(calls[0]?.init?.body ?? "", /"event":"support_request\.created"/);
   assert.match(calls[0]?.init?.body ?? "", /"reference":"RF-70A225"/);
+});
+
+test("sends support notifications to Resend email when configured", async () => {
+  const calls: Array<{ input: string | URL; init?: { method?: string; headers?: Record<string, string>; body?: string } }> = [];
+  const result = await notifySupportRequestCreated({
+    saved,
+    input,
+    user: { email: "person@example.com" },
+    env: {
+      RESEND_API_KEY: "re_secret_value",
+      ROLEFORGE_SUPPORT_EMAIL_FROM: "RoleForge Support <support@roleforgeai.com>",
+      ROLEFORGE_SUPPORT_EMAIL_TO: "owner@example.com",
+    },
+    fetcher: async (requestUrl, init) => {
+      calls.push({ input: requestUrl, init });
+      return { ok: true, status: 202 };
+    },
+  });
+
+  assert.deepEqual(result, { status: "sent" });
+  assert.equal(calls[0]?.input, "https://api.resend.com/emails");
+  assert.equal(calls[0]?.init?.method, "POST");
+  assert.equal(calls[0]?.init?.headers?.authorization, "Bearer re_secret_value");
+  const body = JSON.parse(calls[0]?.init?.body ?? "{}");
+  assert.equal(body.from, "RoleForge Support <support@roleforgeai.com>");
+  assert.deepEqual(body.to, ["owner@example.com"]);
+  assert.deepEqual(body.reply_to, ["person@example.com"]);
+  assert.match(body.subject, /\[RoleForge Support\] RF-70A225 Billing: Premium sync/);
+  assert.match(body.text, /Open the support inbox from \/admin\/support/);
+  assert.match(body.text, /Mark the request reviewing or closed from the web inbox/);
+});
+
+test("skips partially configured support email notifications", async () => {
+  const result = await notifySupportRequestCreated({
+    saved,
+    input,
+    user: { email: "person@example.com" },
+    env: {
+      RESEND_API_KEY: "re_secret_value",
+      ROLEFORGE_SUPPORT_EMAIL_TO: "owner@example.com",
+    },
+    fetcher: async () => ({ ok: true, status: 202 }),
+  });
+
+  assert.deepEqual(result, { status: "skipped", reason: "invalid-email" });
+});
+
+test("sends customer replies from the RoleForge support sender without exposing admin email", async () => {
+  const calls: Array<{ input: string | URL; init?: { method?: string; headers?: Record<string, string>; body?: string } }> = [];
+  const result = await sendSupportReplyEmail({
+    to: "person@example.com",
+    subject: "Premium sync",
+    message: "Hi,\n\nPremium access is now active on your account.",
+    reference: "RF-70A225",
+    env: {
+      RESEND_API_KEY: "re_secret_value",
+      ROLEFORGE_SUPPORT_EMAIL_FROM: "RoleForge Support <support@roleforgeai.com>",
+      ROLEFORGE_SUPPORT_EMAIL_TO: "private-admin@gmail.com",
+    },
+    fetcher: async (requestUrl, init) => {
+      calls.push({ input: requestUrl, init });
+      return { ok: true, status: 202 };
+    },
+  });
+
+  assert.deepEqual(result, { status: "sent" });
+  assert.equal(calls[0]?.input, "https://api.resend.com/emails");
+  const body = JSON.parse(calls[0]?.init?.body ?? "{}");
+  assert.equal(body.from, "RoleForge Support <support@roleforgeai.com>");
+  assert.deepEqual(body.to, ["person@example.com"]);
+  assert.equal(body.reply_to, undefined);
+  assert.doesNotMatch(calls[0]?.init?.body ?? "", /private-admin@gmail\.com/);
+  assert.match(body.subject, /Re: Premium sync \(RF-70A225\)/);
+  assert.match(body.text, /Request: RF-70A225/);
+});
+
+test("skips customer replies without a verified support sender", async () => {
+  const result = await sendSupportReplyEmail({
+    to: "person@example.com",
+    subject: "Premium sync",
+    message: "Hi, quick reply.",
+    reference: "RF-70A225",
+    env: {
+      RESEND_API_KEY: "re_secret_value",
+      ROLEFORGE_SUPPORT_EMAIL_TO: "private-admin@gmail.com",
+    },
+    fetcher: async () => ({ ok: true, status: 202 }),
+  });
+
+  assert.deepEqual(result, { status: "skipped", reason: "invalid-email" });
+});
+
+test("reports customer reply send failures without throwing", async () => {
+  const result = await sendSupportReplyEmail({
+    to: "person@example.com",
+    subject: "Premium sync",
+    message: "Hi, quick reply.",
+    reference: "RF-70A225",
+    env: {
+      RESEND_API_KEY: "re_secret_value",
+      ROLEFORGE_SUPPORT_EMAIL_FROM: "RoleForge Support <support@roleforgeai.com>",
+    },
+    fetcher: async () => ({ ok: false, status: 403, text: async () => "sender is not verified" }),
+  });
+
+  assert.deepEqual(result, {
+    status: "failed",
+    statusCode: 403,
+    bodyPreview: "sender is not verified",
+  });
 });
 
 test("reports support notification failures without throwing", async () => {

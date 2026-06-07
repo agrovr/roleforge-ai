@@ -129,8 +129,8 @@ export function classifySmokeReadiness(output = "") {
 }
 
 export function classifyBillingReadiness(output = "") {
-  const supportConfigured = /ROLEFORGE_SUPPORT_WEBHOOK_URL is configured/i.test(output);
-  const supportMissing = /ROLEFORGE_SUPPORT_WEBHOOK_URL is not configured/i.test(output);
+  const supportConfigured = /ROLEFORGE_SUPPORT_WEBHOOK_URL is configured|Resend support email notifications are configured/i.test(output);
+  const supportMissing = /Support notification destination is not configured/i.test(output);
   const encryptedStripeProof = /prove live mode with a live checkout proof/i.test(output);
   const billingReady = /PASS Premium checkout is ready/i.test(output);
 

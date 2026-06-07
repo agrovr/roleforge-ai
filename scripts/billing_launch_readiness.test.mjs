@@ -32,7 +32,7 @@ test("billing readiness treats live production settings as ready", () => {
   assert.equal(result.checkoutReady, true);
   assert.equal(result.webhookReady, true);
   assert.equal(result.supportNotificationsReady, false);
-  assert.match(result.findings.map((finding) => finding.message).join("\n"), /support requests save to Supabase but do not send ops notifications/);
+  assert.match(result.findings.map((finding) => finding.message).join("\n"), /Support notification destination is not configured/);
 });
 
 test("billing readiness blocks test keys on the production domain", () => {
@@ -78,6 +78,10 @@ test("billing readiness parses pulled env files without exposing values", () => 
     "SUPABASE_SERVICE_ROLE_KEY=service_role_secret",
     "ROLEFORGE_SUPPORT_WEBHOOK_URL=https://hooks.example.com/roleforge",
     "ROLEFORGE_SUPPORT_WEBHOOK_SECRET=do_not_print",
+    "ROLEFORGE_SUPPORT_EMAIL_TO=owner@example.com",
+    "ROLEFORGE_SUPPORT_EMAIL_FROM=RoleForge Support <support@roleforgeai.com>",
+    "RESEND_API_KEY=re_do_not_print",
+    "ROLEFORGE_ADMIN_EMAILS=owner@example.com",
   ].join("\n"));
 
   assert.equal(env.STRIPE_SECRET_KEY, "sk_live_secret_value");
@@ -85,6 +89,9 @@ test("billing readiness parses pulled env files without exposing values", () => 
   assert.equal(safeValueKind("STRIPE_PREMIUM_MONTHLY_PRICE_ID", env.STRIPE_PREMIUM_MONTHLY_PRICE_ID), "price");
   assert.equal(safeValueKind("ROLEFORGE_SUPPORT_WEBHOOK_URL", env.ROLEFORGE_SUPPORT_WEBHOOK_URL), "url");
   assert.equal(safeValueKind("ROLEFORGE_SUPPORT_WEBHOOK_SECRET", env.ROLEFORGE_SUPPORT_WEBHOOK_SECRET), "present");
+  assert.equal(safeValueKind("ROLEFORGE_SUPPORT_EMAIL_TO", env.ROLEFORGE_SUPPORT_EMAIL_TO), "email");
+  assert.equal(safeValueKind("ROLEFORGE_ADMIN_EMAILS", env.ROLEFORGE_ADMIN_EMAILS), "email");
+  assert.equal(safeValueKind("RESEND_API_KEY", env.RESEND_API_KEY), "present");
   assert.equal(evaluateBillingLaunchReadiness(env).ready, true);
   assert.equal(evaluateBillingLaunchReadiness(env).supportNotificationsReady, true);
 });
@@ -100,6 +107,10 @@ test("billing readiness treats Vercel encrypted production vars as configured wi
  NEXT_PUBLIC_SITE_URL                       Encrypted           Production                          18d ago
  ROLEFORGE_SUPPORT_WEBHOOK_URL              Encrypted           Production                          5m ago
  ROLEFORGE_SUPPORT_WEBHOOK_SECRET           Encrypted           Production                          5m ago
+ ROLEFORGE_SUPPORT_EMAIL_TO                 Encrypted           Production                          5m ago
+ ROLEFORGE_SUPPORT_EMAIL_FROM               Encrypted           Production                          5m ago
+ RESEND_API_KEY                             Encrypted           Production                          5m ago
+ ROLEFORGE_ADMIN_EMAILS                     Encrypted           Production                          5m ago
 `);
 
   const result = evaluateBillingLaunchReadiness(env);
@@ -150,4 +161,41 @@ test("support notification readiness warns for invalid optional webhook configur
   assert.equal(result.ready, true);
   assert.equal(result.supportNotificationsReady, false);
   assert.match(result.findings.map((finding) => finding.message).join("\n"), /should be an https webhook URL/);
+});
+
+test("support notification readiness accepts Resend email configuration", () => {
+  const result = evaluateBillingLaunchReadiness(baseEnv({
+    STRIPE_SECRET_KEY: "sk_live_secret_value",
+    RESEND_API_KEY: "re_secret_value",
+    ROLEFORGE_SUPPORT_EMAIL_TO: "owner@example.com",
+    ROLEFORGE_SUPPORT_EMAIL_FROM: "RoleForge Support <support@roleforgeai.com>",
+    ROLEFORGE_ADMIN_EMAILS: "owner@example.com",
+  }));
+
+  assert.equal(result.ready, true);
+  assert.equal(result.supportNotificationsReady, true);
+  assert.match(result.findings.map((finding) => finding.message).join("\n"), /Resend support email notifications are configured/);
+});
+
+test("support readiness reports web inbox admin allow-list state", () => {
+  const missing = evaluateBillingLaunchReadiness(baseEnv({ STRIPE_SECRET_KEY: "sk_live_secret_value" }));
+  assert.match(missing.findings.map((finding) => finding.message).join("\n"), /ROLEFORGE_ADMIN_EMAILS is not configured/);
+
+  const configured = evaluateBillingLaunchReadiness(baseEnv({
+    STRIPE_SECRET_KEY: "sk_live_secret_value",
+    ROLEFORGE_ADMIN_EMAILS: "owner@example.com",
+  }));
+  assert.match(configured.findings.map((finding) => finding.message).join("\n"), /ROLEFORGE_ADMIN_EMAILS is configured/);
+});
+
+test("support notification readiness warns for partial Resend email configuration", () => {
+  const result = evaluateBillingLaunchReadiness(baseEnv({
+    STRIPE_SECRET_KEY: "sk_live_secret_value",
+    RESEND_API_KEY: "re_secret_value",
+    ROLEFORGE_SUPPORT_EMAIL_TO: "owner@example.com",
+  }));
+
+  assert.equal(result.ready, true);
+  assert.equal(result.supportNotificationsReady, false);
+  assert.match(result.findings.map((finding) => finding.message).join("\n"), /need RESEND_API_KEY, ROLEFORGE_SUPPORT_EMAIL_TO, and ROLEFORGE_SUPPORT_EMAIL_FROM/);
 });

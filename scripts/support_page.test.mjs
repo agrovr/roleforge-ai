@@ -41,6 +41,15 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /supportAfterSubmit/);
   assert.match(supportPage, /Support request lifecycle/);
   assert.match(supportPage, /supportStatusLabel\(item\.status\)/);
+  assert.match(supportPage, /supportRoutingSteps/);
+  assert.match(supportPage, /isSupportAdminUser\(user\)/);
+  assert.match(supportPage, /supportAdmin \?/);
+  assert.match(supportPage, /Operator inbox is available for this account/);
+  assert.match(supportPage, /href="\/admin\/support"/);
+  assert.match(supportPage, /Where a support request goes after submit/);
+  assert.match(supportPage, /webhook or Resend email env vars/);
+  assert.match(supportPage, /Every signed-in request is written to Supabase support history/);
+  assert.match(supportPage, /support-routing-strip/);
   assert.match(supportPage, /latestSupportRequest/);
   assert.match(supportPage, /supportRequestPacket/);
   assert.match(supportPage, /Support request packet/);
@@ -157,6 +166,10 @@ test("settings exposes account support request history", () => {
   assert.match(settingsPage, /settings-support-list/);
   assert.match(settingsPage, /settings-account-support-recent/);
   assert.match(settingsPage, /Recent support/);
+  assert.match(settingsPage, /isSupportAdminUser\(user\)/);
+  assert.match(settingsPage, /supportAdmin \?/);
+  assert.match(settingsPage, /Open support inbox/);
+  assert.match(settingsPage, /href="\/admin\/support"/);
   assert.match(settingsPage, /request\.referenceLabel/);
   assert.match(settingsPage, /SupportReferenceCopyButton/);
   assert.match(settingsPage, /referenceLabel=\{request\.referenceLabel\}/);
@@ -201,6 +214,11 @@ test("support request references can be copied without exposing raw ids", () => 
 
 test("support page has overflow-safe responsive form layout", () => {
   assert.match(stylesheet, /\.support-layout\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(260px,\s*0\.72fr\)\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-routing-strip\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0\.48fr\)\s+minmax\(0,\s*1fr\))[^}]*\}/s);
+  assert.match(stylesheet, /\.support-admin-entry\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*42px\s+minmax\(0,\s*1fr\)\s+auto)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-admin-entry\s+\.btn\s*\{(?=[^}]*grid-column:\s*1\s*\/\s*-1)(?=[^}]*width:\s*100%)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-support-actions\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s);
+  assert.match(stylesheet, /\.support-routing-steps\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\))[^}]*\}/s);
   assert.match(stylesheet, /\.support-guide-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*42px\s+minmax\(0,\s*1fr\))[^}]*\}/s);
   assert.match(stylesheet, /\.support-guide-card:hover,\s*\.support-guide-card:focus-visible\s*\{(?=[^}]*border-color:)(?=[^}]*transform:\s*translateY\(-1px\))[^}]*\}/s);
   assert.match(stylesheet, /\.support-guide-card\s+small\s*\{(?=[^}]*grid-area:\s*action)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);

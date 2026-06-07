@@ -6,6 +6,7 @@ import { PublicAccountMenu } from "../components/PublicAccountMenu";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { SupportReferenceCopyButton } from "../components/SupportReferenceCopyButton";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { isSupportAdminUser } from "../lib/supportAdmin";
 import {
   SUPPORT_REQUEST_CATEGORIES,
   loadSupportRequests,
@@ -150,6 +151,24 @@ const supportAfterSubmit = [
   "If the support channel is configured, RoleForge sends the request details for operator review.",
 ] as const;
 
+const supportRoutingSteps = [
+  {
+    label: "1. Saved first",
+    detail: "Every signed-in request is written to Supabase support history with the account id and RF reference.",
+    icon: "lock" as const,
+  },
+  {
+    label: "2. Optional alert",
+    detail: "Set a webhook or Resend email env vars in production to send the same request packet to an operator channel.",
+    icon: "mail" as const,
+  },
+  {
+    label: "3. Tracked status",
+    detail: "Requests move through open, reviewing, and closed while the reference stays visible to the account.",
+    icon: "chart" as const,
+  },
+] as const;
+
 function getParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
 }
@@ -190,6 +209,7 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
     data: { user },
   } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
   const signedIn = Boolean(user);
+  const supportAdmin = isSupportAdminUser(user);
   const accountEmail = user?.email ?? "";
   const recentSupportRequests = supabase && user
     ? await loadSupportRequests(supabase, user.id, { limit: 5 }).catch(() => [])
@@ -270,6 +290,38 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
           <span>Requests appear in Support and Settings history</span>
           <span>Operator review uses the account-safe request packet</span>
           <span>Never paste full payment card details or private credentials</span>
+        </div>
+      </section>
+
+      {supportAdmin ? (
+        <section className="support-admin-entry" aria-label="Operator support inbox">
+          <span aria-hidden="true"><RoleForgeIcon name="mail" size={15} /></span>
+          <div>
+            <strong>Operator inbox is available for this account.</strong>
+            <p>Review customer requests and update status from the browser, including on mobile.</p>
+          </div>
+          <Link className="btn btn-soft btn-sm" href="/admin/support">Open support inbox</Link>
+        </section>
+      ) : null}
+
+      <section className="support-routing-strip" aria-label="Where support requests go">
+        <div className="support-routing-head">
+          <span className="eyebrow">Ticket routing</span>
+          <strong>Where a support request goes after submit.</strong>
+          <p>
+            The account history is the durable record. Operator alerts are available once the production webhook URL is configured.
+          </p>
+        </div>
+        <div className="support-routing-steps">
+          {supportRoutingSteps.map((step) => (
+            <article className="support-routing-step" key={step.label}>
+              <span aria-hidden="true"><RoleForgeIcon name={step.icon} size={15} /></span>
+              <div>
+                <strong>{step.label}</strong>
+                <p>{step.detail}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 

@@ -11,6 +11,7 @@ import { billingReadiness } from "./lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "./lib/billing/stripe";
 import { FREE_ENTITLEMENT, loadAccountEntitlement } from "./lib/entitlements";
 import { loadAccountProfile } from "./lib/accountProfile";
+import { isSupportAdminUser } from "./lib/supportAdmin";
 import { createRoleForgeServerClient } from "./lib/supabase/server";
 import { supportRequestHref } from "./lib/supportRequests";
 import { monthlyRunAllowanceLabel } from "./lib/usage";
@@ -32,6 +33,7 @@ type LandingLinks = {
   exportLabel: string;
   exportCaption: string;
   billingHref: string;
+  supportAdmin: boolean;
 };
 
 const FREE_RUN_ALLOWANCE = monthlyRunAllowanceLabel(FREE_ENTITLEMENT.monthlyRunLimit);
@@ -65,6 +67,7 @@ async function getLandingLinks(): Promise<LandingLinks> {
     : billing.checkoutReady ? "PDF export now, Premium available" : "PDF export now";
   const exportLabel = entitlement.exportFormats.docx ? "PDF DOCX TXT" : "PDF";
   const exportCaption = entitlement.exportFormats.docx ? "Premium exports active" : "DOCX and TXT need Premium";
+  const supportAdmin = isSupportAdminUser(user);
 
   return {
     signedIn,
@@ -83,6 +86,7 @@ async function getLandingLinks(): Promise<LandingLinks> {
     exportLabel,
     exportCaption,
     billingHref: signedIn ? "/settings#billing" : "/login?next=/settings%23billing",
+    supportAdmin,
   };
 }
 
@@ -101,6 +105,7 @@ function Nav({
   billingHref,
   premiumActive,
   checkoutReady,
+  supportAdmin,
 }: Pick<
   LandingLinks,
   | "signedIn"
@@ -117,6 +122,7 @@ function Nav({
   | "exportLabel"
   | "exportCaption"
   | "billingHref"
+  | "supportAdmin"
 >) {
   const landingBillingAction = premiumActive ? "Manage billing" : checkoutReady ? "View Premium" : "Billing status";
   const landingBillingHref = premiumActive || checkoutReady ? billingHref : "/status";
@@ -175,6 +181,7 @@ function Nav({
                   <Link href={landingBillingHref}><RoleForgeIcon name="lock" size={14} /> {landingBillingAction}</Link>
                   <Link href="/settings#projects"><RoleForgeIcon name="chart" size={14} /> Saved projects</Link>
                   <Link href="/support"><RoleForgeIcon name="mail" size={14} /> Contact support</Link>
+                  {supportAdmin ? <Link href="/admin/support"><RoleForgeIcon name="mail" size={14} /> Support inbox</Link> : null}
                 </div>
                 <div className="studio-account-shortcuts landing-account-shortcuts">
                   <Link href="/app"><RoleForgeIcon name="file" size={14} /> Studio</Link>
@@ -199,6 +206,11 @@ function Nav({
                   <Link href="/settings#support">
                     <RoleForgeIcon name="mail" size={14} /> Support history
                   </Link>
+                  {supportAdmin ? (
+                    <Link href="/admin/support">
+                      <RoleForgeIcon name="mail" size={14} /> Support inbox
+                    </Link>
+                  ) : null}
                   <Link href="/support">
                     <RoleForgeIcon name="mail" size={14} /> Contact support
                   </Link>
@@ -802,6 +814,7 @@ export default async function Landing() {
         exportLabel={links.exportLabel}
         exportCaption={links.exportCaption}
         billingHref={links.billingHref}
+        supportAdmin={links.supportAdmin}
       />
       <Hero studioHref={links.studioHref} />
       <RoleStrip />

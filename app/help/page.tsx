@@ -108,6 +108,24 @@ const quickLinks: readonly HelpQuickLink[] = [
   { href: "/privacy", icon: "lock", label: "Privacy", detail: "Review how account and workflow data is handled." },
 ] as const;
 
+const helpSignals = [
+  {
+    label: "Self-service first",
+    detail: "Use Status for operational health and Settings for account-specific state.",
+    icon: "scan" as const,
+  },
+  {
+    label: "Prefilled support",
+    detail: "Issue routes keep category and page context attached when you need help.",
+    icon: "mail" as const,
+  },
+  {
+    label: "Plan clarity",
+    detail: "PDF is free; DOCX and TXT follow the active Premium entitlement.",
+    icon: "lock" as const,
+  },
+] as const;
+
 const helpActionRoutes: readonly HelpActionRoute[] = [
   {
     title: "Workflow is stuck",
@@ -203,6 +221,18 @@ export default function HelpPage() {
           <span>Free export is PDF; Premium adds DOCX and TXT</span>
           <span>Support requests keep an account-visible RF reference</span>
         </div>
+      </section>
+
+      <section className="help-signal-strip" aria-label="Help center operating model">
+        {helpSignals.map((signal) => (
+          <article className="help-signal-card" key={signal.label}>
+            <span aria-hidden="true"><RoleForgeIcon name={signal.icon} size={15} /></span>
+            <div>
+              <strong>{signal.label}</strong>
+              <p>{signal.detail}</p>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="help-action-routes" id="try-first" aria-labelledby="help-action-title">

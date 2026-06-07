@@ -9,6 +9,8 @@ test("landing nav exposes a signed-in account menu from real account data", () =
   assert.match(landingPage, /import \{ AccountAvatar \}/);
   assert.match(landingPage, /accountDisplayName\(user,\s*profile\?\.displayName\)/);
   assert.match(landingPage, /accountReference\(user\.id\)/);
+  assert.match(landingPage, /isSupportAdminUser\(user\)/);
+  assert.match(landingPage, /supportAdmin/);
   assert.match(landingPage, /accountAvatarUrl\(user\)/);
   assert.match(landingPage, /loadAccountProfile\(supabase,\s*user\.id\)/);
   assert.match(landingPage, /className="landing-account-menu"/);
@@ -39,6 +41,8 @@ test("landing nav exposes a signed-in account menu from real account data", () =
   assert.match(landingPage, /System status/);
   assert.match(landingPage, /Updates/);
   assert.match(landingPage, /Contact support/);
+  assert.match(landingPage, /href="\/admin\/support"/);
+  assert.match(landingPage, /Support inbox/);
   assert.match(landingPage, /action="\/auth\/signout"/);
 });
 
@@ -81,12 +85,12 @@ test("landing pricing status pills stay readable on dark featured cards", () => 
   assert.match(stylesheet, /\.price-status::before\s*\{(?=[^}]*content:\s*"";)(?=[^}]*width:\s*7px)(?=[^}]*height:\s*7px)[^}]*\}/s);
   assert.match(stylesheet, /\.price-card\.featured\s+\.price-status\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.62\))(?=[^}]*background:\s*rgba\(255,\s*247,\s*233,\s*0\.2\))(?=[^}]*color:\s*#fffaf0)(?=[^}]*text-shadow:\s*0 1px 1px rgba\(8,\s*12,\s*24,\s*0\.35\))[^}]*\}/s);
   assert.match(stylesheet, /\.price-status\.current\s*\{(?=[^}]*border-color:\s*rgba\(166,\s*102,\s*38,\s*0\.34\))(?=[^}]*background:\s*rgba\(221,\s*160,\s*74,\s*0\.14\))(?=[^}]*color:\s*#74460f)(?=[^}]*text-shadow:\s*none)[^}]*\}/s);
-  assert.match(stylesheet, /\.price-card\.featured\s+\.price-status\.current\s*\{(?=[^}]*border-color:\s*rgba\(146,\s*191,\s*160,\s*0\.46\))(?=[^}]*linear-gradient\(180deg,\s*rgba\(146,\s*191,\s*160,\s*0\.16\),\s*rgba\(146,\s*191,\s*160,\s*0\.075\)\))(?=[^}]*color:\s*#e8f5df)(?=[^}]*text-shadow:\s*none)[^}]*\}/s);
+  assert.match(stylesheet, /\.price-card\.featured\s+\.price-status\.current\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.34\))(?=[^}]*linear-gradient\(180deg,\s*rgba\(255,\s*247,\s*233,\s*0\.12\),\s*rgba\(255,\s*247,\s*233,\s*0\.055\)\))(?=[^}]*color:\s*#fff4da)(?=[^}]*text-shadow:\s*none)[^}]*\}/s);
   assert.match(stylesheet, /\.price-card\.featured\s+\.price-status\.upgrade,\s*\.price-card\.featured\s+\.price-status\.paused\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.52\))(?=[^}]*background:\s*rgba\(255,\s*247,\s*233,\s*0\.16\))(?=[^}]*color:\s*#fff7e9)[^}]*\}/s);
   assert.match(stylesheet, /\.price-card\.featured\s+\.price-status\.upgrade\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*210,\s*118,\s*0\.58\))(?=[^}]*background:\s*rgba\(255,\s*210,\s*118,\s*0\.18\))(?=[^}]*color:\s*#fff4da)[^}]*\}/s);
   assert.match(stylesheet, /\.price-card\.featured\s+\.price-status\.paused\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*186,\s*170,\s*0\.48\))(?=[^}]*background:\s*rgba\(237,\s*127,\s*105,\s*0\.16\))(?=[^}]*color:\s*#ffd7ce)[^}]*\}/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-status\.current\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*213,\s*143,\s*0\.48\))(?=[^}]*background:\s*rgba\(255,\s*213,\s*143,\s*0\.14\))(?=[^}]*color:\s*#ffedc9)(?=[^}]*text-shadow:\s*none)[^}]*\}/s);
-  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-card\.featured\s+\.price-status\.current\s*\{(?=[^}]*border-color:\s*rgba\(183,\s*229,\s*196,\s*0\.48\))(?=[^}]*linear-gradient\(180deg,\s*rgba\(183,\s*229,\s*196,\s*0\.16\),\s*rgba\(183,\s*229,\s*196,\s*0\.065\)\))(?=[^}]*color:\s*#e6f7df)(?=[^}]*text-shadow:\s*none)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-card\.featured\s+\.price-status\.current\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.38\))(?=[^}]*linear-gradient\(180deg,\s*rgba\(255,\s*247,\s*233,\s*0\.14\),\s*rgba\(255,\s*247,\s*233,\s*0\.065\)\))(?=[^}]*color:\s*#fff4da)(?=[^}]*text-shadow:\s*none)[^}]*\}/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-card\.featured\s+\.price-status\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.7\))(?=[^}]*linear-gradient\(180deg,\s*rgba\(255,\s*247,\s*233,\s*0\.26\),\s*rgba\(255,\s*247,\s*233,\s*0\.13\)\))(?=[^}]*color:\s*#fffaf0)(?=[^}]*text-shadow:\s*0 1px 1px rgba\(8,\s*12,\s*24,\s*0\.45\))[^}]*\}/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-card\.featured\s+\.price-status\.upgrade\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*213,\s*143,\s*0\.72\))(?=[^}]*background:\s*rgba\(255,\s*213,\s*143,\s*0\.24\))(?=[^}]*color:\s*#fff0ce)[^}]*\}/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.price-card\.featured\s+\.price-status\.paused\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*203,\s*155,\s*0\.62\))(?=[^}]*background:\s*rgba\(237,\s*127,\s*105,\s*0\.2\))(?=[^}]*color:\s*#ffe0d8)[^}]*\}/s);

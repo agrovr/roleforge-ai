@@ -32,6 +32,27 @@ const updatePrinciples = [
   "Published after behavior ships",
 ] as const;
 
+const updateSignals = [
+  {
+    label: "Cadence",
+    value: "Material notes",
+    detail: "Grouped updates instead of a noisy daily feed.",
+    icon: "sparkle" as const,
+  },
+  {
+    label: "Scope",
+    value: "Shipped behavior",
+    detail: "Only account, workflow, export, billing, and support changes that are live.",
+    icon: "check" as const,
+  },
+  {
+    label: "Live state",
+    value: "Status + Settings",
+    detail: "Operational health stays on Status; account state stays in Settings.",
+    icon: "scan" as const,
+  },
+] as const;
+
 const updates: readonly UpdateItem[] = [
   {
     title: "Account workspace, support history, and preferences",
@@ -130,6 +151,19 @@ export default function UpdatesPage() {
         <p>
           Updates stay grouped around product behavior. Operational availability belongs on Status, and account-specific state belongs in Settings.
         </p>
+      </section>
+
+      <section className="updates-signal-grid" aria-label="Updates reading guide">
+        {updateSignals.map((signal) => (
+          <article className="updates-signal-card" key={signal.label}>
+            <span aria-hidden="true"><RoleForgeIcon name={signal.icon} size={16} /></span>
+            <div>
+              <small>{signal.label}</small>
+              <strong>{signal.value}</strong>
+              <p>{signal.detail}</p>
+            </div>
+          </article>
+        ))}
       </section>
 
       <section className="updates-timeline" aria-label="Recent product updates">

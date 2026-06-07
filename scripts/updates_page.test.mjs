@@ -26,6 +26,11 @@ test("updates page is a factual public product log", () => {
   assert.match(updatesPage, /Material changes only/);
   assert.match(updatesPage, /Grouped by product area/);
   assert.match(updatesPage, /Published after behavior ships/);
+  assert.match(updatesPage, /updateSignals/);
+  assert.match(updatesPage, /Material notes/);
+  assert.match(updatesPage, /Shipped behavior/);
+  assert.match(updatesPage, /Status \+ Settings/);
+  assert.match(updatesPage, /updates-signal-grid/);
   assert.match(updatesPage, /Useful signal, not a patch-by-patch feed/);
   assert.match(updatesPage, /Operational availability belongs on Status/);
   assert.match(updatesPage, /June 2026/);
@@ -69,6 +74,8 @@ test("updates page is discoverable from public and signed-in surfaces", () => {
 
 test("updates timeline has overflow-safe responsive cards", () => {
   assert.match(stylesheet, /\.updates-overview\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0\.62fr\)\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.updates-signal-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\))[^}]*\}/s);
+  assert.match(stylesheet, /\.help-signal-card,\s*\.updates-signal-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\))[^}]*\}/s);
   assert.match(stylesheet, /\.updates-timeline\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*gap:\s*14px)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.updates-card\s*\{(?=[^}]*container:\s*updates-card\s*\/\s*inline-size)(?=[^}]*grid-template-columns:\s*48px\s+minmax\(0,\s*1fr\))(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
   assert.match(stylesheet, /\.updates-card-meta\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*min-width:\s*0)[^}]*\}/s);

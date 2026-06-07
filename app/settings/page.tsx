@@ -39,6 +39,7 @@ import {
 } from "../lib/resumeTemplates";
 import { settingsDocumentCounts, settingsDocumentSummaries, settingsProjectStageSummaries, settingsProjectSummaries } from "../lib/settingsProjects";
 import { getConfiguredSiteOrigin } from "../lib/siteUrl";
+import { isSupportAdminUser } from "../lib/supportAdmin";
 import { loadSupportRequests, supportRequestHref } from "../lib/supportRequests";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 import { deleteSavedProject, loadSavedRuns, renameSavedProject, updateSavedProjectStatus } from "../lib/supabase/savedProjects";
@@ -446,6 +447,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
     subject: "Workflow or export issue",
     contextUrl: "/settings#support",
   });
+  const supportAdmin = isSupportAdminUser(user);
   const displayPlanLabel = premiumEnding ? "Premium ending" : `${planLabel} plan`;
   const displayName = accountDisplayName(user, accountProfile?.displayName);
   const accountReferenceLabel = accountReference(user.id);
@@ -1552,6 +1554,24 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                           <small title={`${project.stageDetail} ${project.actionDetail}`}>
                             {settingsStageLabel(project.stageStatus, project.stageLabel)} · {project.actionLabel}
                           </small>
+                          <div className="settings-project-operations" aria-label={`Project summary for ${project.title}`}>
+                            <Link href={project.href}>
+                              <RoleForgeIcon name={project.actionLabel === "Restore" ? "download" : "file"} size={13} />
+                              {project.actionLabel}
+                            </Link>
+                            <span>
+                              <RoleForgeIcon name="target" size={13} />
+                              {settingsStageLabel(project.stageStatus, project.stageLabel)}
+                            </span>
+                            <span>
+                              <RoleForgeIcon name="layers" size={13} />
+                              {project.downloads.length ? `${project.downloads.length} ${project.downloads.length === 1 ? "file" : "files"}` : "No files yet"}
+                            </span>
+                            <span>
+                              <RoleForgeIcon name="check" size={13} />
+                              {project.kitSummary}
+                            </span>
+                          </div>
                         </div>
                         <div className="settings-project-controls">
                           {project.projectId ? (
@@ -1802,7 +1822,14 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               )}
               <div className="settings-export-actions">
                 <span>Support requests are saved with your account email and included in account exports as safe references.</span>
-                <Link className="btn btn-soft btn-sm settings-inline-link" href={supportHistoryHref}>Open support</Link>
+                <div className="settings-support-actions">
+                  <Link className="btn btn-soft btn-sm settings-inline-link" href={supportHistoryHref}>Open support</Link>
+                  {supportAdmin ? (
+                    <Link className="btn btn-soft btn-sm settings-inline-link" href="/admin/support">
+                      <RoleForgeIcon name="mail" size={13} /> Open support inbox
+                    </Link>
+                  ) : null}
+                </div>
               </div>
             </div>
           </section>

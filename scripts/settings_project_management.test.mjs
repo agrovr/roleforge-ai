@@ -29,6 +29,8 @@ test("settings saved projects expose account-owned stage updates", () => {
   assert.match(settingsPage, /Application kit/);
   assert.match(settingsPage, /project\.kitItems\.map/);
   assert.match(settingsPage, /project\.kitSummary/);
+  assert.match(settingsPage, /settings-project-operations/);
+  assert.match(settingsPage, /project\.downloads\.length \? `\$\{project\.downloads\.length\}/);
   assert.match(settingsPage, /projectStageSummaries/);
   assert.match(settingsPage, /settings-project-pipeline/);
   assert.match(settingsPage, /aria-label="Saved project pipeline"/);
@@ -90,6 +92,8 @@ test("settings saved project stage controls are compact and overflow-safe", () =
   assert.match(stylesheet, /\.settings-project-stage-form\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-stage-controls\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*118px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-stage-controls\s+button\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-operations\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*132px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.settings-project-operations\s+a,\s*\.settings-project-operations\s+span\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-rename\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-rename-row\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(72px,\s*auto\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-rename-row\s+input\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);
@@ -106,7 +110,7 @@ test("settings saved project stage controls are compact and overflow-safe", () =
   assert.match(stylesheet, /\.settings-project-delete-row\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(84px,\s*auto\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-delete-row\s+input\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-project-delete-row\s+button\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*white-space:\s*nowrap)[^}]*\}/s);
-  assert.match(stylesheet, /@container\s+settings-project-card\s+\(max-width:\s*680px\)\s*\{[\s\S]*?\.settings-project-stage-controls,\s*\.settings-project-kit-grid\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*128px\),\s*1fr\)\)/s);
+  assert.match(stylesheet, /@container\s+settings-project-card\s+\(max-width:\s*680px\)\s*\{[\s\S]*?\.settings-project-stage-controls,\s*\.settings-project-kit-grid,\s*\.settings-project-operations\s*\{[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*128px\),\s*1fr\)\)/s);
   assert.match(stylesheet, /@container\s+settings-project-card\s+\(max-width:\s*560px\)\s*\{[\s\S]*?\.settings-project-summary,\s*\.settings-project-controls,\s*\.settings-project-rename-row,\s*\.settings-project-delete-row\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(stylesheet, /@container\s+settings-section\s+\(max-width:\s*720px\)\s*\{[\s\S]*?\.settings-project-item\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?\.settings-project-item\s*\{[^}]*grid-template-columns:\s*1fr/s);
