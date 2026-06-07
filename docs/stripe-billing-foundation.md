@@ -72,7 +72,7 @@ If you only want the live Stripe secret key on the clipboard for a few seconds, 
 
 Use `-PromptForSecret` to paste the key into a hidden PowerShell prompt instead of the clipboard, `-PromptForSupabaseServiceRole` if Supabase CLI is not logged in, `-SkipVercelUpdate` if Vercel already has the rotated key, `-SkipRedeploy` if you are redeploying through GitHub instead, `-CopyPromoCode` if you want the generated promo code copied after the secret has been cleared, or `-AutoPoll` to open Checkout and wait for webhook Premium activation without a terminal prompt.
 
-If the copied Stripe or Supabase credential will be needed after the clipboard is cleared, cache it for a single proof retry first:
+After Premium activation and proof cleanup succeed, the helper writes non-secret proof evidence to `.codex-qa/live-billing-proof.json`; `npm run audit:launch` reads that marker so operators can see whether the live checkout proof is fresh. If the copied Stripe or Supabase credential will be needed after the clipboard is cleared, cache it for a single proof retry first:
 
 ```powershell
 .\scripts\live_billing_one_time_proof.ps1 -CacheStripeSecretOnly

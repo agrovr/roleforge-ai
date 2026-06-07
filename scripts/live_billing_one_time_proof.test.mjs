@@ -62,3 +62,13 @@ test("live billing proof docs mention autopoll and promo-code clipboard handoff"
   assert.match(operationsDocs, /-CopyPromoCode/);
   assert.match(operationsDocs, /-AutoPoll/);
 });
+
+test("successful live billing proof writes non-secret local evidence", () => {
+  assert.match(script, /live-billing-proof\.json/);
+  assert.match(script, /function Write-LiveBillingProofEvidence/);
+  assert.match(script, /Premium entitlement is active for the proof user/);
+  assert.match(script, /Write-LiveBillingProofEvidence -Proof \$proofEvidence -Cleanup \$cleanupEvidence -Interval \$Interval/);
+  assert.match(script, /checkoutSessionPrefix/);
+  assert.match(script, /cleanupUserDeleted/);
+  assert.doesNotMatch(script, /sk_live_.*live-billing-proof/);
+});

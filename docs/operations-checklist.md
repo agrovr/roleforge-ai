@@ -62,13 +62,13 @@ cd C:\Users\ashmi\Downloads\Project_v1\resume-tailor-ui-github
 npm run smoke:readiness
 ```
 
-Concise launch audit across smoke readiness, billing readiness, support inbox volume, recent CI, backend production smoke, and the Vercel production alias:
+Concise launch audit across smoke readiness, billing readiness, live checkout proof freshness, support inbox volume, recent CI, backend production smoke, and the Vercel production alias:
 
 ```bash
 npm run audit:launch
 ```
 
-The support inbox portion prints only counts/status/category summaries. It never prints ticket subjects, messages, emails, raw row ids, or service-role secrets.
+The live checkout proof portion reads `.codex-qa/live-billing-proof.json` when present. The support inbox portion prints only counts/status/category summaries. Neither portion prints ticket subjects, messages, emails, raw row ids, Stripe secrets, or service-role secrets.
 
 If readiness is incomplete, the command prints safe `gh secret set` and `gh variable set` commands with placeholders for the missing values.
 
@@ -172,7 +172,7 @@ For a one-shot live proof after rotating `STRIPE_SECRET_KEY`, copy the live secr
 .\scripts\live_billing_one_time_proof.ps1
 ```
 
-The runner clears any `sk_live_...` clipboard value immediately and again during cleanup, updates Vercel Production, redeploys, creates a one-use 100% off live promo code, opens Stripe Checkout for a temporary proof user, verifies Premium activation in Supabase, and cleans up the proof user/subscription. Use `-PromptForSecret` to paste the Stripe key into a hidden prompt without using the clipboard, `-PromptForSupabaseServiceRole` if Supabase CLI is not logged in, `-SkipVercelUpdate`, `-SkipRedeploy`, `-CopyPromoCode`, or `-AutoPoll` for those specific variants.
+The runner clears any `sk_live_...` clipboard value immediately and again during cleanup, updates Vercel Production, redeploys, creates a one-use 100% off live promo code, opens Stripe Checkout for a temporary proof user, verifies Premium activation in Supabase, cleans up the proof user/subscription, and writes non-secret evidence to `.codex-qa/live-billing-proof.json`. Use `-PromptForSecret` to paste the Stripe key into a hidden prompt without using the clipboard, `-PromptForSupabaseServiceRole` if Supabase CLI is not logged in, `-SkipVercelUpdate`, `-SkipRedeploy`, `-CopyPromoCode`, or `-AutoPoll` for those specific variants.
 
 If a copied secret will be needed after the clipboard is cleared, cache it for a single proof retry first:
 

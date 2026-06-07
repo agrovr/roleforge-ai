@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
 const DEFAULT_VERCEL_TEAM_ID = "team_kEe4HW272D5nYJDD92amj55H";
 const DEFAULT_FRONTEND_REPO = "agrovr/roleforge-ai";
 const DEFAULT_BACKEND_REPO = "agrovr/roleforge-ai-backend";
 const DEFAULT_PRODUCTION_URL = "https://roleforgeai.vercel.app";
+const DEFAULT_PROOF_EVIDENCE_PATH = ".codex-qa/live-billing-proof.json";
+const DEFAULT_PROOF_FRESH_DAYS = 14;
 
 function compactOutput(value = "", limit = 500) {
   const compacted = String(value || "").replace(/\s+/g, " ").trim();
@@ -18,6 +21,8 @@ export function parseArgs(argv) {
     json: false,
     skipLive: false,
     skipSupportInbox: false,
+    proofEvidencePath: DEFAULT_PROOF_EVIDENCE_PATH,
+    proofFreshDays: DEFAULT_PROOF_FRESH_DAYS,
     teamId: DEFAULT_VERCEL_TEAM_ID,
     frontendRepo: DEFAULT_FRONTEND_REPO,
     backendRepo: DEFAULT_BACKEND_REPO,
@@ -46,6 +51,20 @@ export function parseArgs(argv) {
       options.skipSupportInbox = true;
       continue;
     }
+    if (["--proof-evidence", "--proof-fresh-days"].includes(name)) {
+      const value = inlineValue ?? argv[index + 1];
+      if (!value || value.startsWith("--")) throw new Error(`${name} requires a value.`);
+      if (name === "--proof-evidence") options.proofEvidencePath = value;
+      if (name === "--proof-fresh-days") {
+        const parsed = Number.parseInt(value, 10);
+        if (!Number.isSafeInteger(parsed) || parsed < 1 || parsed > 365) {
+          throw new Error("--proof-fresh-days must be an integer from 1 to 365.");
+        }
+        options.proofFreshDays = parsed;
+      }
+      if (inlineValue === undefined) index += 1;
+      continue;
+    }
     if (["--scope", "--team", "--frontend-repo", "--backend-repo", "--production-url"].includes(name)) {
       const value = inlineValue ?? argv[index + 1];
       if (!value || value.startsWith("--")) throw new Error(`${name} requires a value.`);
@@ -72,8 +91,9 @@ Usage:
   npm run audit:launch -- --skip-support-inbox
 
 Runs a concise operator audit over smoke readiness, billing readiness,
-support inbox volume, recent GitHub Actions, and the Vercel production
-deployment. Output avoids printing secret values and support ticket content.`);
+live checkout proof freshness, support inbox volume, recent GitHub Actions,
+and the Vercel production deployment. Output avoids printing secret values
+and support ticket content.`);
 }
 
 function runCommand(command, args, { cwd = process.cwd() } = {}) {
@@ -224,6 +244,78 @@ export function classifySupportInbox(output = "") {
   };
 }
 
+function ageDays(value, now = new Date()) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return Number.POSITIVE_INFINITY;
+  return Math.max(0, (now.getTime() - date.getTime()) / 86_400_000);
+}
+
+export function summarizeLiveBillingProofEvidence(evidence = {}, { now = new Date(), freshDays = DEFAULT_PROOF_FRESH_DAYS } = {}) {
+  const completedAt = typeof evidence.completedAt === "string" ? evidence.completedAt : "";
+  const age = ageDays(completedAt, now);
+  return {
+    completedAt,
+    ageDays: Number.isFinite(age) ? Number.parseFloat(age.toFixed(2)) : null,
+    fresh: Number.isFinite(age) && age <= freshDays,
+    checkoutMode: evidence.checkoutMode === "live" ? "live" : "unknown",
+    productionUrl: evidence.productionUrl === DEFAULT_PRODUCTION_URL ? DEFAULT_PRODUCTION_URL : "",
+    premiumActive: evidence.premiumActive === true,
+    webhookVerified: evidence.webhookVerified === true,
+    cleanupUserDeleted: evidence.cleanupUserDeleted === true,
+    cleanupSubscriptionCanceled: evidence.cleanupSubscriptionCanceled === true,
+    checkoutSessionPrefix: typeof evidence.checkoutSessionPrefix === "string" && evidence.checkoutSessionPrefix.startsWith("cs_live_")
+      ? evidence.checkoutSessionPrefix.slice(0, 12)
+      : "",
+  };
+}
+
+export function classifyLiveBillingProofEvidence(evidence, { now = new Date(), freshDays = DEFAULT_PROOF_FRESH_DAYS } = {}) {
+  if (!evidence) {
+    return {
+      status: "warn",
+      detail: "No local live checkout proof evidence file was found.",
+      warnings: ["Run `./scripts/live_billing_one_time_proof.ps1 -AutoPoll -CopyPromoCode` after Stripe secret rotation or before launch."],
+    };
+  }
+
+  const summary = summarizeLiveBillingProofEvidence(evidence, { now, freshDays });
+  const complete = summary.checkoutMode === "live"
+    && Boolean(summary.productionUrl)
+    && summary.premiumActive
+    && summary.webhookVerified
+    && summary.cleanupUserDeleted
+    && Boolean(summary.checkoutSessionPrefix);
+
+  if (!complete) {
+    return {
+      status: "warn",
+      detail: "Local live checkout proof evidence is incomplete.",
+      warnings: ["Rerun the one-shot live billing proof so the audit can confirm live checkout, webhook Premium activation, and cleanup evidence."],
+      proofEvidence: summary,
+    };
+  }
+
+  if (!summary.fresh) {
+    return {
+      status: "warn",
+      detail: `Live checkout proof evidence is older than ${freshDays} days.`,
+      warnings: ["Rerun the one-shot live billing proof before launch if Stripe keys, webhooks, prices, or billing code changed."],
+      proofEvidence: summary,
+    };
+  }
+
+  return {
+    status: "pass",
+    detail: `Live checkout proof evidence is fresh from ${summary.completedAt}.`,
+    proofEvidence: summary,
+  };
+}
+
+function readJsonFile(path) {
+  if (!existsSync(path)) return null;
+  return JSON.parse(readFileSync(path, "utf8"));
+}
+
 export function summarizeLaunchAudit(checks) {
   const failures = checks.filter((check) => check.status === "fail");
   const warnings = checks.flatMap((check) => check.status === "warn" ? [check.detail] : check.warnings || []);
@@ -261,6 +353,17 @@ export async function runLaunchReadinessAudit(options = {}) {
     runCommand(process.execPath, ["scripts/check_billing_launch_readiness.mjs", "--vercel-production", "--strict"], { cwd }),
     classifyBillingReadiness,
   ));
+
+  try {
+    checks.push({ name: "Live checkout proof", warnings: [], ...classifyLiveBillingProofEvidence(readJsonFile(options.proofEvidencePath), { freshDays: options.proofFreshDays }) });
+  } catch (error) {
+    checks.push({
+      name: "Live checkout proof",
+      status: "warn",
+      detail: `Could not read local live checkout proof evidence: ${error instanceof Error ? error.message : String(error)}`,
+      warnings: [],
+    });
+  }
 
   if (!options.skipLive) {
     if (!options.skipSupportInbox) {

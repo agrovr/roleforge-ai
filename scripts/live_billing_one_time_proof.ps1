@@ -25,6 +25,7 @@ $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent $PSScriptRoot
 $OneTimeStripeSecretCachePath = Join-Path $RepoRoot ".codex-qa\roleforge-stripe-secret.dpapi"
 $OneTimeSupabaseCredentialCachePath = Join-Path $RepoRoot ".codex-qa\roleforge-supabase-admin.dpapi"
+$LiveBillingProofEvidencePath = Join-Path $RepoRoot ".codex-qa\live-billing-proof.json"
 if (-not $NodePath) {
   $BundledNode = "C:\Users\ashmi\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
   $NodePath = if (Test-Path $BundledNode) { $BundledNode } else { "node" }
@@ -83,6 +84,32 @@ function Invoke-NodeJson {
     throw "Node command failed: $($Arguments -join ' ')"
   }
   return ($output | Out-String | ConvertFrom-Json)
+}
+
+function Write-LiveBillingProofEvidence {
+  param(
+    [Parameter(Mandatory = $true)]$Proof,
+    [Parameter(Mandatory = $true)]$Cleanup,
+    [Parameter(Mandatory = $true)][string]$Interval
+  )
+
+  $evidenceDir = Split-Path -Parent $LiveBillingProofEvidencePath
+  New-Item -ItemType Directory -Force -Path $evidenceDir | Out-Null
+
+  [ordered]@{
+    completedAt = (Get-Date).ToUniversalTime().ToString("o")
+    productionUrl = "https://roleforgeai.vercel.app"
+    interval = $Interval
+    checkoutMode = "live"
+    checkoutSessionPrefix = $Proof.checkoutSessionPrefix
+    proofUserIdMasked = $Proof.userIdMasked
+    premiumActive = $true
+    webhookVerified = $true
+    cleanupUserDeleted = [bool]$Cleanup.userDeleted
+    cleanupSubscriptionCanceled = [bool]$Cleanup.subscriptionCanceled
+  } | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $LiveBillingProofEvidencePath
+
+  Write-Host "Wrote non-secret live billing proof evidence to .codex-qa\live-billing-proof.json."
 }
 
 function Set-ServiceRoleFromSupabaseCli {
@@ -372,6 +399,8 @@ function Read-LiveStripeSecret {
 
 Push-Location $RepoRoot
 $proofUserId = ""
+$proofEvidence = $null
+$cleanupEvidence = $null
 $secret = ""
 $exitCode = 0
 $keepOneTimeSecretCache = $false
@@ -396,50 +425,51 @@ try {
       $keepOneTimeSecretCache = $true
       Write-Host "Cached the live Stripe secret for one proof retry and cleared it from the clipboard. Secret value was not printed."
     } else {
-    if (-not $SkipVercelUpdate) {
-      $secret | & $NodePath "scripts\set_vercel_billing_env.mjs" "STRIPE_SECRET_KEY"
-      if ($LASTEXITCODE -ne 0) {
-        throw "Failed to update STRIPE_SECRET_KEY in Vercel Production."
+      if (-not $SkipVercelUpdate) {
+        $secret | & $NodePath "scripts\set_vercel_billing_env.mjs" "STRIPE_SECRET_KEY"
+        if ($LASTEXITCODE -ne 0) {
+          throw "Failed to update STRIPE_SECRET_KEY in Vercel Production."
+        }
       }
-    }
 
-    if (-not $SkipRedeploy -and -not $SkipVercelUpdate) {
-      Invoke-Vercel @("deploy", "--prod", "--scope", "team_kEe4HW272D5nYJDD92amj55H", "--yes")
-    }
-
-    try {
-      Set-ServiceRoleFromSupabaseCli
-    } catch {
-      Read-SupabaseServiceRole
-      if (-not $env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY -and -not $env:SUPABASE_SERVICE_ROLE_KEY) {
-        throw $_
+      if (-not $SkipRedeploy -and -not $SkipVercelUpdate) {
+        Invoke-Vercel @("deploy", "--prod", "--scope", "team_kEe4HW272D5nYJDD92amj55H", "--yes")
       }
-    }
 
-    $promo = Invoke-NodeJson @("scripts\create_live_promo_code.mjs", "--expires-hours", "24", "--max-redemptions", "1")
-    Write-Host "Created one-use live promo code: $($promo.code)"
-    if ($CopyPromoCode) {
-      Set-Clipboard -Value $promo.code
-      Write-Host "Promo code copied to clipboard. The Stripe secret key is no longer on the clipboard."
-    }
+      try {
+        Set-ServiceRoleFromSupabaseCli
+      } catch {
+        Read-SupabaseServiceRole
+        if (-not $env:ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY -and -not $env:SUPABASE_SERVICE_ROLE_KEY) {
+          throw $_
+        }
+      }
 
-    $proof = Invoke-NodeJson @("scripts\live_checkout_entitlement_test.mjs", "start", "--interval", $Interval)
-    $proofUserId = $proof.userId
-    Write-Host "Temporary proof user: $($proof.email)"
-    Write-Host "Checkout URL: $($proof.checkoutUrl)"
-    Write-Host "Use the promo code above in Stripe Checkout, complete checkout, then return here."
-    Start-Process $proof.checkoutUrl
-    if ($AutoPoll) {
-      Write-Host "Waiting up to $WaitSeconds seconds for Stripe webhook Premium activation."
-    } else {
-      Read-Host "Press Enter after Stripe Checkout returns to RoleForge"
-    }
+      $promo = Invoke-NodeJson @("scripts\create_live_promo_code.mjs", "--expires-hours", "24", "--max-redemptions", "1")
+      Write-Host "Created one-use live promo code: $($promo.code)"
+      if ($CopyPromoCode) {
+        Set-Clipboard -Value $promo.code
+        Write-Host "Promo code copied to clipboard. The Stripe secret key is no longer on the clipboard."
+      }
 
-    $check = Invoke-NodeJson @("scripts\check_premium_entitlement.mjs", "--user-id", $proofUserId, "--wait-seconds", "$WaitSeconds")
-    if (-not $check.ok) {
-      throw "Premium entitlement did not activate before timeout. Last plan=$($check.plan), billingStatus=$($check.billingStatus)."
-    }
-    Write-Host "Premium entitlement is active for the proof user."
+      $proof = Invoke-NodeJson @("scripts\live_checkout_entitlement_test.mjs", "start", "--interval", $Interval)
+      $proofUserId = $proof.userId
+      Write-Host "Temporary proof user: $($proof.email)"
+      Write-Host "Checkout URL: $($proof.checkoutUrl)"
+      Write-Host "Use the promo code above in Stripe Checkout, complete checkout, then return here."
+      Start-Process $proof.checkoutUrl
+      if ($AutoPoll) {
+        Write-Host "Waiting up to $WaitSeconds seconds for Stripe webhook Premium activation."
+      } else {
+        Read-Host "Press Enter after Stripe Checkout returns to RoleForge"
+      }
+
+      $check = Invoke-NodeJson @("scripts\check_premium_entitlement.mjs", "--user-id", $proofUserId, "--wait-seconds", "$WaitSeconds")
+      if (-not $check.ok) {
+        throw "Premium entitlement did not activate before timeout. Last plan=$($check.plan), billingStatus=$($check.billingStatus)."
+      }
+      Write-Host "Premium entitlement is active for the proof user."
+      $proofEvidence = $proof
     }
   }
 } catch {
@@ -448,9 +478,10 @@ try {
 } finally {
   if ($proofUserId -and -not $KeepProofUser) {
     try {
-      & $NodePath "scripts\live_checkout_entitlement_test.mjs" "cleanup" "--user-id" $proofUserId | Out-Host
-      if ($LASTEXITCODE -ne 0) {
-        Write-Warning "Proof cleanup command exited with code $LASTEXITCODE."
+      $cleanupEvidence = Invoke-NodeJson @("scripts\live_checkout_entitlement_test.mjs", "cleanup", "--user-id", $proofUserId)
+      $cleanupEvidence | ConvertTo-Json -Depth 4 | Out-Host
+      if ($proofEvidence -and $cleanupEvidence.userDeleted) {
+        Write-LiveBillingProofEvidence -Proof $proofEvidence -Cleanup $cleanupEvidence -Interval $Interval
       }
     } catch {
       Write-Warning "Proof cleanup failed: $($_.Exception.Message)"
