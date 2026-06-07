@@ -62,6 +62,12 @@ cd C:\Users\ashmi\Downloads\Project_v1\resume-tailor-ui-github
 npm run smoke:readiness
 ```
 
+Concise launch audit across smoke readiness, billing readiness, recent CI, backend production smoke, and the Vercel production alias:
+
+```bash
+npm run audit:launch
+```
+
 If readiness is incomplete, the command prints safe `gh secret set` and `gh variable set` commands with placeholders for the missing values.
 
 Useful checks:

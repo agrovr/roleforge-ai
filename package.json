@@ -12,6 +12,7 @@
     "smoke:layout": "node scripts/smoke_layout.mjs",
     "smoke:support-notifications": "node scripts/smoke_support_notifications.mjs",
     "smoke:readiness": "node scripts/check_smoke_readiness.mjs",
+    "audit:launch": "node scripts/launch_readiness_audit.mjs",
     "check:billing": "node scripts/check_billing_launch_readiness.mjs",
     "check:billing:vercel": "node scripts/check_billing_launch_readiness.mjs --vercel-production --strict",
     "check:entitlement": "node scripts/check_premium_entitlement.mjs",
