@@ -77,7 +77,9 @@ test("parses support status update options safely", () => {
     json: true,
     showId: false,
     searchLimit: 500,
+    supabaseCli: true,
   });
+  assert.equal(parseArgs(["--reference", "RF-70A225", "--status", "open", "--no-supabase-cli"]).supabaseCli, false);
   assert.equal(parseArgs(["--id", FIRST_ID, "--status", "closed", "--show-id"]).id, FIRST_ID);
   assert.throws(() => parseArgs(["--reference", "RF-70A225"]), /--status is required/);
   assert.throws(() => parseArgs(["--reference", "RF-70A225", "--id", FIRST_ID, "--status", "open"]), /exactly one/);

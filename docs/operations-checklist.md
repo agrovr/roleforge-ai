@@ -225,7 +225,7 @@ The smoke sends a clearly marked `support_request.test` payload with reference `
 
 `npm run check:billing:vercel` reports this support notification status as a warning-only operational signal while keeping billing readiness focused on Stripe/Supabase launch blockers.
 
-To review saved tickets without opening the Supabase table UI, run the read-only support inbox command with the service-role key in the environment:
+To review saved tickets without opening the Supabase table UI, run the read-only support inbox command. It uses `ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY` or `SUPABASE_SERVICE_ROLE_KEY` when present; otherwise it resolves the service-role key from the logged-in Supabase CLI without printing it:
 
 ```powershell
 npm run support:inbox
@@ -233,6 +233,8 @@ npm run support:inbox -- --status all --limit 50
 npm run support:inbox -- --summary --status all
 npm run support:inbox -- --category billing --json
 ```
+
+Add `--no-supabase-cli` when you want the command to fail unless an explicit service-role environment variable is already set.
 
 The inbox command masks account emails by default. Use `--summary` for counts without subjects, messages, or emails. Use `--show-email` only when direct follow-up requires the full email address.
 
@@ -244,7 +246,7 @@ npm run support:status -- --reference RF-70A225 --status reviewing
 npm run support:status -- --id <support-request-id> --status closed
 ```
 
-The updater only changes `support_requests.status` and `updated_at`. It does not print ticket subjects, messages, emails, or secrets. Short `RF-...` references are resolved from recent tickets and fail closed if the reference is ambiguous; use the full row id when that happens. Status changes are visible in the signed-in Support and Settings history, but they do not send a customer email by themselves.
+The updater uses the same service-role resolution as the inbox command. It only changes `support_requests.status` and `updated_at`. It does not print ticket subjects, messages, emails, or secrets. Short `RF-...` references are resolved from recent tickets and fail closed if the reference is ambiguous; use the full row id when that happens. Status changes are visible in the signed-in Support and Settings history, but they do not send a customer email by themselves.
 
 Useful docs:
 

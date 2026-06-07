@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 
 import { createClient } from "@supabase/supabase-js";
 
+import { resolveSupabaseServiceRoleKey } from "./lib/supabase_service_role.mjs";
 import { supportRequestReference } from "./list_support_requests.mjs";
 
 const DEFAULT_SUPABASE_URL = "https://ijdspodwpkuhwszmvqip.supabase.co";
@@ -33,6 +34,7 @@ export function parseArgs(argv) {
     json: false,
     showId: false,
     searchLimit: 500,
+    supabaseCli: true,
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -55,6 +57,10 @@ export function parseArgs(argv) {
     }
     if (name === "--show-id") {
       options.showId = true;
+      continue;
+    }
+    if (name === "--no-supabase-cli") {
+      options.supabaseCli = false;
       continue;
     }
     if (["--id", "--reference", "--status", "--search-limit"].includes(name)) {
@@ -98,19 +104,23 @@ Usage:
   npm run support:status -- --reference RF-70A225 --status reviewing --dry-run
 
 Required environment:
-  SUPABASE_SERVICE_ROLE_KEY or ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY
+  SUPABASE_SERVICE_ROLE_KEY or ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY,
+  or a logged-in Supabase CLI session
 
 Optional environment:
   ROLEFORGE_SUPABASE_URL
 
 This command updates only support_requests.status and updated_at.
 It does not print ticket messages, subjects, emails, or service-role secrets.
+Use --no-supabase-cli to require an explicit service-role environment variable.
 References are resolved from recent tickets and fail closed if ambiguous.`);
 }
 
-function createServiceClient({ supabaseUrl, serviceRoleKey }) {
-  if (!serviceRoleKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY or ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY is required.");
-  return createClient(supabaseUrl, serviceRoleKey, {
+function createServiceClient({ supabaseUrl, serviceRoleKey, allowCli }) {
+  const resolved = serviceRoleKey
+    ? { key: serviceRoleKey, source: "env" }
+    : resolveSupabaseServiceRoleKey({ allowCli });
+  return createClient(supabaseUrl, resolved.key, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
@@ -193,6 +203,7 @@ export async function runSupportStatusCli(argv = process.argv.slice(2), env = pr
   const client = createServiceClient({
     supabaseUrl: env.ROLEFORGE_SUPABASE_URL?.trim() || env.NEXT_PUBLIC_SUPABASE_URL?.trim() || DEFAULT_SUPABASE_URL,
     serviceRoleKey: env.ROLEFORGE_SUPABASE_SERVICE_ROLE_KEY?.trim() || env.SUPABASE_SERVICE_ROLE_KEY?.trim(),
+    allowCli: options.supabaseCli,
   });
 
   const result = await updateSupportRequestStatus({ client, ...options });

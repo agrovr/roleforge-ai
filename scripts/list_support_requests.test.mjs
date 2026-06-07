@@ -86,7 +86,9 @@ test("parses support inbox options safely", () => {
     json: true,
     summary: true,
     showEmail: true,
+    supabaseCli: true,
   });
+  assert.equal(parseArgs(["--no-supabase-cli"]).supabaseCli, false);
   assert.throws(() => parseArgs(["--limit", "0"]), /--limit must be an integer/);
   assert.throws(() => parseArgs(["--status", "pending"]), /--status must be/);
   assert.throws(() => parseArgs(["--category", "sales"]), /--category must be/);
