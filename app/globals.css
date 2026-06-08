@@ -23786,6 +23786,227 @@ html[data-theme="dark"] :where(.eyebrow, .price-kicker, .settings-price-kicker, 
   }
 }
 
+/* Template gallery polish: selected direction, preview depth, and decision controls. */
+.templates-page-shell {
+  --template-gallery-rail: linear-gradient(180deg, var(--brand), var(--accent), var(--sky));
+  --template-gallery-wash: radial-gradient(circle at 92% 0%, color-mix(in srgb, var(--brand-soft) 48%, transparent), transparent 18rem);
+}
+
+.templates-page-hero,
+.templates-selection-status,
+.templates-fit-guide article,
+.templates-decision-guide,
+.templates-guide-card,
+.templates-page-card,
+.templates-guide-option,
+.template-thumb {
+  position: relative;
+  isolation: isolate;
+}
+
+.templates-selection-status::after,
+.templates-fit-guide article::after,
+.templates-decision-guide::after,
+.templates-page-card::after {
+  position: absolute;
+  inset-block: 14px;
+  inset-inline-start: 0;
+  z-index: 1;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--template-gallery-rail);
+  content: "";
+  opacity: 0.54;
+  pointer-events: none;
+}
+
+.templates-page-hero {
+  background:
+    var(--template-gallery-wash),
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 96%, transparent), color-mix(in srgb, var(--surface-warm) 78%, transparent)),
+    var(--surface-warm);
+}
+
+.templates-selection-status,
+.templates-fit-guide article,
+.templates-decision-guide,
+.templates-guide-card,
+.templates-page-card {
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--brand-soft) 28%, transparent), transparent 11rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 76%, transparent));
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 64%, transparent) inset,
+    0 22px 48px -40px color-mix(in srgb, var(--ink-0) 46%, transparent);
+}
+
+.templates-fit-guide article:hover::after,
+.templates-decision-guide:hover::after,
+.templates-page-card:hover::after,
+.templates-page-card.selected::after,
+.templates-selection-status:hover::after {
+  opacity: 0.9;
+}
+
+.templates-guide-card-head > span,
+.templates-fit-guide article > span {
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 58%, transparent) inset,
+    0 14px 26px -22px color-mix(in srgb, var(--ink-0) 58%, transparent);
+}
+
+.templates-guide-option::before {
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  border-radius: 9px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 70%, transparent), transparent 62%),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--brand-soft) 26%, transparent), transparent 8rem);
+  content: "";
+  opacity: 0;
+  transition: opacity 170ms ease;
+}
+
+.templates-guide-option:hover::before,
+.templates-guide-option:focus-visible::before,
+.templates-guide-option.selected::before {
+  opacity: 1;
+}
+
+.templates-guide-option.selected {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--success) 20%, transparent),
+    0 14px 28px -24px color-mix(in srgb, var(--success) 44%, transparent);
+}
+
+.templates-page-card {
+  transform: translateZ(0);
+}
+
+.templates-page-card.selected {
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 72%, transparent) inset,
+    0 28px 64px -40px color-mix(in srgb, var(--brand) 52%, var(--shadow)),
+    0 0 0 4px color-mix(in srgb, var(--brand-soft) 42%, transparent);
+}
+
+.template-thumb {
+  background:
+    linear-gradient(180deg, #fffdf8, #f3eee5),
+    #fff;
+}
+
+.template-thumb::before {
+  position: absolute;
+  inset: 13px 20px auto;
+  z-index: -1;
+  height: 86%;
+  border: 1px solid color-mix(in srgb, var(--line) 66%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  content: "";
+  opacity: 0.7;
+  transform: rotate(-2.5deg) translateY(4px);
+  pointer-events: none;
+}
+
+.template-thumb .r-doc {
+  box-shadow:
+    0 18px 34px -28px color-mix(in srgb, var(--ink-0) 62%, transparent),
+    0 1px 0 color-mix(in srgb, #fff 74%, transparent) inset;
+  transform-origin: center top;
+  transition:
+    box-shadow 220ms ease,
+    transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.templates-page-card:hover .template-thumb .r-doc,
+.templates-page-card:focus-within .template-thumb .r-doc {
+  box-shadow:
+    0 24px 44px -30px color-mix(in srgb, var(--brand) 42%, var(--ink-0)),
+    0 1px 0 color-mix(in srgb, #fff 82%, transparent) inset;
+  transform: translateY(-3px) rotate(0.45deg);
+}
+
+.template-select-button.selected {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 54%, transparent),
+    0 12px 24px -20px color-mix(in srgb, var(--success) 52%, transparent);
+}
+
+html[data-theme="dark"] .templates-page-shell {
+  --template-gallery-rail: linear-gradient(180deg, #f3c16d, #8fdac8, #b9c7ff);
+  --template-gallery-wash: radial-gradient(circle at 92% 0%, rgba(222, 162, 79, 0.16), transparent 18rem);
+}
+
+html[data-theme="dark"] .templates-page-hero {
+  background:
+    var(--template-gallery-wash),
+    linear-gradient(135deg, rgba(255, 247, 233, 0.07), rgba(255, 247, 233, 0.026)),
+    rgba(16, 22, 37, 0.88);
+}
+
+html[data-theme="dark"] .templates-selection-status,
+html[data-theme="dark"] .templates-fit-guide article,
+html[data-theme="dark"] .templates-decision-guide,
+html[data-theme="dark"] .templates-guide-card,
+html[data-theme="dark"] .templates-page-card {
+  border-color: rgba(255, 247, 233, 0.15);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(222, 162, 79, 0.12), transparent 11rem),
+    linear-gradient(180deg, rgba(255, 247, 233, 0.058), rgba(255, 247, 233, 0.024)),
+    rgba(25, 31, 52, 0.9);
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.07) inset,
+    0 22px 48px -36px rgba(0, 0, 0, 0.82);
+}
+
+html[data-theme="dark"] .templates-page-card.selected {
+  border-color: rgba(243, 193, 109, 0.56);
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.08) inset,
+    0 30px 64px -42px rgba(0, 0, 0, 0.9),
+    0 0 0 4px rgba(222, 162, 79, 0.14);
+}
+
+html[data-theme="dark"] .templates-guide-option::before {
+  background:
+    linear-gradient(135deg, rgba(255, 247, 233, 0.06), transparent 62%),
+    radial-gradient(circle at 100% 0%, rgba(222, 162, 79, 0.1), transparent 8rem);
+}
+
+html[data-theme="dark"] .templates-guide-option.selected {
+  box-shadow:
+    inset 0 0 0 1px rgba(166, 239, 184, 0.2),
+    0 16px 30px -24px rgba(166, 239, 184, 0.22);
+}
+
+html[data-theme="dark"] .template-thumb {
+  background:
+    linear-gradient(180deg, #fffaf2, #eee6d8),
+    #fffaf2;
+}
+
+html[data-theme="dark"] .template-thumb::before {
+  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 250, 242, 0.72);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .templates-page-card,
+  .templates-guide-option,
+  .templates-guide-option::before,
+  .template-thumb .r-doc {
+    transition: none;
+  }
+
+  .templates-page-card:hover .template-thumb .r-doc,
+  .templates-page-card:focus-within .template-thumb .r-doc {
+    transform: none;
+  }
+}
+
 /* Fine-detail finish: native chrome, compact tokens, and form micro-surfaces. */
 html {
   scrollbar-color: color-mix(in srgb, var(--brand) 42%, var(--line-2)) color-mix(in srgb, var(--surface-warm) 62%, transparent);
