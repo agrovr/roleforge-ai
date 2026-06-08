@@ -112,6 +112,11 @@ export function SitePolish() {
       <div className="rf-scroll-progress" aria-hidden="true">
         <span />
       </div>
+      <div className="rf-ambient-field" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
       <div className="rf-page-texture" aria-hidden="true" />
     </>
   );
