@@ -9056,13 +9056,32 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .legal-topbar {
-  max-width: 1280px;
+  width: min(1180px, calc(100% - clamp(20px, 3vw, 44px)));
+  max-width: 100%;
   margin-inline: auto;
-  border: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+  padding: 9px 10px 9px 12px;
+  border: 1px solid color-mix(in srgb, var(--surface) 82%, var(--line));
+  border-radius: clamp(22px, 2.4vw, 34px);
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 82%, transparent), color-mix(in srgb, var(--surface-warm) 72%, transparent));
-  box-shadow: 0 20px 56px -46px var(--shadow);
-  backdrop-filter: blur(18px);
+    linear-gradient(120deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-warm) 78%, transparent)),
+    radial-gradient(circle at 98% 0%, color-mix(in srgb, var(--brand-soft) 44%, transparent), transparent 16rem);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 62%, transparent) inset,
+    0 18px 46px -42px color-mix(in srgb, var(--ink-0) 50%, transparent);
+  backdrop-filter: blur(20px) saturate(1.08);
+  -webkit-backdrop-filter: blur(20px) saturate(1.08);
+  isolation: isolate;
+  overflow: visible;
+}
+
+.legal-topbar::before {
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  border: 1px solid color-mix(in srgb, #fff 46%, transparent);
+  border-radius: calc(clamp(22px, 2.4vw, 34px) - 1px);
+  content: "";
+  pointer-events: none;
 }
 
 .legal-hero,
@@ -11277,7 +11296,7 @@ html[data-theme="dark"] input::file-selector-button {
     grid-template-columns: 1fr;
     align-items: stretch;
     gap: 12px;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .legal-topbar .brand {
@@ -18206,9 +18225,17 @@ html[data-theme="dark"] .settings-project-stage-controls button:focus-visible {
 }
 
 html[data-theme="dark"] .legal-topbar {
-  border-color: rgba(255, 247, 233, 0.12);
+  border-color: rgba(255, 247, 233, 0.16);
   background:
-    linear-gradient(180deg, rgba(25, 31, 52, 0.84), rgba(12, 17, 31, 0.74));
+    linear-gradient(120deg, rgba(25, 31, 52, 0.86), rgba(12, 17, 31, 0.74)),
+    radial-gradient(circle at 100% 0%, rgba(221, 160, 74, 0.13), transparent 18rem);
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.08) inset,
+    0 24px 58px -46px rgba(0, 0, 0, 0.84);
+}
+
+html[data-theme="dark"] .legal-topbar::before {
+  border-color: rgba(255, 247, 233, 0.08);
 }
 
 html[data-theme="dark"] .legal-shell::before {
@@ -23082,5 +23109,199 @@ html[data-theme="dark"] :where(.eyebrow, .price-kicker, .settings-price-kicker, 
   :where(.dash-progress-track, .studio-stat-track, .settings-usage-track, .rf-studio-stat-track, .dash-resume-progress)::after {
     animation: none;
     transition: none;
+  }
+}
+
+/* Fine-detail finish: native chrome, compact tokens, and form micro-surfaces. */
+html {
+  scrollbar-color: color-mix(in srgb, var(--brand) 42%, var(--line-2)) color-mix(in srgb, var(--surface-warm) 62%, transparent);
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+*::-webkit-scrollbar-track {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-warm) 64%, transparent), color-mix(in srgb, var(--bg-alt) 62%, transparent));
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--brand) 46%, var(--line-2));
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--brand-dark) 68%, var(--accent));
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+kbd {
+  display: inline-flex;
+  min-width: 1.65em;
+  min-height: 1.65em;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--line-2) 82%, transparent);
+  border-radius: 7px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, transparent), color-mix(in srgb, var(--surface-warm) 92%, transparent));
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--surface) 82%, transparent) inset,
+    0 2px 0 color-mix(in srgb, var(--line-2) 58%, transparent);
+  color: var(--ink-1);
+  font-family: var(--font-mono);
+  font-size: 0.72em;
+  font-weight: 760;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+:where(
+  .badge,
+  .pill,
+  .stage-chip,
+  .status-pill,
+  .settings-status-pill,
+  .support-status-badge,
+  .price-status,
+  .dash-pill,
+  .rail-pill,
+  .history-sync-badge,
+  .export-format-chip,
+  .settings-hero-status,
+  .login-status,
+  .mock-status
+) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+:where(
+  .badge,
+  .pill,
+  .stage-chip,
+  .status-pill,
+  .settings-status-pill,
+  .support-status-badge,
+  .price-status,
+  .dash-pill,
+  .rail-pill,
+  .history-sync-badge,
+  .settings-hero-status,
+  .login-status,
+  .mock-status
+)::after {
+  position: absolute;
+  inset-inline: 8%;
+  inset-block-start: 1px;
+  z-index: -1;
+  height: 45%;
+  border-radius: inherit;
+  background: linear-gradient(180deg, color-mix(in srgb, #fff 46%, transparent), transparent);
+  content: "";
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+:where(.status-dot, .settings-billing-timeline-icon, .settings-plan-access-icon, .settings-activity-icon, .settings-account-health-icon) {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--surface) 42%, transparent) inset,
+    0 0 0 4px color-mix(in srgb, currentColor 9%, transparent);
+}
+
+:where(input, textarea, select):-webkit-autofill {
+  -webkit-text-fill-color: var(--ink-0);
+  caret-color: var(--ink-0);
+  box-shadow: 0 0 0 1000px color-mix(in srgb, var(--brand-soft) 34%, var(--surface)) inset;
+  transition: background-color 9999s ease-out;
+}
+
+:where(input, textarea, select)::selection {
+  background: color-mix(in srgb, var(--brand-soft) 86%, var(--accent-soft));
+  color: var(--ink-0);
+}
+
+:where(select) {
+  accent-color: var(--brand-dark);
+}
+
+:where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+  accent-color: var(--brand-dark);
+}
+
+html[data-theme="dark"] {
+  scrollbar-color: color-mix(in srgb, var(--brand) 50%, var(--line-2)) rgba(255, 247, 233, 0.06);
+}
+
+html[data-theme="dark"] *::-webkit-scrollbar-track {
+  background: linear-gradient(180deg, rgba(255, 247, 233, 0.045), rgba(255, 247, 233, 0.02));
+}
+
+html[data-theme="dark"] *::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--brand) 54%, rgba(255, 247, 233, 0.16));
+}
+
+html[data-theme="dark"] kbd {
+  border-color: rgba(255, 247, 233, 0.2);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.12), rgba(255, 247, 233, 0.055));
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.1) inset,
+    0 2px 0 rgba(0, 0, 0, 0.34);
+  color: var(--ink-1);
+}
+
+html[data-theme="dark"] :where(
+  .badge,
+  .pill,
+  .stage-chip,
+  .status-pill,
+  .settings-status-pill,
+  .support-status-badge,
+  .price-status,
+  .dash-pill,
+  .rail-pill,
+  .history-sync-badge,
+  .settings-hero-status,
+  .login-status,
+  .mock-status
+)::after {
+  background: linear-gradient(180deg, rgba(255, 247, 233, 0.22), transparent);
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :where(.status-dot.good, .settings-billing-timeline-item.good .settings-billing-timeline-icon, .settings-plan-access-item.good .settings-plan-access-icon) {
+    animation: rf-token-breathe 3.8s ease-in-out infinite;
+  }
+}
+
+@keyframes rf-token-breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--surface) 42%, transparent) inset,
+      0 0 0 4px color-mix(in srgb, currentColor 8%, transparent);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--surface) 42%, transparent) inset,
+      0 0 0 7px color-mix(in srgb, currentColor 14%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(.status-dot.good, .settings-billing-timeline-item.good .settings-billing-timeline-icon, .settings-plan-access-item.good .settings-plan-access-icon) {
+    animation: none;
   }
 }
