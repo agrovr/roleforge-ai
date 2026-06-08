@@ -11,14 +11,16 @@ test("global pointer experience is mounted once in the app shell", () => {
   assert.match(layout, /<PointerEffects \/>/);
 });
 
-test("custom cursor stays responsive and accessibility-aware", () => {
-  assert.match(pointerEffects, /\(hover: hover\) and \(pointer: fine\)/);
-  assert.match(pointerEffects, /prefers-reduced-motion: reduce/);
+test("pointer experience keeps the native cursor fast and accessibility-aware", () => {
   assert.match(pointerEffects, /isEditableTarget/);
   assert.match(pointerEffects, /rf-native-context/);
-  assert.match(globals, /html\.rf-custom-pointer input/);
-  assert.match(globals, /\.rf-cursor-ring/);
-  assert.match(globals, /\.rf-cursor-dot/);
+  assert.doesNotMatch(pointerEffects, /pointermove/);
+  assert.doesNotMatch(pointerEffects, /requestAnimationFrame/);
+  assert.doesNotMatch(pointerEffects, /rf-custom-pointer/);
+  assert.doesNotMatch(globals, /cursor:\s*none/);
+  assert.doesNotMatch(globals, /\.rf-cursor-ring/);
+  assert.doesNotMatch(globals, /\.rf-cursor-dot/);
+  assert.doesNotMatch(globals, /\.pointer-glow/);
 });
 
 test("context menu supports keyboard and native-menu escape hatches", () => {

@@ -3,8 +3,6 @@
 import type { KeyboardEvent } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type CursorMode = "default" | "interactive" | "text" | "menu";
-
 type MenuState = {
   open: boolean;
   x: number;
@@ -15,11 +13,6 @@ type QuickActionKey = "s" | "t" | "a" | "d" | "c" | "r";
 
 const MENU_WIDTH = 276;
 const MENU_GAP = 14;
-
-function canUseCustomPointer() {
-  return window.matchMedia("(hover: hover) and (pointer: fine)").matches
-    && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
 
 function isEditableTarget(target: EventTarget | null) {
   return target instanceof Element
@@ -136,94 +129,16 @@ function MenuIcon({ type }: { type: "studio" | "templates" | "settings" | "theme
 
 export function PointerEffects() {
   const menuRef = useRef<HTMLDivElement>(null);
-  const frameRef = useRef(0);
-  const latestPoint = useRef({ x: 0, y: 0 });
-  const [cursorEnabled, setCursorEnabled] = useState(false);
-  const [cursorMode, setCursorMode] = useState<CursorMode>("default");
-  const [pressed, setPressed] = useState(false);
   const [menu, setMenu] = useState<MenuState>({ open: false, x: 0, y: 0 });
 
   const openQuickMenu = useCallback((point?: { x: number; y: number }) => {
     const position = clampMenuPosition(point?.x ?? window.innerWidth / 2, point?.y ?? Math.min(window.innerHeight / 2, 420));
-    setCursorMode("menu");
     setMenu({ open: true, x: position.x, y: position.y });
   }, []);
 
   const closeMenu = useCallback(() => {
     setMenu((current) => current.open ? { ...current, open: false } : current);
   }, []);
-
-  useEffect(() => {
-    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-    function syncCapability() {
-      setCursorEnabled(canUseCustomPointer());
-    }
-
-    syncCapability();
-    finePointer.addEventListener("change", syncCapability);
-    reducedMotion.addEventListener("change", syncCapability);
-
-    return () => {
-      finePointer.removeEventListener("change", syncCapability);
-      reducedMotion.removeEventListener("change", syncCapability);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!cursorEnabled) return undefined;
-
-    const root = document.documentElement;
-    root.classList.add("rf-custom-pointer");
-
-    function update(event: PointerEvent) {
-      latestPoint.current = { x: event.clientX, y: event.clientY };
-      if (frameRef.current) return;
-      frameRef.current = window.requestAnimationFrame(() => {
-        const { x, y } = latestPoint.current;
-        root.style.setProperty("--pointer-x", `${x}px`);
-        root.style.setProperty("--pointer-y", `${y}px`);
-        frameRef.current = 0;
-      });
-    }
-
-    function updateMode(event: PointerEvent) {
-      const target = event.target;
-      if (isEditableTarget(target)) {
-        setCursorMode("text");
-        return;
-      }
-      if (target instanceof Element && target.closest("a, button, summary, [role='button'], [data-cursor='interactive']")) {
-        setCursorMode("interactive");
-        return;
-      }
-      setCursorMode("default");
-    }
-
-    function handlePointerDown() {
-      setPressed(true);
-    }
-
-    function handlePointerUp() {
-      setPressed(false);
-    }
-
-    window.addEventListener("pointermove", update, { passive: true });
-    window.addEventListener("pointerover", updateMode, { passive: true });
-    window.addEventListener("pointerdown", handlePointerDown, { passive: true });
-    window.addEventListener("pointerup", handlePointerUp, { passive: true });
-
-    return () => {
-      root.classList.remove("rf-custom-pointer");
-      window.removeEventListener("pointermove", update);
-      window.removeEventListener("pointerover", updateMode);
-      window.removeEventListener("pointerdown", handlePointerDown);
-      window.removeEventListener("pointerup", handlePointerUp);
-      if (frameRef.current) window.cancelAnimationFrame(frameRef.current);
-      frameRef.current = 0;
-    };
-  }, [cursorEnabled]);
 
   useEffect(() => {
     function openMenu(event: MouseEvent) {
@@ -335,19 +250,6 @@ export function PointerEffects() {
 
   return (
     <>
-      <div className="pointer-glow" aria-hidden="true" />
-      {cursorEnabled ? (
-        <>
-          <div
-            className={`rf-cursor-ring is-${cursorMode}${pressed ? " is-pressed" : ""}`}
-            aria-hidden="true"
-          />
-          <div
-            className={`rf-cursor-dot is-${cursorMode}${pressed ? " is-pressed" : ""}`}
-            aria-hidden="true"
-          />
-        </>
-      ) : null}
       {menu.open ? (
         <div
           ref={menuRef}
