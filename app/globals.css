@@ -8726,21 +8726,68 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .login-shell {
+  position: relative;
+  isolation: isolate;
   min-height: 100dvh;
   overflow-x: clip;
   padding: 28px clamp(18px, 4vw, 54px) 48px;
   background:
+    linear-gradient(90deg, color-mix(in srgb, var(--line) 38%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in srgb, var(--line) 30%, transparent) 1px, transparent 1px),
     radial-gradient(circle at 86% 8%, rgba(137, 209, 190, 0.18), transparent 20rem),
     radial-gradient(circle at 12% 82%, rgba(222, 162, 79, 0.12), transparent 24rem),
     linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
+  background-size: 38px 38px, 38px 38px, auto, auto, auto;
+}
+
+.login-shell::before,
+.login-shell::after {
+  position: fixed;
+  inset-inline: 0;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+}
+
+.login-shell::before {
+  top: 0;
+  height: 48dvh;
+  background:
+    linear-gradient(110deg, transparent 0 18%, color-mix(in srgb, var(--brand-soft) 42%, transparent) 48%, transparent 78%),
+    repeating-linear-gradient(115deg, transparent 0 22px, color-mix(in srgb, var(--line) 32%, transparent) 22px 23px);
+  mask-image: linear-gradient(180deg, black, transparent);
+  opacity: 0.5;
+}
+
+.login-shell::after {
+  bottom: 0;
+  height: 38dvh;
+  background:
+    radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--accent-soft) 52%, transparent), transparent 62%),
+    linear-gradient(180deg, transparent, color-mix(in srgb, var(--surface-warm) 72%, transparent));
+  mask-image: linear-gradient(0deg, black, transparent);
+  opacity: 0.82;
 }
 
 .login-nav {
+  width: min(1180px, calc(100% - clamp(0px, 2vw, 28px)));
   display: flex;
   min-width: 0;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  margin-inline: auto;
+  padding: 9px 10px 9px 12px;
+  border: 1px solid color-mix(in srgb, var(--surface) 82%, var(--line));
+  border-radius: clamp(22px, 2.2vw, 30px);
+  background:
+    linear-gradient(120deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-warm) 78%, transparent)),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--brand-soft) 38%, transparent), transparent 15rem);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 58%, transparent) inset,
+    0 20px 52px -44px color-mix(in srgb, var(--ink-0) 56%, transparent);
+  backdrop-filter: blur(20px) saturate(1.08);
+  -webkit-backdrop-filter: blur(20px) saturate(1.08);
 }
 
 .login-nav .brand {
@@ -8779,6 +8826,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .login-copy {
   display: grid;
+  position: relative;
   min-width: 0;
   max-width: 100%;
   gap: 18px;
@@ -8856,6 +8904,20 @@ html[data-theme="dark"] input::file-selector-button {
   pointer-events: none;
 }
 
+.login-studio-preview::after {
+  position: absolute;
+  inset: auto 18px 18px;
+  height: 3px;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, var(--good), var(--brand), var(--accent));
+  box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--brand) 68%, transparent);
+  content: "";
+  opacity: 0.74;
+  pointer-events: none;
+  transform-origin: left center;
+}
+
 .login-preview-top,
 .login-preview-sheet {
   position: relative;
@@ -8874,6 +8936,7 @@ html[data-theme="dark"] input::file-selector-button {
   border: 1px solid color-mix(in srgb, var(--brand) 22%, var(--line));
   border-radius: 14px;
   background: color-mix(in srgb, var(--surface) 86%, var(--brand-soft));
+  box-shadow: 0 12px 26px -22px color-mix(in srgb, var(--brand) 62%, transparent);
 }
 
 .login-preview-top span,
@@ -8908,12 +8971,23 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .login-preview-sheet div {
+  position: relative;
   display: grid;
   gap: 6px;
   min-width: 0;
   min-height: 92px;
   padding: 16px;
   border-right: 1px solid var(--line);
+}
+
+.login-preview-sheet div::before {
+  position: absolute;
+  inset: 10px auto 10px 0;
+  width: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand) 64%, var(--accent));
+  content: "";
+  opacity: 0.64;
 }
 
 .login-preview-sheet div:last-child {
@@ -8931,6 +9005,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .login-card {
+  position: relative;
   display: grid;
   gap: 18px;
   min-width: 0;
@@ -8941,6 +9016,34 @@ html[data-theme="dark"] input::file-selector-button {
   border-radius: 18px;
   background: rgba(255, 253, 248, 0.92);
   box-shadow: var(--shadow-lg);
+}
+
+.login-card::before,
+.login-card::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
+}
+
+.login-card::before {
+  inset: 1px;
+  border: 1px solid color-mix(in srgb, #fff 48%, transparent);
+  border-radius: 17px;
+}
+
+.login-card::after {
+  top: -40%;
+  right: -28%;
+  width: 260px;
+  height: 260px;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--brand-soft) 62%, transparent), transparent 68%);
+  opacity: 0.78;
+}
+
+.login-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .login-card-head {
@@ -9005,6 +9108,32 @@ html[data-theme="dark"] input::file-selector-button {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .login-studio-preview::after {
+    animation: login-preview-meter 3.8s ease-in-out infinite;
+  }
+}
+
+@keyframes login-preview-meter {
+  0%,
+  100% {
+    transform: scaleX(0.62);
+    opacity: 0.62;
+  }
+
+  50% {
+    transform: scaleX(1);
+    opacity: 0.86;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-studio-preview::after {
+    animation: none;
+    transform: none;
+  }
 }
 
 .legal-shell {
@@ -19293,9 +19422,35 @@ html[data-theme="dark"] .settings-export-item.enabled {
 
 html[data-theme="dark"] .login-shell {
   background:
+    linear-gradient(90deg, rgba(255, 247, 233, 0.045) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255, 247, 233, 0.035) 1px, transparent 1px),
     radial-gradient(circle at 86% 8%, rgba(137, 209, 190, 0.12), transparent 20rem),
     radial-gradient(circle at 12% 82%, rgba(222, 162, 79, 0.08), transparent 24rem),
     linear-gradient(180deg, #090d1a 0%, #111726 100%);
+}
+
+html[data-theme="dark"] .login-shell::before {
+  background:
+    linear-gradient(110deg, transparent 0 18%, rgba(137, 209, 190, 0.08) 48%, transparent 78%),
+    repeating-linear-gradient(115deg, transparent 0 22px, rgba(255, 247, 233, 0.055) 22px 23px);
+  opacity: 0.42;
+}
+
+html[data-theme="dark"] .login-shell::after {
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(221, 160, 74, 0.1), transparent 62%),
+    linear-gradient(180deg, transparent, rgba(255, 247, 233, 0.035));
+  opacity: 0.74;
+}
+
+html[data-theme="dark"] .login-nav {
+  border-color: rgba(255, 247, 233, 0.16);
+  background:
+    linear-gradient(120deg, rgba(25, 31, 52, 0.86), rgba(12, 17, 31, 0.72)),
+    radial-gradient(circle at 100% 0%, rgba(137, 209, 190, 0.08), transparent 15rem);
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.08) inset,
+    0 22px 54px -42px rgba(0, 0, 0, 0.9);
 }
 
 html[data-theme="dark"] .login-copy p,
@@ -19311,11 +19466,25 @@ html[data-theme="dark"] .login-card {
   box-shadow: 0 26px 60px -34px rgba(0, 0, 0, 0.92);
 }
 
+html[data-theme="dark"] .login-card::before {
+  border-color: rgba(255, 247, 233, 0.08);
+}
+
+html[data-theme="dark"] .login-card::after {
+  background: radial-gradient(circle, rgba(137, 209, 190, 0.12), transparent 68%);
+  opacity: 0.82;
+}
+
 html[data-theme="dark"] .login-studio-preview {
   background:
     linear-gradient(135deg, rgba(255, 247, 233, 0.07), rgba(255, 247, 233, 0.035)),
     rgba(15, 20, 35, 0.72);
   border-color: rgba(255, 247, 233, 0.16);
+}
+
+html[data-theme="dark"] .login-studio-preview::after {
+  box-shadow: 0 10px 24px -12px rgba(137, 209, 190, 0.42);
+  opacity: 0.68;
 }
 
 html[data-theme="dark"] .login-preview-top,
@@ -19326,6 +19495,10 @@ html[data-theme="dark"] .login-preview-sheet {
 
 html[data-theme="dark"] .login-preview-sheet div {
   border-color: rgba(255, 247, 233, 0.16);
+}
+
+html[data-theme="dark"] .login-preview-sheet div::before {
+  background: linear-gradient(180deg, rgba(137, 209, 190, 0.82), rgba(221, 160, 74, 0.64));
 }
 
 html[data-theme="dark"] .login-session-strip span {
