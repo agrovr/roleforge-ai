@@ -22361,6 +22361,121 @@ html[data-theme="dark"] .nav {
   transform: translateY(-1px);
 }
 
+/* Operational surface finish: saved work, document rows, and support triage. */
+.settings-project-list,
+.settings-document-list,
+.admin-support-list {
+  --ops-rail: linear-gradient(180deg, var(--accent), var(--brand), var(--sky));
+}
+
+.settings-project-item,
+.settings-document-item,
+.studio-account-recent-link,
+.admin-support-meta div {
+  position: relative;
+  isolation: isolate;
+}
+
+.settings-project-item,
+.settings-document-item,
+.studio-account-recent-link {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 76%, transparent)),
+    radial-gradient(circle at 96% 0%, color-mix(in srgb, var(--brand-soft) 32%, transparent), transparent 13rem);
+}
+
+.settings-project-item::after,
+.settings-document-item::after,
+.studio-account-recent-link::after {
+  position: absolute;
+  inset-block: 12px;
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: var(--ops-rail);
+  content: "";
+  opacity: 0.52;
+  pointer-events: none;
+}
+
+.settings-project-item:hover::after,
+.settings-project-item:focus-within::after,
+.settings-document-item:hover::after,
+.settings-document-item:focus-within::after,
+.studio-account-recent-link:hover::after,
+.studio-account-recent-link:focus-visible::after {
+  opacity: 0.86;
+}
+
+.settings-project-controls {
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 74%, transparent), color-mix(in srgb, var(--surface-warm) 52%, transparent));
+  padding: 12px;
+}
+
+.settings-project-stage-controls button,
+.settings-project-operations a,
+.settings-project-operations span,
+.settings-document-actions .btn,
+.admin-support-status {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 42%, transparent),
+    0 12px 24px -22px var(--shadow);
+}
+
+.settings-project-stage-controls button {
+  position: relative;
+  overflow: hidden;
+}
+
+.settings-project-stage-controls button::after {
+  position: absolute;
+  inset-inline: 12%;
+  inset-block-start: 1px;
+  height: 42%;
+  border-radius: inherit;
+  background: linear-gradient(180deg, color-mix(in srgb, #fff 38%, transparent), transparent);
+  content: "";
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.settings-document-item {
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.settings-document-item:hover,
+.settings-document-item:focus-within {
+  border-color: color-mix(in srgb, var(--brand-dark) 32%, var(--line));
+  box-shadow: 0 16px 34px -28px var(--shadow);
+  transform: translateY(-1px);
+}
+
+.admin-support-meta div {
+  border-color: color-mix(in srgb, var(--brand) 18%, var(--line));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-warm) 58%, transparent));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 38%, transparent);
+}
+
+.admin-support-meta div::before {
+  position: absolute;
+  inset-inline: 10px;
+  inset-block-start: 0;
+  height: 2px;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 54%, transparent), transparent);
+  content: "";
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.admin-support-status {
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 html[data-theme="dark"] .rf-studio-hero::after,
 html[data-theme="dark"] .rf-preflight-panel::after,
 html[data-theme="dark"] .export-readiness-panel::after,
@@ -22412,6 +22527,59 @@ html[data-theme="dark"] .admin-support-card:focus-within {
     inset 0 1px 0 rgba(255, 247, 233, 0.11);
 }
 
+html[data-theme="dark"] .settings-project-list,
+html[data-theme="dark"] .settings-document-list,
+html[data-theme="dark"] .admin-support-list {
+  --ops-rail: linear-gradient(180deg, #f3c16d, #89d1be, #8eb7f0);
+}
+
+html[data-theme="dark"] .settings-project-item,
+html[data-theme="dark"] .settings-document-item,
+html[data-theme="dark"] .studio-account-recent-link {
+  background:
+    linear-gradient(135deg, rgba(255, 247, 233, 0.075), rgba(255, 247, 233, 0.028)),
+    radial-gradient(circle at 96% 0%, rgba(137, 209, 190, 0.08), transparent 13rem),
+    rgba(12, 17, 31, 0.78);
+}
+
+html[data-theme="dark"] .settings-project-controls {
+  border-color: rgba(255, 247, 233, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.045), rgba(255, 247, 233, 0.018));
+}
+
+html[data-theme="dark"] .settings-project-stage-controls button,
+html[data-theme="dark"] .settings-project-operations a,
+html[data-theme="dark"] .settings-project-operations span,
+html[data-theme="dark"] .settings-document-actions .btn,
+html[data-theme="dark"] .admin-support-status {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.1),
+    0 12px 24px -22px rgba(0, 0, 0, 0.92);
+}
+
+html[data-theme="dark"] .settings-project-stage-controls button::after {
+  background: linear-gradient(180deg, rgba(255, 247, 233, 0.13), transparent);
+  opacity: 0.48;
+}
+
+html[data-theme="dark"] .settings-document-item:hover,
+html[data-theme="dark"] .settings-document-item:focus-within {
+  border-color: rgba(222, 162, 79, 0.3);
+  box-shadow: 0 18px 38px -28px rgba(0, 0, 0, 0.96);
+}
+
+html[data-theme="dark"] .admin-support-meta div {
+  border-color: rgba(255, 247, 233, 0.13);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.055), rgba(255, 247, 233, 0.022));
+  box-shadow: inset 0 1px 0 rgba(255, 247, 233, 0.08);
+}
+
+html[data-theme="dark"] .admin-support-meta div::before {
+  background: linear-gradient(90deg, transparent, rgba(243, 193, 109, 0.42), transparent);
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .rf-studio-stat-fill {
     animation: rf-status-flow 9s ease-in-out infinite;
@@ -22443,6 +22611,24 @@ html[data-theme="dark"] .admin-support-card:focus-within {
   .rf-studio-stat-fill {
     animation: none;
     transition: none;
+  }
+
+  .settings-document-item,
+  .settings-project-item,
+  .studio-account-recent-link,
+  .admin-support-card {
+    transition: none;
+  }
+
+  .settings-document-item:hover,
+  .settings-document-item:focus-within,
+  .settings-project-item:hover,
+  .settings-project-item:focus-within,
+  .studio-account-recent-link:hover,
+  .studio-account-recent-link:focus-visible,
+  .admin-support-card:hover,
+  .admin-support-card:focus-within {
+    transform: none;
   }
 }
 
