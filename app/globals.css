@@ -9185,7 +9185,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .legal-topbar {
-  width: min(1180px, calc(100% - clamp(28px, 6vw, 118px)));
+  width: min(1120px, calc(100% - clamp(32px, 12vw, 280px)));
   max-width: 100%;
   margin-inline: auto;
   padding: 0;
@@ -9200,7 +9200,15 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .legal-topbar::before {
-  content: none;
+  content: "";
+  order: 1;
+  flex: 1 1 120px;
+  min-width: clamp(44px, 9vw, 180px);
+  height: 1px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--line) 12%, transparent), color-mix(in srgb, var(--accent) 42%, var(--line)), color-mix(in srgb, var(--line) 10%, transparent));
+  opacity: 0.62;
+  transform: translateY(1px);
 }
 
 .legal-topbar .brand,
@@ -9217,16 +9225,24 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .legal-topbar .brand {
-  min-height: 58px;
-  max-width: min(100%, 360px);
-  padding: 8px 16px 8px 10px;
-  border-radius: 21px;
+  order: 0;
 }
 
 .legal-topbar .settings-page-actions {
-  min-height: 58px;
-  padding: 8px;
-  border-radius: 999px;
+  order: 2;
+}
+
+.legal-topbar .brand {
+  min-height: 54px;
+  max-width: min(100%, 360px);
+  padding: 7px 15px 7px 9px;
+  border-radius: 18px;
+}
+
+.legal-topbar .settings-page-actions {
+  min-height: 54px;
+  padding: 6px;
+  border-radius: 18px;
   gap: 8px;
 }
 
@@ -11453,6 +11469,10 @@ html[data-theme="dark"] input::file-selector-button {
     gap: 12px;
     width: 100%;
     overflow: visible;
+  }
+
+  .legal-topbar::before {
+    content: none;
   }
 
   .legal-topbar .brand {
