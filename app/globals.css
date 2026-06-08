@@ -22368,3 +22368,322 @@ html[data-theme="dark"] .admin-support-card:focus-within {
     transition: none;
   }
 }
+
+/* Interaction finish: consistent focus, tactile controls, and navigable anchors. */
+:where(a, button, summary, input, textarea, select, [role="button"], [tabindex]):focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--brand) 30%, transparent);
+  outline-offset: 3px;
+}
+
+:where(
+  .btn,
+  .primary-button,
+  .ghost-button,
+  .icon-button,
+  .theme-toggle,
+  .support-submit,
+  .settings-danger-button,
+  .export-format-chip,
+  .segment button,
+  .mode-segment button,
+  .settings-section-clear,
+  .settings-account-email-copy,
+  .public-account-reference-copy,
+  .studio-account-reference-copy,
+  .admin-support-action
+):not(:disabled):not(.disabled):not(.settings-disabled-action) {
+  transform: translateZ(0);
+  transition:
+    border-color 170ms ease,
+    background 170ms ease,
+    box-shadow 170ms ease,
+    color 170ms ease,
+    filter 170ms ease,
+    transform 170ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:where(
+  .btn,
+  .primary-button,
+  .ghost-button,
+  .icon-button,
+  .theme-toggle,
+  .support-submit,
+  .settings-danger-button,
+  .export-format-chip,
+  .segment button,
+  .mode-segment button,
+  .settings-section-clear,
+  .settings-account-email-copy,
+  .public-account-reference-copy,
+  .studio-account-reference-copy,
+  .admin-support-action
+):not(:disabled):not(.disabled):not(.settings-disabled-action):hover {
+  filter: saturate(1.04);
+  transform: translateY(-2px);
+}
+
+:where(
+  .btn,
+  .primary-button,
+  .ghost-button,
+  .icon-button,
+  .theme-toggle,
+  .support-submit,
+  .settings-danger-button,
+  .export-format-chip,
+  .segment button,
+  .mode-segment button,
+  .settings-section-clear,
+  .settings-account-email-copy,
+  .public-account-reference-copy,
+  .studio-account-reference-copy,
+  .admin-support-action
+):not(:disabled):not(.disabled):not(.settings-disabled-action):active {
+  filter: saturate(0.98);
+  transform: translateY(0) scale(0.985);
+}
+
+:where(
+  .field input,
+  .field textarea,
+  .support-form input,
+  .support-form select,
+  .support-form textarea,
+  .studio-account-form input,
+  .settings-section-search input,
+  .settings-profile-edit-row input,
+  .settings-project-rename-row input,
+  .settings-project-delete-row input,
+  .settings-danger-actions input,
+  .rf-target-editor input,
+  .rf-target-editor textarea,
+  .rf-run-controls input,
+  .admin-support-reply-form textarea
+) {
+  background-image:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 34%, transparent), transparent 56%),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--brand-soft) 28%, transparent), transparent 12rem);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--surface) 58%, transparent);
+  transition:
+    border-color 170ms ease,
+    box-shadow 170ms ease,
+    background-color 170ms ease,
+    transform 170ms ease;
+}
+
+:where(
+  .field input,
+  .field textarea,
+  .support-form input,
+  .support-form select,
+  .support-form textarea,
+  .studio-account-form input,
+  .settings-section-search input,
+  .settings-profile-edit-row input,
+  .settings-project-rename-row input,
+  .settings-project-delete-row input,
+  .settings-danger-actions input,
+  .rf-target-editor input,
+  .rf-target-editor textarea,
+  .rf-run-controls input,
+  .admin-support-reply-form textarea
+):focus {
+  border-color: color-mix(in srgb, var(--brand) 46%, var(--line));
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--brand-soft) 58%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--surface) 68%, transparent);
+}
+
+:where(
+  .field input,
+  .field textarea,
+  .support-form input,
+  .support-form select,
+  .support-form textarea,
+  .studio-account-form input,
+  .settings-section-search input,
+  .settings-profile-edit-row input,
+  .settings-project-rename-row input,
+  .settings-project-delete-row input,
+  .settings-danger-actions input,
+  .rf-target-editor input,
+  .rf-target-editor textarea,
+  .rf-run-controls input,
+  .admin-support-reply-form textarea
+)::placeholder {
+  color: color-mix(in srgb, var(--ink-3) 76%, transparent);
+}
+
+:where(
+  .settings-section,
+  .settings-card,
+  .settings-plan-access,
+  .settings-account-health,
+  .settings-activity-panel,
+  .legal-card,
+  .legal-footer-card,
+  .support-request-card,
+  .updates-card,
+  .status-card,
+  .templates-decision-guide,
+  .templates-selection-status,
+  .rf-workflow-panel,
+  .studio-card,
+  .admin-support-card
+):target {
+  border-color: color-mix(in srgb, var(--brand) 48%, var(--line));
+  box-shadow:
+    0 0 0 5px color-mix(in srgb, var(--brand-soft) 56%, transparent),
+    var(--shadow-soft);
+  scroll-margin-top: clamp(92px, 10vw, 150px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :where(
+    .settings-section,
+    .settings-card,
+    .settings-plan-access,
+    .settings-account-health,
+    .settings-activity-panel,
+    .legal-card,
+    .legal-footer-card,
+    .support-request-card,
+    .updates-card,
+    .status-card,
+    .templates-decision-guide,
+    .templates-selection-status,
+    .rf-workflow-panel,
+    .studio-card,
+    .admin-support-card
+  ):target {
+    animation: rf-target-pulse 1400ms ease both;
+  }
+}
+
+@keyframes rf-target-pulse {
+  0% {
+    box-shadow:
+      0 0 0 0 color-mix(in srgb, var(--brand-soft) 0%, transparent),
+      var(--shadow-soft);
+  }
+
+  34% {
+    box-shadow:
+      0 0 0 7px color-mix(in srgb, var(--brand-soft) 66%, transparent),
+      var(--shadow-soft);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 5px color-mix(in srgb, var(--brand-soft) 44%, transparent),
+      var(--shadow-soft);
+  }
+}
+
+html[data-theme="dark"] :where(a, button, summary, input, textarea, select, [role="button"], [tabindex]):focus-visible {
+  outline-color: color-mix(in srgb, var(--brand) 42%, transparent);
+}
+
+html[data-theme="dark"] :where(
+  .field input,
+  .field textarea,
+  .support-form input,
+  .support-form select,
+  .support-form textarea,
+  .studio-account-form input,
+  .settings-section-search input,
+  .settings-profile-edit-row input,
+  .settings-project-rename-row input,
+  .settings-project-delete-row input,
+  .settings-danger-actions input,
+  .rf-target-editor input,
+  .rf-target-editor textarea,
+  .rf-run-controls input,
+  .admin-support-reply-form textarea
+) {
+  background-image:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.045), transparent 56%),
+    radial-gradient(circle at 100% 0%, rgba(221, 160, 74, 0.1), transparent 12rem);
+  box-shadow: inset 0 1px 0 rgba(255, 247, 233, 0.08);
+}
+
+html[data-theme="dark"] :where(
+  .field input,
+  .field textarea,
+  .support-form input,
+  .support-form select,
+  .support-form textarea,
+  .studio-account-form input,
+  .settings-section-search input,
+  .settings-profile-edit-row input,
+  .settings-project-rename-row input,
+  .settings-project-delete-row input,
+  .settings-danger-actions input,
+  .rf-target-editor input,
+  .rf-target-editor textarea,
+  .rf-run-controls input,
+  .admin-support-reply-form textarea
+):focus {
+  border-color: rgba(245, 214, 154, 0.38);
+  box-shadow:
+    0 0 0 4px rgba(221, 160, 74, 0.16),
+    inset 0 1px 0 rgba(255, 247, 233, 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(
+    .btn,
+    .primary-button,
+    .ghost-button,
+    .icon-button,
+    .theme-toggle,
+    .support-submit,
+    .settings-danger-button,
+    .export-format-chip,
+    .segment button,
+    .mode-segment button,
+    .settings-section-clear,
+    .settings-account-email-copy,
+    .public-account-reference-copy,
+    .studio-account-reference-copy,
+    .admin-support-action,
+    .field input,
+    .field textarea,
+    .support-form input,
+    .support-form select,
+    .support-form textarea,
+    .studio-account-form input,
+    .settings-section-search input,
+    .settings-profile-edit-row input,
+    .settings-project-rename-row input,
+    .settings-project-delete-row input,
+    .settings-danger-actions input,
+    .rf-target-editor input,
+    .rf-target-editor textarea,
+    .rf-run-controls input,
+    .admin-support-reply-form textarea
+  ) {
+    transition: none;
+  }
+
+  :where(
+    .settings-section,
+    .settings-card,
+    .settings-plan-access,
+    .settings-account-health,
+    .settings-activity-panel,
+    .legal-card,
+    .legal-footer-card,
+    .support-request-card,
+    .updates-card,
+    .status-card,
+    .templates-decision-guide,
+    .templates-selection-status,
+    .rf-workflow-panel,
+    .studio-card,
+    .admin-support-card
+  ):target {
+    animation: none;
+  }
+}
