@@ -3,6 +3,7 @@ import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { AccountMenuBehavior } from "./components/AccountMenuBehavior";
 import { PointerEffects } from "./components/PointerEffects";
+import { SitePolish } from "./components/SitePolish";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -83,6 +84,7 @@ export default function RootLayout({
             __html: `(function(){try{var p=new URLSearchParams(location.search).get("theme");var s=localStorage.getItem("roleforge-theme");var t=p==="dark"||p==="light"?p:s;if(t!=="dark"&&t!=="light"){t="light"}document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;}catch(e){}})();`,
           }}
         />
+        <SitePolish />
         {children}
         <AccountMenuBehavior />
         <PointerEffects />

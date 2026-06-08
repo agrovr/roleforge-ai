@@ -170,6 +170,317 @@ html[data-theme="dark"] textarea {
   background: var(--brand-soft);
 }
 
+.rf-scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2147482500;
+  width: 100%;
+  height: 3px;
+  pointer-events: none;
+}
+
+.rf-scroll-progress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background:
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--surface) 34%, transparent) 18%, transparent 34%),
+    linear-gradient(90deg, var(--accent), var(--brand) 48%, var(--coral));
+  box-shadow: 0 0 22px color-mix(in srgb, var(--brand) 46%, transparent);
+  animation: rf-scroll-progress linear both;
+  animation-timeline: scroll(root block);
+}
+
+.rf-page-texture {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0.16;
+  mix-blend-mode: multiply;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--ink-0) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in srgb, var(--ink-0) 4%, transparent) 1px, transparent 1px),
+    repeating-linear-gradient(135deg, transparent 0 10px, color-mix(in srgb, var(--surface) 28%, transparent) 10px 11px);
+  background-size: 54px 54px, 54px 54px, 18px 18px;
+  mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 86%, transparent 100%);
+}
+
+html[data-theme="dark"] .rf-page-texture {
+  opacity: 0.13;
+  mix-blend-mode: screen;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--surface) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 7%, transparent) 1px, transparent 1px),
+    repeating-linear-gradient(135deg, transparent 0 10px, color-mix(in srgb, var(--brand) 10%, transparent) 10px 11px);
+}
+
+html.rf-polish-ready [data-polish-reveal="true"] {
+  opacity: 0;
+  transform: scale(0.992);
+  transition:
+    opacity 560ms ease,
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+  transition-delay: calc(var(--rf-reveal-index, 0) * 34ms);
+  will-change: opacity, transform;
+}
+
+html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.page-shell,
+.shell,
+.templates-page-shell,
+.settings-page-shell,
+.legal-shell,
+.rf-studio-page,
+.login-shell {
+  position: relative;
+  z-index: 2;
+}
+
+.btn,
+.primary-button,
+.ghost-button,
+.icon-button,
+.studio-oauth-button,
+.support-submit,
+.settings-danger-button,
+.studio-account-shortcuts a,
+.studio-account-shortcuts button,
+.studio-account-next-actions a,
+.studio-account-utilities a {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after,
+.primary-button::after,
+.ghost-button::after,
+.icon-button::after,
+.studio-oauth-button::after,
+.support-submit::after,
+.settings-danger-button::after,
+.studio-account-shortcuts a::after,
+.studio-account-shortcuts button::after,
+.studio-account-next-actions a::after,
+.studio-account-utilities a::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background: linear-gradient(120deg, transparent 0 32%, color-mix(in srgb, #fff 44%, transparent) 46%, transparent 58% 100%);
+  opacity: 0;
+  transform: translateX(-40%);
+  transition: opacity 180ms ease, transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.btn:hover::after,
+.btn:focus-visible::after,
+.primary-button:hover::after,
+.primary-button:focus-visible::after,
+.ghost-button:hover::after,
+.ghost-button:focus-visible::after,
+.icon-button:hover::after,
+.icon-button:focus-visible::after,
+.studio-oauth-button:hover::after,
+.studio-oauth-button:focus-visible::after,
+.support-submit:hover::after,
+.support-submit:focus-visible::after,
+.settings-danger-button:hover::after,
+.settings-danger-button:focus-visible::after,
+.studio-account-shortcuts a:hover::after,
+.studio-account-shortcuts a:focus-visible::after,
+.studio-account-shortcuts button:hover::after,
+.studio-account-shortcuts button:focus-visible::after,
+.studio-account-next-actions a:hover::after,
+.studio-account-next-actions a:focus-visible::after,
+.studio-account-utilities a:hover::after,
+.studio-account-utilities a:focus-visible::after {
+  opacity: 0.72;
+  transform: translateX(46%);
+}
+
+.btn:active,
+.primary-button:active,
+.ghost-button:active,
+.icon-button:active,
+.studio-oauth-button:active,
+.support-submit:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.template-card,
+.templates-page-card,
+.templates-guide-card,
+.templates-fit-guide article,
+.step-card,
+.feature-card,
+.price-card,
+.legal-card,
+.legal-footer-card,
+.help-signal-card,
+.help-action-card,
+.help-quick-link,
+.support-routing-step,
+.support-guide-card,
+.support-triage-card,
+.support-request-card,
+.support-packet-card,
+.support-response-card,
+.updates-hero-card,
+.updates-card,
+.status-card,
+.status-diagnostic-card,
+.settings-section,
+.settings-card,
+.settings-project-item,
+.studio-card,
+.studio-stat,
+.suggestion,
+.ats-item {
+  position: relative;
+  isolation: isolate;
+}
+
+.template-card::before,
+.templates-page-card::before,
+.templates-guide-card::before,
+.templates-fit-guide article::before,
+.step-card::before,
+.feature-card::before,
+.price-card::before,
+.legal-card::before,
+.legal-footer-card::before,
+.help-signal-card::before,
+.help-action-card::before,
+.help-quick-link::before,
+.support-routing-step::before,
+.support-guide-card::before,
+.support-triage-card::before,
+.support-request-card::before,
+.support-packet-card::before,
+.support-response-card::before,
+.updates-hero-card::before,
+.updates-card::before,
+.status-card::before,
+.status-diagnostic-card::before,
+.settings-section::before,
+.settings-card::before,
+.settings-project-item::before,
+.studio-card::before,
+.studio-stat::before,
+.suggestion::before,
+.ats-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--surface) 38%, transparent), transparent 34%),
+    linear-gradient(315deg, color-mix(in srgb, var(--brand) 10%, transparent), transparent 42%);
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+.template-card:hover::before,
+.template-card:focus-within::before,
+.templates-page-card:hover::before,
+.templates-page-card:focus-within::before,
+.templates-guide-card:hover::before,
+.templates-guide-card:focus-within::before,
+.templates-fit-guide article:hover::before,
+.step-card:hover::before,
+.step-card:focus-within::before,
+.feature-card:hover::before,
+.feature-card:focus-within::before,
+.price-card:hover::before,
+.price-card:focus-within::before,
+.legal-card:hover::before,
+.legal-card:focus-within::before,
+.legal-footer-card:hover::before,
+.legal-footer-card:focus-within::before,
+.help-signal-card:hover::before,
+.help-action-card:hover::before,
+.help-action-card:focus-within::before,
+.help-quick-link:hover::before,
+.support-routing-step:hover::before,
+.support-guide-card:hover::before,
+.support-triage-card:hover::before,
+.support-request-card:hover::before,
+.support-request-card:focus-within::before,
+.support-packet-card:hover::before,
+.support-response-card:hover::before,
+.updates-hero-card:hover::before,
+.updates-card:hover::before,
+.updates-card:focus-within::before,
+.status-card:hover::before,
+.status-diagnostic-card:hover::before,
+.settings-section:hover::before,
+.settings-section:focus-within::before,
+.settings-card:hover::before,
+.settings-card:focus-within::before,
+.settings-project-item:hover::before,
+.settings-project-item:focus-within::before,
+.studio-card:hover::before,
+.studio-card:focus-within::before,
+.studio-stat:hover::before,
+.suggestion:hover::before,
+.suggestion:focus-within::before,
+.ats-item:hover::before {
+  opacity: 1;
+}
+
+@keyframes rf-scroll-progress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rf-scroll-progress span {
+    animation: none;
+    opacity: 0.56;
+    transform: scaleX(1);
+  }
+
+  html.rf-polish-ready [data-polish-reveal="true"],
+  html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .btn::after,
+  .primary-button::after,
+  .ghost-button::after,
+  .icon-button::after,
+  .studio-oauth-button::after,
+  .support-submit::after,
+  .settings-danger-button::after,
+  .studio-account-shortcuts a::after,
+  .studio-account-shortcuts button::after,
+  .studio-account-next-actions a::after,
+  .studio-account-utilities a::after {
+    transition: none;
+  }
+}
+
 .pointer-glow {
   position: fixed;
   left: var(--pointer-x, -120px);
@@ -11084,8 +11395,60 @@ html[data-theme="dark"] input::file-selector-button {
     padding-inline: 14px;
   }
 
+  .legal-topbar {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 12px;
+    overflow: hidden;
+  }
+
+  .legal-topbar .brand {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .legal-topbar .settings-page-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    justify-content: stretch;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .legal-topbar .settings-page-actions .btn,
+  .legal-topbar .settings-page-actions .theme-toggle,
+  .legal-topbar .settings-page-actions .public-account-loading,
+  .legal-topbar .settings-page-actions .public-account-signin,
+  .legal-topbar .settings-page-actions .public-account-menu,
+  .legal-topbar .settings-page-actions .public-topbar-avatar {
+    width: 100%;
+    min-width: 0;
+    justify-self: stretch;
+  }
+
+  .legal-topbar .settings-page-actions .theme-toggle,
+  .legal-topbar .settings-page-actions .public-topbar-avatar {
+    min-height: 42px;
+  }
+
   .legal-hero h1 {
-    font-size: 3.1rem;
+    font-size: clamp(2.82rem, 15vw, 3.1rem);
+    line-height: 0.98;
+  }
+
+  .legal-hero p,
+  .support-routing-head p,
+  .support-routing-step p,
+  .support-guide-card p,
+  .support-triage-item p,
+  .support-packet-item p,
+  .support-response-head p,
+  .support-after-submit-list li {
+    line-height: 1.44;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
   }
 
   .legal-card,
@@ -11132,6 +11495,23 @@ html[data-theme="dark"] input::file-selector-button {
   .support-packet-item > span {
     width: 30px;
     height: 30px;
+  }
+
+  .legal-hero-card,
+  .support-routing-strip,
+  .support-guide-card,
+  .support-triage-card,
+  .support-request-card,
+  .support-packet-card,
+  .support-response-card {
+    padding: 14px;
+  }
+
+  .legal-hero-card span {
+    grid-template-columns: 8px minmax(0, 1fr);
+    gap: 8px;
+    font-size: 0.86rem;
+    line-height: 1.28;
   }
 }
 
