@@ -17865,6 +17865,285 @@ html[data-theme="dark"] .rf-preflight-copy small {
   color: var(--ink-3);
 }
 
+/* Studio workbench polish: tactile rails and glints for the signed-in workflow. */
+.rf-workflow-panel,
+.rf-intake-grid,
+.rf-live-card,
+.suggestion-list,
+.ats-list,
+.generated-grid {
+  --studio-workbench-rail: linear-gradient(180deg, var(--brand), var(--accent), var(--sky));
+  --studio-workbench-glint: linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand-soft) 74%, transparent), transparent);
+}
+
+.rf-intake-card,
+.rf-file-drop,
+.rf-target-editor,
+.rf-run-controls,
+.rf-preview-wrap,
+.suggestion,
+.ats-item,
+.generated-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.rf-intake-card::after,
+.suggestion::after,
+.ats-item::after,
+.generated-card::after {
+  position: absolute;
+  inset-block: 16px;
+  inset-inline-start: 0;
+  z-index: 1;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--studio-workbench-rail);
+  content: "";
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.rf-file-drop::before,
+.rf-target-editor::before,
+.rf-run-controls::before,
+.rf-preview-wrap::before,
+.suggestion::before,
+.ats-item::before,
+.generated-card::before {
+  position: absolute;
+  inset-inline: 18px;
+  inset-block-start: 0;
+  z-index: 1;
+  height: 1px;
+  background: var(--studio-workbench-glint);
+  content: "";
+  opacity: 0.74;
+  pointer-events: none;
+}
+
+.rf-intake-card {
+  background:
+    radial-gradient(circle at 94% 0%, color-mix(in srgb, var(--brand-soft) 34%, transparent), transparent 12rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 98%, transparent), color-mix(in srgb, var(--surface-warm) 88%, transparent)),
+    var(--surface);
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rf-intake-card:hover,
+.rf-intake-card:focus-within {
+  border-color: color-mix(in srgb, var(--brand) 32%, var(--line));
+  box-shadow:
+    0 24px 48px -36px color-mix(in srgb, var(--brand) 38%, var(--shadow)),
+    inset 0 1px 0 color-mix(in srgb, #fff 72%, transparent);
+  transform: translateY(-2px);
+}
+
+.rf-intake-card:hover::after,
+.rf-intake-card:focus-within::after,
+.suggestion:hover::after,
+.suggestion:focus-within::after,
+.ats-item:hover::after,
+.generated-card:hover::after,
+.generated-card:focus-within::after {
+  opacity: 0.92;
+}
+
+.rf-intake-grid .rf-file-drop,
+.rf-intake-grid .rf-target-segment,
+.rf-intake-grid .mode-segment,
+.rf-intake-grid .rf-target-editor textarea,
+.rf-intake-grid .rf-target-editor input,
+.rf-intake-grid .rf-run-controls input {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 68%, transparent),
+    0 16px 34px -32px color-mix(in srgb, var(--ink-0) 52%, transparent);
+}
+
+.rf-intake-grid .rf-file-drop:hover,
+.rf-intake-grid .rf-file-drop.active {
+  box-shadow:
+    0 24px 46px -34px color-mix(in srgb, var(--brand) 52%, var(--shadow)),
+    inset 0 1px 0 color-mix(in srgb, #fff 76%, transparent);
+}
+
+.rf-preview-wrap {
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--sky) 10%, transparent), transparent 14rem),
+    linear-gradient(180deg, #fbf7ee, #f4ede1);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, #fff 62%, transparent),
+    0 20px 44px -38px color-mix(in srgb, var(--ink-0) 48%, transparent);
+}
+
+.suggestion,
+.ats-item,
+.generated-card {
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--brand-soft) 34%, transparent), transparent 10rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-2) 86%, transparent)),
+    var(--surface-2);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 58%, transparent),
+    0 16px 34px -34px color-mix(in srgb, var(--ink-0) 48%, transparent);
+  transition:
+    border-color 170ms ease,
+    background 170ms ease,
+    box-shadow 170ms ease,
+    transform 170ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.suggestion:hover,
+.suggestion:focus-within,
+.ats-item:hover,
+.generated-card:hover,
+.generated-card:focus-within {
+  border-color: color-mix(in srgb, var(--brand) 34%, var(--line));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 72%, transparent),
+    0 24px 48px -38px color-mix(in srgb, var(--brand) 44%, var(--shadow));
+  transform: translateY(-2px);
+}
+
+.suggestion-after,
+.studio-evidence-list span,
+.generated-body,
+.empty-state,
+.warning-list span,
+.generated-action-note,
+.copy-state {
+  background-image:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 42%, transparent), transparent 64%),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--brand-soft) 24%, transparent), transparent 10rem);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 52%, transparent);
+}
+
+.ats-dot,
+.rf-preflight-icon,
+.export-readiness-icon {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 42%, transparent),
+    0 10px 22px -18px color-mix(in srgb, var(--ink-0) 70%, transparent);
+}
+
+html[data-theme="dark"] .rf-workflow-panel,
+html[data-theme="dark"] .rf-intake-grid,
+html[data-theme="dark"] .rf-live-card,
+html[data-theme="dark"] .suggestion-list,
+html[data-theme="dark"] .ats-list,
+html[data-theme="dark"] .generated-grid {
+  --studio-workbench-rail: linear-gradient(180deg, #f3c16d, #8fdac8, #b9c7ff);
+  --studio-workbench-glint: linear-gradient(90deg, transparent, rgba(255, 247, 233, 0.22), transparent);
+}
+
+html[data-theme="dark"] .rf-intake-card {
+  background:
+    radial-gradient(circle at 94% 0%, rgba(222, 162, 79, 0.16), transparent 12rem),
+    linear-gradient(180deg, rgba(255, 247, 233, 0.065), rgba(255, 247, 233, 0.026)),
+    #101625;
+}
+
+html[data-theme="dark"] .rf-intake-card:hover,
+html[data-theme="dark"] .rf-intake-card:focus-within {
+  border-color: rgba(222, 162, 79, 0.36);
+  box-shadow:
+    0 28px 58px -42px rgba(0, 0, 0, 0.96),
+    inset 0 1px 0 rgba(255, 247, 233, 0.075);
+}
+
+html[data-theme="dark"] .rf-intake-grid .rf-file-drop,
+html[data-theme="dark"] .rf-intake-grid .rf-target-segment,
+html[data-theme="dark"] .rf-intake-grid .mode-segment,
+html[data-theme="dark"] .rf-intake-grid .rf-target-editor textarea,
+html[data-theme="dark"] .rf-intake-grid .rf-target-editor input,
+html[data-theme="dark"] .rf-intake-grid .rf-run-controls input {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.075),
+    0 18px 36px -34px rgba(0, 0, 0, 0.88);
+}
+
+html[data-theme="dark"] .rf-preview-wrap {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(137, 209, 190, 0.08), transparent 14rem),
+    linear-gradient(180deg, rgba(15, 20, 35, 0.84), rgba(10, 14, 28, 0.88));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 247, 233, 0.05),
+    0 22px 48px -38px rgba(0, 0, 0, 0.88);
+}
+
+html[data-theme="dark"] .suggestion,
+html[data-theme="dark"] .ats-item,
+html[data-theme="dark"] .generated-card {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(222, 162, 79, 0.13), transparent 10rem),
+    linear-gradient(180deg, rgba(255, 247, 233, 0.056), rgba(255, 247, 233, 0.024)),
+    rgba(25, 31, 52, 0.9);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.07),
+    0 18px 38px -34px rgba(0, 0, 0, 0.88);
+}
+
+html[data-theme="dark"] .suggestion:hover,
+html[data-theme="dark"] .suggestion:focus-within,
+html[data-theme="dark"] .ats-item:hover,
+html[data-theme="dark"] .generated-card:hover,
+html[data-theme="dark"] .generated-card:focus-within {
+  border-color: rgba(222, 162, 79, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.08),
+    0 26px 54px -40px rgba(0, 0, 0, 0.92);
+}
+
+html[data-theme="dark"] .suggestion-after,
+html[data-theme="dark"] .studio-evidence-list span,
+html[data-theme="dark"] .generated-body,
+html[data-theme="dark"] .empty-state,
+html[data-theme="dark"] .warning-list span,
+html[data-theme="dark"] .generated-action-note,
+html[data-theme="dark"] .copy-state {
+  background-image:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.04), transparent 64%),
+    radial-gradient(circle at 100% 0%, rgba(222, 162, 79, 0.08), transparent 10rem);
+  box-shadow: inset 0 1px 0 rgba(255, 247, 233, 0.065);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rf-intake-card,
+  .rf-file-drop,
+  .rf-target-editor,
+  .rf-run-controls,
+  .rf-preview-wrap,
+  .suggestion,
+  .ats-item,
+  .generated-card,
+  .rf-intake-card::after,
+  .rf-file-drop::before,
+  .rf-target-editor::before,
+  .rf-run-controls::before,
+  .rf-preview-wrap::before,
+  .suggestion::before,
+  .suggestion::after,
+  .ats-item::before,
+  .ats-item::after,
+  .generated-card::before,
+  .generated-card::after {
+    transition: none;
+  }
+
+  .rf-intake-card:hover,
+  .rf-intake-card:focus-within,
+  .suggestion:hover,
+  .suggestion:focus-within,
+  .ats-item:hover,
+  .generated-card:hover,
+  .generated-card:focus-within {
+    transform: none;
+  }
+}
+
 html[data-theme="dark"] .studio-account-button {
   background: linear-gradient(145deg, #d09343, #a7652d);
   color: #fffdf8;
