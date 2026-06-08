@@ -22048,3 +22048,323 @@ html[data-theme="dark"] .nav {
     display: none;
   }
 }
+
+/* Product surface polish: protected workspace, settings, and admin support. */
+.rf-studio-hero,
+.rf-preflight-panel,
+.export-readiness-panel,
+.rf-recovery-card,
+.settings-account-overview,
+.settings-activity-panel,
+.settings-account-health,
+.settings-plan-access,
+.settings-plan-active-card,
+.settings-plan-info-item,
+.settings-billing-timeline-item,
+.admin-support-playbook,
+.admin-support-card,
+.admin-support-empty,
+.admin-support-readiness-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.rf-studio-hero::after,
+.rf-preflight-panel::after,
+.export-readiness-panel::after,
+.settings-account-overview::after,
+.settings-activity-panel::after,
+.settings-account-health::after,
+.settings-plan-access::after,
+.admin-support-playbook::after,
+.admin-support-card::after {
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    linear-gradient(126deg, rgba(255, 255, 255, 0.3), transparent 28%, transparent 72%, rgba(255, 255, 255, 0.16)),
+    radial-gradient(circle at 92% 8%, color-mix(in srgb, var(--accent-soft) 44%, transparent), transparent 14rem);
+  content: "";
+  opacity: 0.76;
+}
+
+.rf-preflight-panel,
+.export-readiness-panel,
+.rf-recovery-card,
+.settings-account-overview,
+.settings-activity-panel,
+.settings-account-health,
+.settings-plan-access,
+.settings-plan-active-card,
+.admin-support-playbook,
+.admin-support-card,
+.admin-support-empty {
+  box-shadow:
+    0 24px 70px -54px var(--shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.rf-preflight-item,
+.export-readiness-item,
+.settings-activity-item,
+.settings-account-health-card,
+.settings-plan-access-item,
+.settings-plan-info-item,
+.settings-billing-timeline-item,
+.admin-support-readiness-card,
+.admin-support-filter a,
+.admin-support-action,
+.admin-support-meta div {
+  position: relative;
+  overflow: hidden;
+}
+
+.rf-preflight-item::after,
+.export-readiness-item::after,
+.settings-activity-item::after,
+.settings-account-health-card::after,
+.settings-plan-access-item::after,
+.settings-plan-info-item::after,
+.settings-billing-timeline-item::after,
+.admin-support-readiness-card::after,
+.admin-support-filter a::after,
+.admin-support-action::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 0 28%, rgba(255, 255, 255, 0.46) 45%, transparent 62% 100%);
+  content: "";
+  opacity: 0;
+  transform: translateX(-55%);
+  transition: opacity 180ms ease, transform 520ms ease;
+}
+
+.rf-preflight-item:hover::after,
+.rf-preflight-item:focus-visible::after,
+.export-readiness-item:hover::after,
+.export-readiness-item:focus-visible::after,
+.settings-activity-item:hover::after,
+.settings-activity-item:focus-visible::after,
+.settings-account-health-card:hover::after,
+.settings-account-health-card:focus-visible::after,
+.settings-plan-access-item:hover::after,
+.settings-plan-info-item:hover::after,
+.settings-billing-timeline-item:hover::after,
+.admin-support-readiness-card:hover::after,
+.admin-support-filter a:hover::after,
+.admin-support-filter a:focus-visible::after,
+.admin-support-action:hover::after,
+.admin-support-action:focus-visible::after {
+  opacity: 0.7;
+  transform: translateX(62%);
+}
+
+.rf-studio-stat {
+  position: relative;
+  overflow: hidden;
+}
+
+.rf-studio-stat::after {
+  position: absolute;
+  inset: auto 14px 0;
+  height: 3px;
+  border-radius: 999px 999px 0 0;
+  background: linear-gradient(90deg, var(--accent), var(--sky), var(--good));
+  content: "";
+  opacity: 0.52;
+}
+
+.rf-studio-stat-fill {
+  background-size: 160% 100%;
+  box-shadow: 0 0 18px color-mix(in srgb, currentColor 30%, transparent);
+}
+
+.rf-preflight-score,
+.admin-support-status,
+.settings-activity-action,
+.settings-account-health-action {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    0 12px 28px -24px var(--shadow);
+}
+
+.admin-support-card {
+  transform: translateZ(0);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.admin-support-card::before {
+  position: absolute;
+  inset-block: 18px;
+  inset-inline-start: -1px;
+  width: 4px;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(180deg, var(--accent), var(--sky));
+  content: "";
+  opacity: 0.68;
+}
+
+.admin-support-card:has(.admin-support-status.closed)::before {
+  background: linear-gradient(180deg, var(--good), var(--sky));
+}
+
+.admin-support-card:hover,
+.admin-support-card:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+  box-shadow:
+    0 30px 86px -58px var(--shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.admin-support-reply-form textarea:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 44%, var(--line));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-soft) 48%, transparent);
+  outline: none;
+}
+
+.admin-support-playbook li {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
+  transition: border-color 180ms ease, transform 180ms ease;
+}
+
+.admin-support-playbook li:hover {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+  transform: translateY(-1px);
+}
+
+.settings-account-overview,
+.settings-activity-panel,
+.settings-account-health {
+  background:
+    radial-gradient(circle at 92% 12%, color-mix(in srgb, var(--sky-soft) 34%, transparent), transparent 13rem),
+    linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 44%, transparent), transparent 55%),
+    color-mix(in srgb, var(--surface) 91%, var(--surface-2));
+}
+
+.settings-overview-status a,
+.settings-overview-actions a,
+.settings-account-health-action,
+.settings-activity-action {
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.settings-overview-actions a:hover,
+.settings-overview-actions a:focus-visible,
+.settings-account-health-action:hover,
+.settings-account-health-action:focus-visible,
+.settings-activity-action:hover,
+.settings-activity-action:focus-visible {
+  box-shadow: 0 13px 28px -24px var(--shadow);
+  transform: translateY(-1px);
+}
+
+.settings-plan-active-card::after {
+  flex: 0 0 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--good), var(--sky), var(--accent));
+  content: "";
+  opacity: 0.54;
+}
+
+.settings-plan-access-item,
+.settings-plan-info-item,
+.settings-billing-timeline-item {
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.settings-plan-access-item:hover,
+.settings-plan-info-item:hover,
+.settings-billing-timeline-item:hover {
+  border-color: color-mix(in srgb, var(--accent) 36%, var(--line));
+  box-shadow: 0 16px 34px -28px var(--shadow);
+  transform: translateY(-1px);
+}
+
+html[data-theme="dark"] .rf-studio-hero::after,
+html[data-theme="dark"] .rf-preflight-panel::after,
+html[data-theme="dark"] .export-readiness-panel::after,
+html[data-theme="dark"] .settings-account-overview::after,
+html[data-theme="dark"] .settings-activity-panel::after,
+html[data-theme="dark"] .settings-account-health::after,
+html[data-theme="dark"] .settings-plan-access::after,
+html[data-theme="dark"] .admin-support-playbook::after,
+html[data-theme="dark"] .admin-support-card::after {
+  background:
+    linear-gradient(126deg, rgba(255, 247, 233, 0.08), transparent 30%, transparent 74%, rgba(245, 214, 154, 0.08)),
+    radial-gradient(circle at 92% 8%, rgba(222, 162, 79, 0.14), transparent 14rem);
+  opacity: 0.9;
+}
+
+html[data-theme="dark"] .rf-preflight-item::after,
+html[data-theme="dark"] .export-readiness-item::after,
+html[data-theme="dark"] .settings-activity-item::after,
+html[data-theme="dark"] .settings-account-health-card::after,
+html[data-theme="dark"] .settings-plan-access-item::after,
+html[data-theme="dark"] .settings-plan-info-item::after,
+html[data-theme="dark"] .settings-billing-timeline-item::after,
+html[data-theme="dark"] .admin-support-readiness-card::after,
+html[data-theme="dark"] .admin-support-filter a::after,
+html[data-theme="dark"] .admin-support-action::after {
+  background: linear-gradient(110deg, transparent 0 30%, rgba(255, 247, 233, 0.12) 48%, transparent 66% 100%);
+}
+
+html[data-theme="dark"] .rf-preflight-panel,
+html[data-theme="dark"] .export-readiness-panel,
+html[data-theme="dark"] .rf-recovery-card,
+html[data-theme="dark"] .settings-account-overview,
+html[data-theme="dark"] .settings-activity-panel,
+html[data-theme="dark"] .settings-account-health,
+html[data-theme="dark"] .settings-plan-access,
+html[data-theme="dark"] .settings-plan-active-card,
+html[data-theme="dark"] .admin-support-playbook,
+html[data-theme="dark"] .admin-support-card,
+html[data-theme="dark"] .admin-support-empty {
+  box-shadow:
+    0 28px 76px -54px rgba(0, 0, 0, 0.96),
+    inset 0 1px 0 rgba(255, 247, 233, 0.08);
+}
+
+html[data-theme="dark"] .admin-support-card:hover,
+html[data-theme="dark"] .admin-support-card:focus-within {
+  box-shadow:
+    0 34px 86px -58px rgba(0, 0, 0, 0.98),
+    inset 0 1px 0 rgba(255, 247, 233, 0.11);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rf-studio-stat-fill {
+    animation: rf-status-flow 9s ease-in-out infinite;
+  }
+}
+
+@keyframes rf-status-flow {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rf-preflight-item::after,
+  .export-readiness-item::after,
+  .settings-activity-item::after,
+  .settings-account-health-card::after,
+  .settings-plan-access-item::after,
+  .settings-plan-info-item::after,
+  .settings-billing-timeline-item::after,
+  .admin-support-readiness-card::after,
+  .admin-support-filter a::after,
+  .admin-support-action::after,
+  .rf-studio-stat-fill {
+    animation: none;
+    transition: none;
+  }
+}
