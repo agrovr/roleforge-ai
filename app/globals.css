@@ -23275,6 +23275,196 @@ html[data-theme="dark"] .support-reference-copy {
   }
 }
 
+/* Landing pricing polish: calmer plan status, premium depth, and billing clarity. */
+.pricing-grid.two {
+  --landing-pricing-rail: linear-gradient(90deg, var(--brand), var(--accent), var(--sky));
+  --landing-pricing-wash: linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 76%, transparent));
+  align-items: stretch;
+}
+
+.pricing-grid.two .price-card,
+.pricing-clarity-grid a {
+  position: relative;
+  isolation: isolate;
+}
+
+.pricing-grid.two .price-card {
+  border-color: color-mix(in srgb, var(--brand) 18%, var(--line));
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--line) 24%, transparent) 1px, transparent 1px),
+    var(--landing-pricing-wash),
+    var(--surface);
+  background-size: 32px 32px, auto, auto;
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 60%, transparent) inset,
+    0 28px 70px -52px color-mix(in srgb, var(--ink-0) 52%, transparent);
+}
+
+.pricing-grid.two .price-card::after {
+  position: absolute;
+  inset-inline: 24px;
+  inset-block-start: 0;
+  height: 3px;
+  border-radius: 0 0 999px 999px;
+  background: var(--landing-pricing-rail);
+  content: "";
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.pricing-grid.two .price-card.featured {
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--ink-0));
+  background:
+    linear-gradient(90deg, rgba(255, 247, 233, 0.045) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(255, 247, 233, 0.065), transparent 46%),
+    linear-gradient(160deg, #10142d, #0b1028 56%, #1f1c2a);
+  background-size: 34px 34px, auto, auto;
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.11) inset,
+    0 34px 88px -58px rgba(8, 12, 24, 0.86);
+}
+
+.pricing-grid.two .price-card:hover::after,
+.pricing-grid.two .price-card:focus-within::after {
+  opacity: 0.9;
+}
+
+.price-card-top {
+  padding-bottom: 2px;
+}
+
+.price-status.current {
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--line));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 82%, var(--accent-soft)), color-mix(in srgb, var(--surface-warm) 86%, transparent));
+  color: color-mix(in srgb, var(--ink-0) 72%, var(--brand-dark));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 58%, transparent),
+    0 12px 24px -22px color-mix(in srgb, var(--accent) 42%, transparent);
+}
+
+.price-card.featured .price-status.current {
+  border-color: rgba(245, 214, 154, 0.34);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.105), rgba(255, 247, 233, 0.045)),
+    rgba(255, 247, 233, 0.035);
+  color: #f5d69a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.08),
+    0 12px 28px -24px rgba(0, 0, 0, 0.78);
+  text-shadow: none;
+}
+
+.price-card.featured .price-status.current::before {
+  background: #f5d69a;
+  box-shadow: 0 0 0 3px rgba(245, 214, 154, 0.12);
+}
+
+.pricing-grid.two .price-card .price-list li {
+  align-items: flex-start;
+  padding: 2px 0;
+}
+
+.pricing-grid.two .price-card .price-list li svg {
+  color: var(--good);
+}
+
+.pricing-grid.two .price-card.featured .price-list li svg {
+  color: #a6efb8;
+}
+
+.pricing-clarity-grid a {
+  border-color: color-mix(in srgb, var(--brand) 18%, var(--line));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-warm) 72%, transparent)),
+    var(--surface);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 54%, transparent) inset,
+    0 18px 44px -38px color-mix(in srgb, var(--ink-0) 38%, transparent);
+}
+
+.pricing-clarity-grid a::after {
+  position: absolute;
+  inset-block: 12px;
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: var(--landing-pricing-rail);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 170ms ease;
+}
+
+.pricing-clarity-grid a:hover::after,
+.pricing-clarity-grid a:focus-visible::after {
+  opacity: 0.72;
+}
+
+html[data-theme="dark"] .pricing-grid.two {
+  --landing-pricing-rail: linear-gradient(90deg, #89d1be, #f3c16d, #8eb7f0);
+  --landing-pricing-wash: linear-gradient(135deg, rgba(255, 247, 233, 0.06), rgba(255, 247, 233, 0.022));
+}
+
+html[data-theme="dark"] .pricing-grid.two .price-card,
+html[data-theme="dark"] .pricing-clarity-grid a {
+  border-color: rgba(255, 247, 233, 0.14);
+  background:
+    linear-gradient(90deg, rgba(255, 247, 233, 0.04) 1px, transparent 1px),
+    var(--landing-pricing-wash),
+    rgba(16, 22, 37, 0.86);
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.08) inset,
+    0 26px 64px -44px rgba(0, 0, 0, 0.92);
+}
+
+html[data-theme="dark"] .pricing-grid.two .price-card.featured {
+  border-color: rgba(245, 214, 154, 0.24);
+  background:
+    linear-gradient(90deg, rgba(255, 247, 233, 0.05) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(245, 214, 154, 0.09), transparent 48%),
+    linear-gradient(160deg, #11162f, #0b1028 58%, #211d2c);
+}
+
+html[data-theme="dark"] .price-card.featured .price-status.current {
+  border-color: rgba(245, 214, 154, 0.36);
+  background:
+    linear-gradient(180deg, rgba(245, 214, 154, 0.12), rgba(245, 214, 154, 0.052)),
+    rgba(255, 247, 233, 0.03);
+  color: #f5d69a;
+  text-shadow: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pricing-grid.two .price-card {
+    animation: landing-pricing-card-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .pricing-grid.two .price-card.featured {
+    animation-delay: 80ms;
+  }
+}
+
+@keyframes landing-pricing-card-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pricing-grid.two .price-card,
+  .pricing-grid.two .price-card::after,
+  .pricing-clarity-grid a,
+  .pricing-clarity-grid a::after {
+    animation: none;
+    transition: none;
+  }
+}
+
 /* Interaction finish: consistent focus, tactile controls, and navigable anchors. */
 :where(a, button, summary, input, textarea, select, [role="button"], [tabindex]):focus-visible {
   outline: 3px solid color-mix(in srgb, var(--brand) 30%, transparent);
