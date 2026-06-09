@@ -9629,6 +9629,7 @@ html[data-theme="dark"] input::file-selector-button {
   margin: 0 auto;
   padding: 18px;
   overflow: hidden;
+  counter-reset: help-route;
   border: 1px solid color-mix(in srgb, var(--brand) 20%, var(--line));
   border-radius: 14px;
   background:
@@ -9904,6 +9905,7 @@ html[data-theme="dark"] input::file-selector-button {
   border: 1px solid color-mix(in srgb, var(--brand) 16%, var(--line));
   border-radius: 14px;
   background: color-mix(in srgb, var(--surface) 88%, var(--bg-alt));
+  counter-increment: help-route;
 }
 
 .help-action-card > span {
@@ -9988,9 +9990,9 @@ html[data-theme="dark"] input::file-selector-button {
 
 .help-search-card {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) max-content;
+  grid-template-columns: minmax(190px, 0.42fr) minmax(0, 1fr) max-content;
   gap: 12px;
-  align-items: end;
+  align-items: center;
   min-width: 0;
   padding: 16px;
   border: 1px solid color-mix(in srgb, var(--brand) 20%, var(--line));
@@ -9999,6 +10001,51 @@ html[data-theme="dark"] input::file-selector-button {
     linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 36%, transparent), transparent),
     color-mix(in srgb, var(--surface) 90%, var(--bg-alt));
   box-shadow: 0 20px 52px -42px var(--shadow);
+}
+
+.help-search-intro {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.help-search-intro > span {
+  display: inline-grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--brand) 26%, var(--line));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--brand-soft) 56%, var(--surface));
+  color: var(--brand-dark);
+}
+
+.help-search-intro div,
+.help-search-intro strong,
+.help-search-intro small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.help-search-intro strong {
+  display: block;
+  color: var(--ink-0);
+  font-size: 0.94rem;
+  font-weight: 950;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.help-search-intro small {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink-3);
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1.24;
+  text-wrap: pretty;
 }
 
 .help-search-field {
@@ -25908,6 +25955,189 @@ html[data-theme="dark"] .template-thumb::before {
   .templates-page-card:focus-within .template-thumb .r-doc,
   .templates-hero-preview:hover,
   .templates-hero-preview:focus-within {
+    transform: none;
+  }
+}
+
+/* Help center polish: search command surface and route-card wayfinding. */
+.help-shell {
+  --help-center-rail: linear-gradient(180deg, var(--sky), var(--brand), var(--accent));
+  --help-center-glass: linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 72%, transparent));
+}
+
+.help-action-routes,
+.help-search-card,
+.help-action-card,
+.help-quick-link,
+.help-search-empty {
+  position: relative;
+  isolation: isolate;
+}
+
+.help-action-routes,
+.help-search-card,
+.help-search-empty {
+  background:
+    radial-gradient(circle at 96% 0%, color-mix(in srgb, var(--sky-soft) 30%, transparent), transparent 16rem),
+    var(--help-center-glass),
+    var(--surface);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 58%, transparent) inset,
+    0 24px 60px -44px color-mix(in srgb, var(--ink-0) 46%, transparent);
+}
+
+.help-action-routes::before,
+.help-search-card::before,
+.help-search-empty::before {
+  position: absolute;
+  inset-inline: 18px;
+  inset-block-start: 0;
+  height: 1px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, #fff 68%, transparent), transparent);
+  content: "";
+  opacity: 0.76;
+  pointer-events: none;
+}
+
+.help-action-card,
+.help-quick-link,
+.help-signal-card {
+  background:
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--brand-soft) 24%, transparent), transparent 10rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 72%, transparent));
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 54%, transparent) inset,
+    0 20px 50px -42px color-mix(in srgb, var(--ink-0) 42%, transparent);
+}
+
+.help-action-card::after,
+.help-quick-link::after,
+.help-signal-card::after {
+  position: absolute;
+  inset-block: 12px;
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: var(--help-center-rail);
+  content: "";
+  opacity: 0.44;
+  transition: opacity 180ms ease, transform 220ms ease;
+  transform: scaleY(0.66);
+  transform-origin: top;
+  pointer-events: none;
+}
+
+.help-action-card:hover::after,
+.help-action-card:focus-within::after,
+.help-quick-link:hover::after,
+.help-quick-link:focus-visible::after,
+.help-signal-card:hover::after {
+  opacity: 0.88;
+  transform: scaleY(1);
+}
+
+.help-action-card > span,
+.help-quick-link > span,
+.help-signal-card > span,
+.help-search-intro > span {
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 58%, transparent) inset,
+    0 14px 26px -22px color-mix(in srgb, var(--ink-0) 58%, transparent);
+}
+
+.help-action-card strong::before {
+  content: counter(help-route, decimal-leading-zero) " / ";
+  color: color-mix(in srgb, var(--brand-dark) 72%, var(--ink-3));
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.help-search-card {
+  overflow: hidden;
+}
+
+.help-search-field input {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 72%, transparent),
+    0 12px 28px -24px color-mix(in srgb, var(--brand) 42%, transparent);
+  transition: border-color 170ms ease, box-shadow 170ms ease, background 170ms ease;
+}
+
+.help-search-meta {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 52%, transparent),
+    0 12px 26px -22px color-mix(in srgb, var(--sky) 44%, transparent);
+}
+
+html[data-theme="dark"] .help-shell {
+  --help-center-rail: linear-gradient(180deg, #8eb7f0, #8fdac8, #f3c16d);
+  --help-center-glass: linear-gradient(135deg, rgba(255, 247, 233, 0.06), rgba(255, 247, 233, 0.022));
+}
+
+html[data-theme="dark"] .help-action-routes,
+html[data-theme="dark"] .help-search-card,
+html[data-theme="dark"] .help-search-empty {
+  background:
+    radial-gradient(circle at 96% 0%, rgba(142, 183, 240, 0.1), transparent 16rem),
+    var(--help-center-glass),
+    rgba(12, 17, 31, 0.82);
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.08) inset,
+    0 26px 62px -44px rgba(0, 0, 0, 0.9);
+}
+
+html[data-theme="dark"] .help-action-card,
+html[data-theme="dark"] .help-quick-link,
+html[data-theme="dark"] .help-signal-card {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(243, 193, 109, 0.1), transparent 10rem),
+    linear-gradient(180deg, rgba(255, 247, 233, 0.052), rgba(255, 247, 233, 0.022)),
+    rgba(17, 23, 41, 0.86);
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.07) inset,
+    0 22px 50px -38px rgba(0, 0, 0, 0.84);
+}
+
+html[data-theme="dark"] .help-search-intro > span {
+  border-color: rgba(243, 193, 109, 0.28);
+  background: rgba(243, 193, 109, 0.14);
+  color: #f3c16d;
+}
+
+html[data-theme="dark"] .help-search-intro strong {
+  color: var(--ink-0);
+}
+
+html[data-theme="dark"] .help-search-intro small {
+  color: var(--ink-3);
+}
+
+html[data-theme="dark"] .help-action-card strong::before {
+  color: #f3c16d;
+}
+
+@media (max-width: 900px) {
+  .help-search-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .help-action-card::after,
+  .help-quick-link::after,
+  .help-signal-card::after,
+  .help-search-field input {
+    transition: none;
+  }
+
+  .help-action-card:hover::after,
+  .help-action-card:focus-within::after,
+  .help-quick-link:hover::after,
+  .help-quick-link:focus-visible::after,
+  .help-signal-card:hover::after {
     transform: none;
   }
 }

@@ -50,6 +50,13 @@ export function HelpSearch({ quickLinks, helpSections }: HelpSearchProps) {
   return (
     <section className="help-search-shell" aria-label="Search RoleForge help">
       <div className="help-search-card">
+        <div className="help-search-intro">
+          <span aria-hidden="true"><RoleForgeIcon name="scan" size={16} /></span>
+          <div>
+            <strong>Find the right route</strong>
+            <small>Search topics, pages, and support paths.</small>
+          </div>
+        </div>
         <label className="help-search-field">
           <span>Search help</span>
           <input

@@ -12,6 +12,9 @@ test("help center has client-side search over topics and actions", () => {
   assert.match(helpPage, /helpSections=\{helpSections\}/);
   assert.match(helpSearch, /"use client"/);
   assert.match(helpSearch, /type="search"/);
+  assert.match(helpSearch, /className="help-search-intro"/);
+  assert.match(helpSearch, /Find the right route/);
+  assert.match(helpSearch, /Search topics, pages, and support paths/);
   assert.match(helpSearch, /Search billing, exports, saved projects, account/);
   assert.match(helpSearch, /normalizedQuery/);
   assert.match(helpSearch, /matchingLinks/);
@@ -41,11 +44,12 @@ test("help search keeps existing topics and quick actions searchable", () => {
 
 test("help search layout is responsive and overflow safe", () => {
   assert.match(stylesheet, /\.help-search-shell\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
-  assert.match(stylesheet, /\.help-search-card\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+max-content)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.help-search-card\s*\{(?=[^}]*grid-template-columns:\s*minmax\(190px,\s*0\.42fr\)\s+minmax\(0,\s*1fr\)\s+max-content)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.help-search-intro\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*42px\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.help-search-field\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.help-search-field\s+input\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
   assert.match(stylesheet, /\.help-search-meta\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*min-width:\s*0)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
   assert.match(stylesheet, /\.help-search-empty\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)[^}]*\}/s);
-  assert.match(stylesheet, /@media\s*\(max-width:\s*620px\)\s*\{[\s\S]*\.help-search-card\s*\{(?=[^}]*grid-template-columns:\s*1fr)[^}]*\}/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*\.help-search-card\s*\{(?=[^}]*grid-template-columns:\s*1fr)[^}]*\}/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.help-search-card/);
 });

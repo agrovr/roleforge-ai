@@ -79,15 +79,18 @@ test("help page is discoverable from public navigation and crawler metadata", ()
 
 test("help quick links are compact and overflow-safe", () => {
   assert.match(stylesheet, /\.help-action-routes\s*\{(?=[^}]*display:\s*grid)(?=[^}]*overflow:\s*hidden)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.help-action-routes\s*\{(?=[^}]*counter-reset:\s*help-route)[^}]*\}/s);
   assert.match(stylesheet, /\.help-signal-strip,\s*\.updates-signal-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\))[^}]*\}/s);
   assert.match(stylesheet, /\.help-signal-card,\s*\.updates-signal-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\))[^}]*\}/s);
   assert.match(stylesheet, /\.help-action-head\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0\.9fr\)\s+minmax\(260px,\s*0\.72fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.help-action-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(min\(100%,\s*220px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.help-action-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\))(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
+  assert.match(stylesheet, /\.help-action-card\s*\{(?=[^}]*counter-increment:\s*help-route)[^}]*\}/s);
   assert.match(stylesheet, /\.help-action-card\s+strong,\s*\.help-action-card\s+p,\s*\.help-action-card\s+small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
   assert.match(stylesheet, /\.help-action-buttons\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.help-action-buttons\s+\.btn\s*\{(?=[^}]*width:\s*100%)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /\.help-search-card\s*\{/);
+  assert.match(stylesheet, /\.help-search-intro\s*\{/);
   assert.match(stylesheet, /\.help-search-field\s+input\s*\{/);
   assert.match(stylesheet, /\.help-quick-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*220px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.help-quick-link\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
@@ -97,4 +100,15 @@ test("help quick links are compact and overflow-safe", () => {
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.help-action-routes/);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.help-action-card/);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.help-quick-link/);
+});
+
+test("help center polish adds route rails and accessible motion fallbacks", () => {
+  assert.match(stylesheet, /\/\* Help center polish: search command surface and route-card wayfinding\. \*\//);
+  assert.match(stylesheet, /\.help-shell\s*\{(?=[^}]*--help-center-rail:\s*linear-gradient\(180deg,\s*var\(--sky\),\s*var\(--brand\),\s*var\(--accent\)\))(?=[^}]*--help-center-glass:)[^}]*\}/s);
+  assert.match(stylesheet, /\.help-action-card::after,\s*\.help-quick-link::after,\s*\.help-signal-card::after\s*\{(?=[^}]*background:\s*var\(--help-center-rail\))(?=[^}]*transform:\s*scaleY\(0\.66\))[^}]*\}/s);
+  assert.match(stylesheet, /\.help-action-card:hover::after,\s*\.help-action-card:focus-within::after,\s*\.help-quick-link:hover::after,\s*\.help-quick-link:focus-visible::after,\s*\.help-signal-card:hover::after\s*\{(?=[^}]*opacity:\s*0\.88)(?=[^}]*transform:\s*scaleY\(1\))[^}]*\}/s);
+  assert.match(stylesheet, /\.help-action-card\s+strong::before\s*\{(?=[^}]*counter\(help-route,\s*decimal-leading-zero\))(?=[^}]*font-family:\s*var\(--font-mono\))[^}]*\}/s);
+  assert.match(stylesheet, /\.help-search-field\s+input\s*\{(?=[^}]*transition:\s*border-color 170ms ease,\s*box-shadow 170ms ease,\s*background 170ms ease)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.help-shell\s*\{(?=[^}]*--help-center-rail:\s*linear-gradient\(180deg,\s*#8eb7f0,\s*#8fdac8,\s*#f3c16d\))[^}]*\}/s);
+  assert.match(stylesheet, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.help-action-card::after,[\s\S]*?\.help-search-field input\s*\{[^}]*transition:\s*none;[\s\S]*?\.help-action-card:hover::after,[\s\S]*?\.help-signal-card:hover::after\s*\{[^}]*transform:\s*none;[\s\S]*?\}/s);
 });
