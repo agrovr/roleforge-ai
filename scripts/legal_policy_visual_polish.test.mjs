@@ -31,5 +31,5 @@ test("legal summary and footer have policy-center structure across themes", () =
 
   assert.match(globals, /html\[data-theme="dark"\]\s+\.legal-summary-strip,\s*html\[data-theme="dark"\]\s+\.legal-card,\s*html\[data-theme="dark"\]\s+\.legal-footer-card\s*\{(?=[^}]*rgba\(255,\s*247,\s*233,\s*0\.16\))[^}]*\}/s);
   assert.match(globals, /html\[data-theme="dark"\]\s+\.legal-card\s+h2::before\s*\{(?=[^}]*rgba\(221,\s*160,\s*74,\s*0\.24\))(?=[^}]*color:\s*var\(--brand-dark\))[^}]*\}/s);
-  assert.match(globals, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.legal-card:focus-within,[\s\S]*?\.legal-footer-card:focus-within\s*\{[^}]*transform:\s*none/s);
+  assert.match(globals, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.legal-card:focus-within,[\s\S]*?\.legal-footer-card:focus-within,[\s\S]*?\{[^}]*transform:\s*none/s);
 });

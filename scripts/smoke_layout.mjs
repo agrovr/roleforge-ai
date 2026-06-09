@@ -344,6 +344,28 @@ const PAGE_CHECKS = [
     ],
   },
   {
+    path: "/missing-layout-smoke",
+    name: "not-found",
+    selectors: [".not-found-shell", ".legal-topbar", ".not-found-hero", ".not-found-docket", ".not-found-recovery", ".not-found-recovery-card"],
+    textFitSelectors: [
+      ".not-found-copy h1",
+      ".not-found-copy p",
+      ".not-found-actions .btn",
+      ".not-found-code",
+      ".not-found-docket-footer span",
+      ".not-found-docket-footer strong",
+      ".not-found-recovery-card strong",
+      ".not-found-recovery-card small",
+    ],
+    containedSelectors: [
+      { container: ".not-found-shell", selector: ".not-found-hero", tolerance: 4 },
+      { container: ".not-found-shell", selector: ".not-found-recovery", tolerance: 4 },
+      { container: ".not-found-docket", selector: ".not-found-code", tolerance: 4 },
+      { container: "closest:.not-found-recovery-card", selector: ".not-found-recovery-card strong", tolerance: 4 },
+      { container: "closest:.not-found-recovery-card", selector: ".not-found-recovery-card small", tolerance: 4 },
+    ],
+  },
+  {
     path: "/app",
     name: "signed-in studio",
     requiresAuth: true,
