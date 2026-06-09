@@ -9185,21 +9185,21 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .legal-topbar {
-  width: min(1280px, 100%);
+  width: min(1220px, 100%);
   max-width: 100%;
   margin-inline: auto;
-  min-height: 70px;
-  padding: 6px 6px 6px 10px;
-  border: 1px solid color-mix(in srgb, var(--surface) 76%, var(--line));
-  border-radius: 28px;
+  min-height: 62px;
+  padding: 6px 8px 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--surface) 70%, var(--line));
+  border-radius: 18px;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--surface) 91%, transparent), color-mix(in srgb, var(--surface-warm) 72%, transparent)),
-    linear-gradient(90deg, color-mix(in srgb, var(--brand-soft) 18%, transparent), transparent 38%, color-mix(in srgb, var(--accent-soft) 22%, transparent));
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 84%, transparent)),
+    linear-gradient(90deg, color-mix(in srgb, var(--brand-soft) 12%, transparent), transparent 36%, color-mix(in srgb, var(--accent-soft) 16%, transparent));
   box-shadow:
     0 1px 0 color-mix(in srgb, #fff 62%, transparent) inset,
-    0 24px 70px -52px color-mix(in srgb, var(--ink-0) 44%, transparent);
-  backdrop-filter: blur(18px) saturate(1.08);
-  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+    0 16px 48px -40px color-mix(in srgb, var(--ink-0) 42%, transparent);
+  backdrop-filter: blur(16px) saturate(1.05);
+  -webkit-backdrop-filter: blur(16px) saturate(1.05);
   isolation: isolate;
   overflow: clip;
 }
@@ -9216,6 +9216,18 @@ html[data-theme="dark"] input::file-selector-button {
   pointer-events: none;
 }
 
+.legal-topbar::after {
+  content: "";
+  position: absolute;
+  inset-inline: 18px;
+  inset-block-end: 0;
+  height: 1px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 20%, transparent), transparent);
+  opacity: 0.68;
+  pointer-events: none;
+}
+
 .legal-topbar .brand,
 .legal-topbar .settings-page-actions {
   border: 0;
@@ -9226,10 +9238,10 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .legal-topbar .brand {
-  min-height: 54px;
+  min-height: 48px;
   max-width: min(100%, 360px);
-  padding: 7px 15px 7px 9px;
-  border-radius: 22px;
+  padding: 5px 14px 5px 7px;
+  border-radius: 14px;
   transition: background 170ms ease, transform 170ms ease;
 }
 
@@ -9239,9 +9251,11 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .legal-topbar .settings-page-actions {
-  min-height: 54px;
+  min-height: 48px;
   padding: 0;
-  border-radius: 22px;
+  padding-left: 12px;
+  border-left: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  border-radius: 14px;
   gap: 8px;
 }
 
@@ -9252,6 +9266,16 @@ html[data-theme="dark"] input::file-selector-button {
 .legal-topbar .settings-page-actions .public-account-menu,
 .legal-topbar .settings-page-actions .public-topbar-avatar {
   box-shadow: none;
+}
+
+.legal-topbar .settings-page-actions .btn,
+.legal-topbar .settings-page-actions .theme-toggle,
+.legal-topbar .settings-page-actions .public-account-loading,
+.legal-topbar .settings-page-actions .public-account-signin,
+.legal-topbar .settings-page-actions .public-account-menu,
+.legal-topbar .settings-page-actions .public-topbar-avatar {
+  min-height: 42px;
+  border-radius: 14px;
 }
 
 .legal-hero,
@@ -11469,7 +11493,7 @@ html[data-theme="dark"] input::file-selector-button {
     width: 100%;
     min-height: 0;
     padding: 8px;
-    border-radius: 26px;
+    border-radius: 18px;
     overflow: clip;
   }
 
@@ -11477,7 +11501,7 @@ html[data-theme="dark"] input::file-selector-button {
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    border-radius: 20px;
+    border-radius: 14px;
     background: color-mix(in srgb, var(--surface) 48%, transparent);
   }
 
@@ -11488,7 +11512,11 @@ html[data-theme="dark"] input::file-selector-button {
     justify-content: stretch;
     width: 100%;
     gap: 8px;
-    border-radius: 20px;
+    padding-left: 0;
+    padding-top: 8px;
+    border-left: 0;
+    border-top: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+    border-radius: 14px;
   }
 
   .legal-topbar .settings-page-actions .btn,
@@ -18682,13 +18710,13 @@ html[data-theme="dark"] .settings-project-stage-controls button:focus-visible {
 }
 
 html[data-theme="dark"] .legal-topbar {
-  border-color: rgba(255, 247, 233, 0.14);
+  border-color: rgba(255, 247, 233, 0.16);
   background:
-    linear-gradient(135deg, rgba(25, 31, 52, 0.86), rgba(12, 17, 31, 0.76)),
-    linear-gradient(90deg, rgba(127, 200, 184, 0.08), transparent 38%, rgba(221, 160, 74, 0.1));
+    linear-gradient(180deg, rgba(22, 27, 46, 0.88), rgba(12, 17, 31, 0.78)),
+    linear-gradient(90deg, rgba(127, 200, 184, 0.075), transparent 38%, rgba(221, 160, 74, 0.085));
   box-shadow:
     0 1px 0 rgba(255, 247, 233, 0.08) inset,
-    0 24px 58px -46px rgba(0, 0, 0, 0.84);
+    0 18px 50px -42px rgba(0, 0, 0, 0.86);
 }
 
 html[data-theme="dark"] .legal-topbar::before {
@@ -18696,10 +18724,19 @@ html[data-theme="dark"] .legal-topbar::before {
   opacity: 0.72;
 }
 
+html[data-theme="dark"] .legal-topbar::after {
+  background: linear-gradient(90deg, transparent, rgba(221, 160, 74, 0.22), transparent);
+  opacity: 0.58;
+}
+
 html[data-theme="dark"] .legal-topbar .brand,
 html[data-theme="dark"] .legal-topbar .settings-page-actions {
   background: transparent;
   box-shadow: none;
+}
+
+html[data-theme="dark"] .legal-topbar .settings-page-actions {
+  border-left-color: rgba(255, 247, 233, 0.13);
 }
 
 html[data-theme="dark"] .legal-topbar .brand:hover,
