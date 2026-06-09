@@ -9185,64 +9185,63 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .legal-topbar {
-  width: min(1120px, calc(100% - clamp(32px, 12vw, 280px)));
+  width: min(1280px, 100%);
   max-width: 100%;
   margin-inline: auto;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  min-height: 70px;
+  padding: 6px 6px 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--surface) 76%, var(--line));
+  border-radius: 28px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 91%, transparent), color-mix(in srgb, var(--surface-warm) 72%, transparent)),
+    linear-gradient(90deg, color-mix(in srgb, var(--brand-soft) 18%, transparent), transparent 38%, color-mix(in srgb, var(--accent-soft) 22%, transparent));
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 62%, transparent) inset,
+    0 24px 70px -52px color-mix(in srgb, var(--ink-0) 44%, transparent);
+  backdrop-filter: blur(18px) saturate(1.08);
+  -webkit-backdrop-filter: blur(18px) saturate(1.08);
   isolation: isolate;
-  overflow: visible;
+  overflow: clip;
 }
 
 .legal-topbar::before {
   content: "";
-  order: 1;
-  flex: 1 1 120px;
-  min-width: clamp(44px, 9vw, 180px);
+  position: absolute;
+  inset-inline: 22px;
+  inset-block-start: 0;
   height: 1px;
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--line) 12%, transparent), color-mix(in srgb, var(--accent) 42%, var(--line)), color-mix(in srgb, var(--line) 10%, transparent));
-  opacity: 0.62;
-  transform: translateY(1px);
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, #fff 74%, transparent), transparent);
+  opacity: 0.86;
+  pointer-events: none;
 }
 
 .legal-topbar .brand,
 .legal-topbar .settings-page-actions {
-  border: 1px solid color-mix(in srgb, var(--surface) 78%, var(--line));
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 76%, transparent)),
-    radial-gradient(circle at 94% 0%, color-mix(in srgb, var(--brand-soft) 38%, transparent), transparent 11rem);
-  box-shadow:
-    0 1px 0 color-mix(in srgb, #fff 62%, transparent) inset,
-    0 18px 44px -36px color-mix(in srgb, var(--ink-0) 44%, transparent);
-  backdrop-filter: blur(18px) saturate(1.06);
-  -webkit-backdrop-filter: blur(18px) saturate(1.06);
-}
-
-.legal-topbar .brand {
-  order: 0;
-}
-
-.legal-topbar .settings-page-actions {
-  order: 2;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .legal-topbar .brand {
   min-height: 54px;
   max-width: min(100%, 360px);
   padding: 7px 15px 7px 9px;
-  border-radius: 18px;
+  border-radius: 22px;
+  transition: background 170ms ease, transform 170ms ease;
+}
+
+.legal-topbar .brand:hover,
+.legal-topbar .brand:focus-visible {
+  background: color-mix(in srgb, var(--surface) 54%, transparent);
 }
 
 .legal-topbar .settings-page-actions {
   min-height: 54px;
-  padding: 6px;
-  border-radius: 18px;
+  padding: 0;
+  border-radius: 22px;
   gap: 8px;
 }
 
@@ -11466,13 +11465,12 @@ html[data-theme="dark"] input::file-selector-button {
     display: grid;
     grid-template-columns: 1fr;
     align-items: stretch;
-    gap: 12px;
+    gap: 8px;
     width: 100%;
-    overflow: visible;
-  }
-
-  .legal-topbar::before {
-    content: none;
+    min-height: 0;
+    padding: 8px;
+    border-radius: 26px;
+    overflow: clip;
   }
 
   .legal-topbar .brand {
@@ -11480,6 +11478,7 @@ html[data-theme="dark"] input::file-selector-button {
     max-width: 100%;
     min-width: 0;
     border-radius: 20px;
+    background: color-mix(in srgb, var(--surface) 48%, transparent);
   }
 
   .legal-topbar .settings-page-actions {
@@ -18683,23 +18682,29 @@ html[data-theme="dark"] .settings-project-stage-controls button:focus-visible {
 }
 
 html[data-theme="dark"] .legal-topbar {
-  background: transparent;
-  box-shadow: none;
+  border-color: rgba(255, 247, 233, 0.14);
+  background:
+    linear-gradient(135deg, rgba(25, 31, 52, 0.86), rgba(12, 17, 31, 0.76)),
+    linear-gradient(90deg, rgba(127, 200, 184, 0.08), transparent 38%, rgba(221, 160, 74, 0.1));
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.08) inset,
+    0 24px 58px -46px rgba(0, 0, 0, 0.84);
 }
 
 html[data-theme="dark"] .legal-topbar::before {
-  content: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 247, 233, 0.34), transparent);
+  opacity: 0.72;
 }
 
 html[data-theme="dark"] .legal-topbar .brand,
 html[data-theme="dark"] .legal-topbar .settings-page-actions {
-  border-color: rgba(255, 247, 233, 0.15);
-  background:
-    linear-gradient(135deg, rgba(25, 31, 52, 0.86), rgba(12, 17, 31, 0.72)),
-    radial-gradient(circle at 100% 0%, rgba(221, 160, 74, 0.12), transparent 12rem);
-  box-shadow:
-    0 1px 0 rgba(255, 247, 233, 0.08) inset,
-    0 24px 58px -46px rgba(0, 0, 0, 0.84);
+  background: transparent;
+  box-shadow: none;
+}
+
+html[data-theme="dark"] .legal-topbar .brand:hover,
+html[data-theme="dark"] .legal-topbar .brand:focus-visible {
+  background: rgba(255, 247, 233, 0.055);
 }
 
 html[data-theme="dark"] .legal-shell::before {
