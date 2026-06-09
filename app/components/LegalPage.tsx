@@ -9,6 +9,13 @@ type LegalSection = {
   body: readonly string[];
 };
 
+function sectionId(title: string) {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 export function LegalPage({
   eyebrow,
   title,
@@ -21,6 +28,11 @@ export function LegalPage({
   sections: readonly LegalSection[];
 }) {
   const currentYear = new Date().getFullYear();
+  const sectionLinks = sections.map((section, index) => ({
+    id: sectionId(section.title),
+    index: String(index + 1).padStart(2, "0"),
+    title: section.title,
+  }));
 
   return (
     <main className="legal-shell">
@@ -61,9 +73,27 @@ export function LegalPage({
         </p>
       </section>
 
+      <nav className="legal-index" aria-label={`${title} contents`}>
+        <div className="legal-index-head">
+          <span className="eyebrow">Document map</span>
+          <strong>{sectionLinks.length} sections</strong>
+          <small>Jump to the part you want to review.</small>
+        </div>
+        <ol>
+          {sectionLinks.map((section) => (
+            <li key={section.id}>
+              <a href={`#${section.id}`}>
+                <span>{section.index}</span>
+                <strong>{section.title}</strong>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
       <section className="legal-grid" aria-label={`${title} sections`}>
         {sections.map((section) => (
-          <article className="legal-card" key={section.title}>
+          <article className="legal-card" id={sectionId(section.title)} key={section.title}>
             <h2>{section.title}</h2>
             {section.body.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>

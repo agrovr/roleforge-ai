@@ -13,6 +13,7 @@ const REVEAL_SELECTORS = [
   ".pricing-clarity-grid a",
   ".cta-band",
   ".legal-hero",
+  ".legal-index",
   ".legal-card",
   ".legal-footer-card",
   ".help-signal-card",
