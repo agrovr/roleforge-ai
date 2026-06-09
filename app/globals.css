@@ -5761,10 +5761,10 @@ html[data-theme="dark"] .history-actions .ghost-button.danger {
   gap: 14px;
   align-items: center;
   padding: 14px;
-  border: 1px solid color-mix(in srgb, var(--mint) 34%, var(--line));
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--line));
   border-radius: 14px;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--mint) 11%, transparent), rgba(255, 255, 255, 0.42)),
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 11%, transparent), rgba(255, 255, 255, 0.42)),
     color-mix(in srgb, var(--surface) 76%, var(--bg-alt));
 }
 
@@ -9406,6 +9406,7 @@ html[data-theme="dark"] input::file-selector-button {
 
 .legal-summary-strip,
 .updates-overview {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 0.62fr) minmax(0, 1fr);
   gap: 16px;
@@ -9416,10 +9417,25 @@ html[data-theme="dark"] input::file-selector-button {
   border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line));
   border-radius: 14px;
   background:
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 12%, transparent) 0 3px, transparent 3px),
+    linear-gradient(90deg, color-mix(in srgb, var(--brand-soft) 16%, transparent) 0 1px, transparent 1px 100%),
     linear-gradient(135deg, color-mix(in srgb, var(--sky-soft) 30%, transparent), transparent),
     color-mix(in srgb, var(--surface) 90%, var(--bg-alt));
+  background-size: auto, 20px 20px, auto, auto;
   box-shadow: 0 18px 48px -42px var(--shadow);
   animation: public-page-rise 620ms 80ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.legal-summary-strip::after {
+  content: "";
+  position: absolute;
+  inset-inline: 18px;
+  inset-block-end: 0;
+  height: 1px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand) 22%, transparent), transparent);
+  opacity: 0.7;
+  pointer-events: none;
 }
 
 .legal-summary-strip > *,
@@ -9805,6 +9821,7 @@ html[data-theme="dark"] input::file-selector-button {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+  counter-reset: legal-section;
 }
 
 .help-search-shell {
@@ -11279,12 +11296,15 @@ html[data-theme="dark"] input::file-selector-button {
 
 .legal-card,
 .legal-footer-card {
+  position: relative;
   min-width: 0;
   border: 1px solid var(--line);
   border-radius: 14px;
   background:
+    linear-gradient(90deg, color-mix(in srgb, var(--brand-soft) 15%, transparent) 0 1px, transparent 1px 100%),
     linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, transparent), color-mix(in srgb, var(--bg-alt) 72%, transparent)),
     var(--surface);
+  background-size: 18px 18px, auto, auto;
   box-shadow: 0 20px 54px -44px var(--shadow);
 }
 
@@ -11292,10 +11312,49 @@ html[data-theme="dark"] input::file-selector-button {
   display: grid;
   align-content: start;
   gap: 12px;
+  overflow: hidden;
   padding: clamp(18px, 3vw, 24px);
+  counter-increment: legal-section;
+  isolation: isolate;
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.legal-card::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand), var(--accent), var(--sky));
+  opacity: 0.74;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 180ms ease;
+  z-index: 0;
+}
+
+.legal-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.legal-card:hover,
+.legal-card:focus-within {
+  border-color: color-mix(in srgb, var(--brand) 28%, var(--line));
+  box-shadow: 0 24px 62px -42px var(--shadow);
+  transform: translateY(-1px);
+}
+
+.legal-card:hover::after,
+.legal-card:focus-within::after {
+  opacity: 1;
+  transform: scaleX(1.01);
 }
 
 .legal-card h2 {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
   margin: 0;
   color: var(--ink-0);
   font-family: var(--font-display);
@@ -11303,6 +11362,26 @@ html[data-theme="dark"] input::file-selector-button {
   line-height: 1.04;
   overflow-wrap: anywhere;
   text-wrap: balance;
+}
+
+.legal-card h2::before {
+  content: counter(legal-section, decimal-leading-zero);
+  display: inline-grid;
+  width: 34px;
+  min-width: 34px;
+  min-height: 28px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
+  border-radius: 10px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--accent-soft) 42%, transparent), color-mix(in srgb, var(--surface) 82%, transparent));
+  color: color-mix(in srgb, var(--accent) 76%, var(--ink-0));
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: 0;
+  box-shadow: 0 10px 24px -22px var(--shadow);
 }
 
 .legal-card p {
@@ -11321,6 +11400,21 @@ html[data-theme="dark"] input::file-selector-button {
   gap: 16px;
   margin-top: 16px;
   padding: 18px;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--accent) 18%, var(--line));
+  isolation: isolate;
+}
+
+.legal-footer-card::before {
+  content: "";
+  position: absolute;
+  inset-inline: 18px;
+  inset-block-start: 0;
+  height: 1px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 30%, transparent), transparent);
+  opacity: 0.84;
+  pointer-events: none;
 }
 
 .legal-footer-card strong {
@@ -11345,6 +11439,16 @@ html[data-theme="dark"] input::file-selector-button {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.legal-footer-actions .btn {
+  min-width: 0;
+  border-radius: 12px;
+  white-space: normal;
+  text-align: center;
+  text-wrap: balance;
 }
 
 @keyframes public-page-rise {
@@ -11641,6 +11745,7 @@ html[data-theme="dark"] input::file-selector-button {
   .support-guide-card:hover,
   .support-guide-card:focus-visible,
   .legal-card:hover,
+  .legal-card:focus-within,
   .legal-footer-card:focus-within {
     transform: none;
   }
@@ -11761,7 +11866,7 @@ html[data-theme="dark"] input::file-selector-button {
   inset: 2px;
   width: 34%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--brand), var(--mint));
+  background: linear-gradient(90deg, var(--brand), var(--accent));
   animation: studio-auth-progress 1.15s ease-in-out infinite alternate;
 }
 
@@ -18761,6 +18866,46 @@ html[data-theme="dark"] .legal-hero-meta span {
   border-color: rgba(255, 247, 233, 0.16);
   background: rgba(255, 247, 233, 0.055);
   color: var(--ink-2);
+}
+
+html[data-theme="dark"] .legal-summary-strip,
+html[data-theme="dark"] .legal-card,
+html[data-theme="dark"] .legal-footer-card {
+  border-color: rgba(255, 247, 233, 0.16);
+  background:
+    linear-gradient(90deg, rgba(127, 200, 184, 0.07) 0 1px, transparent 1px 100%),
+    linear-gradient(180deg, rgba(255, 247, 233, 0.05), rgba(255, 247, 233, 0.018)),
+    rgba(12, 17, 31, 0.78);
+}
+
+html[data-theme="dark"] .legal-summary-strip {
+  background:
+    linear-gradient(90deg, rgba(221, 160, 74, 0.2) 0 3px, transparent 3px),
+    linear-gradient(90deg, rgba(127, 200, 184, 0.07) 0 1px, transparent 1px 100%),
+    linear-gradient(135deg, rgba(142, 183, 240, 0.075), transparent),
+    rgba(12, 17, 31, 0.82);
+}
+
+html[data-theme="dark"] .legal-card h2::before {
+  border-color: rgba(221, 160, 74, 0.24);
+  background:
+    linear-gradient(180deg, rgba(221, 160, 74, 0.16), rgba(255, 247, 233, 0.045));
+  color: var(--brand-dark);
+}
+
+html[data-theme="dark"] .legal-card:hover,
+html[data-theme="dark"] .legal-card:focus-within {
+  border-color: rgba(127, 200, 184, 0.32);
+  box-shadow: 0 24px 62px -42px rgba(0, 0, 0, 0.92);
+}
+
+html[data-theme="dark"] .legal-footer-card {
+  border-color: rgba(221, 160, 74, 0.18);
+}
+
+html[data-theme="dark"] .legal-footer-card::before,
+html[data-theme="dark"] .legal-summary-strip::after {
+  background: linear-gradient(90deg, transparent, rgba(221, 160, 74, 0.28), transparent);
 }
 
 html[data-theme="dark"] .help-action-routes {
