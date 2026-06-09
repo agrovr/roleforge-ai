@@ -19627,9 +19627,93 @@ html[data-theme="dark"] .support-routing-step p {
 .admin-support-list,
 .admin-support-readiness,
 .admin-support-filter,
-.admin-support-playbook {
+.admin-support-playbook,
+.admin-support-commandbar {
   width: min(1120px, 100%);
   margin-inline: auto;
+}
+
+.admin-support-commandbar {
+  position: relative;
+  display: flex;
+  min-height: 66px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: clamp(20px, 3vw, 34px);
+  isolation: isolate;
+}
+
+.admin-support-commandbar::before {
+  position: absolute;
+  inset-inline: clamp(110px, 18vw, 260px);
+  inset-block-start: 50%;
+  height: 1px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--line) 74%, transparent), transparent);
+  content: "";
+  opacity: 0.68;
+  pointer-events: none;
+}
+
+.admin-support-commandbar .brand,
+.admin-support-commandbar nav {
+  position: relative;
+  z-index: 1;
+  border: 1px solid color-mix(in srgb, var(--brand) 15%, var(--line));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 78%, transparent)),
+    radial-gradient(circle at 96% 0%, color-mix(in srgb, var(--accent-soft) 32%, transparent), transparent 10rem);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 58%, transparent),
+    0 20px 50px -42px color-mix(in srgb, var(--ink-0) 46%, transparent);
+  backdrop-filter: blur(16px) saturate(1.06);
+  -webkit-backdrop-filter: blur(16px) saturate(1.06);
+}
+
+.admin-support-commandbar .brand {
+  min-width: 0;
+  min-height: 58px;
+  padding: 7px 17px 7px 8px;
+  border-radius: 22px;
+}
+
+.admin-support-commandbar nav {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 5px;
+  border-radius: 24px;
+}
+
+.admin-support-commandbar nav a {
+  display: inline-flex;
+  min-height: 46px;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 13px;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  color: var(--ink-1);
+  font-size: 0.86rem;
+  font-weight: 950;
+  line-height: 1.1;
+  text-decoration: none;
+  text-wrap: balance;
+  transition: border-color 170ms ease, background 170ms ease, box-shadow 170ms ease, transform 170ms ease;
+}
+
+.admin-support-commandbar nav a:hover,
+.admin-support-commandbar nav a:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 42%, var(--surface));
+  box-shadow: 0 12px 26px -22px color-mix(in srgb, var(--ink-0) 42%, transparent);
+  color: var(--ink-0);
+  transform: translateY(-1px);
 }
 
 .admin-support-hero {
@@ -20185,10 +20269,35 @@ html[data-theme="dark"] .support-routing-step p {
   .admin-support-hero,
   .admin-support-readiness,
   .admin-support-playbook,
+  .admin-support-commandbar,
   .admin-support-card header,
   .admin-support-meta,
   .admin-support-reply-footer {
     grid-template-columns: 1fr;
+  }
+
+  .admin-support-commandbar {
+    display: grid;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .admin-support-commandbar::before {
+    display: none;
+  }
+
+  .admin-support-commandbar .brand {
+    width: 100%;
+  }
+
+  .admin-support-commandbar nav {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .admin-support-commandbar nav a {
+    width: 100%;
   }
 
   .admin-support-playbook ol {
@@ -24517,6 +24626,34 @@ html[data-theme="dark"] .admin-support-shell {
   --support-experience-glint: linear-gradient(110deg, transparent 0 34%, rgba(255, 247, 233, 0.1) 50%, transparent 66% 100%);
 }
 
+html[data-theme="dark"] .admin-support-commandbar::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 247, 233, 0.18), rgba(222, 162, 79, 0.16), transparent);
+  opacity: 0.72;
+}
+
+html[data-theme="dark"] .admin-support-commandbar .brand,
+html[data-theme="dark"] .admin-support-commandbar nav {
+  border-color: rgba(255, 247, 233, 0.13);
+  background:
+    linear-gradient(180deg, rgba(25, 30, 49, 0.88), rgba(11, 16, 31, 0.78)),
+    radial-gradient(circle at 96% 0%, rgba(137, 209, 190, 0.08), transparent 10rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.08),
+    0 20px 52px -42px rgba(0, 0, 0, 0.9);
+}
+
+html[data-theme="dark"] .admin-support-commandbar nav a {
+  color: var(--ink-2);
+}
+
+html[data-theme="dark"] .admin-support-commandbar nav a:hover,
+html[data-theme="dark"] .admin-support-commandbar nav a:focus-visible {
+  border-color: rgba(142, 183, 240, 0.3);
+  background: rgba(255, 247, 233, 0.06);
+  box-shadow: 0 14px 30px -24px rgba(0, 0, 0, 0.94);
+  color: var(--ink-0);
+}
+
 html[data-theme="dark"] .support-routing-strip,
 html[data-theme="dark"] .support-admin-entry,
 html[data-theme="dark"] .support-guide-card,
@@ -24587,6 +24724,7 @@ html[data-theme="dark"] .support-reference-copy {
   .support-response-item,
   .support-history-item,
   .settings-support-item,
+  .admin-support-commandbar nav a,
   .admin-support-readiness-card,
   .admin-support-filter a,
   .admin-support-empty {
@@ -24603,6 +24741,8 @@ html[data-theme="dark"] .support-reference-copy {
   .support-history-item:focus-within,
   .settings-support-item:hover,
   .settings-support-item:focus-within,
+  .admin-support-commandbar nav a:hover,
+  .admin-support-commandbar nav a:focus-visible,
   .admin-support-readiness-card:hover,
   .admin-support-filter a:hover,
   .admin-support-filter a:focus-visible,

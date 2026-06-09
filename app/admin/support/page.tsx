@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { Brand } from "@/app/components/Brand";
 import { RoleForgeIcon } from "@/app/components/RoleForgeIcons";
 import {
   isSupportAdminUser,
@@ -126,6 +127,15 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
 
   return (
     <main className="admin-support-shell">
+      <header className="admin-support-commandbar" aria-label="Support operator navigation">
+        <Brand href="/" label="RoleForge AI home" />
+        <nav aria-label="Operator shortcuts">
+          <Link href="/app"><RoleForgeIcon name="file" size={14} /> Studio</Link>
+          <Link href="/support"><RoleForgeIcon name="mail" size={14} /> Support page</Link>
+          <Link href="/settings"><RoleForgeIcon name="settings" size={14} /> Settings</Link>
+        </nav>
+      </header>
+
       <section className="admin-support-hero" aria-label="Support inbox overview">
         <div>
           <span className="eyebrow">Operator inbox</span>

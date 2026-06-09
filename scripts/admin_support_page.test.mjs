@@ -41,6 +41,25 @@ test("admin support inbox is discoverable only for support admins", () => {
   assert.match(supportPage, /href="\/admin\/support"/);
 });
 
+test("admin support inbox has a branded operator command bar", () => {
+  const sitePolish = readFileSync("app/components/SitePolish.tsx", "utf8");
+  assert.match(page, /import \{ Brand \} from "@\/app\/components\/Brand"/);
+  assert.match(page, /className="admin-support-commandbar"/);
+  assert.match(page, /aria-label="Support operator navigation"/);
+  assert.match(page, /href="\/app"/);
+  assert.match(page, /href="\/support"/);
+  assert.match(page, /href="\/settings"/);
+  assert.doesNotMatch(page, /user\.email/);
+  assert.match(sitePolish, /"\.admin-support-commandbar"/);
+  assert.match(stylesheet, /\.admin-support-commandbar\s*\{(?=[^}]*display:\s*flex)(?=[^}]*justify-content:\s*space-between)(?=[^}]*margin-bottom:\s*clamp\(20px,\s*3vw,\s*34px\))[^}]*\}/s);
+  assert.match(stylesheet, /\.admin-support-commandbar::before\s*\{(?=[^}]*inset-inline:\s*clamp\(110px,\s*18vw,\s*260px\))(?=[^}]*height:\s*1px)[^}]*\}/s);
+  assert.match(stylesheet, /\.admin-support-commandbar\s+\.brand,\s*\.admin-support-commandbar\s+nav\s*\{(?=[^}]*backdrop-filter:\s*blur\(16px\) saturate\(1\.06\))(?=[^}]*box-shadow:)[^}]*\}/s);
+  assert.match(stylesheet, /\.admin-support-commandbar\s+nav\s+a\s*\{(?=[^}]*min-height:\s*46px)(?=[^}]*border-radius:\s*18px)(?=[^}]*transition:)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.admin-support-commandbar\s+\.brand,\s*html\[data-theme="dark"\]\s+\.admin-support-commandbar\s+nav\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.13\))(?=[^}]*box-shadow:)[^}]*\}/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?\.admin-support-commandbar\s*\{(?=[^}]*display:\s*grid)(?=[^}]*align-items:\s*stretch)[^}]*\}/s);
+  assert.match(stylesheet, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.admin-support-commandbar nav a,[\s\S]*?transition:\s*none/);
+});
+
 test("admin support inbox supports mobile triage without terminal commands", () => {
   assert.doesNotMatch(page, /mailto:/);
   assert.match(page, /action="\/admin\/support\/reply"/);
