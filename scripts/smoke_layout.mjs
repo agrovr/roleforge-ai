@@ -803,6 +803,19 @@ async function evaluateLayout(send, baseUrl, page, width, cookie, options = {}) 
     if (theme !== "account") url.searchParams.set("theme", theme);
     await send("Page.navigate", { url: url.toString() });
     await delay(page.requiresAuth ? 3200 : 1800);
+    await send("Runtime.evaluate", {
+      awaitPromise: true,
+      returnByValue: true,
+      expression: `new Promise((resolve) => {
+        const done = () => resolve(Boolean(document.documentElement));
+        if (document.documentElement && document.readyState !== "loading") {
+          done();
+          return;
+        }
+        document.addEventListener("DOMContentLoaded", done, { once: true });
+        setTimeout(done, 2200);
+      })`,
+    });
 
     const expression = `(() => {
     document.documentElement.style.scrollBehavior = "auto";
