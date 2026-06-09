@@ -22920,6 +22920,233 @@ html[data-theme="dark"] .admin-support-meta div::before {
   background: linear-gradient(90deg, transparent, rgba(243, 193, 109, 0.42), transparent);
 }
 
+/* Saved-project workspace finish: clearer hierarchy for dense project controls. */
+.settings-project-list {
+  gap: clamp(10px, 1.5vw, 14px);
+}
+
+.settings-project-pipeline {
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.settings-project-pipeline-item {
+  border-radius: 14px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--line) 18%, transparent) 1px, transparent 1px),
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 93%, transparent), color-mix(in srgb, var(--surface-warm) 72%, transparent));
+  background-size: 28px 28px, auto;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 52%, transparent),
+    0 18px 42px -36px color-mix(in srgb, var(--ink-0) 34%, transparent);
+}
+
+.settings-project-item {
+  border-color: color-mix(in srgb, var(--brand) 16%, var(--line));
+  border-radius: 16px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--line) 18%, transparent) 1px, transparent 1px),
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 70%, transparent));
+  background-size: 30px 30px, auto;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 54%, transparent),
+    0 24px 62px -48px color-mix(in srgb, var(--ink-0) 42%, transparent);
+  padding: clamp(14px, 1.6vw, 18px);
+}
+
+.settings-project-item:hover,
+.settings-project-item:focus-within {
+  border-color: color-mix(in srgb, var(--brand-dark) 36%, var(--line));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 58%, transparent),
+    0 28px 70px -50px color-mix(in srgb, var(--ink-0) 48%, transparent);
+}
+
+.settings-project-summary {
+  gap: 12px;
+}
+
+.settings-project-title-block {
+  display: grid;
+  gap: 6px;
+  padding-inline-start: 4px;
+}
+
+.settings-project-title-block strong {
+  font-size: clamp(1.02rem, 2vw, 1.16rem);
+  line-height: 1.13;
+}
+
+.settings-project-title-block span {
+  margin-top: 0;
+  line-height: 1.34;
+}
+
+.settings-project-item small {
+  border-color: color-mix(in srgb, var(--brand) 20%, var(--line));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 86%, var(--brand-soft)), color-mix(in srgb, var(--surface-warm) 82%, transparent));
+  color: color-mix(in srgb, var(--ink-2) 78%, var(--brand-dark));
+}
+
+.settings-project-operations {
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.settings-project-operations a,
+.settings-project-operations span {
+  justify-content: flex-start;
+  min-height: 40px;
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 88%, transparent), color-mix(in srgb, var(--surface-warm) 64%, transparent));
+  text-align: left;
+}
+
+.settings-project-operations a:hover,
+.settings-project-operations a:focus-visible {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--brand-soft) 58%, var(--surface)), color-mix(in srgb, var(--surface-warm) 64%, transparent));
+}
+
+.settings-project-controls {
+  gap: 12px;
+  border-color: color-mix(in srgb, var(--brand) 16%, var(--line));
+  border-radius: 14px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--line) 16%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 76%, transparent), color-mix(in srgb, var(--surface-warm) 54%, transparent));
+  background-size: 26px 26px, auto;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 42%, transparent);
+}
+
+.settings-project-stage-controls {
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid color-mix(in srgb, var(--brand) 14%, var(--line));
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 76%, transparent);
+}
+
+.settings-project-stage-controls button {
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.settings-project-stage-controls button.active,
+.settings-project-stage-controls button:disabled {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--brand-soft) 58%, var(--surface)), color-mix(in srgb, var(--surface-warm) 70%, transparent));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 44%, transparent),
+    0 10px 22px -20px color-mix(in srgb, var(--brand) 58%, transparent);
+}
+
+.settings-project-rename label > span,
+.settings-project-delete label > span {
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.settings-project-rename-row input,
+.settings-project-delete-row input,
+.settings-project-rename-row button,
+.settings-project-delete-row button,
+.settings-project-downloads .btn {
+  border-radius: 12px;
+}
+
+.settings-project-kit {
+  gap: 10px;
+  border-color: color-mix(in srgb, var(--accent) 20%, var(--line));
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 88%, transparent), color-mix(in srgb, var(--accent-soft) 20%, var(--surface-warm)));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 42%, transparent);
+  padding: 12px;
+}
+
+.settings-project-kit-grid {
+  gap: 8px;
+}
+
+.settings-project-kit-item {
+  justify-content: flex-start;
+  border-radius: 12px;
+  text-align: left;
+}
+
+.settings-project-kit-item.ready {
+  color: color-mix(in srgb, var(--good) 74%, var(--ink-0));
+}
+
+.settings-project-delete {
+  margin-top: 2px;
+  padding-top: 8px;
+}
+
+.settings-project-delete summary {
+  padding-inline: 10px;
+  border: 1px solid color-mix(in srgb, var(--danger) 20%, transparent);
+  background: color-mix(in srgb, var(--danger-soft) 26%, transparent);
+}
+
+html[data-theme="dark"] .settings-project-pipeline-item,
+html[data-theme="dark"] .settings-project-item {
+  border-color: rgba(255, 247, 233, 0.13);
+  background:
+    linear-gradient(90deg, rgba(255, 247, 233, 0.04) 1px, transparent 1px),
+    linear-gradient(135deg, rgba(255, 247, 233, 0.072), rgba(255, 247, 233, 0.025));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.08),
+    0 26px 66px -48px rgba(0, 0, 0, 0.92);
+}
+
+html[data-theme="dark"] .settings-project-item:hover,
+html[data-theme="dark"] .settings-project-item:focus-within {
+  border-color: rgba(245, 214, 154, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.1),
+    0 30px 76px -52px rgba(0, 0, 0, 0.96);
+}
+
+html[data-theme="dark"] .settings-project-item small {
+  border-color: rgba(245, 214, 154, 0.22);
+  background:
+    linear-gradient(180deg, rgba(245, 214, 154, 0.11), rgba(255, 247, 233, 0.035));
+  color: #f5d69a;
+}
+
+html[data-theme="dark"] .settings-project-operations a,
+html[data-theme="dark"] .settings-project-operations span,
+html[data-theme="dark"] .settings-project-stage-controls,
+html[data-theme="dark"] .settings-project-controls,
+html[data-theme="dark"] .settings-project-kit {
+  border-color: rgba(255, 247, 233, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.052), rgba(255, 247, 233, 0.02));
+}
+
+html[data-theme="dark"] .settings-project-stage-controls button.active,
+html[data-theme="dark"] .settings-project-stage-controls button:disabled {
+  background:
+    linear-gradient(180deg, rgba(245, 214, 154, 0.13), rgba(245, 214, 154, 0.045));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.1),
+    0 10px 22px -20px rgba(0, 0, 0, 0.9);
+}
+
+html[data-theme="dark"] .settings-project-kit-item.ready {
+  color: #a6efb8;
+}
+
+html[data-theme="dark"] .settings-project-delete summary {
+  border-color: rgba(255, 152, 142, 0.24);
+  background: rgba(255, 152, 142, 0.08);
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .rf-studio-stat-fill {
     animation: rf-status-flow 9s ease-in-out infinite;
