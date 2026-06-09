@@ -9339,11 +9339,11 @@ html[data-theme="dark"] input::file-selector-button {
 
 .legal-topbar {
   position: relative;
-  width: min(1180px, 100%);
+  width: min(1240px, 100%);
   max-width: 100%;
   margin-inline: auto;
-  min-height: 62px;
-  padding: 4px 0;
+  min-height: 58px;
+  padding: 0;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -9355,15 +9355,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .legal-topbar::before {
-  content: "";
-  position: absolute;
-  inset-inline: clamp(70px, 12vw, 190px);
-  inset-block: 50% auto;
-  height: 1px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--line) 70%, transparent), transparent);
-  opacity: 0.62;
-  pointer-events: none;
+  content: none;
 }
 
 .legal-topbar::after {
@@ -9374,22 +9366,23 @@ html[data-theme="dark"] input::file-selector-button {
 .legal-topbar .settings-page-actions {
   position: relative;
   z-index: 1;
-  border: 1px solid color-mix(in srgb, var(--line) 74%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--line) 66%, var(--surface));
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 78%, transparent)),
-    linear-gradient(115deg, color-mix(in srgb, var(--brand-soft) 10%, transparent), transparent 44%, color-mix(in srgb, var(--accent-soft) 12%, transparent));
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 90%, transparent), color-mix(in srgb, var(--surface-warm) 62%, transparent)),
+    radial-gradient(circle at 8% 20%, color-mix(in srgb, var(--brand-soft) 20%, transparent), transparent 9rem),
+    radial-gradient(circle at 96% 10%, color-mix(in srgb, var(--accent-soft) 18%, transparent), transparent 8rem);
   box-shadow:
-    0 1px 0 color-mix(in srgb, #fff 66%, transparent) inset,
-    0 18px 46px -38px color-mix(in srgb, var(--ink-0) 48%, transparent);
+    0 1px 0 color-mix(in srgb, #fff 70%, transparent) inset,
+    0 16px 42px -34px color-mix(in srgb, var(--ink-0) 42%, transparent);
   backdrop-filter: blur(16px) saturate(1.06);
   -webkit-backdrop-filter: blur(16px) saturate(1.06);
 }
 
 .legal-topbar .brand {
-  min-height: 48px;
-  max-width: min(100%, 360px);
-  padding: 6px 16px 6px 7px;
-  border-radius: 20px;
+  min-height: 52px;
+  max-width: min(100%, 390px);
+  padding: 7px 18px 7px 8px;
+  border-radius: 18px 28px 28px 18px;
   transition: border-color 170ms ease, background 170ms ease, transform 170ms ease, box-shadow 170ms ease;
 }
 
@@ -9397,18 +9390,19 @@ html[data-theme="dark"] input::file-selector-button {
 .legal-topbar .brand:focus-visible {
   border-color: color-mix(in srgb, var(--accent) 24%, var(--line));
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 98%, transparent), color-mix(in srgb, var(--surface-warm) 84%, transparent)),
-    linear-gradient(115deg, color-mix(in srgb, var(--brand-soft) 14%, transparent), transparent 44%, color-mix(in srgb, var(--accent-soft) 16%, transparent));
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, transparent), color-mix(in srgb, var(--surface-warm) 72%, transparent)),
+    radial-gradient(circle at 8% 20%, color-mix(in srgb, var(--brand-soft) 24%, transparent), transparent 9rem),
+    radial-gradient(circle at 96% 10%, color-mix(in srgb, var(--accent-soft) 22%, transparent), transparent 8rem);
   box-shadow:
     0 1px 0 color-mix(in srgb, #fff 72%, transparent) inset,
     0 20px 50px -38px color-mix(in srgb, var(--ink-0) 52%, transparent);
 }
 
 .legal-topbar .settings-page-actions {
-  min-height: 48px;
-  padding: 5px;
-  border-radius: 22px;
-  gap: 8px;
+  min-height: 52px;
+  padding: 6px;
+  border-radius: 999px;
+  gap: 6px;
 }
 
 .legal-topbar .settings-page-actions .btn,
@@ -9427,7 +9421,7 @@ html[data-theme="dark"] input::file-selector-button {
 .legal-topbar .settings-page-actions .public-account-menu,
 .legal-topbar .settings-page-actions .public-topbar-avatar {
   min-height: 42px;
-  border-radius: 14px;
+  border-radius: 999px;
 }
 
 .legal-hero,
@@ -9732,6 +9726,150 @@ html[data-theme="dark"] input::file-selector-button {
   font-size: 0.82rem;
   font-weight: 720;
   line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.updates-ledger {
+  position: relative;
+  display: grid;
+  width: min(1280px, 100%);
+  max-width: 100%;
+  min-width: 0;
+  grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
+  gap: 14px;
+  margin: 0 auto 16px;
+  padding: 16px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--line));
+  border-radius: 16px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--line) 20%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at 96% 0%, color-mix(in srgb, var(--accent-soft) 32%, transparent), transparent 14rem),
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 70%, transparent));
+  background-size: 30px 30px, auto, auto;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 54%, transparent),
+    0 22px 56px -44px color-mix(in srgb, var(--ink-0) 42%, transparent);
+  animation: public-page-rise 620ms 160ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.updates-ledger::before {
+  position: absolute;
+  inset-block: 14px;
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(180deg, var(--brand), var(--accent), var(--sky));
+  content: "";
+  opacity: 0.62;
+  pointer-events: none;
+}
+
+.updates-ledger-head,
+.updates-ledger li,
+.updates-ledger a,
+.updates-ledger strong,
+.updates-ledger small,
+.updates-ledger p {
+  min-width: 0;
+}
+
+.updates-ledger-head {
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  padding: 4px 4px 4px 8px;
+}
+
+.updates-ledger-head strong {
+  color: var(--ink-0);
+  font-size: clamp(1.12rem, 2vw, 1.34rem);
+  font-weight: 950;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.updates-ledger-head p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1.36;
+  overflow-wrap: anywhere;
+}
+
+.updates-ledger ol {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.updates-ledger a {
+  position: relative;
+  display: grid;
+  height: 100%;
+  gap: 7px;
+  padding: 12px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--brand) 16%, var(--line));
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 86%, transparent), color-mix(in srgb, var(--surface-warm) 62%, transparent));
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 170ms ease, box-shadow 170ms ease, transform 170ms ease;
+}
+
+.updates-ledger a::after {
+  position: absolute;
+  inset-inline: 12px;
+  inset-block-start: 0;
+  height: 2px;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(90deg, var(--brand), var(--accent), var(--sky));
+  content: "";
+  opacity: 0.46;
+  pointer-events: none;
+}
+
+.updates-ledger a:hover,
+.updates-ledger a:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--line));
+  box-shadow: 0 16px 36px -30px color-mix(in srgb, var(--ink-0) 44%, transparent);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.updates-ledger span {
+  width: fit-content;
+  min-height: 24px;
+  padding: 5px 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent-soft) 50%, var(--surface));
+  color: var(--brand-dark);
+  font-size: 0.68rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.updates-ledger strong {
+  color: var(--ink-0);
+  font-size: 0.9rem;
+  font-weight: 950;
+  line-height: 1.12;
+}
+
+.updates-ledger small {
+  color: var(--ink-2);
+  font-size: 0.74rem;
+  font-weight: 740;
+  line-height: 1.32;
+  overflow-wrap: anywhere;
   text-wrap: pretty;
 }
 
@@ -10586,6 +10724,7 @@ html[data-theme="dark"] input::file-selector-button {
   padding: 18px;
   border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line));
   border-radius: 14px;
+  scroll-margin-block-start: 92px;
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--bg-alt) 72%, transparent)),
     var(--surface);
@@ -11945,6 +12084,7 @@ html[data-theme="dark"] input::file-selector-button {
 
   .legal-summary-strip,
   .updates-overview,
+  .updates-ledger,
   .updates-timeline,
   .updates-signal-grid,
   .help-signal-strip,
@@ -12031,6 +12171,10 @@ html[data-theme="dark"] input::file-selector-button {
     grid-template-columns: 1fr;
   }
 
+  .updates-ledger ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .support-routing-step {
     grid-template-columns: 34px minmax(0, 1fr);
   }
@@ -12082,6 +12226,10 @@ html[data-theme="dark"] input::file-selector-button {
     border-left: 0;
     border-top: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
     border-radius: 14px;
+  }
+
+  .updates-ledger ol {
+    grid-template-columns: 1fr;
   }
 
   .legal-topbar .settings-page-actions .btn,
@@ -12410,11 +12558,11 @@ html[data-theme="dark"] input::file-selector-button {
 
 .public-page-topbar {
   position: relative;
-  width: min(1180px, 100%);
+  width: min(1240px, 100%);
   max-width: 100%;
-  min-height: 72px;
+  min-height: 64px;
   margin-inline: auto;
-  padding: 5px 0;
+  padding: 0;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -12426,15 +12574,7 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .public-page-topbar::before {
-  content: "";
-  position: absolute;
-  inset-inline: clamp(88px, 12vw, 220px);
-  inset-block-start: 50%;
-  height: 1px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--line) 72%, transparent), transparent);
-  opacity: 0.58;
-  pointer-events: none;
+  content: none;
 }
 
 .public-page-topbar::after {
@@ -12445,22 +12585,23 @@ html[data-theme="dark"] input::file-selector-button {
 .public-page-topbar .settings-page-actions {
   position: relative;
   z-index: 1;
-  border: 1px solid color-mix(in srgb, var(--line) 74%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--line) 66%, var(--surface));
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 78%, transparent)),
-    linear-gradient(115deg, color-mix(in srgb, var(--brand-soft) 10%, transparent), transparent 44%, color-mix(in srgb, var(--accent-soft) 12%, transparent));
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 90%, transparent), color-mix(in srgb, var(--surface-warm) 62%, transparent)),
+    radial-gradient(circle at 8% 20%, color-mix(in srgb, var(--brand-soft) 20%, transparent), transparent 9rem),
+    radial-gradient(circle at 96% 10%, color-mix(in srgb, var(--accent-soft) 18%, transparent), transparent 8rem);
   box-shadow:
-    0 1px 0 color-mix(in srgb, #fff 66%, transparent) inset,
-    0 18px 46px -38px color-mix(in srgb, var(--ink-0) 48%, transparent);
+    0 1px 0 color-mix(in srgb, #fff 70%, transparent) inset,
+    0 16px 42px -34px color-mix(in srgb, var(--ink-0) 42%, transparent);
   backdrop-filter: blur(16px) saturate(1.06);
   -webkit-backdrop-filter: blur(16px) saturate(1.06);
 }
 
 .public-page-topbar .brand {
   min-width: 0;
-  min-height: 54px;
-  padding: 7px 17px 7px 8px;
-  border-radius: 22px;
+  min-height: 52px;
+  padding: 7px 18px 7px 8px;
+  border-radius: 18px 28px 28px 18px;
   transition: border-color 170ms ease, background 170ms ease, transform 170ms ease, box-shadow 170ms ease;
 }
 
@@ -12468,17 +12609,19 @@ html[data-theme="dark"] input::file-selector-button {
 .public-page-topbar .brand:focus-visible {
   border-color: color-mix(in srgb, var(--accent) 24%, var(--line));
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 98%, transparent), color-mix(in srgb, var(--surface-warm) 84%, transparent)),
-    linear-gradient(115deg, color-mix(in srgb, var(--brand-soft) 14%, transparent), transparent 44%, color-mix(in srgb, var(--accent-soft) 16%, transparent));
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, transparent), color-mix(in srgb, var(--surface-warm) 72%, transparent)),
+    radial-gradient(circle at 8% 20%, color-mix(in srgb, var(--brand-soft) 24%, transparent), transparent 9rem),
+    radial-gradient(circle at 96% 10%, color-mix(in srgb, var(--accent-soft) 22%, transparent), transparent 8rem);
   box-shadow:
     0 1px 0 color-mix(in srgb, #fff 72%, transparent) inset,
     0 20px 50px -38px color-mix(in srgb, var(--ink-0) 52%, transparent);
 }
 
 .public-page-topbar .settings-page-actions {
-  min-height: 54px;
-  padding: 5px;
-  border-radius: 24px;
+  min-height: 52px;
+  padding: 6px;
+  border-radius: 999px;
+  gap: 6px;
 }
 
 .public-page-topbar .settings-page-actions .btn,
@@ -12487,8 +12630,8 @@ html[data-theme="dark"] input::file-selector-button {
 .public-page-topbar .settings-page-actions .public-account-signin,
 .public-page-topbar .settings-page-actions .public-account-menu,
 .public-page-topbar .settings-page-actions .public-topbar-avatar {
-  min-height: 44px;
-  border-radius: 15px;
+  min-height: 42px;
+  border-radius: 999px;
   box-shadow: none;
 }
 
@@ -19401,6 +19544,7 @@ html[data-theme="dark"] .legal-topbar {
 }
 
 html[data-theme="dark"] .legal-topbar::before {
+  content: none;
   background: linear-gradient(90deg, transparent, rgba(255, 247, 233, 0.2), rgba(221, 160, 74, 0.18), transparent);
   opacity: 0.68;
 }
@@ -19439,6 +19583,7 @@ html[data-theme="dark"] .public-page-topbar {
 }
 
 html[data-theme="dark"] .public-page-topbar::before {
+  content: none;
   background: linear-gradient(90deg, transparent, rgba(255, 247, 233, 0.2), rgba(221, 160, 74, 0.18), transparent);
   opacity: 0.66;
 }
@@ -20410,12 +20555,39 @@ html[data-theme="dark"] .support-packet-card,
 html[data-theme="dark"] .support-response-card,
 html[data-theme="dark"] .support-request-card,
 html[data-theme="dark"] .support-signin-card,
+html[data-theme="dark"] .updates-ledger,
 html[data-theme="dark"] .updates-hero-card,
 html[data-theme="dark"] .updates-card {
   border-color: rgba(255, 247, 233, 0.16);
   background:
     linear-gradient(180deg, rgba(255, 247, 233, 0.045), rgba(255, 247, 233, 0.02)),
     rgba(12, 17, 31, 0.78);
+}
+
+html[data-theme="dark"] .updates-ledger {
+  background:
+    linear-gradient(90deg, rgba(255, 247, 233, 0.04) 1px, transparent 1px),
+    radial-gradient(circle at 96% 0%, rgba(137, 209, 190, 0.08), transparent 14rem),
+    linear-gradient(135deg, rgba(255, 247, 233, 0.065), rgba(255, 247, 233, 0.024));
+  background-size: 30px 30px, auto, auto;
+}
+
+html[data-theme="dark"] .updates-ledger a {
+  border-color: rgba(255, 247, 233, 0.13);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.05), rgba(255, 247, 233, 0.02));
+}
+
+html[data-theme="dark"] .updates-ledger a:hover,
+html[data-theme="dark"] .updates-ledger a:focus-visible {
+  border-color: rgba(142, 183, 240, 0.32);
+  box-shadow: 0 18px 40px -30px rgba(0, 0, 0, 0.96);
+}
+
+html[data-theme="dark"] .updates-ledger span {
+  border-color: rgba(222, 162, 79, 0.28);
+  background: rgba(222, 162, 79, 0.14);
+  color: #f3c16d;
 }
 
 html[data-theme="dark"] .status-hero-card svg {

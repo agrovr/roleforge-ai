@@ -297,7 +297,7 @@ const PAGE_CHECKS = [
   {
     path: "/updates",
     name: "updates",
-    selectors: [".legal-shell", ".legal-topbar", ".legal-hero", ".updates-signal-grid", ".updates-signal-card", ".updates-timeline", ".updates-card", ".legal-footer-card"],
+    selectors: [".legal-shell", ".legal-topbar", ".legal-hero", ".updates-signal-grid", ".updates-signal-card", ".updates-ledger", ".updates-timeline", ".updates-card", ".legal-footer-card"],
     textFitSelectors: [
       ".legal-hero h1",
       ".legal-hero p",
@@ -305,6 +305,10 @@ const PAGE_CHECKS = [
       ".updates-signal-card small",
       ".updates-signal-card strong",
       ".updates-signal-card p",
+      ".updates-ledger-head strong",
+      ".updates-ledger-head p",
+      ".updates-ledger a strong",
+      ".updates-ledger a small",
       ".updates-card-meta time",
       ".updates-card-meta span",
       ".updates-card h2",
@@ -316,6 +320,7 @@ const PAGE_CHECKS = [
     containedSelectors: [
       { container: ".legal-shell", selector: ".legal-hero", tolerance: 4 },
       { container: ".legal-shell", selector: ".updates-signal-grid", tolerance: 4 },
+      { container: ".legal-shell", selector: ".updates-ledger", tolerance: 4 },
       { container: ".legal-shell", selector: ".updates-timeline", tolerance: 4 },
       { container: ".legal-shell", selector: ".legal-footer-card", tolerance: 4 },
       { container: "closest:.updates-card", selector: ".updates-card h2", tolerance: 4 },

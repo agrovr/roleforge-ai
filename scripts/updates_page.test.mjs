@@ -50,8 +50,15 @@ test("updates page is a factual public product log", () => {
   assert.match(updatesPage, /actionHref: "\/help"/);
   assert.match(updatesPage, /actionHref: "\/settings#billing"/);
   assert.match(updatesPage, /updates-overview/);
+  assert.match(updatesPage, /updates-ledger/);
+  assert.match(updatesPage, /June 2026 ledger/);
+  assert.match(updatesPage, /releaseAreas/);
+  assert.match(updatesPage, /shipped product notes/);
+  assert.match(updatesPage, /href=\{`#\$\{item\.slug\}`\}/);
+  assert.match(updatesPage, /id=\{item\.slug\}/);
   assert.match(updatesPage, /updates-card-actions/);
   assert.equal((updatesPage.match(/date: "/g) ?? []).length, 4);
+  assert.equal((updatesPage.match(/slug: "/g) ?? []).length, 4);
   assert.doesNotMatch(updatesPage, /trusted by|customers|guaranteed|ATS pass|human coach|live roadmap/i);
 });
 
@@ -75,15 +82,24 @@ test("updates page is discoverable from public and signed-in surfaces", () => {
 test("updates timeline has overflow-safe responsive cards", () => {
   assert.match(stylesheet, /\.updates-overview\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0\.62fr\)\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.updates-signal-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\))[^}]*\}/s);
+  assert.match(stylesheet, /\.updates-ledger\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(220px,\s*0\.34fr\)\s+minmax\(0,\s*1fr\))(?=[^}]*background-size:\s*30px\s+30px,\s*auto,\s*auto)[^}]*\}/s);
+  assert.match(stylesheet, /\.updates-ledger::before\s*\{(?=[^}]*width:\s*3px)(?=[^}]*linear-gradient\(180deg,\s*var\(--brand\),\s*var\(--accent\),\s*var\(--sky\)\))[^}]*\}/s);
+  assert.match(stylesheet, /\.updates-ledger\s+ol\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\))[^}]*\}/s);
+  assert.match(stylesheet, /\.updates-ledger\s+a\s*\{(?=[^}]*display:\s*grid)(?=[^}]*border-radius:\s*14px)(?=[^}]*transition:\s*border-color 170ms ease,\s*box-shadow 170ms ease,\s*transform 170ms ease)[^}]*\}/s);
+  assert.match(stylesheet, /\.updates-ledger\s+small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*pretty)[^}]*\}/s);
   assert.match(stylesheet, /\.help-signal-card,\s*\.updates-signal-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\))[^}]*\}/s);
   assert.match(stylesheet, /\.updates-timeline\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*gap:\s*14px)(?=[^}]*min-width:\s*0)[^}]*\}/s);
-  assert.match(stylesheet, /\.updates-card\s*\{(?=[^}]*container:\s*updates-card\s*\/\s*inline-size)(?=[^}]*grid-template-columns:\s*48px\s+minmax\(0,\s*1fr\))(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
+  assert.match(stylesheet, /\.updates-card\s*\{(?=[^}]*container:\s*updates-card\s*\/\s*inline-size)(?=[^}]*grid-template-columns:\s*48px\s+minmax\(0,\s*1fr\))(?=[^}]*scroll-margin-block-start:\s*92px)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
   assert.match(stylesheet, /\.updates-card-meta\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.updates-card\s+h2\s*\{(?=[^}]*font-size:\s*1\.72rem)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
   assert.match(stylesheet, /\.updates-card\s+li\s*\{(?=[^}]*grid-template-columns:\s*16px\s+minmax\(0,\s*1fr\))(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*pretty)[^}]*\}/s);
   assert.match(stylesheet, /\.updates-card-actions\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.updates-card-actions\s+\.btn\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /@container\s+updates-card\s+\(max-width:\s*520px\)/);
-  assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.updates-overview,[\s\S]*?\.updates-timeline\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.updates-overview,[\s\S]*?\.updates-ledger,[\s\S]*?\.updates-timeline\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*620px\)\s*\{[\s\S]*?\.updates-ledger\s+ol\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.updates-ledger\s+ol\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.updates-ledger/);
+  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.updates-ledger\s+a/);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.updates-card/);
 });

@@ -25,6 +25,7 @@ const REVEAL_SELECTORS = [
   ".support-packet-card",
   ".support-response-card",
   ".updates-hero-card",
+  ".updates-ledger",
   ".updates-card",
   ".status-card",
   ".status-diagnostic-card",

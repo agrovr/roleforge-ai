@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 };
 
 type UpdateItem = {
+  slug: string;
   title: string;
   date: string;
   eyebrow: string;
@@ -55,6 +56,7 @@ const updateSignals = [
 
 const updates: readonly UpdateItem[] = [
   {
+    slug: "account",
     title: "Account workspace, support history, and preferences",
     date: "June 2026",
     eyebrow: "Account",
@@ -68,6 +70,7 @@ const updates: readonly UpdateItem[] = [
     actionLabel: "Open settings",
   },
   {
+    slug: "billing",
     title: "Premium billing and export access are clearer",
     date: "June 2026",
     eyebrow: "Billing",
@@ -81,6 +84,7 @@ const updates: readonly UpdateItem[] = [
     actionLabel: "Open billing",
   },
   {
+    slug: "projects",
     title: "Saved project recovery is easier to scan",
     date: "June 2026",
     eyebrow: "Projects",
@@ -94,6 +98,7 @@ const updates: readonly UpdateItem[] = [
     actionLabel: "Open projects",
   },
   {
+    slug: "guidance",
     title: "Templates and public guidance were consolidated",
     date: "June 2026",
     eyebrow: "Guidance",
@@ -109,6 +114,8 @@ const updates: readonly UpdateItem[] = [
 ];
 
 export default function UpdatesPage() {
+  const releaseAreas = updates.map((item) => item.eyebrow).join(" / ");
+
   return (
     <main className="legal-shell updates-shell">
       <header className="settings-page-topbar legal-topbar">
@@ -166,9 +173,28 @@ export default function UpdatesPage() {
         ))}
       </section>
 
+      <section className="updates-ledger" aria-label="June 2026 release ledger">
+        <div className="updates-ledger-head">
+          <span className="eyebrow">June 2026 ledger</span>
+          <strong>{updates.length} shipped product notes</strong>
+          <p>{releaseAreas}</p>
+        </div>
+        <ol>
+          {updates.map((item, index) => (
+            <li key={item.slug}>
+              <a href={`#${item.slug}`}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{item.eyebrow}</strong>
+                <small>{item.title}</small>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <section className="updates-timeline" aria-label="Recent product updates">
         {updates.map((item) => (
-          <article className="updates-card" key={item.title}>
+          <article className="updates-card" id={item.slug} key={item.title}>
             <div className="updates-card-icon">
               <RoleForgeIcon name={item.icon} size={18} />
             </div>
