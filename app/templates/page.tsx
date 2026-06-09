@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { AccountAvatar } from "../components/AccountAvatar";
 import { AccountReferenceCopyButton } from "../components/AccountReferenceCopyButton";
 import { Brand } from "../components/Brand";
+import { ResumePreview } from "../components/ResumePreview";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { accountAvatarUrl, accountDisplayName, accountReference } from "../lib/accountUser";
 import { RESUME_TEMPLATE_COOKIE, getResumeTemplate, resumeTemplateStudioHref } from "../lib/resumeTemplates";
@@ -141,21 +142,35 @@ export default async function TemplatesPage() {
       </header>
 
       <section className="templates-page-hero" aria-labelledby="templates-title">
-        <div>
+        <div className="templates-page-hero-copy">
           <div className="eyebrow">Template library</div>
           <h1 id="templates-title">Resume formats for cleaner exports.</h1>
           <p>
             Choose the visual direction RoleForge should carry into new PDF and premium DOCX exports. You can change it before each run.
           </p>
+          <div className="templates-page-actions">
+            <Link className="primary-button" href={studioHref}>
+              Open studio <RoleForgeIcon name="arrow" size={14} />
+            </Link>
+            <Link className="ghost-button" href={settingsHref}>
+              Export access
+            </Link>
+          </div>
         </div>
-        <div className="templates-page-actions">
-          <Link className="primary-button" href={studioHref}>
-            Open studio <RoleForgeIcon name="arrow" size={14} />
-          </Link>
-          <Link className="ghost-button" href={settingsHref}>
-            Export access
-          </Link>
-        </div>
+        <aside className="templates-hero-preview" aria-label={`${selectedTemplate.name} template preview`}>
+          <div className="templates-hero-preview-head">
+            <span>Selected now</span>
+            <strong>{selectedTemplate.name}</strong>
+          </div>
+          <div className="template-thumb templates-hero-thumb" style={{ borderTopColor: selectedTemplate.color }}>
+            <ResumePreview
+              variant={selectedTemplate.variant}
+              name={selectedTemplate.previewName}
+              role={selectedTemplate.tag.replace(/ resumes| drafts| roles/i, "")}
+              highlight
+            />
+          </div>
+        </aside>
       </section>
 
       <TemplateLibrary signedIn={signedIn} initialTemplateSlug={initialTemplateSlug} />
