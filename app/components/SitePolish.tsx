@@ -54,6 +54,7 @@ const REVEAL_SELECTORS = [
   ".export-readiness-panel",
   ".export-readiness-item",
   ".rf-recovery-card",
+  ".empty-state",
   ".admin-support-commandbar",
   ".admin-support-hero",
   ".admin-support-playbook",

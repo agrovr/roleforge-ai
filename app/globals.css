@@ -5187,6 +5187,107 @@ html[data-theme="dark"] .result-box {
   background: var(--surface);
 }
 
+.empty-state {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  min-block-size: 148px;
+  align-content: center;
+  padding: 18px 18px 18px 76px;
+  border-color: color-mix(in srgb, var(--brand) 16%, var(--line));
+  border-radius: 16px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--brand-soft) 18%, transparent) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent-soft) 32%, transparent), transparent 12rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 64%, transparent));
+  background-size: 22px 22px, auto, auto;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 58%, transparent),
+    0 18px 42px -38px color-mix(in srgb, var(--ink-0) 46%, transparent);
+  isolation: isolate;
+  transition: border-color 170ms ease, box-shadow 170ms ease, transform 170ms ease;
+}
+
+.empty-state::before {
+  position: absolute;
+  inset-block-start: 18px;
+  inset-inline-start: 18px;
+  width: 40px;
+  height: 40px;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent) 72%, var(--brand)) 0 4px, transparent 5px),
+    conic-gradient(from 140deg, color-mix(in srgb, var(--brand-soft) 70%, transparent), color-mix(in srgb, var(--accent-soft) 78%, transparent), color-mix(in srgb, var(--sky-soft) 62%, transparent), color-mix(in srgb, var(--brand-soft) 70%, transparent));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 58%, transparent),
+    0 16px 30px -24px color-mix(in srgb, var(--ink-0) 58%, transparent);
+  content: "";
+  pointer-events: none;
+}
+
+.empty-state::after {
+  position: absolute;
+  inset-inline: 18px;
+  inset-block-end: 0;
+  height: 3px;
+  border-radius: 999px 999px 0 0;
+  background: linear-gradient(90deg, var(--brand), var(--accent), var(--sky));
+  content: "";
+  opacity: 0.42;
+  pointer-events: none;
+  transform: scaleX(0.72);
+  transform-origin: left center;
+  transition: opacity 170ms ease, transform 170ms ease;
+}
+
+.empty-state > * {
+  position: relative;
+  z-index: 1;
+}
+
+.empty-state strong {
+  font-size: clamp(1.04rem, 2vw, 1.2rem);
+}
+
+.empty-state p {
+  margin-top: 0;
+}
+
+.empty-state:hover,
+.empty-state:focus-within {
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--line));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 64%, transparent),
+    0 22px 48px -38px color-mix(in srgb, var(--brand) 42%, var(--shadow));
+  transform: translateY(-1px);
+}
+
+.empty-state:hover::after,
+.empty-state:focus-within::after {
+  opacity: 0.76;
+  transform: scaleX(1);
+}
+
+@media (max-width: 560px) {
+  .empty-state {
+    min-block-size: 0;
+    padding: 16px;
+  }
+
+  .empty-state::before {
+    position: relative;
+    inset: auto;
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+  }
+
+  .empty-state::after {
+    inset-inline: 16px;
+  }
+}
+
 .issue-card {
   border-color: rgba(159, 61, 55, 0.22);
   background: var(--danger-soft);
@@ -19132,6 +19233,42 @@ html[data-theme="dark"] .copy-state {
   box-shadow: inset 0 1px 0 rgba(255, 247, 233, 0.065);
 }
 
+.empty-state {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--brand-soft) 18%, transparent) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent-soft) 32%, transparent), transparent 12rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 64%, transparent));
+  background-size: 22px 22px, auto, auto;
+}
+
+html[data-theme="dark"] .empty-state {
+  border-color: rgba(255, 247, 233, 0.13);
+  background:
+    linear-gradient(90deg, rgba(127, 200, 184, 0.055) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 100% 0%, rgba(222, 162, 79, 0.1), transparent 12rem),
+    linear-gradient(180deg, rgba(255, 247, 233, 0.058), rgba(255, 247, 233, 0.02)),
+    rgba(18, 24, 40, 0.86);
+  background-size: 22px 22px, auto, auto, auto;
+}
+
+html[data-theme="dark"] .empty-state::before {
+  border-color: rgba(222, 162, 79, 0.28);
+  background:
+    radial-gradient(circle at 50% 50%, #f3c16d 0 4px, transparent 5px),
+    conic-gradient(from 140deg, rgba(137, 209, 190, 0.16), rgba(222, 162, 79, 0.18), rgba(142, 183, 240, 0.14), rgba(137, 209, 190, 0.16));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.08),
+    0 16px 32px -24px rgba(0, 0, 0, 0.92);
+}
+
+html[data-theme="dark"] .empty-state:hover,
+html[data-theme="dark"] .empty-state:focus-within {
+  border-color: rgba(222, 162, 79, 0.32);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.075),
+    0 24px 54px -40px rgba(0, 0, 0, 0.94);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .rf-intake-card,
   .rf-file-drop,
@@ -19162,6 +19299,18 @@ html[data-theme="dark"] .copy-state {
   .ats-item:hover,
   .generated-card:hover,
   .generated-card:focus-within {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .empty-state,
+  .empty-state::after {
+    transition: none;
+  }
+
+  .empty-state:hover,
+  .empty-state:focus-within {
     transform: none;
   }
 }
