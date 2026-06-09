@@ -36,6 +36,8 @@ const PAGE_CHECKS = [
       { container: ".cta-band", selector: ".cta-band > div:first-child", tolerance: 4 },
       { container: ".cta-band", selector: ".cta-band h2", tolerance: 4 },
       { container: ".cta-band", selector: ".cta-band .cta-cluster", tolerance: 4 },
+      { container: "closest:.faq-item", selector: ".faq-question-text", tolerance: 4 },
+      { container: "closest:.faq-item.open", selector: ".faq-item.open .faq-a", tolerance: 4 },
     ],
     maxHeightChecks: [
       { selector: ".cta-band", maxHeight: 720, minWidth: 1181, maxWidth: 1440 },
@@ -48,6 +50,8 @@ const PAGE_CHECKS = [
       ".steps",
       ".dash-mock",
       ".pricing-grid",
+      ".faq-grid",
+      ".faq-item",
       ".cta-band",
       ".cta-band h2",
       ".cta-band .cta-cluster",
@@ -64,6 +68,8 @@ const PAGE_CHECKS = [
       ".dash-main-head .btn",
       ".dash-resume-actions .btn",
       ".price-card .btn",
+      ".faq-question-text",
+      ".faq-item.open .faq-a",
       ".cta-band h2",
       ".cta-band p",
       ".cta-band .btn",
@@ -72,8 +78,10 @@ const PAGE_CHECKS = [
   {
     path: "/templates",
     name: "templates",
-    selectors: [".templates-page-hero", ".templates-page-actions", ".templates-selection-status", ".templates-decision-guide", ".templates-page-grid"],
+    selectors: [".public-page-topbar", ".templates-page-hero", ".templates-page-actions", ".templates-selection-status", ".templates-decision-guide", ".templates-page-grid"],
     textFitSelectors: [
+      ".public-page-topbar .brand-name",
+      ".public-page-topbar .btn",
       ".templates-page-hero h1",
       ".templates-page-hero p",
       ".templates-page-actions .primary-button",
@@ -90,6 +98,9 @@ const PAGE_CHECKS = [
       ".template-card-actions .btn",
     ],
     containedSelectors: [
+      { container: ".templates-page-shell", selector: ".public-page-topbar", tolerance: 4 },
+      { container: ".public-page-topbar", selector: ".public-page-topbar .brand", tolerance: 4 },
+      { container: ".public-page-topbar", selector: ".public-page-topbar .settings-page-actions", tolerance: 4 },
       { container: ".templates-page-shell", selector: ".templates-page-hero", tolerance: 4 },
       { container: ".templates-page-shell", selector: ".templates-selection-status", tolerance: 4 },
       { container: ".templates-page-shell", selector: ".templates-decision-guide", tolerance: 4 },

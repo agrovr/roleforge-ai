@@ -48,7 +48,7 @@ export default async function TemplatesPage() {
 
   return (
     <main className="templates-page-shell">
-      <header className="settings-page-topbar">
+      <header className="settings-page-topbar public-page-topbar templates-topbar">
         <Brand href="/" label="RoleForge AI home" />
         <div className="settings-page-actions">
           <Link className="btn btn-soft btn-sm" href={studioHref}>Studio</Link>

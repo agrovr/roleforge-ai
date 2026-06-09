@@ -22,8 +22,11 @@ export function FaqAccordion({ items }: { items: readonly FaqItem[] }) {
               onClick={() => setOpenIndex(isOpen ? null : index)}
               type="button"
             >
-              <span>{question}</span>
-              <span className="faq-toggle" aria-hidden="true">+</span>
+              <span className="faq-question-text">{question}</span>
+              <span className="faq-toggle" aria-hidden="true">
+                <span />
+                <span />
+              </span>
             </button>
             <div aria-hidden={!isOpen} className="faq-a" id={answerId}>
               {answer}
