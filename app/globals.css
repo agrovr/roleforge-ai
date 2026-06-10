@@ -20483,6 +20483,106 @@ html[data-theme="dark"] .public-page-topbar .settings-page-actions {
   box-shadow: 0 1px 0 rgba(255, 247, 233, 0.06) inset;
 }
 
+/* Public masthead refinement: compact dock shape for legal, help, status, updates, and template pages. */
+.legal-topbar,
+.public-page-topbar {
+  width: min(1160px, calc(100% - clamp(20px, 5vw, 96px)));
+  min-height: 72px;
+  padding: 9px 10px 9px 12px;
+  border-radius: 20px;
+  border-color: color-mix(in srgb, var(--line) 76%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 90%, transparent), color-mix(in srgb, var(--surface-warm) 78%, transparent)),
+    radial-gradient(circle at 4% 0%, color-mix(in srgb, var(--brand-soft) 22%, transparent), transparent 15rem),
+    radial-gradient(circle at 100% 18%, color-mix(in srgb, var(--sky-soft) 24%, transparent), transparent 14rem);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 82%, transparent) inset,
+    0 12px 34px -28px color-mix(in srgb, var(--ink-0) 48%, transparent);
+}
+
+.legal-topbar::before,
+.public-page-topbar::before {
+  inset: -1px auto auto clamp(16px, 3vw, 34px);
+  width: clamp(96px, 18vw, 220px);
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--brand), var(--accent), transparent);
+  content: "";
+  mask-image: none;
+  opacity: 0.56;
+}
+
+.legal-topbar::after,
+.public-page-topbar::after {
+  inset: 12px clamp(116px, 14vw, 190px) 12px clamp(168px, 22vw, 300px);
+  border-radius: 14px;
+  background:
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--line-2) 44%, transparent), transparent);
+  opacity: 0.44;
+}
+
+.legal-topbar .brand,
+.public-page-topbar .brand {
+  min-height: 52px;
+  padding: 6px 14px 6px 2px;
+  border-radius: 16px;
+}
+
+.legal-topbar .settings-page-actions,
+.public-page-topbar .settings-page-actions {
+  min-height: 52px;
+  padding: 5px;
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 78%, transparent), color-mix(in srgb, var(--surface-warm) 62%, transparent));
+}
+
+.legal-topbar .settings-page-actions .btn,
+.legal-topbar .settings-page-actions .theme-toggle,
+.legal-topbar .settings-page-actions .public-account-loading,
+.legal-topbar .settings-page-actions .public-account-signin,
+.legal-topbar .settings-page-actions .public-account-menu,
+.legal-topbar .settings-page-actions .public-topbar-avatar,
+.public-page-topbar .settings-page-actions .btn,
+.public-page-topbar .settings-page-actions .theme-toggle,
+.public-page-topbar .settings-page-actions .public-account-loading,
+.public-page-topbar .settings-page-actions .public-account-signin,
+.public-page-topbar .settings-page-actions .public-account-menu,
+.public-page-topbar .settings-page-actions .public-topbar-avatar {
+  min-height: 42px;
+  border-radius: 12px;
+}
+
+html[data-theme="dark"] .legal-topbar,
+html[data-theme="dark"] .public-page-topbar {
+  border-color: rgba(255, 247, 233, 0.14);
+  background:
+    linear-gradient(180deg, rgba(25, 30, 49, 0.9), rgba(11, 16, 31, 0.8)),
+    radial-gradient(circle at 4% 0%, rgba(222, 162, 79, 0.13), transparent 15rem),
+    radial-gradient(circle at 100% 18%, rgba(142, 183, 240, 0.1), transparent 14rem);
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.08) inset,
+    0 18px 46px -34px rgba(0, 0, 0, 0.84);
+}
+
+html[data-theme="dark"] .legal-topbar::before,
+html[data-theme="dark"] .public-page-topbar::before {
+  background: linear-gradient(90deg, #f3c16d, #8fdac8, transparent);
+  opacity: 0.66;
+}
+
+html[data-theme="dark"] .legal-topbar::after,
+html[data-theme="dark"] .public-page-topbar::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 247, 233, 0.11), transparent);
+  opacity: 0.5;
+}
+
+html[data-theme="dark"] .legal-topbar .settings-page-actions,
+html[data-theme="dark"] .public-page-topbar .settings-page-actions {
+  border-color: rgba(255, 247, 233, 0.14);
+  background: linear-gradient(180deg, rgba(255, 247, 233, 0.062), rgba(255, 247, 233, 0.034));
+}
+
 html[data-theme="dark"] .legal-shell::before {
   background:
     linear-gradient(90deg, transparent, rgba(221, 160, 74, 0.13), transparent),
