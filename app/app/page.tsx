@@ -920,6 +920,11 @@ function StudioAccountGate({ state }: { state: "loading" | "required" }) {
           <div className="studio-auth-preview" aria-label="Protected studio state">
             <span><RoleForgeIcon name="file" size={15} /> Resume workflow</span>
             <strong>{isLoading ? "Preparing workspace" : "Sign in required"}</strong>
+            <div className="studio-auth-preview-grid" aria-hidden="true">
+              <small>{isLoading ? "Session check" : "Account gate"}</small>
+              <small>Saved projects</small>
+              <small>Export access</small>
+            </div>
           </div>
           {isLoading ? (
             <div className="studio-auth-progress" aria-hidden="true" />
