@@ -19869,6 +19869,349 @@ html[data-theme="dark"] .empty-state:focus-within {
   }
 }
 
+/* Studio preview finish: review desk polish for tabs, status chips, and document paper. */
+.rf-live-card .studio-tabs-mini {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--line) 72%, transparent);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 72%, transparent)),
+    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--brand-soft) 34%, transparent), transparent 9rem);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 72%, transparent),
+    0 16px 32px -28px color-mix(in srgb, var(--ink-0) 52%, transparent);
+}
+
+.rf-live-card .studio-tabs-mini::before {
+  position: absolute;
+  inset: 0 12px auto;
+  z-index: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand) 52%, transparent), color-mix(in srgb, var(--accent) 38%, transparent), transparent);
+  content: "";
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.rf-live-card .studio-tabs-mini button {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  border: 1px solid transparent;
+  transition:
+    border-color 170ms ease,
+    background 170ms ease,
+    box-shadow 170ms ease,
+    color 170ms ease,
+    transform 170ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rf-live-card .studio-tabs-mini button::before {
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  border-radius: 9px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--surface) 72%, transparent), transparent);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 170ms ease;
+}
+
+.rf-live-card .studio-tabs-mini button:hover,
+.rf-live-card .studio-tabs-mini button:focus-visible {
+  border-color: color-mix(in srgb, var(--brand) 24%, transparent);
+  color: var(--ink-0);
+  transform: translateY(-1px);
+}
+
+.rf-live-card .studio-tabs-mini button:hover::before,
+.rf-live-card .studio-tabs-mini button:focus-visible::before {
+  opacity: 1;
+}
+
+.rf-live-card .studio-tabs-mini button.active {
+  border-color: color-mix(in srgb, var(--brand) 32%, transparent);
+  background:
+    radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 7rem),
+    linear-gradient(135deg, var(--ink-0), color-mix(in srgb, var(--ink-0) 88%, var(--brand-dark)));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.18),
+    0 12px 24px -20px color-mix(in srgb, var(--ink-0) 82%, transparent);
+}
+
+.rf-preview-wrap {
+  position: relative;
+  isolation: isolate;
+}
+
+.rf-preview-wrap::after {
+  position: absolute;
+  inset: 10px;
+  z-index: 0;
+  border: 1px solid color-mix(in srgb, #fff 54%, transparent);
+  border-radius: 17px;
+  background:
+    linear-gradient(115deg, transparent 0 18%, color-mix(in srgb, #fff 18%, transparent) 18% 19%, transparent 19% 100%),
+    radial-gradient(circle at 96% 6%, color-mix(in srgb, var(--sky-soft) 26%, transparent), transparent 10rem);
+  content: "";
+  opacity: 0.56;
+  pointer-events: none;
+}
+
+.rf-preview-status,
+.rf-preview-alert,
+.rf-resume-paper {
+  position: relative;
+  z-index: 1;
+}
+
+.rf-preview-status span,
+.rf-preview-alert {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-inline-start: 14px;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 62%, transparent),
+    0 10px 20px -18px color-mix(in srgb, var(--brand) 42%, transparent);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rf-preview-status span::before,
+.rf-preview-alert::before {
+  position: absolute;
+  inset: 7px auto 7px 6px;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--accent), var(--good));
+  content: "";
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.rf-preview-status span:hover,
+.rf-preview-status span:focus-within {
+  border-color: color-mix(in srgb, var(--good) 34%, var(--line));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 72%, transparent),
+    0 14px 26px -20px color-mix(in srgb, var(--good) 42%, transparent);
+  transform: translateY(-1px);
+}
+
+.rf-preview-status span.warn::before,
+.rf-preview-alert::before {
+  background: linear-gradient(180deg, var(--brand), var(--warn));
+}
+
+.rf-resume-paper {
+  isolation: isolate;
+  background:
+    linear-gradient(90deg, rgba(14, 20, 48, 0.028) 0 1px, transparent 1px 100%),
+    linear-gradient(180deg, rgba(14, 20, 48, 0.018) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 100% 0%, rgba(232, 149, 56, 0.08), transparent 12rem),
+    linear-gradient(180deg, #fffdf8, #fffaf0);
+  background-size: 26px 26px, 26px 26px, auto, auto;
+  box-shadow:
+    0 28px 56px -46px rgba(14, 20, 48, 0.42),
+    0 1px 3px rgba(14, 20, 48, 0.08),
+    inset 0 0 0 1px rgba(14, 20, 48, 0.025);
+  scrollbar-color: #d7c8b5 transparent;
+}
+
+.rf-resume-paper::before {
+  position: absolute;
+  inset: 0 18px auto;
+  z-index: 0;
+  height: 3px;
+  border-radius: 0 0 999px 999px;
+  background: linear-gradient(90deg, transparent, rgba(191, 107, 44, 0.46), rgba(45, 138, 94, 0.28), transparent);
+  content: "";
+  opacity: 0.74;
+  pointer-events: none;
+}
+
+.rf-resume-paper::after {
+  position: absolute;
+  inset: 16px 18px;
+  z-index: 0;
+  border: 1px solid rgba(14, 20, 48, 0.035);
+  border-radius: 10px;
+  content: "";
+  opacity: 0.82;
+  pointer-events: none;
+}
+
+.rf-resume-paper > * {
+  position: relative;
+  z-index: 1;
+}
+
+.rf-resume-head {
+  position: relative;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #eadfce;
+}
+
+.rf-resume-head::after {
+  position: absolute;
+  inset: auto auto -1px 0;
+  width: min(180px, 42%);
+  height: 2px;
+  background: linear-gradient(90deg, #222, transparent);
+  content: "";
+}
+
+.rf-preview-empty-steps span,
+.rf-diff-readiness span,
+.rf-resume-change-list li,
+.rf-diff-column {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.66),
+    0 12px 22px -20px rgba(14, 20, 48, 0.22);
+}
+
+.rf-preview-empty-steps span::before,
+.rf-diff-readiness span::before,
+.rf-resume-change-list li::before,
+.rf-diff-column::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: linear-gradient(180deg, rgba(191, 107, 44, 0.52), rgba(45, 138, 94, 0.32));
+  content: "";
+  opacity: 0.62;
+  pointer-events: none;
+}
+
+.rf-preview-empty-steps span.waiting::before,
+.rf-diff-readiness span.waiting::before {
+  background: linear-gradient(180deg, rgba(222, 162, 79, 0.68), rgba(140, 93, 45, 0.32));
+}
+
+.rf-diff-column.after::before {
+  background: linear-gradient(180deg, rgba(45, 138, 94, 0.56), rgba(137, 209, 190, 0.34));
+}
+
+.rf-diff-lines .diff-line {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.46);
+}
+
+html[data-theme="dark"] .rf-live-card .studio-tabs-mini {
+  border-color: rgba(255, 247, 233, 0.14);
+  background:
+    linear-gradient(135deg, rgba(255, 247, 233, 0.062), rgba(255, 247, 233, 0.028)),
+    radial-gradient(circle at 12% 0%, rgba(222, 162, 79, 0.14), transparent 9rem);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.08),
+    0 18px 34px -30px rgba(0, 0, 0, 0.92);
+}
+
+html[data-theme="dark"] .rf-live-card .studio-tabs-mini button:hover,
+html[data-theme="dark"] .rf-live-card .studio-tabs-mini button:focus-visible {
+  border-color: rgba(243, 193, 109, 0.28);
+  color: var(--ink-0);
+}
+
+html[data-theme="dark"] .rf-live-card .studio-tabs-mini button.active {
+  border-color: rgba(243, 193, 109, 0.36);
+  background:
+    radial-gradient(circle at 18% 0%, rgba(243, 193, 109, 0.18), transparent 7rem),
+    linear-gradient(135deg, rgba(255, 247, 233, 0.14), rgba(255, 247, 233, 0.075));
+  color: #fff7e9;
+}
+
+html[data-theme="dark"] .rf-preview-wrap::after {
+  border-color: rgba(255, 247, 233, 0.07);
+  background:
+    linear-gradient(115deg, transparent 0 18%, rgba(255, 247, 233, 0.045) 18% 19%, transparent 19% 100%),
+    radial-gradient(circle at 96% 6%, rgba(137, 209, 190, 0.08), transparent 10rem);
+  opacity: 0.64;
+}
+
+html[data-theme="dark"] .rf-preview-status span,
+html[data-theme="dark"] .rf-preview-alert {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.07),
+    0 14px 28px -24px rgba(0, 0, 0, 0.82);
+}
+
+html[data-theme="dark"] .rf-resume-paper {
+  background:
+    linear-gradient(90deg, rgba(14, 20, 48, 0.03) 0 1px, transparent 1px 100%),
+    linear-gradient(180deg, rgba(14, 20, 48, 0.02) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 100% 0%, rgba(232, 149, 56, 0.08), transparent 12rem),
+    linear-gradient(180deg, #fffdf8, #fffaf0);
+  background-size: 26px 26px, 26px 26px, auto, auto;
+  box-shadow:
+    0 30px 60px -46px rgba(0, 0, 0, 0.9),
+    inset 0 0 0 1px rgba(14, 20, 48, 0.025);
+}
+
+html[data-theme="dark"] .rf-preview-empty-steps span,
+html[data-theme="dark"] .rf-diff-readiness span,
+html[data-theme="dark"] .rf-resume-change-list li,
+html[data-theme="dark"] .rf-diff-column {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.58),
+    0 14px 24px -20px rgba(0, 0, 0, 0.24);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rf-live-card .studio-tabs-mini button.active::before {
+    animation: rf-studio-preview-tab-glow 6s ease-in-out infinite;
+  }
+}
+
+@keyframes rf-studio-preview-tab-glow {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateX(-8%);
+  }
+
+  44%,
+  58% {
+    opacity: 0.3;
+    transform: translateX(8%);
+  }
+}
+
+@media (max-width: 760px) {
+  .rf-preview-wrap::after {
+    inset: 6px;
+    border-radius: 13px;
+  }
+
+  .rf-resume-paper::after {
+    inset: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rf-live-card .studio-tabs-mini button,
+  .rf-live-card .studio-tabs-mini button::before,
+  .rf-preview-status span,
+  .rf-preview-alert {
+    animation: none;
+    transition: none;
+  }
+
+  .rf-live-card .studio-tabs-mini button:hover,
+  .rf-live-card .studio-tabs-mini button:focus-visible,
+  .rf-preview-status span:hover,
+  .rf-preview-status span:focus-within {
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .empty-state,
   .empty-state::after {
