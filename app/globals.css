@@ -684,7 +684,7 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   position: sticky;
   top: 0;
   z-index: 100;
-  padding-block: 10px;
+  padding-block: 12px;
   border-bottom: 0;
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--bg) 92%, transparent), color-mix(in srgb, var(--bg) 62%, transparent) 78%, transparent);
@@ -695,31 +695,31 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
 
 .nav-inner {
   position: relative;
-  width: min(1280px, calc(100% - clamp(28px, 5vw, 96px)));
-  max-width: 1280px;
+  width: min(1120px, calc(100% - clamp(32px, 8vw, 120px)));
+  max-width: 1120px;
   min-height: 0;
   margin: 0 auto;
-  padding: 8px 10px 8px 12px;
+  padding: 9px 10px 9px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: clamp(12px, 2vw, 24px);
   border: 1px solid color-mix(in srgb, var(--line) 76%, transparent);
-  border-radius: 24px;
+  border-radius: 999px;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 78%, transparent), color-mix(in srgb, var(--surface-warm) 58%, transparent)),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 88%, transparent), color-mix(in srgb, var(--surface-warm) 74%, transparent)),
     radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--brand-soft) 28%, transparent), transparent 16rem),
     radial-gradient(circle at 92% 14%, color-mix(in srgb, var(--accent-soft) 22%, transparent), transparent 15rem);
   box-shadow:
-    0 1px 0 color-mix(in srgb, #fff 72%, transparent) inset,
-    0 20px 58px -44px color-mix(in srgb, var(--ink-0) 50%, transparent);
+    0 1px 0 color-mix(in srgb, #fff 76%, transparent) inset,
+    0 18px 48px -38px color-mix(in srgb, var(--ink-0) 42%, transparent);
   backdrop-filter: blur(18px) saturate(1.08);
   -webkit-backdrop-filter: blur(18px) saturate(1.08);
 }
 
 .nav-inner::before {
   position: absolute;
-  inset-inline: clamp(154px, 22vw, 320px) clamp(162px, 20vw, 360px);
+  inset-inline: clamp(152px, 20vw, 292px) clamp(176px, 22vw, 330px);
   top: 50%;
   height: 1px;
   background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--line-2) 68%, transparent), transparent);
@@ -1038,7 +1038,7 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   max-width: var(--container);
   min-width: 0;
   min-height: auto;
-  margin: 0 auto;
+  margin: clamp(18px, 2.2vw, 38px) auto 0;
   display: grid;
   grid-template-columns: 1.05fr 1fr;
   align-items: center;
@@ -1306,6 +1306,13 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
 .dash-mock,
 .cta-band {
   animation: rise-in 560ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/* Landing workflow polish: guided progress rails and richer feature surfaces. */
+.steps,
+.features-grid {
+  --landing-workflow-rail: linear-gradient(90deg, var(--brand), var(--accent), var(--sky));
+  --landing-workflow-glint: linear-gradient(90deg, transparent, color-mix(in srgb, var(--surface) 74%, transparent), transparent);
 }
 
 .step:nth-child(2),
@@ -1594,6 +1601,178 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   margin-top: 2px;
   font-size: 13px;
   line-height: 1;
+}
+
+/* Landing workflow finish: clearer progress, depth, and card affordance. */
+.steps {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 74%, transparent)),
+    radial-gradient(circle at 4% 0%, color-mix(in srgb, var(--brand-soft) 44%, transparent), transparent 15rem),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--sky-soft) 38%, transparent), transparent 16rem);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 72%, transparent) inset,
+    0 26px 62px -48px color-mix(in srgb, var(--ink-0) 46%, transparent);
+}
+
+.steps::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--landing-workflow-rail);
+  content: "";
+  opacity: 0.78;
+  z-index: 0;
+}
+
+.steps::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent, color-mix(in srgb, white 42%, transparent), transparent),
+    repeating-linear-gradient(135deg, transparent 0 14px, color-mix(in srgb, var(--line) 42%, transparent) 14px 15px);
+  content: "";
+  opacity: 0.26;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.step {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(180deg, color-mix(in srgb, white 36%, transparent), transparent 72%);
+  transition:
+    background-color 220ms ease,
+    box-shadow 260ms ease,
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.step::before {
+  position: absolute;
+  inset: 20px auto 20px 0;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--landing-workflow-rail);
+  content: "";
+  opacity: 0.28;
+  transition:
+    opacity 220ms ease,
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.step::after {
+  position: absolute;
+  inset: 12px 12px auto auto;
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 32% 24%, color-mix(in srgb, white 72%, transparent), transparent 42%),
+    color-mix(in srgb, var(--brand-soft) 28%, transparent);
+  content: "";
+  opacity: 0.34;
+  pointer-events: none;
+  transform: rotate(8deg);
+}
+
+.step:hover {
+  background-color: color-mix(in srgb, var(--brand-soft) 14%, transparent);
+  transform: translateY(-2px);
+}
+
+.step:hover::before {
+  opacity: 0.72;
+  transform: scaleY(1.06);
+}
+
+.step-icon,
+.feature-icon {
+  position: relative;
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 68%, transparent) inset,
+    0 14px 26px -20px color-mix(in srgb, var(--brand-dark) 56%, transparent);
+}
+
+.feature-card {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, white 64%, transparent), color-mix(in srgb, var(--surface) 94%, transparent)),
+    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--brand-soft) 30%, transparent), transparent 11rem),
+    var(--surface);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 72%, transparent) inset,
+    0 24px 54px -42px color-mix(in srgb, var(--ink-0) 36%, transparent);
+}
+
+.feature-card::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  border-radius: inherit;
+  background: var(--landing-workflow-rail);
+  content: "";
+  opacity: 0.42;
+  transition:
+    opacity 220ms ease,
+    width 220ms ease;
+  z-index: -1;
+}
+
+.feature-card::after {
+  position: absolute;
+  inset: 0;
+  background:
+    var(--landing-workflow-glint),
+    repeating-linear-gradient(135deg, transparent 0 18px, color-mix(in srgb, var(--line) 34%, transparent) 18px 19px);
+  background-size: 180% 100%, auto;
+  content: "";
+  opacity: 0.22;
+  pointer-events: none;
+  transition:
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: -1;
+}
+
+.feature-card:hover::before {
+  width: 6px;
+  opacity: 0.72;
+}
+
+.feature-card:hover::after {
+  opacity: 0.34;
+  transform: translateX(8px);
+}
+
+.feature-card-list {
+  padding-top: 14px;
+  border-top: 1px solid color-mix(in srgb, var(--line) 76%, transparent);
+}
+
+.feature-card-list li {
+  padding: 7px 9px;
+  border: 1px solid color-mix(in srgb, var(--line) 58%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--surface-warm) 62%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step,
+  .step::before,
+  .feature-card,
+  .feature-card::before,
+  .feature-card::after {
+    animation: none;
+    transition: none;
+  }
+
+  .step:hover,
+  .feature-card:hover,
+  .feature-card:hover::after {
+    transform: none;
+  }
 }
 
 .step p {
@@ -18165,6 +18344,43 @@ html[data-theme="dark"] .rf-studio-stat {
   box-shadow: 0 22px 48px -34px rgba(0, 0, 0, 0.82);
 }
 
+html[data-theme="dark"] .steps {
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.075), rgba(255, 247, 233, 0.03)),
+    radial-gradient(circle at 4% 0%, rgba(222, 162, 79, 0.16), transparent 15rem),
+    radial-gradient(circle at 100% 0%, rgba(137, 209, 190, 0.1), transparent 16rem),
+    rgba(14, 19, 34, 0.92);
+}
+
+html[data-theme="dark"] .steps::after {
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 247, 233, 0.06), transparent),
+    repeating-linear-gradient(135deg, transparent 0 14px, rgba(255, 247, 233, 0.035) 14px 15px);
+  opacity: 0.5;
+}
+
+html[data-theme="dark"] .step {
+  background: linear-gradient(180deg, rgba(255, 247, 233, 0.035), transparent 72%);
+}
+
+html[data-theme="dark"] .step::after {
+  background:
+    radial-gradient(circle at 32% 24%, rgba(255, 247, 233, 0.14), transparent 42%),
+    rgba(222, 162, 79, 0.08);
+}
+
+html[data-theme="dark"] .feature-card {
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.07), rgba(255, 247, 233, 0.035)),
+    radial-gradient(circle at 100% 0%, rgba(222, 162, 79, 0.1), transparent 11rem),
+    var(--surface);
+}
+
+html[data-theme="dark"] .feature-card-list li {
+  border-color: rgba(255, 247, 233, 0.1);
+  background: rgba(255, 247, 233, 0.04);
+}
+
 html[data-theme="dark"] .templates-page-hero {
   border-color: rgba(255, 247, 233, 0.16);
   background:
@@ -26281,7 +26497,7 @@ html[data-theme="dark"] .brand::after {
 
 .nav::after {
   position: absolute;
-  inset-inline: max(18px, calc((100% - 1280px) / 2 + 18px));
+  inset-inline: max(24px, calc((100% - 1120px) / 2 + 28px));
   inset-block-end: 3px;
   height: 1px;
   background:
