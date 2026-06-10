@@ -12689,15 +12689,15 @@ html[data-theme="dark"] input::file-selector-button {
     width: 100%;
     min-height: 0;
     padding: 8px;
-    border-radius: 18px;
-    overflow: clip;
+    border-radius: 26px;
+    overflow: visible;
   }
 
   .legal-topbar .brand {
     width: 100%;
     max-width: 100%;
     min-width: 0;
-    border-radius: 14px;
+    border-radius: 20px;
     background: color-mix(in srgb, var(--surface) 48%, transparent);
   }
 
@@ -12712,7 +12712,7 @@ html[data-theme="dark"] input::file-selector-button {
     padding-top: 8px;
     border-left: 0;
     border-top: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
-    border-radius: 14px;
+    border-radius: 20px;
   }
 
   .updates-ledger ol {
@@ -20826,63 +20826,67 @@ html[data-theme="dark"] .public-page-topbar .settings-page-actions {
   box-shadow: 0 1px 0 rgba(255, 247, 233, 0.06) inset;
 }
 
-/* Public masthead refinement: slim glass command rail for legal, help, status, updates, and template pages. */
+/* Public masthead refinement: rounded floating command dock for legal, help, status, updates, and template pages. */
 .legal-topbar,
 .public-page-topbar {
   --public-topbar-accent: linear-gradient(90deg, transparent, var(--brand), var(--accent), var(--sky), transparent);
-  width: min(1220px, calc(100% - clamp(24px, 5vw, 96px)));
-  min-height: 72px;
-  padding: 8px 10px;
-  border-radius: 18px;
-  border-color: color-mix(in srgb, var(--line) 76%, transparent);
+  width: min(1180px, calc(100% - clamp(32px, 7vw, 144px)));
+  min-height: 78px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  border-color: color-mix(in srgb, var(--line) 66%, transparent);
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 80%, transparent)),
-    radial-gradient(ellipse at 14% 0%, color-mix(in srgb, var(--brand-soft) 28%, transparent), transparent 20rem),
-    radial-gradient(ellipse at 92% 18%, color-mix(in srgb, var(--sky-soft) 24%, transparent), transparent 18rem);
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 89%, transparent), color-mix(in srgb, var(--surface-warm) 72%, transparent)),
+    radial-gradient(ellipse at 13% -24%, color-mix(in srgb, var(--brand-soft) 26%, transparent), transparent 18rem),
+    radial-gradient(ellipse at 92% 8%, color-mix(in srgb, var(--accent-soft) 18%, transparent), transparent 16rem);
   box-shadow:
-    0 1px 0 color-mix(in srgb, white 78%, transparent) inset,
-    0 16px 42px -34px color-mix(in srgb, var(--ink-0) 54%, transparent);
-  overflow: clip;
+    0 1px 0 color-mix(in srgb, white 76%, transparent) inset,
+    0 0 0 1px color-mix(in srgb, white 34%, transparent) inset,
+    0 24px 62px -48px color-mix(in srgb, var(--ink-0) 56%, transparent);
+  overflow: visible;
 }
 
 .legal-topbar::before,
 .public-page-topbar::before {
-  inset: 0 clamp(20px, 3.4vw, 58px) auto;
-  height: 2px;
+  inset: 7px clamp(30px, 6vw, 96px) auto;
+  height: 1px;
   border-radius: 999px;
   background: var(--public-topbar-accent);
   content: "";
   mask-image: none;
-  opacity: 0.54;
+  opacity: 0.46;
 }
 
 .legal-topbar::after,
 .public-page-topbar::after {
-  inset: auto 12px 9px;
-  height: 1px;
-  border: 0;
+  inset: 11px;
+  z-index: 0;
+  border: 1px solid color-mix(in srgb, white 42%, transparent);
   border-radius: 999px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--line-2) 62%, transparent), transparent);
-  opacity: 0.72;
+  background: transparent;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 42%, transparent);
+  opacity: 0.58;
 }
 
 .legal-topbar .brand,
 .public-page-topbar .brand {
-  min-height: 56px;
-  padding: 6px 18px 6px 4px;
-  border-radius: 14px;
+  min-height: 58px;
+  padding: 6px 20px 6px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 28%, transparent);
 }
 
 .legal-topbar .settings-page-actions,
 .public-page-topbar .settings-page-actions {
-  min-height: 56px;
-  padding: 6px;
-  border-radius: 16px;
+  min-height: 58px;
+  padding: 7px;
+  border-radius: 999px;
+  border-color: color-mix(in srgb, var(--line) 58%, transparent);
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 86%, transparent), color-mix(in srgb, var(--surface-warm) 68%, transparent));
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 90%, transparent), color-mix(in srgb, var(--surface-warm) 72%, transparent));
   box-shadow:
-    0 1px 0 color-mix(in srgb, white 64%, transparent) inset,
-    0 12px 28px -25px color-mix(in srgb, var(--ink-0) 48%, transparent);
+    0 1px 0 color-mix(in srgb, white 66%, transparent) inset,
+    0 13px 30px -26px color-mix(in srgb, var(--ink-0) 46%, transparent);
 }
 
 .legal-topbar .settings-page-actions .btn,
@@ -20897,41 +20901,48 @@ html[data-theme="dark"] .public-page-topbar .settings-page-actions {
 .public-page-topbar .settings-page-actions .public-account-signin,
 .public-page-topbar .settings-page-actions .public-account-menu,
 .public-page-topbar .settings-page-actions .public-topbar-avatar {
-  min-height: 42px;
-  border-radius: 12px;
+  min-height: 44px;
+  border-radius: 999px;
 }
 
 html[data-theme="dark"] .legal-topbar,
 html[data-theme="dark"] .public-page-topbar {
   border-color: rgba(255, 247, 233, 0.13);
   background:
-    linear-gradient(180deg, rgba(25, 30, 49, 0.9), rgba(12, 17, 32, 0.82)),
-    radial-gradient(ellipse at 14% 0%, rgba(222, 162, 79, 0.16), transparent 20rem),
-    radial-gradient(ellipse at 92% 18%, rgba(137, 209, 190, 0.11), transparent 18rem);
+    linear-gradient(135deg, rgba(25, 30, 49, 0.88), rgba(12, 17, 32, 0.8)),
+    radial-gradient(ellipse at 14% -24%, rgba(222, 162, 79, 0.14), transparent 18rem),
+    radial-gradient(ellipse at 92% 8%, rgba(137, 209, 190, 0.09), transparent 16rem);
   box-shadow:
     0 1px 0 rgba(255, 247, 233, 0.08) inset,
+    0 0 0 1px rgba(255, 247, 233, 0.04) inset,
     0 18px 46px -34px rgba(0, 0, 0, 0.84);
 }
 
 html[data-theme="dark"] .legal-topbar::before,
 html[data-theme="dark"] .public-page-topbar::before {
   background: linear-gradient(90deg, transparent, #f3c16d, #8fdac8, rgba(142, 183, 240, 0.82), transparent);
-  opacity: 0.66;
+  opacity: 0.58;
 }
 
 html[data-theme="dark"] .legal-topbar::after,
 html[data-theme="dark"] .public-page-topbar::after {
-  background: linear-gradient(90deg, transparent, rgba(255, 247, 233, 0.16), transparent);
-  opacity: 0.64;
+  border-color: rgba(255, 247, 233, 0.09);
+  box-shadow: inset 0 1px 0 rgba(255, 247, 233, 0.06);
+  opacity: 0.74;
 }
 
 html[data-theme="dark"] .legal-topbar .settings-page-actions,
 html[data-theme="dark"] .public-page-topbar .settings-page-actions {
   border-color: rgba(255, 247, 233, 0.13);
-  background: linear-gradient(180deg, rgba(255, 247, 233, 0.06), rgba(255, 247, 233, 0.026));
+  background: linear-gradient(180deg, rgba(255, 247, 233, 0.07), rgba(255, 247, 233, 0.03));
   box-shadow:
     0 1px 0 rgba(255, 247, 233, 0.07) inset,
     0 16px 30px -28px rgba(0, 0, 0, 0.72);
+}
+
+html[data-theme="dark"] .legal-topbar .brand,
+html[data-theme="dark"] .public-page-topbar .brand {
+  background: rgba(255, 247, 233, 0.026);
 }
 
 /* Landing footer finish: grounded trust surface and polished link rails. */
@@ -23845,7 +23856,7 @@ html[data-theme="dark"] .studio-account-utilities {
   .public-page-topbar {
     width: min(100%, 760px);
     padding: 7px;
-    border-radius: 22px;
+    border-radius: 30px;
   }
 
   .public-page-topbar .brand {
@@ -25394,7 +25405,7 @@ html[data-theme="dark"] .nav {
     gap: 8px;
     width: 100%;
     padding: 8px;
-    border-radius: 22px;
+    border-radius: 26px;
   }
 
   .public-page-topbar::after {
@@ -27238,6 +27249,278 @@ html[data-theme="dark"] .support-reference-copy {
   .support-form textarea:focus,
   .admin-support-reply-form textarea:focus-visible {
     transform: none;
+  }
+}
+
+/* Support portal finish: clearer request packet, form depth, and traceable history. */
+.support-shell {
+  --support-portal-rail: linear-gradient(90deg, transparent, var(--sky), var(--brand), var(--accent), transparent);
+  --support-portal-glint: linear-gradient(112deg, transparent 0 34%, color-mix(in srgb, white 44%, transparent) 48%, transparent 64% 100%);
+}
+
+.support-request-card,
+.support-packet-card,
+.support-response-card,
+.support-triage-card,
+.support-history {
+  position: relative;
+  isolation: isolate;
+}
+
+.support-request-card,
+.support-packet-card,
+.support-response-card,
+.support-triage-card {
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 56%, transparent) inset,
+    0 28px 72px -54px color-mix(in srgb, var(--ink-0) 50%, transparent);
+}
+
+.support-request-card {
+  background:
+    radial-gradient(circle at 92% 0%, color-mix(in srgb, var(--accent-soft) 30%, transparent), transparent 17rem),
+    radial-gradient(circle at 0% 18%, color-mix(in srgb, var(--sky-soft) 22%, transparent), transparent 15rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 68%, transparent));
+}
+
+.support-request-head {
+  padding-block-end: 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--brand) 14%, var(--line));
+}
+
+.support-request-head::after,
+.support-packet-head::after,
+.support-response-head::after,
+.support-history-head::after {
+  display: block;
+  width: min(160px, 42%);
+  height: 2px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--support-portal-rail);
+  content: "";
+  opacity: 0.62;
+}
+
+.support-packet-card,
+.support-response-card,
+.support-triage-card {
+  border-color: color-mix(in srgb, var(--sky) 20%, var(--line));
+  background:
+    radial-gradient(circle at 96% 0%, color-mix(in srgb, var(--brand-soft) 24%, transparent), transparent 12rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 91%, transparent), color-mix(in srgb, var(--surface-warm) 58%, transparent));
+}
+
+.support-notice,
+.support-prefill-note {
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 40%, transparent),
+    0 14px 28px -24px color-mix(in srgb, var(--ink-0) 42%, transparent);
+}
+
+.support-notice::before,
+.support-prefill-note::before {
+  position: absolute;
+  inset-block: 10px;
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(180deg, var(--warn), var(--accent));
+  content: "";
+  opacity: 0.62;
+}
+
+.support-notice.success::before,
+.support-prefill-note::before {
+  background: linear-gradient(180deg, var(--good), var(--sky));
+}
+
+.support-packet-item,
+.support-response-item,
+.support-triage-item,
+.support-history-item {
+  position: relative;
+  isolation: isolate;
+}
+
+.support-packet-item::before,
+.support-response-item::before,
+.support-triage-item::before,
+.support-history-item::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--support-portal-glint);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-58%);
+  transition: opacity 180ms ease, transform 560ms ease;
+}
+
+.support-packet-item:hover::before,
+.support-response-item:hover::before,
+.support-triage-item:hover::before,
+.support-history-item:hover::before,
+.support-history-item:focus-within::before {
+  opacity: 0.58;
+  transform: translateX(58%);
+}
+
+.support-packet-item.good > span,
+.support-response-item:has(.support-status-badge.closed) .support-status-badge {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 40%, transparent),
+    0 0 0 4px color-mix(in srgb, var(--good-soft) 42%, transparent),
+    0 14px 28px -24px color-mix(in srgb, var(--good) 48%, transparent);
+}
+
+.support-packet-item.warn > span {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 40%, transparent),
+    0 0 0 4px color-mix(in srgb, var(--warn-soft) 46%, transparent),
+    0 14px 28px -24px color-mix(in srgb, var(--warn) 46%, transparent);
+}
+
+.support-form {
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--brand) 14%, var(--line));
+  border-radius: 16px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 74%, transparent), color-mix(in srgb, var(--surface-warm) 44%, transparent));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 42%, transparent);
+}
+
+.support-form label {
+  position: relative;
+}
+
+.support-form label span {
+  color: var(--brand-dark);
+}
+
+.support-form input,
+.support-form select,
+.support-form textarea {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 46%, transparent),
+    0 12px 24px -24px color-mix(in srgb, var(--ink-0) 38%, transparent);
+}
+
+.support-form input:hover,
+.support-form select:hover,
+.support-form textarea:hover {
+  border-color: color-mix(in srgb, var(--brand) 28%, var(--line));
+  background: color-mix(in srgb, var(--surface) 98%, white);
+}
+
+.support-submit {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 34%, transparent),
+    0 18px 36px -28px color-mix(in srgb, var(--brand-dark) 58%, transparent);
+}
+
+.support-history {
+  display: grid;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.support-history-head {
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--brand) 16%, var(--line));
+}
+
+.support-history-item {
+  border-color: color-mix(in srgb, var(--brand) 18%, var(--line));
+  background:
+    radial-gradient(circle at 96% 0%, color-mix(in srgb, var(--sky-soft) 18%, transparent), transparent 10rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-warm) 58%, transparent));
+}
+
+.support-reference-copy,
+.support-status-badge {
+  min-height: 34px;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 42%, transparent),
+    0 12px 24px -22px color-mix(in srgb, var(--ink-0) 42%, transparent);
+}
+
+html[data-theme="dark"] .support-shell {
+  --support-portal-rail: linear-gradient(90deg, transparent, #8eb7f0, #89d1be, #f3c16d, transparent);
+  --support-portal-glint: linear-gradient(112deg, transparent 0 34%, rgba(255, 247, 233, 0.1) 48%, transparent 64% 100%);
+}
+
+html[data-theme="dark"] .support-request-card,
+html[data-theme="dark"] .support-packet-card,
+html[data-theme="dark"] .support-response-card,
+html[data-theme="dark"] .support-triage-card {
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.08) inset,
+    0 30px 76px -54px rgba(0, 0, 0, 0.94);
+}
+
+html[data-theme="dark"] .support-request-card {
+  background:
+    radial-gradient(circle at 92% 0%, rgba(243, 193, 109, 0.1), transparent 17rem),
+    radial-gradient(circle at 0% 18%, rgba(142, 183, 240, 0.08), transparent 15rem),
+    linear-gradient(180deg, rgba(17, 23, 41, 0.9), rgba(12, 17, 31, 0.82));
+}
+
+html[data-theme="dark"] .support-request-head,
+html[data-theme="dark"] .support-history-head {
+  border-color: rgba(255, 247, 233, 0.12);
+}
+
+html[data-theme="dark"] .support-packet-card,
+html[data-theme="dark"] .support-response-card,
+html[data-theme="dark"] .support-triage-card,
+html[data-theme="dark"] .support-history-item {
+  background:
+    radial-gradient(circle at 96% 0%, rgba(137, 209, 190, 0.08), transparent 12rem),
+    linear-gradient(180deg, rgba(255, 247, 233, 0.052), rgba(255, 247, 233, 0.02));
+}
+
+html[data-theme="dark"] .support-form {
+  border-color: rgba(255, 247, 233, 0.13);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.045), rgba(255, 247, 233, 0.018));
+  box-shadow: inset 0 1px 0 rgba(255, 247, 233, 0.08);
+}
+
+html[data-theme="dark"] .support-form label span {
+  color: #f3c16d;
+}
+
+html[data-theme="dark"] .support-form input,
+html[data-theme="dark"] .support-form select,
+html[data-theme="dark"] .support-form textarea,
+html[data-theme="dark"] .support-reference-copy,
+html[data-theme="dark"] .support-status-badge {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.09),
+    0 12px 24px -22px rgba(0, 0, 0, 0.92);
+}
+
+html[data-theme="dark"] .support-form input:hover,
+html[data-theme="dark"] .support-form select:hover,
+html[data-theme="dark"] .support-form textarea:hover {
+  border-color: rgba(243, 193, 109, 0.28);
+  background: rgba(255, 247, 233, 0.065);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .support-packet-item::before,
+  .support-response-item::before,
+  .support-triage-item::before,
+  .support-history-item::before,
+  .support-form input,
+  .support-form select,
+  .support-form textarea {
+    transition: none;
   }
 }
 
