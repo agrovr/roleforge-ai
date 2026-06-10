@@ -13578,6 +13578,157 @@ html[data-theme="dark"] input::file-selector-button {
   overflow-wrap: anywhere;
 }
 
+/* Settings command rail: denser navigation with polished active states. */
+.settings-page-nav {
+  position: sticky;
+  top: 28px;
+  isolation: isolate;
+  gap: 12px;
+  padding: 12px;
+  border-color: color-mix(in srgb, var(--brand) 16%, var(--line));
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-warm) 76%, transparent)),
+    radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--brand-soft) 46%, transparent), transparent 11rem),
+    radial-gradient(circle at 100% 22%, color-mix(in srgb, var(--sky-soft) 34%, transparent), transparent 10rem);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 72%, transparent) inset,
+    0 24px 54px -42px color-mix(in srgb, var(--ink-0) 42%, transparent);
+  overflow: hidden;
+}
+
+.settings-page-nav::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand), var(--accent), var(--sky));
+  content: "";
+  opacity: 0.74;
+  z-index: 0;
+}
+
+.settings-page-nav::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(110deg, color-mix(in srgb, white 28%, transparent), transparent 36%),
+    repeating-linear-gradient(135deg, transparent 0 12px, color-mix(in srgb, var(--line) 36%, transparent) 12px 13px);
+  content: "";
+  opacity: 0.25;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.settings-section-search,
+.settings-task-shortcuts,
+.settings-section-list,
+.settings-section-empty {
+  position: relative;
+  z-index: 1;
+}
+
+.settings-section-search > div {
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, white 42%, transparent), transparent),
+    color-mix(in srgb, var(--surface) 86%, var(--bg-alt));
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 64%, transparent) inset,
+    0 12px 24px -22px color-mix(in srgb, var(--ink-0) 34%, transparent);
+}
+
+.settings-task-shortcuts a,
+.settings-page-nav a {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--line) 52%, transparent);
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    color 180ms ease,
+    box-shadow 220ms ease,
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.settings-task-shortcuts a::before,
+.settings-page-nav a::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--brand), var(--accent), var(--sky));
+  content: "";
+  opacity: 0;
+  transition:
+    opacity 180ms ease,
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: -1;
+}
+
+.settings-task-shortcuts a:hover,
+.settings-task-shortcuts a:focus-visible,
+.settings-page-nav a:hover,
+.settings-page-nav a:focus-visible {
+  border-color: color-mix(in srgb, var(--brand) 32%, var(--line));
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 58%, transparent) inset,
+    0 14px 30px -26px color-mix(in srgb, var(--brand) 46%, var(--ink-0));
+  transform: translateY(-1px);
+}
+
+.settings-task-shortcuts a:hover::before,
+.settings-task-shortcuts a:focus-visible::before,
+.settings-page-nav a:hover::before,
+.settings-page-nav a:focus-visible::before,
+.settings-page-nav a.active::before {
+  opacity: 0.9;
+  transform: scaleY(1.05);
+}
+
+.settings-page-nav a.active {
+  border-color: color-mix(in srgb, var(--brand) 36%, var(--ink-0));
+  background:
+    linear-gradient(135deg, #12172f 0%, #191d38 58%, #2a2230 100%);
+  color: #fff7e9;
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.12) inset,
+    0 18px 34px -28px color-mix(in srgb, var(--brand) 58%, var(--ink-0));
+}
+
+.settings-page-nav a svg {
+  flex: 0 0 auto;
+  transition: transform 180ms ease;
+}
+
+.settings-page-nav a:hover svg,
+.settings-page-nav a:focus-visible svg,
+.settings-page-nav a.active svg {
+  transform: translateX(1px);
+}
+
+.settings-section-empty {
+  border-color: color-mix(in srgb, var(--brand) 24%, var(--line));
+  background: color-mix(in srgb, var(--surface) 62%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-task-shortcuts a,
+  .settings-page-nav a,
+  .settings-task-shortcuts a::before,
+  .settings-page-nav a::before,
+  .settings-page-nav a svg {
+    transition: none;
+  }
+
+  .settings-task-shortcuts a:hover,
+  .settings-task-shortcuts a:focus-visible,
+  .settings-page-nav a:hover,
+  .settings-page-nav a:focus-visible,
+  .settings-page-nav a.active svg {
+    transform: none;
+  }
+}
+
 .settings-page-main {
   display: grid;
   gap: 16px;
@@ -22002,6 +22153,25 @@ html[data-theme="dark"] .settings-section {
   border-color: rgba(255, 247, 233, 0.18);
 }
 
+html[data-theme="dark"] .settings-page-nav {
+  border-color: rgba(255, 247, 233, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 247, 233, 0.07), rgba(255, 247, 233, 0.032)),
+    radial-gradient(circle at 0% 0%, rgba(222, 162, 79, 0.13), transparent 11rem),
+    radial-gradient(circle at 100% 22%, rgba(137, 209, 190, 0.08), transparent 10rem),
+    rgba(15, 20, 35, 0.92);
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.08) inset,
+    0 24px 58px -42px rgba(0, 0, 0, 0.84);
+}
+
+html[data-theme="dark"] .settings-page-nav::after {
+  background:
+    linear-gradient(110deg, rgba(255, 247, 233, 0.045), transparent 36%),
+    repeating-linear-gradient(135deg, transparent 0 12px, rgba(255, 247, 233, 0.034) 12px 13px);
+  opacity: 0.46;
+}
+
 html[data-theme="dark"] .settings-section-search > span,
 html[data-theme="dark"] .settings-section-result,
 html[data-theme="dark"] .settings-section-empty {
@@ -22047,6 +22217,15 @@ html[data-theme="dark"] .settings-task-shortcuts a:focus-visible {
   border-color: rgba(222, 162, 79, 0.32);
   background: rgba(222, 162, 79, 0.13);
   color: #fff4da;
+}
+
+html[data-theme="dark"] .settings-task-shortcuts a:hover,
+html[data-theme="dark"] .settings-task-shortcuts a:focus-visible,
+html[data-theme="dark"] .settings-page-nav a:hover,
+html[data-theme="dark"] .settings-page-nav a:focus-visible {
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.08) inset,
+    0 16px 34px -26px rgba(222, 162, 79, 0.45);
 }
 
 html[data-theme="dark"] .settings-billing-alert {
@@ -22258,8 +22437,17 @@ html[data-theme="dark"] .settings-page-nav a {
 html[data-theme="dark"] .settings-page-nav a.active,
 html[data-theme="dark"] .settings-page-nav a:hover,
 html[data-theme="dark"] .settings-page-nav a:focus-visible {
-  background: #fff7e9;
-  color: #0d1226;
+  border-color: rgba(222, 162, 79, 0.36);
+  background:
+    linear-gradient(135deg, rgba(222, 162, 79, 0.22), rgba(255, 247, 233, 0.07)),
+    rgba(255, 247, 233, 0.055);
+  color: #fff7e9;
+}
+
+html[data-theme="dark"] .settings-page-nav a.active {
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.08) inset,
+    0 18px 38px -28px rgba(222, 162, 79, 0.55);
 }
 
 html[data-theme="dark"] .history-sync-badge {
