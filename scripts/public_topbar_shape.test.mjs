@@ -6,19 +6,19 @@ const templatesPage = readFileSync("app/templates/page.tsx", "utf8");
 const globals = readFileSync("app/globals.css", "utf8");
 
 test("public legal topbar uses a slim structured navigation dock", () => {
-  assert.match(globals, /\/\* Public masthead refinement: compact dock shape/);
-  assert.match(globals, /\.legal-topbar,\s*\.public-page-topbar\s*\{(?=[^}]*width:\s*min\(1160px,\s*calc\(100%\s*-\s*clamp\(20px,\s*5vw,\s*96px\)\)\))(?=[^}]*min-height:\s*72px)(?=[^}]*padding:\s*9px\s+10px\s+9px\s+12px)(?=[^}]*border-radius:\s*20px)(?=[^}]*box-shadow:)[^}]*\}/s);
-  assert.match(globals, /\.legal-topbar::before,\s*\.public-page-topbar::before\s*\{(?=[^}]*width:\s*clamp\(96px,\s*18vw,\s*220px\))(?=[^}]*height:\s*2px)(?=[^}]*mask-image:\s*none)(?=[^}]*opacity:\s*0\.56)[^}]*\}/s);
-  assert.match(globals, /\.legal-topbar::after,\s*\.public-page-topbar::after\s*\{(?=[^}]*inset:\s*12px clamp\(116px,\s*14vw,\s*190px\) 12px clamp\(168px,\s*22vw,\s*300px\))(?=[^}]*border-radius:\s*14px)(?=[^}]*opacity:\s*0\.44)[^}]*\}/s);
-  assert.match(globals, /\.legal-topbar\s+\.brand,\s*\.public-page-topbar\s+\.brand\s*\{(?=[^}]*min-height:\s*52px)(?=[^}]*border-radius:\s*16px)[^}]*\}/s);
-  assert.match(globals, /\.legal-topbar\s+\.settings-page-actions,\s*\.public-page-topbar\s+\.settings-page-actions\s*\{(?=[^}]*min-height:\s*52px)(?=[^}]*padding:\s*5px)(?=[^}]*border-radius:\s*16px)[^}]*\}/s);
-  assert.match(globals, /\.legal-topbar\s+\.settings-page-actions\s+\.btn,[\s\S]*?\.public-page-topbar\s+\.settings-page-actions\s+\.public-topbar-avatar\s*\{(?=[^}]*min-height:\s*42px)(?=[^}]*border-radius:\s*12px)[^}]*\}/s);
+  assert.match(globals, /\/\* Public masthead refinement: compact command dock/);
+  assert.match(globals, /\.legal-topbar,\s*\.public-page-topbar\s*\{(?=[^}]*width:\s*min\(1180px,\s*calc\(100%\s*-\s*clamp\(32px,\s*9vw,\s*220px\)\)\))(?=[^}]*min-height:\s*68px)(?=[^}]*padding:\s*7px)(?=[^}]*border-radius:\s*28px)(?=[^}]*box-shadow:)[^}]*\}/s);
+  assert.match(globals, /\.legal-topbar::before,\s*\.public-page-topbar::before\s*\{(?=[^}]*width:\s*clamp\(118px,\s*17vw,\s*238px\))(?=[^}]*height:\s*2px)(?=[^}]*mask-image:\s*none)(?=[^}]*opacity:\s*0\.48)[^}]*\}/s);
+  assert.match(globals, /\.legal-topbar::after,\s*\.public-page-topbar::after\s*\{(?=[^}]*inset:\s*9px clamp\(114px,\s*14vw,\s*184px\) 9px clamp\(176px,\s*22vw,\s*296px\))(?=[^}]*border:\s*1px solid)(?=[^}]*border-radius:\s*22px)(?=[^}]*opacity:\s*0\.36)[^}]*\}/s);
+  assert.match(globals, /\.legal-topbar\s+\.brand,\s*\.public-page-topbar\s+\.brand\s*\{(?=[^}]*min-height:\s*54px)(?=[^}]*border-radius:\s*22px)[^}]*\}/s);
+  assert.match(globals, /\.legal-topbar\s+\.settings-page-actions,\s*\.public-page-topbar\s+\.settings-page-actions\s*\{(?=[^}]*min-height:\s*54px)(?=[^}]*padding:\s*5px)(?=[^}]*border-radius:\s*22px)(?=[^}]*box-shadow:)[^}]*\}/s);
+  assert.match(globals, /\.legal-topbar\s+\.settings-page-actions\s+\.btn,[\s\S]*?\.public-page-topbar\s+\.settings-page-actions\s+\.public-topbar-avatar\s*\{(?=[^}]*min-height:\s*42px)(?=[^}]*border-radius:\s*16px)[^}]*\}/s);
 });
 
 test("public legal topbar keeps dark mode and mobile actions shaped safely", () => {
   assert.match(globals, /html\[data-theme="dark"\]\s+\.legal-topbar,\s*html\[data-theme="dark"\]\s+\.public-page-topbar\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.14\))(?=[^}]*box-shadow:)[^}]*\}/s);
-  assert.match(globals, /html\[data-theme="dark"\]\s+\.legal-topbar::before,\s*html\[data-theme="dark"\]\s+\.public-page-topbar::before\s*\{(?=[^}]*#f3c16d)(?=[^}]*#8fdac8)(?=[^}]*opacity:\s*0\.66)[^}]*\}/s);
-  assert.match(globals, /html\[data-theme="dark"\]\s+\.legal-topbar::after,\s*html\[data-theme="dark"\]\s+\.public-page-topbar::after\s*\{(?=[^}]*rgba\(255,\s*247,\s*233,\s*0\.11\))(?=[^}]*opacity:\s*0\.5)[^}]*\}/s);
+  assert.match(globals, /html\[data-theme="dark"\]\s+\.legal-topbar::before,\s*html\[data-theme="dark"\]\s+\.public-page-topbar::before\s*\{(?=[^}]*#f3c16d)(?=[^}]*#8fdac8)(?=[^}]*opacity:\s*0\.6)[^}]*\}/s);
+  assert.match(globals, /html\[data-theme="dark"\]\s+\.legal-topbar::after,\s*html\[data-theme="dark"\]\s+\.public-page-topbar::after\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.09\))(?=[^}]*opacity:\s*0\.46)[^}]*\}/s);
   assert.match(globals, /html\[data-theme="dark"\]\s+\.legal-topbar\s+\.settings-page-actions,\s*html\[data-theme="dark"\]\s+\.public-page-topbar\s+\.settings-page-actions\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.14\))(?=[^}]*linear-gradient\(180deg,\s*rgba\(255,\s*247,\s*233,\s*0\.062\),\s*rgba\(255,\s*247,\s*233,\s*0\.034\)\))[^}]*\}/s);
   assert.match(globals, /@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.legal-topbar\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*1fr)(?=[^}]*padding:\s*8px)(?=[^}]*border-radius:\s*18px)[^}]*\}/s);
   assert.match(globals, /@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.legal-topbar\s+\.settings-page-actions\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*border-top:\s*1px solid)(?=[^}]*border-radius:\s*14px)[^}]*\}/s);
@@ -30,10 +30,10 @@ test("templates page uses the polished public topbar shell", () => {
 });
 
 test("public topbar has a contained rounded shape with grouped actions", () => {
-  assert.match(globals, /\.legal-topbar,\s*\.public-page-topbar\s*\{(?=[^}]*width:\s*min\(1160px,\s*calc\(100%\s*-\s*clamp\(20px,\s*5vw,\s*96px\)\)\))(?=[^}]*border-radius:\s*20px)[^}]*\}/s);
+  assert.match(globals, /\.legal-topbar,\s*\.public-page-topbar\s*\{(?=[^}]*width:\s*min\(1180px,\s*calc\(100%\s*-\s*clamp\(32px,\s*9vw,\s*220px\)\)\))(?=[^}]*border-radius:\s*28px)[^}]*\}/s);
   assert.match(globals, /\.public-page-topbar\s+\.brand\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*min-height:\s*48px)[^}]*\}/s);
-  assert.match(globals, /\.legal-topbar\s+\.brand,\s*\.public-page-topbar\s+\.brand\s*\{(?=[^}]*min-height:\s*52px)(?=[^}]*border-radius:\s*16px)[^}]*\}/s);
-  assert.match(globals, /\.legal-topbar\s+\.settings-page-actions,\s*\.public-page-topbar\s+\.settings-page-actions\s*\{(?=[^}]*min-height:\s*52px)(?=[^}]*border-radius:\s*16px)[^}]*\}/s);
+  assert.match(globals, /\.legal-topbar\s+\.brand,\s*\.public-page-topbar\s+\.brand\s*\{(?=[^}]*min-height:\s*54px)(?=[^}]*border-radius:\s*22px)[^}]*\}/s);
+  assert.match(globals, /\.legal-topbar\s+\.settings-page-actions,\s*\.public-page-topbar\s+\.settings-page-actions\s*\{(?=[^}]*min-height:\s*54px)(?=[^}]*border-radius:\s*22px)[^}]*\}/s);
 });
 
 test("public topbar has dark and narrow viewport polish", () => {
