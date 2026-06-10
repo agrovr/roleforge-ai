@@ -117,7 +117,7 @@ test("public account menu topbar layout is overflow safe", () => {
   assert.match(stylesheet, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.public-account-loading\s+>\s+span\[aria-hidden="true"\]\s*\{[^}]*animation:\s*none/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.public-account-loading/);
   assert.match(stylesheet, /\.public-topbar-avatar\s*\{(?=[^}]*width:\s*40px)(?=[^}]*height:\s*40px)[^}]*\}/s);
-  assert.match(stylesheet, /\.public-account-popover\s*\{(?=[^}]*width:\s*min\(420px,\s*calc\(100vw\s*-\s*30px\)\))[^}]*\}/s);
+  assert.match(stylesheet, /\.public-account-popover\s*\{(?=[^}]*width:\s*min\(440px,\s*calc\(100vw\s*-\s*30px\)\))[^}]*\}/s);
   assert.match(stylesheet, /\.public-account-reference,\s*\.studio-account-reference\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*max-width:\s*100%)[^}]*\}/s);
   assert.match(stylesheet, /\.public-account-reference\s*>\s*span,\s*\.studio-account-reference\s*>\s*span\s*\{(?=[^}]*font-size:\s*0\.74rem)(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
   assert.match(stylesheet, /\.public-account-reference-copy,\s*\.studio-account-reference-copy\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*min-height:\s*26px)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
