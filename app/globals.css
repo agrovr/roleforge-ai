@@ -7457,6 +7457,33 @@ html[data-theme="dark"] input::file-selector-button {
   white-space: normal;
 }
 
+.action-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.action-submit.is-pending {
+  cursor: progress;
+}
+
+.action-submit-spinner {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  border: 2px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-top-color: currentColor;
+  border-radius: 999px;
+  animation: action-submit-spin 0.72s linear infinite;
+}
+
+@keyframes action-submit-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
 .studio-account-shortcuts {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr));
@@ -13642,6 +13669,11 @@ html[data-theme="dark"] input::file-selector-button {
   min-width: 0;
   overflow-wrap: anywhere;
   text-wrap: pretty;
+}
+
+.settings-action-notice {
+  margin-block-end: 4px;
+  box-shadow: none;
 }
 
 .settings-workspace-actions {
@@ -26645,6 +26677,34 @@ html[data-theme="dark"] .settings-billing-control-item:hover > span {
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, #fff 44%, transparent),
     0 10px 22px -20px color-mix(in srgb, var(--brand) 58%, transparent);
+}
+
+.settings-project-stage-controls button:disabled:not(.active):not(.is-pending) {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--ink-3);
+  box-shadow: none;
+  cursor: wait;
+  opacity: 0.58;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action-submit-spinner {
+    animation: none;
+  }
+}
+
+.action-submit.is-pending:disabled {
+  cursor: progress;
+  opacity: 0.86;
+}
+
+.primary-button.action-submit.is-pending:disabled {
+  color: #69451f;
+}
+
+html[data-theme="dark"] .primary-button.action-submit.is-pending:disabled {
+  color: #f3d9ad;
 }
 
 .settings-project-rename label > span,

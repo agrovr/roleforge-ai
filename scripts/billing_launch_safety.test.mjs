@@ -47,8 +47,8 @@ test("direct billing portal navigation redirects to the billing UI instead of re
 });
 
 test("settings billing actions submit with POST instead of opening API routes as pages", () => {
-  assert.match(settingsPage, /<form action="\/api\/billing\/checkout" method="post">/);
-  assert.match(settingsPage, /<form action="\/api\/billing\/portal" method="post">/);
+  assert.match(settingsPage, /<NativeActionForm action="\/api\/billing\/checkout">/);
+  assert.match(settingsPage, /<NativeActionForm action="\/api\/billing\/portal">/);
 });
 
 test("checkout sessions allow promotion codes for launch testing and controlled discounts", () => {

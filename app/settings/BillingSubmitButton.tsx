@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormStatus } from "react-dom";
+import { ActionSubmitButton } from "../components/ActionSubmitButton";
 
 type BillingSubmitButtonProps = {
   className: string;
@@ -19,18 +19,13 @@ export function BillingSubmitButton({
   unavailableLabel = "Unavailable",
   title,
 }: BillingSubmitButtonProps) {
-  const { pending } = useFormStatus();
-  const disabled = !ready || pending;
-
   return (
-    <button
-      aria-busy={pending ? "true" : undefined}
+    <ActionSubmitButton
       className={className}
-      disabled={disabled}
+      disabled={!ready}
+      label={ready ? readyLabel : unavailableLabel}
+      pendingLabel={pendingLabel}
       title={title}
-      type="submit"
-    >
-      {ready ? (pending ? pendingLabel : readyLabel) : unavailableLabel}
-    </button>
+    />
   );
 }

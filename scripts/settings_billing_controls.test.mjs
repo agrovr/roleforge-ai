@@ -4,6 +4,8 @@ import test from "node:test";
 
 const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
 const billingSubmitButton = readFileSync("app/settings/BillingSubmitButton.tsx", "utf8");
+const actionSubmitButton = readFileSync("app/components/ActionSubmitButton.tsx", "utf8");
+const nativeActionForm = readFileSync("app/components/NativeActionForm.tsx", "utf8");
 const stylesheet = readFileSync("app/globals.css", "utf8");
 
 test("settings billing action distinguishes active portals from inactive billing state", () => {
@@ -23,9 +25,13 @@ test("settings billing action distinguishes active portals from inactive billing
 });
 
 test("settings billing submit buttons show progress while Stripe opens", () => {
-  assert.match(billingSubmitButton, /useFormStatus/);
-  assert.match(billingSubmitButton, /aria-busy=\{pending \? "true" : undefined\}/);
-  assert.match(billingSubmitButton, /disabled=\{disabled\}/);
+  assert.match(billingSubmitButton, /ActionSubmitButton/);
+  assert.match(settingsPage, /<NativeActionForm action="\/api\/billing\/portal">/);
+  assert.match(settingsPage, /<NativeActionForm action="\/api\/billing\/checkout">/);
+  assert.match(nativeActionForm, /onSubmit/);
+  assert.match(actionSubmitButton, /useFormStatus/);
+  assert.match(actionSubmitButton, /aria-busy=\{activeSubmission \? "true" : undefined\}/);
+  assert.match(actionSubmitButton, /disabled=\{disabled \|\| formPending\}/);
   assert.match(settingsPage, /pendingLabel="Opening checkout\.\.\."/);
   assert.match(settingsPage, /pendingLabel="Opening billing\.\.\."/);
 });

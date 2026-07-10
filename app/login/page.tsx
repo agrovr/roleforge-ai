@@ -2,6 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { Brand } from "../components/Brand";
+import { ActionSubmitButton } from "../components/ActionSubmitButton";
+import { NativeActionForm } from "../components/NativeActionForm";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { loginNoticeCopy, loginNoticeTone } from "../lib/loginNotice";
@@ -94,15 +96,17 @@ export default async function LoginPage({ searchParams }: { searchParams: LoginS
                 Continue with Google
               </a>
               <div className="studio-account-divider"><span>Email sign-in</span></div>
-              <form className="studio-account-form" action="/auth/signin" method="post">
+              <NativeActionForm className="studio-account-form" action="/auth/signin">
                 <input type="hidden" name="next" value={next} />
                 <input type="hidden" name="statusNext" value={statusNext} />
                 <label htmlFor="login-email">Email address</label>
                 <input id="login-email" name="email" type="email" autoComplete="email" required placeholder="you@example.com" />
-                <button className="primary-button studio-account-submit" type="submit">
-                  Send sign-in link
-                </button>
-              </form>
+                <ActionSubmitButton
+                  className="primary-button studio-account-submit"
+                  label="Send sign-in link"
+                  pendingLabel="Sending secure link…"
+                />
+              </NativeActionForm>
             </>
           ) : (
             <div className="login-disabled">

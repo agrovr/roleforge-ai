@@ -3,7 +3,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { AccountAvatar } from "../components/AccountAvatar";
+import { ActionSubmitButton } from "../components/ActionSubmitButton";
 import { Brand } from "../components/Brand";
+import { NativeActionForm } from "../components/NativeActionForm";
 import { ResumePreview } from "../components/ResumePreview";
 import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
 import { SupportReferenceCopyButton } from "../components/SupportReferenceCopyButton";
@@ -139,6 +141,14 @@ function accountNotice(value: string | undefined) {
     default:
       return null;
   }
+}
+
+function accountNoticeArea(value: string | undefined) {
+  if (value?.startsWith("profile-") || value?.startsWith("email-")) return "account";
+  if (value?.startsWith("delete-")) return "data-privacy";
+  if (value?.startsWith("template-") || value?.startsWith("communication-")) return "preferences";
+  if (value?.startsWith("project-")) return "projects";
+  return null;
 }
 
 async function countRows(
@@ -459,6 +469,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const lastSignInLabel = accountSecurityDateLabel(user.last_sign_in_at);
   const accountCreatedLabel = accountSecurityDateLabel(user.created_at);
   const profileNotice = accountNotice(accountParam);
+  const profileNoticeArea = accountNoticeArea(accountParam);
   const planFeatures = premiumActive
     ? ["Unlimited runs", "DOCX and TXT exports", premiumEnding && premiumEndLabel ? `Access until ${premiumEndLabel}` : "PDF export included"]
     : [monthlyRunAllowanceLabel(usage.monthlyRunLimit), "PDF export", "Saved project sync"];
@@ -1102,20 +1113,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
             </div>
           </div>
 
-          {notice ? (
-            <div className={`settings-billing-alert ${notice.tone}`} role="status">
-              <RoleForgeIcon name={notice.tone === "success" ? "check" : "settings"} size={16} />
-              <span>{notice.text}</span>
-            </div>
-          ) : null}
-
-          {profileNotice ? (
-            <div className={`settings-billing-alert ${profileNotice.tone}`} role="status">
-              <RoleForgeIcon name={profileNotice.tone === "success" ? "check" : "settings"} size={16} />
-              <span>{profileNotice.text}</span>
-            </div>
-          ) : null}
-
           <nav className="settings-workspace-actions" aria-label="Workspace quick actions">
             <Link className="settings-workspace-action" href="/app">
               <span><RoleForgeIcon name="file" size={16} /></span>
@@ -1249,6 +1246,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               <p>Your studio access is tied to this signed-in account.</p>
             </div>
             <div className="settings-section-panel">
+              {profileNotice && profileNoticeArea === "account" ? (
+                <div className={`settings-billing-alert settings-action-notice ${profileNotice.tone}`} role="status" aria-live="polite">
+                  <RoleForgeIcon name={profileNotice.tone === "success" ? "check" : "settings"} size={16} />
+                  <span>{profileNotice.text}</span>
+                </div>
+              ) : null}
               <div className="settings-profile-row">
                 <div className="studio-account-button settings-profile-avatar" aria-hidden="true">
                   <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
@@ -1277,9 +1280,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     defaultValue={displayName}
                     placeholder="Add a display name"
                   />
-                  <button className="primary-button" type="submit">
-                    Save name
-                  </button>
+                  <ActionSubmitButton className="primary-button" label="Save name" pendingLabel="Saving name…" />
                 </div>
                 <small>Shown in your account menu and saved-project profile.</small>
               </form>
@@ -1295,9 +1296,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     placeholder="you@example.com"
                     required
                   />
-                  <button className="primary-button" type="submit">
-                    Update email
-                  </button>
+                  <ActionSubmitButton className="primary-button" label="Update email" pendingLabel="Sending confirmation…" />
                 </div>
                 <small>Supabase may send confirmation links to your current and new email before the change applies.</small>
               </form>
@@ -1394,6 +1393,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               <p>Export your account record, review legal policies, and manage destructive account actions from one place.</p>
             </div>
             <div className="settings-section-panel">
+              {profileNotice && profileNoticeArea === "data-privacy" ? (
+                <div className={`settings-billing-alert settings-action-notice ${profileNotice.tone}`} role="status" aria-live="polite">
+                  <RoleForgeIcon name={profileNotice.tone === "success" ? "check" : "settings"} size={16} />
+                  <span>{profileNotice.text}</span>
+                </div>
+              ) : null}
               <div className="settings-data-privacy-grid" aria-label="Data and privacy actions">
                 {dataPrivacyItems.map((item) => (
                   <a className={`settings-data-privacy-item ${item.tone}`} href={item.href} key={item.title}>
@@ -1415,7 +1420,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     Permanently removes your RoleForge account and saved projects. Download your summary first. Premium accounts must cancel billing before deletion.
                   </span>
                 </div>
-                <form action="/api/account/delete" method="post">
+                <NativeActionForm action="/api/account/delete">
                   <label htmlFor="settings-delete-confirmation">Type DELETE</label>
                   <div className="settings-danger-actions">
                     <input
@@ -1427,11 +1432,13 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                       spellCheck={false}
                       required
                     />
-                    <button className="ghost-button settings-danger-button" type="submit">
-                      Delete account
-                    </button>
+                    <ActionSubmitButton
+                      className="ghost-button settings-danger-button"
+                      label="Delete account"
+                      pendingLabel="Deleting account…"
+                    />
                   </div>
-                </form>
+                </NativeActionForm>
               </div>
             </div>
           </section>
@@ -1442,6 +1449,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               <p>Set the default resume direction RoleForge sends with new exports.</p>
             </div>
             <div className="settings-section-panel">
+              {profileNotice && profileNoticeArea === "preferences" ? (
+                <div className={`settings-billing-alert settings-action-notice ${profileNotice.tone}`} role="status" aria-live="polite">
+                  <RoleForgeIcon name={profileNotice.tone === "success" ? "check" : "settings"} size={16} />
+                  <span>{profileNotice.text}</span>
+                </div>
+              ) : null}
               <div className="settings-template-grid" aria-label="Default resume direction">
                 {RESUME_TEMPLATES.map((template) => {
                   const selected = template.slug === selectedTemplate.slug;
@@ -1463,14 +1476,13 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                         <p>{template.detail}</p>
                         <form className="settings-template-form" action={updateTemplatePreferenceAction}>
                           <input type="hidden" name="template" value={template.slug} />
-                          <button
+                          <ActionSubmitButton
+                            ariaPressed={selected}
                             className={`btn btn-soft btn-sm settings-template-button${selected ? " selected" : ""}`}
-                            type="submit"
-                            aria-pressed={selected}
-                          >
-                            {selected ? "Selected" : "Set default"}
-                            <RoleForgeIcon name={selected ? "check" : "layers"} size={12} />
-                          </button>
+                            icon={selected ? "check" : "layers"}
+                            label={selected ? "Selected" : "Set default"}
+                            pendingLabel="Saving direction…"
+                          />
                         </form>
                       </div>
                     </article>
@@ -1503,9 +1515,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     <span><RoleForgeIcon name="settings" size={13} /> Billing and subscription notices</span>
                     <span><RoleForgeIcon name="mail" size={13} /> Support request follow-up</span>
                   </div>
-                  <button className="primary-button" type="submit">
-                    Save communication preferences
-                  </button>
+                  <ActionSubmitButton
+                    className="primary-button"
+                    label="Save communication preferences"
+                    pendingLabel="Saving preferences…"
+                  />
                 </form>
               </div>
             </div>
@@ -1517,6 +1531,12 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               <p>Completed runs are stored with your account and can be restored from History.</p>
             </div>
             <div className="settings-section-panel">
+              {profileNotice && profileNoticeArea === "projects" ? (
+                <div className={`settings-billing-alert settings-action-notice ${profileNotice.tone}`} role="status" aria-live="polite">
+                  <RoleForgeIcon name={profileNotice.tone === "success" ? "check" : "settings"} size={16} />
+                  <span>{profileNotice.text}</span>
+                </div>
+              ) : null}
               <div className="settings-metric-row">
                 <div className="settings-metric">
                   <strong>{projectCount}</strong>
@@ -1581,18 +1601,17 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                                 {APPLICATION_STATUS_OPTIONS.map((option) => {
                                   const selected = project.stageStatus === option.status;
                                   return (
-                                    <button
+                                    <ActionSubmitButton
+                                      ariaPressed={selected}
                                       className={selected ? "active" : ""}
                                       disabled={selected}
                                       key={`${project.projectId}-${option.status}`}
+                                      label={settingsStageLabel(option.status, option.label)}
                                       name="status"
-                                      type="submit"
+                                      pendingLabel="Updating…"
                                       value={option.status}
                                       title={option.detail}
-                                      aria-pressed={selected}
-                                    >
-                                      {settingsStageLabel(option.status, option.label)}
-                                    </button>
+                                    />
                                   );
                                 })}
                               </div>
@@ -1611,7 +1630,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                                     aria-label={`Rename ${project.title}`}
                                     autoComplete="off"
                                   />
-                                  <button type="submit">Save</button>
+                                  <ActionSubmitButton label="Save" pendingLabel="Saving…" />
                                 </div>
                               </label>
                             </form>
@@ -1658,7 +1677,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                                       autoComplete="off"
                                       placeholder="DELETE"
                                     />
-                                    <button type="submit">Remove</button>
+                                    <ActionSubmitButton label="Remove" pendingLabel="Removing…" />
                                   </div>
                                 </label>
                               </form>
@@ -1840,12 +1859,18 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
               <p>Premium is priced for early users at ${PREMIUM_PRICE.monthly / 100}/month or ${PREMIUM_PRICE.yearly / 100}/year.</p>
             </div>
             <div className="settings-section-panel settings-billing-panel">
+              {notice ? (
+                <div className={`settings-billing-alert settings-action-notice ${notice.tone}`} role="status" aria-live="polite">
+                  <RoleForgeIcon name={notice.tone === "success" ? "check" : "settings"} size={16} />
+                  <span>{notice.text}</span>
+                </div>
+              ) : null}
               <div className="settings-billing-head">
                 <span className={`settings-status-pill ${premiumEnding ? "ready" : billingTone}`}>
                   {billingLabel}
                 </span>
                 {portalReady ? (
-                  <form action="/api/billing/portal" method="post">
+                  <NativeActionForm action="/api/billing/portal">
                     <BillingSubmitButton
                       className="ghost-button"
                       pendingLabel="Opening billing..."
@@ -1853,9 +1878,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                       readyLabel="Manage billing"
                       title={portalActionTitle}
                     />
-                  </form>
+                  </NativeActionForm>
                 ) : showCheckoutHeaderAction ? (
-                  <form action="/api/billing/checkout" method="post">
+                  <NativeActionForm action="/api/billing/checkout">
                     <input type="hidden" name="interval" value="month" />
                     <BillingSubmitButton
                       className="ghost-button"
@@ -1864,7 +1889,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                       readyLabel="Start Premium"
                       title={portalActionTitle}
                     />
-                  </form>
+                  </NativeActionForm>
                 ) : (
                   <span className="ghost-button settings-disabled-action" aria-disabled="true" title={portalActionTitle}>
                     {inactiveBillingActionLabel}
@@ -1892,7 +1917,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                       <strong>${PREMIUM_PRICE.monthly / 100}</strong>
                       <small>per month</small>
                     </div>
-                    <form action="/api/billing/checkout" method="post">
+                    <NativeActionForm action="/api/billing/checkout">
                       <input type="hidden" name="interval" value="month" />
                       <BillingSubmitButton
                         className="primary-button"
@@ -1900,7 +1925,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                         ready={checkoutReady}
                         readyLabel="Start monthly"
                       />
-                    </form>
+                    </NativeActionForm>
                   </article>
                   <article className="settings-price-card featured">
                     <div>
@@ -1908,7 +1933,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                       <strong>${PREMIUM_PRICE.yearly / 100}</strong>
                       <small>per year</small>
                     </div>
-                    <form action="/api/billing/checkout" method="post">
+                    <NativeActionForm action="/api/billing/checkout">
                       <input type="hidden" name="interval" value="year" />
                       <BillingSubmitButton
                         className="primary-button"
@@ -1916,7 +1941,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                         ready={checkoutReady}
                         readyLabel="Start yearly"
                       />
-                    </form>
+                    </NativeActionForm>
                   </article>
                 </div>
               )}
