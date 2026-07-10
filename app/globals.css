@@ -29179,6 +29179,449 @@ html[data-theme="dark"] .template-thumb {
   }
 }
 
+/* Resume template system: complete paper previews and a quieter featured gallery. */
+.templates-head::after,
+.template-card::before,
+.template-card::after,
+.r-doc::before,
+.r-doc::after,
+.r-section-title::after {
+  content: none;
+}
+
+.templates {
+  padding-inline: clamp(18px, 4vw, 64px);
+  overflow: visible;
+}
+
+.templates-head,
+.templates-row {
+  width: min(var(--container), 100%);
+  margin-inline: auto;
+}
+
+.templates-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 24px);
+  overflow: visible;
+  padding: 0;
+  scroll-snap-type: none;
+  scrollbar-width: none;
+}
+
+.templates-row::-webkit-scrollbar {
+  display: none;
+}
+
+.template-card {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+  animation: none;
+}
+
+.template-card:hover,
+.template-card:focus-within {
+  box-shadow: none;
+  transform: none;
+}
+
+.template-thumb,
+.settings-template-thumb {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 8.5 / 11;
+  display: grid;
+  place-items: center;
+  padding: clamp(9px, 1.2vw, 14px);
+  overflow: hidden;
+  border: 0;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface-2) 70%, var(--surface-warm));
+}
+
+.template-thumb .r-doc,
+.settings-template-thumb .r-doc {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 8.5 / 11;
+  padding: 16px 18px;
+  font-size: 6.1px;
+  box-shadow: 0 16px 32px -28px rgba(24, 28, 38, 0.48);
+}
+
+.template-thumb .r-name,
+.settings-template-thumb .r-name {
+  font-size: 14px;
+}
+
+.template-thumb .r-role,
+.settings-template-thumb .r-role {
+  font-size: 7.4px;
+}
+
+.template-thumb .r-contact,
+.settings-template-thumb .r-contact,
+.template-thumb .r-job-org,
+.template-thumb .r-job-date,
+.settings-template-thumb .r-job-org,
+.settings-template-thumb .r-job-date {
+  font-size: 5.2px;
+}
+
+.template-thumb .r-section-title,
+.settings-template-thumb .r-section-title {
+  font-size: 6.7px;
+}
+
+.template-thumb .r-copy,
+.template-thumb .r-bullet,
+.settings-template-thumb .r-copy,
+.settings-template-thumb .r-bullet {
+  font-size: 5.6px;
+}
+
+.template-thumb .r-job-title,
+.settings-template-thumb .r-job-title {
+  font-size: 6px;
+}
+
+.template-thumb .r-skill,
+.settings-template-thumb .r-skill {
+  font-size: 5.2px;
+}
+
+.template-info {
+  align-items: start;
+  padding: 0 2px;
+  border: 0;
+}
+
+.template-info > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.template-info small {
+  color: var(--brand-dark);
+  font-size: 0.66rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.template-info .template-name {
+  font-size: 1rem;
+}
+
+.template-info .template-tag {
+  max-width: 11rem;
+  color: var(--ink-3);
+  font-size: 0.78rem;
+  line-height: 1.25;
+  text-align: right;
+}
+
+.templates-actions {
+  width: min(var(--container), 100%);
+  margin-inline: auto;
+  padding: 26px 0 0;
+}
+
+.r-doc {
+  --resume-accent: #202736;
+  position: relative;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 8.5 / 11;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 24px 28px;
+  background: #fff;
+  color: #20242a;
+  font-family: Arial, sans-serif;
+  font-size: 8.5px;
+  line-height: 1.38;
+}
+
+.resume-card .r-doc {
+  aspect-ratio: auto;
+  height: 100%;
+}
+
+.r-header {
+  margin-bottom: 10px;
+}
+
+.r-name {
+  margin: 0 0 2px;
+  color: var(--resume-accent);
+  font-family: Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+.r-role {
+  margin: 0 0 4px;
+  color: #343a43;
+  font-size: 10px;
+}
+
+.r-contact {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #68707b;
+  font-size: 7.5px;
+  letter-spacing: 0;
+}
+
+.r-sections {
+  min-height: 0;
+}
+
+.r-section {
+  margin: 0 0 10px;
+}
+
+.r-section-title {
+  margin: 0 0 4px;
+  padding: 0;
+  border: 0;
+  color: var(--resume-accent);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.065em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.r-copy,
+.r-bullet {
+  color: #262b32;
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.r-copy {
+  margin: 0;
+}
+
+.r-bullet {
+  margin-bottom: 1px;
+  padding-left: 9px;
+}
+
+.r-bullet::before {
+  color: var(--resume-accent);
+  content: "-";
+}
+
+.r-job {
+  margin-bottom: 6px;
+}
+
+.r-job-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 1px;
+}
+
+.r-job-title {
+  font-size: 8.5px;
+  font-weight: 700;
+}
+
+.r-job-date,
+.r-job-org {
+  color: #68707b;
+  font-size: 7px;
+}
+
+.r-job-org {
+  margin-bottom: 3px;
+  font-style: normal;
+}
+
+.r-skills {
+  gap: 2px 8px;
+}
+
+.r-skill {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #303640;
+  font-size: 7.5px;
+}
+
+.r-skill:not(:last-child)::after {
+  margin-inline-start: 8px;
+  color: #a1a7af;
+  content: "·";
+}
+
+.r-doc.professional {
+  --resume-accent: #3f5f6f;
+}
+
+.r-doc.professional .r-header {
+  text-align: center;
+}
+
+.r-doc.editorial {
+  --resume-accent: #4c6c5d;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.r-doc.editorial .r-name,
+.r-doc.executive .r-name {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.r-doc.editorial .r-name {
+  font-style: italic;
+}
+
+.r-doc.editorial .r-section-title,
+.r-doc.executive .r-section-title {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.r-doc.compact {
+  --resume-accent: #4f5864;
+  padding: 20px 22px;
+}
+
+.r-doc.compact .r-header {
+  margin-bottom: 7px;
+}
+
+.r-doc.compact .r-name {
+  font-size: 19px;
+}
+
+.r-doc.compact .r-section {
+  margin-bottom: 7px;
+}
+
+.r-doc.compact .r-job {
+  margin-bottom: 4px;
+}
+
+.r-doc.executive {
+  --resume-accent: #6a5435;
+  padding: 28px 32px;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.r-doc.executive .r-name {
+  font-size: 24px;
+}
+
+.r-doc.executive .r-section {
+  margin-bottom: 13px;
+}
+
+.r-doc.technical {
+  --resume-accent: #344b67;
+  padding: 21px 23px;
+}
+
+.r-doc.student {
+  --resume-accent: #44685f;
+}
+
+.r-doc.hybrid {
+  --resume-accent: #6b4f56;
+}
+
+.r-doc.academic {
+  --resume-accent: #344456;
+  padding: 27px 30px;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.r-doc.academic .r-name {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.r-doc.academic .r-section-title {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.r-doc.impact {
+  --resume-accent: #70463d;
+}
+
+.r-doc.impact .r-name {
+  font-size: 24px;
+}
+
+.templates-page-card .template-thumb,
+.templates-hero-thumb {
+  height: auto;
+  aspect-ratio: 8.5 / 11;
+  border-top: 0;
+}
+
+.templates-page-card .template-thumb .r-doc,
+.templates-hero-thumb .r-doc {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 8.5 / 11;
+}
+
+html[data-theme="dark"] .template-card,
+html[data-theme="dark"] .template-thumb,
+html[data-theme="dark"] .settings-template-thumb {
+  background: transparent;
+  box-shadow: none;
+}
+
+@media (max-width: 1100px) {
+  .templates-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .templates {
+    padding-inline: 16px;
+  }
+
+  .templates-row {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .template-card {
+    width: min(100%, 350px);
+    margin-inline: auto;
+  }
+
+  .template-info .template-tag {
+    text-align: left;
+  }
+}
+
 /* Help center polish: search command surface and route-card wayfinding. */
 .help-shell {
   --help-center-rail: linear-gradient(180deg, var(--sky), var(--brand), var(--accent));

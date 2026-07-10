@@ -71,9 +71,9 @@ test("templates page explains the selected template without cramped status pills
 
 test("templates page includes a real decision guide with visible dark selected states", () => {
   assert.match(templateLibrary, /TEMPLATE_DECISION_GROUPS/);
-  assert.match(templateLibrary, /Broad applications/);
-  assert.match(templateLibrary, /Technical evidence/);
-  assert.match(templateLibrary, /Narrative roles/);
+  assert.match(templateLibrary, /Everyday applications/);
+  assert.match(templateLibrary, /Focused formats/);
+  assert.match(templateLibrary, /Leadership and creative/);
   assert.match(templateLibrary, /className="templates-decision-guide"/);
   assert.match(templateLibrary, /aria-labelledby="templates-decision-title"/);
   assert.match(templateLibrary, /These groups use the same template directions available in the studio/);

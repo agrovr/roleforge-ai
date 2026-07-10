@@ -76,7 +76,7 @@ test("groups settings saved projects by project with a restore link", () => {
   assert.match(summaries[0].detail, /best 86\/100/);
   assert.match(summaries[0].detail, /cover letter 4 words/);
   assert.match(summaries[0].detail, /1 interview question/);
-  assert.match(summaries[0].detail, /Engineer/);
+  assert.match(summaries[0].detail, /Technical/);
   assert.equal(summaries[0].href, "/app?historyRun=run-latest&historyAction=restore#history");
   assert.equal(summaries[0].projectId, "project-1");
   assert.deepEqual(summaries[0].downloads, [{ format: "pdf", label: "PDF", url: "/api/workflow/download/latest.pdf" }]);
@@ -198,7 +198,7 @@ test("settings document hub summarizes safe entitlement-ready downloads", () => 
     ],
   );
   assert.match(documents[0].detail, /product-ops\.pdf/);
-  assert.match(documents[0].detail, /Modern/);
+  assert.match(documents[0].detail, /Professional/);
   assert.equal(documents[0].projectHref, "/app?historyRun=run-latest&historyAction=restore#history");
 });
 

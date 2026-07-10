@@ -4,6 +4,7 @@ import { AccountReferenceCopyButton } from "./components/AccountReferenceCopyBut
 import { Brand } from "./components/Brand";
 import { FaqAccordion } from "./components/FaqAccordion";
 import { ResumePreview } from "./components/ResumePreview";
+import { RESUME_TEMPLATES } from "./lib/resumeTemplates";
 import { RoleForgeIcon } from "./components/RoleForgeIcons";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { accountAvatarUrl, accountDisplayName, accountReference } from "./lib/accountUser";
@@ -265,13 +266,13 @@ function Hero({ studioHref }: Pick<LandingLinks, "studioHref">) {
 
       <div className="hero-stage" aria-label="RoleForge resume preview">
         <div className="resume-card resume-card-back-l">
-          <ResumePreview variant="modern" name="Noor Vale" role="Software Engineer" />
+          <ResumePreview variant="technical" name="Noor Vale" role="Software Engineer" />
         </div>
         <div className="resume-card resume-card-front">
-          <ResumePreview variant="classic" highlight />
+          <ResumePreview variant="essential" highlight />
         </div>
         <div className="resume-card resume-card-back-r">
-          <ResumePreview variant="accent" name="Mina Okafor" role="Product Designer" />
+          <ResumePreview variant="editorial" name="Mina Okafor" role="Product Designer" />
         </div>
 
         <div className="hero-badge b-score">
@@ -473,14 +474,7 @@ function StudioPreview({ studioHref }: Pick<LandingLinks, "studioHref">) {
 }
 
 function Templates() {
-  const templates = [
-    ["Classic", "General roles", "classic", "#f5e6cb"],
-    ["Modern", "Technical resumes", "modern", "#d8e0ee"],
-    ["Editorial", "Creative roles", "accent", "#d9e7df"],
-    ["Compact", "Concise drafts", "classic", "#efd8d1"],
-    ["Executive", "Senior roles", "accent", "#f0dfbd"],
-    ["Engineer", "Technical roles", "modern", "#d8e0ee"],
-  ] as const;
+  const templates = RESUME_TEMPLATES.filter((template) => template.featured);
 
   return (
     <section className="templates" id="templates">
@@ -493,15 +487,18 @@ function Templates() {
           <p className="lede">Browse the visual directions RoleForge can carry into cleaner resume exports. Pick a direction before opening the studio.</p>
         </div>
       </div>
-      <div className="templates-row">
-        {templates.map(([name, tag, variant, color], index) => (
-          <article className="template-card" key={name}>
-            <div className="template-thumb" style={{ borderTopColor: color }}>
-              <ResumePreview variant={variant} name={["Avery Stone", "Noor Vale", "Mina Okafor", "Iris Calder", "Rafael Ko", "Elena Voss"][index]} />
+      <div className="templates-row" aria-label="Featured resume templates">
+        {templates.map((template) => (
+          <article className="template-card" key={template.slug}>
+            <div className="template-thumb">
+              <ResumePreview variant={template.variant} name={template.previewName} role={template.previewRole} />
             </div>
             <div className="template-info">
-              <span className="template-name">{name}</span>
-              <span className="template-tag">{tag}</span>
+              <div>
+                {template.recommended ? <small>Recommended default</small> : null}
+                <span className="template-name">{template.name}</span>
+              </div>
+              <span className="template-tag">{template.tag}</span>
             </div>
           </article>
         ))}
@@ -727,8 +724,8 @@ function CTABand({ studioHref }: Pick<LandingLinks, "studioHref">) {
             </div>
           </div>
           <div className="cta-visual">
-            <div className="resume-card back"><ResumePreview variant="modern" name="Noor Vale" role="Software Engineer" /></div>
-            <div className="resume-card"><ResumePreview variant="classic" highlight /></div>
+            <div className="resume-card back"><ResumePreview variant="technical" name="Noor Vale" role="Software Engineer" /></div>
+            <div className="resume-card"><ResumePreview variant="essential" highlight /></div>
           </div>
         </div>
       </div>

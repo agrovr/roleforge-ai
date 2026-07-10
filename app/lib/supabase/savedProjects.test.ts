@@ -108,7 +108,7 @@ test("loads saved runs with project titles without embedded relationship names",
   assert.equal(runs[0].applicationStatus, "active");
   assert.equal(runs[0].source, "account");
   assert.equal(runs[0].snapshot?.templateSlug, "engineer");
-  assert.equal(runs[0].snapshot?.templateName, "Engineer");
+  assert.equal(runs[0].snapshot?.templateName, "Technical");
 });
 
 test("updates saved project application status", async () => {

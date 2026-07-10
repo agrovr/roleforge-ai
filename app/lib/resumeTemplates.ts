@@ -1,13 +1,15 @@
-export type ResumeTemplateVariant = "classic" | "modern" | "accent";
+export type ResumeTemplateVariant = "essential" | "professional" | "editorial" | "compact" | "executive" | "technical" | "student" | "hybrid" | "academic" | "impact";
 
 export type ResumeTemplate = {
   slug: string;
   name: string;
   tag: string;
   variant: ResumeTemplateVariant;
-  color: string;
   detail: string;
   previewName: string;
+  previewRole: string;
+  featured?: boolean;
+  recommended?: boolean;
 };
 
 export const RESUME_TEMPLATE_STORAGE_KEY = "roleforge-template-v1";
@@ -16,57 +18,113 @@ export const RESUME_TEMPLATE_COOKIE = "roleforge-template";
 export const RESUME_TEMPLATES = [
   {
     slug: "classic",
-    name: "Classic",
-    tag: "General roles",
-    variant: "classic",
-    color: "#f5e6cb",
-    detail: "A clean single-column format for broad professional applications.",
+    name: "Essential",
+    tag: "Most roles",
+    variant: "essential",
+    detail: "A clean single-column format for dependable everyday applications.",
     previewName: "Avery Stone",
+    previewRole: "Product Operations Manager",
+    featured: true,
+    recommended: true,
   },
   {
     slug: "modern",
-    name: "Modern",
-    tag: "Technical resumes",
-    variant: "modern",
-    color: "#d8e0ee",
-    detail: "A denser split layout for technical skills, projects, and tooling.",
-    previewName: "Noor Vale",
+    name: "Professional",
+    tag: "Corporate roles",
+    variant: "professional",
+    detail: "A centered, polished format for business, operations, and client-facing work.",
+    previewName: "Camille Hart",
+    previewRole: "Operations Director",
+    featured: true,
+    recommended: false,
   },
   {
     slug: "editorial",
-    name: "Editorial",
-    tag: "Creative roles",
-    variant: "accent",
-    color: "#d9e7df",
-    detail: "A lighter visual rhythm for roles where presentation matters.",
+    name: "Studio",
+    tag: "Creative fields",
+    variant: "editorial",
+    detail: "A restrained serif format for design, writing, brand, and portfolio-led work.",
     previewName: "Mina Okafor",
+    previewRole: "Brand Strategist",
+    featured: false,
+    recommended: false,
   },
   {
     slug: "compact",
     name: "Compact",
-    tag: "Concise drafts",
-    variant: "classic",
-    color: "#efd8d1",
-    detail: "A restrained direction for shorter resumes and quick review.",
+    tag: "One-page resumes",
+    variant: "compact",
+    detail: "A dense but readable format for fitting substantial experience on one page.",
     previewName: "Iris Calder",
+    previewRole: "Product Manager",
+    featured: false,
+    recommended: false,
   },
   {
     slug: "executive",
-    name: "Executive",
-    tag: "Senior roles",
-    variant: "accent",
-    color: "#f0dfbd",
-    detail: "A more spacious format for leadership summaries and selected impact.",
+    name: "Leadership",
+    tag: "Senior leadership",
+    variant: "executive",
+    detail: "A spacious serif format that gives leadership scope and selected impact room.",
     previewName: "Rafael Ko",
+    previewRole: "VP, Product Operations",
+    featured: false,
+    recommended: false,
   },
   {
     slug: "engineer",
-    name: "Engineer",
-    tag: "Technical roles",
-    variant: "modern",
-    color: "#d8e0ee",
-    detail: "A structured direction for skills-first engineering resumes.",
+    name: "Technical",
+    tag: "Engineering & data",
+    variant: "technical",
+    detail: "A compact skills-and-projects format for engineering, data, and technical roles.",
     previewName: "Elena Voss",
+    previewRole: "Software Engineer",
+    featured: true,
+    recommended: false,
+  },
+  {
+    slug: "student",
+    name: "Early Career",
+    tag: "Students & internships",
+    variant: "student",
+    detail: "An education-and-projects-led format for internships, graduates, and first roles.",
+    previewName: "Jordan Ellis",
+    previewRole: "Business Analytics Student",
+    featured: true,
+    recommended: false,
+  },
+  {
+    slug: "hybrid",
+    name: "Career Pivot",
+    tag: "Career changes",
+    variant: "hybrid",
+    detail: "A combination format that brings transferable strengths forward without hiding work history.",
+    previewName: "Samira Quinn",
+    previewRole: "Program Manager",
+    featured: false,
+    recommended: false,
+  },
+  {
+    slug: "academic",
+    name: "Academic",
+    tag: "Research & education",
+    variant: "academic",
+    detail: "A traditional format for research, teaching, publications, and advanced education.",
+    previewName: "Adrian Cole",
+    previewRole: "Research Fellow",
+    featured: false,
+    recommended: false,
+  },
+  {
+    slug: "impact",
+    name: "Impact",
+    tag: "Sales & marketing",
+    variant: "impact",
+    detail: "A bold but readable format for measurable growth, campaigns, revenue, and client outcomes.",
+    previewName: "Tessa Monroe",
+    previewRole: "Growth Marketing Lead",
+    featured: false,
+    recommended: false,
   },
 ] as const satisfies readonly ResumeTemplate[];
 

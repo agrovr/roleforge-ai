@@ -1460,11 +1460,11 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   const selected = template.slug === selectedTemplate.slug;
                   return (
                     <article className={`settings-template-card${selected ? " selected" : ""}`} key={template.slug}>
-                      <div className="settings-template-thumb" style={{ borderTopColor: template.color }}>
+                      <div className="settings-template-thumb">
                         <ResumePreview
                           variant={template.variant}
                           name={template.previewName}
-                          role={template.tag.replace(/ resumes| drafts| roles/i, "")}
+                          role={template.previewRole}
                           highlight={selected}
                         />
                       </div>

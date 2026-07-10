@@ -162,11 +162,11 @@ export default async function TemplatesPage() {
             <span>Selected now</span>
             <strong>{selectedTemplate.name}</strong>
           </div>
-          <div className="template-thumb templates-hero-thumb" style={{ borderTopColor: selectedTemplate.color }}>
+          <div className="template-thumb templates-hero-thumb">
             <ResumePreview
               variant={selectedTemplate.variant}
               name={selectedTemplate.previewName}
-              role={selectedTemplate.tag.replace(/ resumes| drafts| roles/i, "")}
+              role={selectedTemplate.previewRole}
               highlight
             />
           </div>

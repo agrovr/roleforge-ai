@@ -1,165 +1,199 @@
-type ResumePreviewVariant = "classic" | "modern" | "accent";
+import type { ResumeTemplateVariant } from "../lib/resumeTemplates";
+
+type PreviewSection = {
+  title: string;
+  copy?: string;
+  skills?: readonly string[];
+  jobs?: ReadonlyArray<{
+    title: string;
+    organization: string;
+    date: string;
+    bullets: readonly string[];
+  }>;
+};
+
+const SHARED_EXPERIENCE = [
+  {
+    title: "Product Operations Manager",
+    organization: "Northstar Systems",
+    date: "2022 - Present",
+    bullets: [
+      "Built a weekly launch-readiness process across product and engineering.",
+      "Turned customer evidence into prioritized roadmap decisions.",
+      "Connected adoption signals, release risk, and customer commitments.",
+    ],
+  },
+  {
+    title: "Operations Specialist",
+    organization: "Brightline Labs",
+    date: "2019 - 2022",
+    bullets: ["Improved handoffs by documenting owners, risks, and next steps.", "Coordinated beta feedback across customer-facing teams."],
+  },
+] as const;
+
+function sectionsFor(variant: ResumeTemplateVariant): PreviewSection[] {
+  if (variant === "hybrid") {
+    return [
+      { title: "Core Strengths", skills: ["Program delivery", "Customer research", "Operations", "Analytics"] },
+      { title: "Relevant Experience", copy: "Transferred planning, stakeholder, and analysis experience into product operations work." },
+      { title: "Career History", jobs: [...SHARED_EXPERIENCE] },
+      { title: "Education", copy: "Professional certificate and B.S. degree - University program" },
+    ];
+  }
+
+  if (variant === "academic") {
+    return [
+      { title: "Education", copy: "Ph.D. Candidate, Information Science - University program" },
+      { title: "Research", copy: "Studies how teams use evidence and decision systems in complex organizations." },
+      { title: "Publications", copy: "Selected peer-reviewed articles and conference proceedings available on request." },
+      { title: "Teaching", copy: "Instructor for research methods, data communication, and collaborative systems." },
+    ];
+  }
+
+  if (variant === "impact") {
+    return [
+      { title: "Performance Profile", copy: "Growth operator connecting customer insight, campaign execution, and measurable revenue outcomes." },
+      {
+        title: "Experience",
+        jobs: [{
+          title: "Growth Marketing Lead",
+          organization: "Juniper Market",
+          date: "2022 - Present",
+          bullets: ["Improved qualified pipeline through role-specific campaigns.", "Built reporting that tied launches to adoption and revenue.", "Aligned lifecycle programs with sales enablement and customer insight."],
+        }],
+      },
+      { title: "Core Skills", skills: ["Growth strategy", "Lifecycle", "Analytics", "Sales enablement"] },
+      { title: "Education", copy: "B.B.A. Marketing - University program" },
+    ];
+  }
+
+  if (variant === "technical") {
+    return [
+      { title: "Technical Skills", skills: ["TypeScript", "Python", "SQL", "Cloud systems"] },
+      {
+        title: "Experience",
+        jobs: [{
+          title: "Software Engineer",
+          organization: "Harborline Platforms",
+          date: "2021 - Present",
+          bullets: ["Built reliable workflow APIs used across customer teams.", "Reduced release risk through automated test coverage.", "Documented recovery paths for account-safe exports."],
+        }],
+      },
+      { title: "Projects", copy: "Designed an account-safe export pipeline with auditable recovery states." },
+      { title: "Education", copy: "B.S. Computer Science - University program" },
+    ];
+  }
+
+  if (variant === "student") {
+    return [
+      { title: "Education", copy: "B.S. Business Analytics - University program - Expected 2027" },
+      { title: "Projects", copy: "Analyzed customer retention data and presented a measurable action plan." },
+      {
+        title: "Experience",
+        jobs: [{
+          title: "Operations Intern",
+          organization: "Fieldstone Cooperative",
+          date: "Summer 2026",
+          bullets: ["Organized research findings for weekly team decisions.", "Improved documentation for a recurring support workflow.", "Presented a measurable recommendation to program leaders."],
+        }],
+      },
+      { title: "Skills", skills: ["Excel", "SQL", "Research", "Presentations"] },
+    ];
+  }
+
+  if (variant === "executive") {
+    return [
+      { title: "Leadership Profile", copy: "Operations leader connecting customer evidence, portfolio priorities, and accountable execution." },
+      {
+        title: "Selected Experience",
+        jobs: [{
+          title: "Vice President, Product Operations",
+          organization: "Northstar Systems",
+          date: "2020 - Present",
+          bullets: ["Led operating cadence across a multi-team product portfolio.", "Improved executive visibility into adoption, risk, and commitments.", "Developed senior leaders through clearer ownership and review systems."],
+        }],
+      },
+      { title: "Areas of Expertise", skills: ["Portfolio strategy", "Team leadership", "Operating systems"] },
+      { title: "Education", copy: "Master of Business Administration - University program" },
+    ];
+  }
+
+  if (variant === "editorial") {
+    return [
+      { title: "Profile", copy: "Creative strategist translating research and brand direction into clear, useful work." },
+      {
+        title: "Selected Work",
+        jobs: [{
+          title: "Senior Brand Strategist",
+          organization: "Common Thread Studio",
+          date: "2021 - Present",
+          bullets: ["Shaped launch narratives across product and editorial teams.", "Built a research-led system for campaign decisions.", "Directed workshops that aligned brand, product, and customer evidence."],
+        }],
+      },
+      { title: "Capabilities", skills: ["Brand systems", "Editorial", "Research", "Workshops"] },
+      { title: "Education", copy: "B.A. Communication Design - University program" },
+    ];
+  }
+
+  return [
+    {
+      title: variant === "compact" ? "Summary" : "Professional Summary",
+      copy: "Product operations lead turning customer evidence into clearer priorities, launch systems, and accountable delivery.",
+    },
+    { title: "Experience", jobs: [...SHARED_EXPERIENCE] },
+    { title: "Skills", skills: ["Roadmap operations", "Analytics", "Launch planning", "Stakeholder communication"] },
+    { title: "Education", copy: "B.S. Business Analytics - University program" },
+  ];
+}
 
 export function ResumePreview({
-  variant = "classic",
+  variant = "essential",
   name = "Avery Stone",
-  role = "Product Manager",
+  role = "Product Operations Manager",
   highlight = false,
 }: {
-  variant?: ResumePreviewVariant;
+  variant?: ResumeTemplateVariant;
   name?: string;
   role?: string;
   highlight?: boolean;
 }) {
-  if (variant === "modern") {
-    return (
-      <div className="r-doc modern">
-        <div className="r-side">
-          <div className="r-name">{name}</div>
-          <div className="r-role">{role}</div>
-          <div className="r-contact">
-            candidate@preview.test
-            <br />
-            Portfolio available
-            <br />
-            Remote-friendly
-          </div>
-          <div className="r-section">
-            <div className="r-section-title">Skills</div>
-            <div className="r-bullet">Roadmapping</div>
-            <div className="r-bullet">Analytics</div>
-            <div className="r-bullet">Stakeholder mgmt</div>
-            <div className="r-bullet">Cross-functional</div>
-            <div className="r-bullet">Process design</div>
-          </div>
-          <div className="r-section">
-            <div className="r-section-title">Education</div>
-            <div className="r-bullet r-strong">Business program</div>
-            <div className="r-bullet r-muted">Continuing education</div>
-          </div>
-        </div>
-        <div className="r-main">
-          <div className="r-section">
-            <div className="r-section-title">Experience</div>
-            <div className="r-job">
-              <div className="r-job-head">
-                <div className="r-job-title">Product Lead</div>
-                <div className="r-job-date">Recent role</div>
-              </div>
-              <div className="r-job-org">Internal product team</div>
-              <div className="r-bullet">
-                Owned <span className="r-hl">cross-functional planning</span> for a product team
-              </div>
-              <div className="r-bullet">Clarified release scope through a structured review ritual</div>
-              <div className="r-bullet">Turned customer feedback into prioritized roadmap work</div>
-            </div>
-            <div className="r-job">
-              <div className="r-job-head">
-                <div className="r-job-title">Operations Partner</div>
-                <div className="r-job-date">Earlier role</div>
-              </div>
-              <div className="r-job-org">Operations group</div>
-              <div className="r-bullet">Organized planning rituals across product and support groups</div>
-              <div className="r-bullet">Documented handoffs so decisions stayed easy to audit</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (variant === "accent") {
-    return (
-      <div className="r-doc accent">
-        <div className="r-name">{name}</div>
-        <div className="r-role">{role}</div>
-        <div className="r-contact">candidate@preview.test &middot; portfolio.preview.test &middot; Remote-friendly</div>
-        <div className="r-section">
-          <div className="r-section-title">Summary</div>
-          <p className="r-copy">
-            Clear, evidence-led resume summary aligned to the role target and written in a professional tone.
-          </p>
-        </div>
-        <div className="r-section">
-          <div className="r-section-title">Experience</div>
-          <div className="r-job">
-            <div className="r-job-head">
-              <div className="r-job-title">Product Manager</div>
-              <div className="r-job-date">Recent role</div>
-            </div>
-            <div className="r-job-org">Product design group</div>
-            <div className="r-bullet">Shaped product priorities with research and operations partners</div>
-            <div className="r-bullet">Translated ambiguous requirements into organized delivery plans</div>
-            <div className="r-bullet">Partnered with design and engineering on launch readiness</div>
-          </div>
-          <div className="r-job">
-            <div className="r-job-head">
-              <div className="r-job-title">Project Lead</div>
-              <div className="r-job-date">Earlier role</div>
-            </div>
-            <div className="r-bullet">Built repeatable notes for weekly team decisions</div>
-            <div className="r-bullet">Kept scope, evidence, and ownership visible in the review flow</div>
-          </div>
-        </div>
-        <div className="r-section">
-          <div className="r-section-title">Skills</div>
-          <div className="r-skills">
-            <span className="r-skill">Roadmaps</span>
-            <span className="r-skill">Analytics</span>
-            <span className="r-skill">Writing</span>
-            <span className="r-skill">Prioritization</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const sections = sectionsFor(variant);
 
   return (
-    <div className="r-doc">
-      <div className="r-name">{name}</div>
-      <div className="r-role">{role}</div>
-      <div className="r-contact">candidate@preview.test &middot; portfolio.preview.test &middot; Remote-friendly</div>
-      <div className="r-section">
-        <div className="r-section-title">Professional Summary</div>
-        <p className="r-copy">
-          Product-minded operator with experience building{" "}
-          <span className={highlight ? "r-hl" : ""}>structured roadmaps</span>, leading{" "}
-          <span className={highlight ? "r-hl" : ""}>collaborative reviews</span>, and translating{" "}
-          <span className={highlight ? "r-hl-good" : ""}>evidence</span> into clear decisions.
-        </p>
-      </div>
-      <div className="r-section">
-        <div className="r-section-title">Experience</div>
-        <div className="r-job">
-          <div className="r-job-head">
-            <div className="r-job-title">Product Manager</div>
-            <div className="r-job-date">Recent role</div>
-          </div>
-          <div className="r-job-org">Product operations team &middot; Remote</div>
-          <div className="r-bullet">
-            Owned <span className={highlight ? "r-hl" : ""}>cross-functional roadmap</span> delivery for a customer-facing workflow
-          </div>
-          <div className="r-bullet">Clarified launch scope through stakeholder reviews and prioritization</div>
-          <div className="r-bullet">Used research notes to focus team decisions and reduce ambiguity</div>
-        </div>
-        <div className="r-job">
-          <div className="r-job-head">
-            <div className="r-job-title">Project Lead, Operations</div>
-            <div className="r-job-date">Earlier role</div>
-          </div>
-          <div className="r-job-org">Planning group &middot; Remote</div>
-          <div className="r-bullet">Created a planning process that made status and ownership easier to review</div>
-          <div className="r-bullet">Organized feedback into decisions, risks, and next steps for the team</div>
-        </div>
-      </div>
-      <div className="r-section">
-        <div className="r-section-title">Skills</div>
-        <div className="r-skills">
-          <span className="r-skill">Roadmapping</span>
-          <span className="r-skill">Analytics</span>
-          <span className="r-skill">Prioritization</span>
-          <span className="r-skill">Stakeholder mgmt</span>
-        </div>
+    <div className={`r-doc ${variant}`}>
+      <header className="r-header">
+        <div className="r-name">{name}</div>
+        <div className="r-role">{role}</div>
+        <div className="r-contact">candidate@preview.test · Austin, TX · portfolio.preview.test</div>
+      </header>
+      <div className="r-sections">
+        {sections.map((section) => (
+          <section className="r-section" key={section.title}>
+            <div className="r-section-title">{section.title}</div>
+            {section.copy ? (
+              <p className="r-copy">
+                {highlight && section.title.toLowerCase().includes("summary") ? (
+                  <>Product operations lead turning <span className="r-hl-good">customer evidence</span> into clearer priorities, launch systems, and accountable delivery.</>
+                ) : section.copy}
+              </p>
+            ) : null}
+            {section.jobs?.map((job) => (
+              <div className="r-job" key={`${section.title}-${job.title}`}>
+                <div className="r-job-head">
+                  <div className="r-job-title">{job.title}</div>
+                  <div className="r-job-date">{job.date}</div>
+                </div>
+                <div className="r-job-org">{job.organization}</div>
+                {job.bullets.map((bullet) => <div className="r-bullet" key={bullet}>{bullet}</div>)}
+              </div>
+            ))}
+            {section.skills ? (
+              <div className="r-skills">
+                {section.skills.map((skill) => <span className="r-skill" key={skill}>{skill}</span>)}
+              </div>
+            ) : null}
+          </section>
+        ))}
       </div>
     </div>
   );

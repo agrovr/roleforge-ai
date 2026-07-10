@@ -16,18 +16,24 @@ test("normalizes the live backend capabilities shape", () => {
       { format: "txt", label: "TXT", enabled: false, plan: "premium", reason: "Premium" },
     ],
     export_templates: [
-      { template: "classic", label: "Classic" },
-      { template: "modern", label: "Modern" },
-      { template: "editorial", label: "Editorial" },
+      { template: "classic", label: "Essential" },
+      { template: "modern", label: "Professional" },
+      { template: "editorial", label: "Studio" },
       { template: "compact", label: "Compact" },
-      { template: "executive", label: "Executive" },
-      { template: "engineer", label: "Engineer" },
+      { template: "executive", label: "Leadership" },
+      { template: "engineer", label: "Technical" },
+      { template: "student", label: "Early Career" },
+      { template: "hybrid", label: "Career Pivot" },
+      { template: "academic", label: "Academic" },
+      { template: "impact", label: "Impact" },
     ],
   });
 
   assert.equal(capabilities.upload_formats.length, 3);
   assert.equal(capabilities.export_formats.find((format) => format.format === "docx")?.plan, "premium");
-  assert.equal(capabilities.export_templates.find((template) => template.template === "engineer")?.label, "Engineer");
+  assert.equal(capabilities.export_templates.find((template) => template.template === "engineer")?.label, "Technical");
+  assert.equal(capabilities.export_templates.find((template) => template.template === "student")?.label, "Early Career");
+  assert.equal(capabilities.export_templates.length, 10);
 });
 
 test("filters unknown and duplicate capability entries", () => {
@@ -54,7 +60,7 @@ test("filters unknown and duplicate capability entries", () => {
     { format: "pdf", label: "PDF", enabled: true, plan: "free", reason: undefined },
     { format: "txt", label: "Text", enabled: true, plan: "premium", reason: undefined },
   ]);
-  assert.deepEqual(capabilities.export_templates, [{ template: "classic", label: "Classic" }]);
+  assert.deepEqual(capabilities.export_templates, [{ template: "classic", label: "Essential" }]);
 });
 
 test("falls back to safe defaults when capabilities are missing", () => {

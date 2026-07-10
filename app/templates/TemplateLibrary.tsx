@@ -19,22 +19,22 @@ import {
 
 const TEMPLATE_DECISION_GROUPS = [
   {
-    title: "Broad applications",
-    detail: "Start here when the role does not need a specialized layout.",
+    title: "Everyday applications",
+    detail: "Reliable formats for most professional roles and industries.",
     icon: "file",
-    slugs: ["classic", "compact"],
+    slugs: ["classic", "modern", "impact"],
   },
   {
-    title: "Technical evidence",
-    detail: "Use these when skills, tools, and projects need to scan quickly.",
+    title: "Focused formats",
+    detail: "Use these when density, projects, or early-career evidence should lead.",
     icon: "scan",
-    slugs: ["modern", "engineer"],
+    slugs: ["engineer", "compact", "student", "hybrid"],
   },
   {
-    title: "Narrative roles",
-    detail: "Use these when leadership, presentation, or a role story matters.",
+    title: "Leadership and creative",
+    detail: "Give senior scope or portfolio-led work a more editorial rhythm.",
     icon: "sparkle",
-    slugs: ["editorial", "executive"],
+    slugs: ["executive", "editorial", "academic"],
   },
 ] as const;
 
@@ -45,10 +45,23 @@ function rememberTemplate(slug: ResumeTemplateSlug) {
 
 function layoutLabel(variant: ResumeTemplateVariant) {
   switch (variant) {
-    case "modern":
-      return "Split layout";
-    case "accent":
-      return "Editorial accent";
+    case "professional":
+      return "Centered header";
+    case "editorial":
+    case "executive":
+      return "Serif hierarchy";
+    case "compact":
+      return "Condensed page";
+    case "technical":
+      return "Skills and projects";
+    case "student":
+      return "Education first";
+    case "hybrid":
+      return "Skills-forward";
+    case "academic":
+      return "Research record";
+    case "impact":
+      return "Results-forward";
     default:
       return "Single column";
   }
@@ -56,10 +69,24 @@ function layoutLabel(variant: ResumeTemplateVariant) {
 
 function layoutDetail(variant: ResumeTemplateVariant) {
   switch (variant) {
-    case "modern":
-      return "Good when skills, tools, and projects need scan-friendly structure.";
-    case "accent":
-      return "Good when presentation and role narrative need more visual rhythm.";
+    case "professional":
+      return "Good for polished corporate and client-facing applications.";
+    case "editorial":
+      return "Good when presentation and portfolio narrative matter.";
+    case "executive":
+      return "Good when leadership scope and selected impact need room.";
+    case "compact":
+      return "Good for keeping substantial experience to a readable page.";
+    case "technical":
+      return "Good when technical skills and projects need to scan quickly.";
+    case "student":
+      return "Good when education, internships, and projects carry the story.";
+    case "hybrid":
+      return "Good when transferable strengths need context from a clear work history.";
+    case "academic":
+      return "Good for research, teaching, publications, and advanced education.";
+    case "impact":
+      return "Good when measurable growth, campaigns, or revenue outcomes should lead.";
     default:
       return "Good when clarity and broad compatibility matter most.";
   }
@@ -172,11 +199,11 @@ export function TemplateLibrary({
           const selected = template.slug === selectedSlug;
           return (
             <article className={`templates-page-card${selected ? " selected" : ""}`} key={template.name}>
-              <div className="template-thumb" style={{ borderTopColor: template.color }}>
+              <div className="template-thumb">
                 <ResumePreview
                   variant={template.variant}
                   name={template.previewName}
-                  role={template.tag.replace(/ resumes| drafts| roles/i, "")}
+                  role={template.previewRole}
                   highlight={selected}
                 />
               </div>
