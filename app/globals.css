@@ -27948,6 +27948,153 @@ html[data-theme="dark"] .step:nth-child(n):hover {
   }
 }
 
+/* Landing FAQ refinement: a divided disclosure list without card chrome. */
+.faq-grid {
+  grid-template-columns: 1fr;
+  gap: 0;
+  width: min(100%, 960px);
+  margin-inline-start: auto;
+  border-block-start: 1px solid color-mix(in srgb, var(--line) 84%, transparent);
+}
+
+.faq-item {
+  align-self: stretch;
+  overflow: visible;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transition: none;
+}
+
+.faq-item + .faq-item {
+  border-block-start: 1px solid color-mix(in srgb, var(--line) 84%, transparent);
+}
+
+.faq-item:hover,
+.faq-item:focus-within,
+.faq-item.open,
+.faq-item[open] {
+  border-color: var(--line);
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.faq-q {
+  grid-template-columns: 48px minmax(0, 1fr) 28px;
+  gap: 14px;
+  min-height: 72px;
+  padding: 14px 2px;
+}
+
+.faq-q::before {
+  display: block;
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: color-mix(in srgb, var(--brand-dark) 82%, var(--ink-1));
+  font-size: 0.7rem;
+  line-height: 1.4;
+  text-align: start;
+}
+
+.faq-toggle {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.faq-toggle span {
+  height: 1px;
+}
+
+.faq-item.open .faq-toggle,
+.faq-item[open] .faq-toggle {
+  border-color: transparent;
+  background: transparent;
+  color: var(--accent);
+}
+
+.faq-a {
+  margin-inline-start: 62px;
+  padding-inline-end: 48px;
+}
+
+.faq-item.open .faq-a,
+.faq-item[open] .faq-a {
+  margin-top: -4px;
+  padding-block-end: 20px;
+}
+
+html[data-theme="dark"] .faq-grid,
+html[data-theme="dark"] .faq-item + .faq-item {
+  border-color: rgba(255, 247, 233, 0.14);
+}
+
+html[data-theme="dark"] .faq-item:nth-child(n),
+html[data-theme="dark"] .faq-item:nth-child(n):hover,
+html[data-theme="dark"] .faq-item:nth-child(n):focus-within,
+html[data-theme="dark"] .faq-item:nth-child(n).open,
+html[data-theme="dark"] .faq-item:nth-child(n)[open] {
+  border-color: rgba(255, 247, 233, 0.14);
+  background: transparent;
+  box-shadow: none;
+}
+
+html[data-theme="dark"] .faq-q::before {
+  border: 0;
+  background: transparent;
+  color: #f0bb69;
+}
+
+html[data-theme="dark"] .faq-toggle,
+html[data-theme="dark"] .faq-item.open .faq-toggle,
+html[data-theme="dark"] .faq-item[open] .faq-toggle {
+  border-color: transparent;
+  background: transparent;
+}
+
+html[data-theme="dark"] .faq-item.open .faq-toggle,
+html[data-theme="dark"] .faq-item[open] .faq-toggle {
+  color: #89d1be;
+}
+
+@media (max-width: 640px) {
+  .faq-grid {
+    width: 100%;
+  }
+
+  .faq-q {
+    grid-template-columns: 36px minmax(0, 1fr) 24px;
+    gap: 10px;
+    min-height: 66px;
+    padding: 12px 0;
+  }
+
+  .faq-toggle {
+    width: 24px;
+    height: 24px;
+  }
+
+  .faq-a {
+    margin-inline-start: 46px;
+    padding-inline-end: 34px;
+  }
+
+  .faq-item.open .faq-a,
+  .faq-item[open] .faq-a {
+    margin-top: -2px;
+    padding-block-end: 18px;
+  }
+}
+
 /* Interaction finish: consistent focus, tactile controls, and navigable anchors. */
 :where(a, button, summary, input, textarea, select, [role="button"], [tabindex]):focus-visible {
   outline: 3px solid color-mix(in srgb, var(--brand) 30%, transparent);
