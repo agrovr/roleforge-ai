@@ -9164,7 +9164,13 @@ html[data-theme="dark"] input::file-selector-button {
   min-height: calc(100vh - 150px);
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(360px, 440px);
-  gap: clamp(28px, 6vw, 86px);
+  grid-template-areas:
+    "copy card"
+    "supporting card";
+  grid-template-rows: auto auto;
+  column-gap: clamp(28px, 6vw, 86px);
+  row-gap: 18px;
+  align-content: center;
   align-items: center;
   margin: 0 auto;
   padding: clamp(42px, 6vw, 72px) 0 28px;
@@ -9177,9 +9183,20 @@ html[data-theme="dark"] input::file-selector-button {
 .login-copy {
   display: grid;
   position: relative;
+  grid-area: copy;
+  align-self: end;
   min-width: 0;
   max-width: 100%;
   gap: 18px;
+}
+
+.login-supporting {
+  display: grid;
+  grid-area: supporting;
+  align-self: start;
+  gap: 18px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .login-copy h1 {
@@ -9357,6 +9374,8 @@ html[data-theme="dark"] input::file-selector-button {
 .login-card {
   position: relative;
   display: grid;
+  grid-area: card;
+  align-self: center;
   gap: 18px;
   min-width: 0;
   max-width: 100%;
@@ -17980,7 +17999,14 @@ html[data-theme="dark"] .rf-rail-upgrade p {
   .login-panel {
     min-height: auto;
     grid-template-columns: 1fr;
-    gap: 28px;
+    grid-template-areas:
+      "copy"
+      "card"
+      "supporting";
+    grid-template-rows: auto;
+    column-gap: 0;
+    row-gap: 28px;
+    align-content: start;
     align-items: start;
   }
 
@@ -17990,6 +18016,10 @@ html[data-theme="dark"] .rf-rail-upgrade p {
 
   .login-card {
     width: min(560px, 100%);
+  }
+
+  .login-supporting {
+    width: min(760px, 100%);
   }
 }
 
@@ -23817,12 +23847,13 @@ html[data-theme="dark"] .studio-account-utilities {
   .login-panel {
     width: 100%;
     max-width: 100%;
-    gap: 24px;
+    row-gap: 20px;
     overflow: hidden;
-    padding-top: 42px;
+    padding-top: 32px;
   }
 
   .login-copy,
+  .login-supporting,
   .login-copy h1,
   .login-copy p,
   .login-benefits,
@@ -23833,7 +23864,25 @@ html[data-theme="dark"] .studio-account-utilities {
   }
 
   .login-copy h1 {
-    font-size: 3rem;
+    font-size: clamp(2.55rem, 12vw, 3rem);
+  }
+
+  .login-copy p {
+    font-size: 0.98rem;
+    line-height: 1.52;
+  }
+
+  .login-supporting {
+    gap: 12px;
+  }
+
+  .login-benefits {
+    margin-top: 0;
+  }
+
+  .login-studio-preview,
+  .login-session-strip {
+    display: none;
   }
 
   .login-preview-top {

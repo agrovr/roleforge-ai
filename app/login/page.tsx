@@ -52,31 +52,6 @@ export default async function LoginPage({ searchParams }: { searchParams: LoginS
           <div className="eyebrow">Account required</div>
           <h1 id="login-title" className="display">Sign in to your RoleForge studio.</h1>
           <p>{notice}</p>
-          <div className="login-benefits" aria-label="Account benefits">
-            <span><RoleForgeIcon name="check" size={14} /> <span className="login-benefit-copy">Saved projects stay with your account</span></span>
-            <span><RoleForgeIcon name="lock" size={14} /> <span className="login-benefit-copy">The studio is protected from anonymous use</span></span>
-            <span><RoleForgeIcon name="download" size={14} /> <span className="login-benefit-copy">PDF exports remain available after runs</span></span>
-          </div>
-          <div className="login-studio-preview" aria-label="Protected studio preview">
-            <div className="login-preview-top">
-              <span>Protected workspace</span>
-              <strong>Resume studio</strong>
-            </div>
-            <div className="login-preview-sheet">
-              <div>
-                <span>Resume</span>
-                <strong>Selected</strong>
-              </div>
-              <div>
-                <span>Target</span>
-                <strong>Ready</strong>
-              </div>
-              <div>
-                <span>Projects</span>
-                <strong>Saved</strong>
-              </div>
-            </div>
-          </div>
         </div>
 
         <div className="login-card">
@@ -114,6 +89,34 @@ export default async function LoginPage({ searchParams }: { searchParams: LoginS
               <p>The public site is available. Please try opening the protected studio again shortly.</p>
             </div>
           )}
+        </div>
+
+        <div className="login-supporting">
+          <div className="login-benefits" aria-label="Account benefits">
+            <span><RoleForgeIcon name="check" size={14} /> <span className="login-benefit-copy">Saved projects stay with your account</span></span>
+            <span><RoleForgeIcon name="lock" size={14} /> <span className="login-benefit-copy">The studio is protected from anonymous use</span></span>
+            <span><RoleForgeIcon name="download" size={14} /> <span className="login-benefit-copy">PDF exports remain available after runs</span></span>
+          </div>
+          <div className="login-studio-preview" aria-label="Protected studio preview">
+            <div className="login-preview-top">
+              <span>Protected workspace</span>
+              <strong>Resume studio</strong>
+            </div>
+            <div className="login-preview-sheet">
+              <div>
+                <span>Resume</span>
+                <strong>Selected</strong>
+              </div>
+              <div>
+                <span>Target</span>
+                <strong>Ready</strong>
+              </div>
+              <div>
+                <span>Projects</span>
+                <strong>Saved</strong>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </main>

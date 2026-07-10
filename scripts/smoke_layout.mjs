@@ -120,7 +120,7 @@ const PAGE_CHECKS = [
   {
     path: "/login?next=%2Fapp&account=signin-required",
     name: "login",
-    selectors: [".login-nav", ".login-panel", ".login-copy", ".login-card", ".studio-oauth-button"],
+    selectors: [".login-nav", ".login-panel", ".login-copy", ".login-card", ".login-supporting", ".studio-oauth-button"],
     textFitSelectors: [
       ".login-copy h1",
       ".login-copy p",
@@ -138,6 +138,7 @@ const PAGE_CHECKS = [
       { container: ".login-shell", selector: ".login-panel", tolerance: 4 },
       { container: ".login-panel", selector: ".login-card", tolerance: 4 },
       { container: ".login-panel", selector: ".login-copy", tolerance: 4 },
+      { container: ".login-panel", selector: ".login-supporting", tolerance: 4 },
       { container: "closest:.login-card", selector: ".login-status", tolerance: 4 },
     ],
   },

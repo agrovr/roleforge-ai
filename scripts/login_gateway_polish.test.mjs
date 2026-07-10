@@ -19,6 +19,18 @@ test("login gateway topbar and sign-in card use refined product surfaces", () =>
   assert.match(globals, /\.login-card > \*\s*\{(?=[^}]*z-index:\s*1)[^}]*\}/s);
 });
 
+test("collapsed login layouts place authentication before secondary proof", () => {
+  const introIndex = loginPage.indexOf('className="login-copy"');
+  const cardIndex = loginPage.indexOf('className="login-card"');
+  const supportingIndex = loginPage.indexOf('className="login-supporting"');
+
+  assert.ok(introIndex >= 0 && introIndex < cardIndex);
+  assert.ok(cardIndex < supportingIndex);
+  assert.match(globals, /\.login-panel\s*\{(?=[^}]*grid-template-areas:\s*"copy card"\s*"supporting card")(?=[^}]*row-gap:\s*18px)[^}]*\}/s);
+  assert.match(globals, /@media\s*\(max-width:\s*1040px\)[\s\S]*?\.login-panel\s*\{(?=[^}]*grid-template-areas:\s*"copy"\s*"card"\s*"supporting")(?=[^}]*row-gap:\s*28px)[^}]*\}/s);
+  assert.match(globals, /@media\s*\(max-width:\s*760px\)[\s\S]*?\.login-studio-preview,\s*\.login-session-strip\s*\{[^}]*display:\s*none[^}]*\}/s);
+});
+
 test("login protected preview has restrained motion with dark and reduced-motion support", () => {
   assert.match(globals, /\.login-studio-preview::after\s*\{(?=[^}]*linear-gradient\(90deg,\s*var\(--good\),\s*var\(--brand\),\s*var\(--accent\)\))[^}]*\}/s);
   assert.match(globals, /\.login-preview-sheet div::before\s*\{/);
