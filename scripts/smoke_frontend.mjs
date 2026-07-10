@@ -467,7 +467,7 @@ async function checkPublicShell(baseUrl) {
   pass("landing dashboard stat cards include overflow-safe styles");
 
   requireCondition(stylesheetText.includes(".nav-cta-short"), "landing mobile nav compact CTA styles were missing");
-  requireCondition(/\.nav-link-secondary,\s*\.nav-link-account,\s*\.nav-divider\s*\{\s*display:\s*none/.test(stylesheetText), "landing mobile nav still exposes full navigation links");
+  requireCondition(/\.nav-link-secondary,\s*\.nav-link-account\s*\{\s*display:\s*none/.test(stylesheetText), "landing mobile nav still exposes full navigation links");
   requireCondition(/\.nav\s+\.btn-brand\s*\{[^}]*min-width:\s*0/.test(stylesheetText), "landing mobile nav CTA can still force header overflow");
   requireCondition(/\.landing-account-popover\s*\{(?=[^}]*width:\s*min\(430px,\s*calc\(100vw\s*-\s*36px\)\))[^}]*\}/s.test(sourceStylesheetText), "landing account menu popover can still overflow desktop nav");
   requireCondition(/@media\s*\(max-width:\s*620px\)\s*\{[\s\S]*?\.landing-account-popover\s*\{(?=[^}]*width:\s*min\(360px,\s*calc\(100vw\s*-\s*24px\)\))[^}]*\}/s.test(sourceStylesheetText), "landing account menu popover can still overflow mobile nav");

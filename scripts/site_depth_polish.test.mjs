@@ -13,11 +13,12 @@ test("ambient polish field is mounted behind the shared page texture", () => {
   assert.match(globals, /\.rf-ambient-field span:nth-child\(3\)/);
 });
 
-test("site depth polish refines navigation, section heads, and repeated product cards", () => {
-  assert.match(globals, /\.nav::after\s*\{/);
-  assert.match(globals, /\.section-head,[\s\S]*?\.admin-support-hero[\s\S]*?\)::after\s*\{/);
-  assert.match(globals, /\.feature-card,[\s\S]*?\.admin-support-card[\s\S]*?\)\s*\{/);
-  assert.match(globals, /\.feature-card,[\s\S]*?\.admin-support-card[\s\S]*?\):hover\s*\{/);
+test("site depth polish avoids global landing rails while keeping product surfaces consistent", () => {
+  assert.doesNotMatch(globals, /\.nav::after\s*\{/);
+  assert.doesNotMatch(globals, /:where\(\s*\.section-head,/);
+  assert.match(globals, /\.templates-head,[\s\S]*?\.admin-support-hero[\s\S]*?\)::after\s*\{/);
+  assert.match(globals, /\.template-card,[\s\S]*?\.admin-support-card[\s\S]*?\)\s*\{/);
+  assert.match(globals, /\.template-card,[\s\S]*?\.admin-support-card[\s\S]*?\):hover\s*\{/);
 });
 
 test("progress polish and ambient motion respect reduced motion", () => {

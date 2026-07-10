@@ -136,7 +136,6 @@ function Nav({
           <a className="nav-link nav-link-secondary" href="#how">How it works</a>
           <a className="nav-link nav-link-secondary" href="#features">Features</a>
           <a className="nav-link nav-link-secondary" href="#pricing">Pricing</a>
-          <span className="nav-divider" aria-hidden="true" />
           <ThemeToggle />
           {signedIn ? (
             <details className="landing-account-menu" data-account-menu="true">

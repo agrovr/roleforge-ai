@@ -48,6 +48,8 @@ function customerWorkflowMessage(code: string | undefined, apiMessage: string | 
       return "We could not check your plan usage. Wait a moment, then try again.";
     case "usage_recording_failed":
       return "We could not save this run to your account usage yet. Try again in a moment.";
+    case "entitlement_verification_failed":
+      return "We could not verify Premium access. Your plan was not changed. Wait a moment, then try the export again.";
     case "rate_limited":
       return "Too many tailoring requests are running right now. Wait a minute, then try again.";
     case "plan_limit_reached":

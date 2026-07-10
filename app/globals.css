@@ -718,14 +718,7 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
 }
 
 .nav-inner::before {
-  position: absolute;
-  inset-inline: clamp(152px, 20vw, 292px) clamp(176px, 22vw, 330px);
-  top: 50%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--line-2) 68%, transparent), transparent);
-  content: "";
-  opacity: 0.72;
-  pointer-events: none;
+  content: none;
 }
 
 .brand {
@@ -886,13 +879,6 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
 
 .nav-cta-short {
   display: none;
-}
-
-.nav-divider {
-  width: 1px;
-  height: 24px;
-  margin: 0 8px;
-  background: var(--line);
 }
 
 .landing-account-menu {
@@ -1308,13 +1294,6 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   animation: rise-in 560ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
-/* Landing workflow polish: guided progress rails and richer feature surfaces. */
-.steps,
-.features-grid {
-  --landing-workflow-rail: linear-gradient(90deg, var(--brand), var(--accent), var(--sky));
-  --landing-workflow-glint: linear-gradient(90deg, transparent, color-mix(in srgb, var(--surface) 74%, transparent), transparent);
-}
-
 .step:nth-child(2),
 .feature-card:nth-child(2),
 .template-card:nth-child(2),
@@ -1440,31 +1419,32 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
 .features-grid {
   min-width: 0;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  background: var(--surface);
-  box-shadow: var(--shadow-soft);
 }
 
-.feature-card,
+.steps {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 .step {
   min-width: 0;
   overflow: hidden;
-  padding: 32px 28px;
-  border-right: 1px solid var(--line);
+  padding: 26px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: 0 16px 38px -34px color-mix(in srgb, var(--ink-0) 34%, transparent);
 }
 
 .step {
   display: flex;
   flex-direction: column;
   gap: 14px;
-}
-
-.feature-card:last-child,
-.step:last-child {
-  border-right: 0;
 }
 
 .features-grid {
@@ -1489,9 +1469,9 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--line-2);
+  transform: translateY(-1px);
+  box-shadow: 0 20px 42px -34px color-mix(in srgb, var(--ink-0) 42%, transparent);
+  border-color: color-mix(in srgb, var(--brand) 26%, var(--line));
 }
 
 .step-num {
@@ -1603,87 +1583,34 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   line-height: 1;
 }
 
-/* Landing workflow finish: clearer progress, depth, and card affordance. */
+/* Landing workflow refinement: quiet cards with clear product information. */
 .steps {
   position: relative;
   isolation: isolate;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 74%, transparent)),
-    radial-gradient(circle at 4% 0%, color-mix(in srgb, var(--brand-soft) 44%, transparent), transparent 15rem),
-    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--sky-soft) 38%, transparent), transparent 16rem);
-  box-shadow:
-    0 1px 0 color-mix(in srgb, white 72%, transparent) inset,
-    0 26px 62px -48px color-mix(in srgb, var(--ink-0) 46%, transparent);
 }
 
-.steps::before {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 4px;
-  background: var(--landing-workflow-rail);
-  content: "";
-  opacity: 0.78;
-  z-index: 0;
-}
-
-.steps::after {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(90deg, transparent, color-mix(in srgb, white 42%, transparent), transparent),
-    repeating-linear-gradient(135deg, transparent 0 14px, color-mix(in srgb, var(--line) 42%, transparent) 14px 15px);
-  content: "";
-  opacity: 0.26;
-  pointer-events: none;
-  z-index: 0;
+.steps::before,
+.steps::after,
+.step::before,
+.step::after,
+.feature-card::before,
+.feature-card::after {
+  content: none;
 }
 
 .step {
   position: relative;
   z-index: 1;
-  background: linear-gradient(180deg, color-mix(in srgb, white 36%, transparent), transparent 72%);
   transition:
-    background-color 220ms ease,
+    border-color 220ms ease,
     box-shadow 260ms ease,
     transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.step::before {
-  position: absolute;
-  inset: 20px auto 20px 0;
-  width: 3px;
-  border-radius: 999px;
-  background: var(--landing-workflow-rail);
-  content: "";
-  opacity: 0.28;
-  transition:
-    opacity 220ms ease,
-    transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.step::after {
-  position: absolute;
-  inset: 12px 12px auto auto;
-  width: 72px;
-  height: 72px;
-  border-radius: 22px;
-  background:
-    radial-gradient(circle at 32% 24%, color-mix(in srgb, white 72%, transparent), transparent 42%),
-    color-mix(in srgb, var(--brand-soft) 28%, transparent);
-  content: "";
-  opacity: 0.34;
-  pointer-events: none;
-  transform: rotate(8deg);
-}
-
 .step:hover {
-  background-color: color-mix(in srgb, var(--brand-soft) 14%, transparent);
-  transform: translateY(-2px);
-}
-
-.step:hover::before {
-  opacity: 0.72;
-  transform: scaleY(1.06);
+  border-color: color-mix(in srgb, var(--brand) 26%, var(--line));
+  box-shadow: 0 20px 42px -34px color-mix(in srgb, var(--ink-0) 42%, transparent);
+  transform: translateY(-1px);
 }
 
 .step-icon,
@@ -1697,65 +1624,20 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
 .feature-card {
   position: relative;
   isolation: isolate;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, white 64%, transparent), color-mix(in srgb, var(--surface) 94%, transparent)),
-    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--brand-soft) 30%, transparent), transparent 11rem),
-    var(--surface);
-  box-shadow:
-    0 1px 0 color-mix(in srgb, white 72%, transparent) inset,
-    0 24px 54px -42px color-mix(in srgb, var(--ink-0) 36%, transparent);
-}
-
-.feature-card::before {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 4px;
-  border-radius: inherit;
-  background: var(--landing-workflow-rail);
-  content: "";
-  opacity: 0.42;
-  transition:
-    opacity 220ms ease,
-    width 220ms ease;
-  z-index: -1;
-}
-
-.feature-card::after {
-  position: absolute;
-  inset: 0;
-  background:
-    var(--landing-workflow-glint),
-    repeating-linear-gradient(135deg, transparent 0 18px, color-mix(in srgb, var(--line) 34%, transparent) 18px 19px);
-  background-size: 180% 100%, auto;
-  content: "";
-  opacity: 0.22;
-  pointer-events: none;
-  transition:
-    opacity 220ms ease,
-    transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
-  z-index: -1;
-}
-
-.feature-card:hover::before {
-  width: 6px;
-  opacity: 0.72;
-}
-
-.feature-card:hover::after {
-  opacity: 0.34;
-  transform: translateX(8px);
+  background: var(--surface);
+  box-shadow: 0 18px 44px -38px color-mix(in srgb, var(--ink-0) 36%, transparent);
 }
 
 .feature-card-list {
-  padding-top: 14px;
-  border-top: 1px solid color-mix(in srgb, var(--line) 76%, transparent);
+  padding-top: 2px;
+  border-top: 0;
 }
 
 .feature-card-list li {
-  padding: 7px 9px;
-  border: 1px solid color-mix(in srgb, var(--line) 58%, transparent);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--surface-warm) 62%, transparent);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3126,13 +3008,9 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   flex-direction: column;
   gap: 12px;
   margin: 0;
-  padding: 18px 0 0;
-  border-top: 1px solid var(--line);
+  padding: 0;
+  border-top: 0;
   list-style: none;
-}
-
-.price-card.featured .price-list {
-  border-color: rgba(255, 255, 255, 0.16);
 }
 
 .price-list li {
@@ -3250,52 +3128,27 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   padding: 18px 22px 18px 18px;
   border: 1px solid color-mix(in srgb, var(--brand) 16%, var(--line));
   border-radius: var(--radius);
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--brand-soft) 14%, transparent) 0 1px, transparent 1px 100%),
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, transparent), color-mix(in srgb, var(--surface-warm) 74%, transparent)),
-    var(--surface);
-  background-size: 18px 18px, auto, auto;
-  box-shadow: 0 18px 46px -42px var(--shadow);
+  background: var(--surface);
+  box-shadow: 0 14px 34px -32px var(--shadow);
   counter-increment: faq-item;
   isolation: isolate;
   transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
 }
 
 .faq-item::before {
-  content: "";
-  position: absolute;
-  inset-block: 16px;
-  inset-inline-start: 0;
-  width: 3px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, var(--brand), var(--accent));
-  opacity: 0.58;
-  transform: scaleY(0.62);
-  transform-origin: top;
-  transition: opacity 180ms ease, transform 220ms ease;
-  pointer-events: none;
+  content: none;
 }
 
 .faq-item:hover,
 .faq-item:focus-within {
   border-color: color-mix(in srgb, var(--brand) 30%, var(--line));
-  box-shadow: 0 22px 58px -44px var(--shadow);
-  transform: translateY(-1px);
+  box-shadow: 0 18px 40px -34px var(--shadow);
 }
 
 .faq-item.open,
 .faq-item[open] {
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--accent-soft) 24%, transparent) 0 1px, transparent 1px 100%),
-    linear-gradient(180deg, color-mix(in srgb, var(--surface-warm) 94%, transparent), color-mix(in srgb, var(--surface) 82%, transparent)),
-    var(--surface-warm);
+  background: var(--surface-warm);
   border-color: color-mix(in srgb, var(--accent) 30%, var(--line-2));
-}
-
-.faq-item.open::before,
-.faq-item[open]::before {
-  opacity: 0.94;
-  transform: scaleY(1);
 }
 
 .faq-q {
@@ -3397,16 +3250,15 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   overflow: hidden;
   color: var(--ink-2);
   line-height: 1.58;
-  border-top: 1px solid transparent;
-  transition: max-height 260ms ease, margin-top 260ms ease, padding-top 260ms ease, border-color 260ms ease;
+  border-top: 0;
+  transition: max-height 260ms ease, margin-top 260ms ease;
 }
 
 .faq-item.open .faq-a,
 .faq-item[open] .faq-a {
   max-height: 260px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top-color: color-mix(in srgb, var(--line) 74%, transparent);
+  margin-top: 10px;
+  padding-top: 0;
 }
 
 .cta-band {
@@ -3872,11 +3724,6 @@ html[data-theme="dark"] .nav-inner {
     0 24px 62px -46px rgba(0, 0, 0, 0.92);
 }
 
-html[data-theme="dark"] .nav-inner::before {
-  background: linear-gradient(90deg, transparent, rgba(255, 247, 233, 0.14), transparent);
-  opacity: 0.78;
-}
-
 html[data-theme="dark"] .brand-name span,
 html[data-theme="dark"] .brand-kicker,
 html[data-theme="dark"] .disabled-link {
@@ -3901,10 +3748,6 @@ html[data-theme="dark"] .icon-button:hover,
 html[data-theme="dark"] .theme-toggle:hover {
   background: rgba(255, 247, 233, 0.08);
   color: #fff7e9;
-}
-
-html[data-theme="dark"] .nav-divider {
-  background: rgba(255, 247, 233, 0.16);
 }
 
 html[data-theme="dark"] .icon-button,
@@ -17624,6 +17467,63 @@ html[data-theme="dark"] .rf-rail-upgrade p {
     overflow: hidden;
   }
 
+  .rf-studio-rail {
+    min-height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline proximity;
+    scrollbar-width: thin;
+  }
+
+  .rf-studio-rail .rail-section-title,
+  .rf-studio-rail .rail-divider {
+    display: none;
+  }
+
+  .rf-studio-rail .rail-item {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding-inline: 12px;
+    scroll-snap-align: start;
+  }
+
+  .rf-studio-rail .rail-pill {
+    margin-left: 2px;
+  }
+
+  .rf-studio-rail .rf-rail-upgrade {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0;
+    padding: 8px 10px;
+    border-radius: 12px;
+    box-shadow: none;
+    scroll-snap-align: end;
+  }
+
+  .rf-studio-rail .rf-rail-upgrade strong,
+  .rf-studio-rail .rf-rail-upgrade .primary-button {
+    white-space: nowrap;
+  }
+
+  .rf-studio-rail .rf-rail-upgrade p {
+    display: none;
+  }
+
+  .rf-studio-rail .rf-rail-upgrade .primary-button {
+    width: auto;
+    min-height: 36px;
+    padding-inline: 12px;
+  }
+
   .rf-studio-top-actions,
   .rf-studio-hero,
   .studio-card-head {
@@ -17667,8 +17567,17 @@ html[data-theme="dark"] .rf-rail-upgrade p {
   }
 
   .studio-hero-actions .export-format-strip,
-  .studio-hero-actions .export-status-note {
+  .studio-hero-actions .export-status-note,
+  .studio-hero-actions .studio-run-next-action,
+  .studio-hero-actions .studio-template-preference,
+  .studio-hero-actions .export-readiness-panel {
     grid-column: 1 / -1;
+  }
+
+  .studio-hero-actions .studio-template-preference {
+    align-self: start;
+    max-width: none;
+    border-radius: 14px;
   }
 
   .studio-hero-actions .export-format-strip {
@@ -17841,8 +17750,7 @@ html[data-theme="dark"] .rf-rail-upgrade p {
     flex-wrap: nowrap;
   }
 
-  .nav-link-secondary,
-  .nav-divider {
+  .nav-link-secondary {
     display: none;
   }
 
@@ -18072,8 +17980,7 @@ html[data-theme="dark"] .rf-rail-upgrade p {
   }
 
   .nav-link-secondary,
-  .nav-link-account,
-  .nav-divider {
+  .nav-link-account {
     display: none;
   }
 
@@ -18532,40 +18439,25 @@ html[data-theme="dark"] .rf-studio-stat {
 }
 
 html[data-theme="dark"] .steps {
-  background:
-    linear-gradient(180deg, rgba(255, 247, 233, 0.075), rgba(255, 247, 233, 0.03)),
-    radial-gradient(circle at 4% 0%, rgba(222, 162, 79, 0.16), transparent 15rem),
-    radial-gradient(circle at 100% 0%, rgba(137, 209, 190, 0.1), transparent 16rem),
-    rgba(14, 19, 34, 0.92);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
-html[data-theme="dark"] .steps::after {
-  background:
-    linear-gradient(90deg, transparent, rgba(255, 247, 233, 0.06), transparent),
-    repeating-linear-gradient(135deg, transparent 0 14px, rgba(255, 247, 233, 0.035) 14px 15px);
-  opacity: 0.5;
-}
-
-html[data-theme="dark"] .step {
-  background: linear-gradient(180deg, rgba(255, 247, 233, 0.035), transparent 72%);
-}
-
-html[data-theme="dark"] .step::after {
-  background:
-    radial-gradient(circle at 32% 24%, rgba(255, 247, 233, 0.14), transparent 42%),
-    rgba(222, 162, 79, 0.08);
-}
-
+html[data-theme="dark"] .step,
 html[data-theme="dark"] .feature-card {
-  background:
-    linear-gradient(180deg, rgba(255, 247, 233, 0.07), rgba(255, 247, 233, 0.035)),
-    radial-gradient(circle at 100% 0%, rgba(222, 162, 79, 0.1), transparent 11rem),
-    var(--surface);
+  border-color: rgba(255, 247, 233, 0.14);
+  background: rgba(16, 22, 37, 0.86);
+  box-shadow: 0 18px 42px -34px rgba(0, 0, 0, 0.9);
 }
 
 html[data-theme="dark"] .feature-card-list li {
-  border-color: rgba(255, 247, 233, 0.1);
-  background: rgba(255, 247, 233, 0.04);
+  border-color: transparent;
+  background: transparent;
+}
+
+html[data-theme="dark"] .faq-item {
+  background: rgba(16, 22, 37, 0.86);
 }
 
 html[data-theme="dark"] .templates-page-hero {
@@ -27524,10 +27416,8 @@ html[data-theme="dark"] .support-form textarea:hover {
   }
 }
 
-/* Landing pricing polish: calmer plan status, premium depth, and billing clarity. */
+/* Landing pricing refinement: clear plans without decorative rails or grid lines. */
 .pricing-grid.two {
-  --landing-pricing-rail: linear-gradient(90deg, var(--brand), var(--accent), var(--sky));
-  --landing-pricing-wash: linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 76%, transparent));
   align-items: stretch;
 }
 
@@ -27538,44 +27428,19 @@ html[data-theme="dark"] .support-form textarea:hover {
 }
 
 .pricing-grid.two .price-card {
-  border-color: color-mix(in srgb, var(--brand) 18%, var(--line));
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--line) 24%, transparent) 1px, transparent 1px),
-    var(--landing-pricing-wash),
-    var(--surface);
-  background-size: 32px 32px, auto, auto;
-  box-shadow:
-    0 1px 0 color-mix(in srgb, #fff 60%, transparent) inset,
-    0 28px 70px -52px color-mix(in srgb, var(--ink-0) 52%, transparent);
+  border-color: var(--line);
+  background: var(--surface);
+  box-shadow: 0 20px 48px -42px color-mix(in srgb, var(--ink-0) 44%, transparent);
 }
 
 .pricing-grid.two .price-card::after {
-  position: absolute;
-  inset-inline: 24px;
-  inset-block-start: 0;
-  height: 3px;
-  border-radius: 0 0 999px 999px;
-  background: var(--landing-pricing-rail);
-  content: "";
-  opacity: 0.58;
-  pointer-events: none;
+  content: none;
 }
 
 .pricing-grid.two .price-card.featured {
-  border-color: color-mix(in srgb, var(--accent) 34%, var(--ink-0));
-  background:
-    linear-gradient(90deg, rgba(255, 247, 233, 0.045) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(255, 247, 233, 0.065), transparent 46%),
-    linear-gradient(160deg, #10142d, #0b1028 56%, #1f1c2a);
-  background-size: 34px 34px, auto, auto;
-  box-shadow:
-    0 1px 0 rgba(255, 247, 233, 0.11) inset,
-    0 34px 88px -58px rgba(8, 12, 24, 0.86);
-}
-
-.pricing-grid.two .price-card:hover::after,
-.pricing-grid.two .price-card:focus-within::after {
-  opacity: 0.9;
+  border-color: rgba(245, 214, 154, 0.2);
+  background: linear-gradient(160deg, #11162f, #0d1228);
+  box-shadow: 0 24px 58px -44px rgba(8, 12, 24, 0.78);
 }
 
 .price-card-top {
@@ -27623,56 +27488,25 @@ html[data-theme="dark"] .support-form textarea:hover {
 }
 
 .pricing-clarity-grid a {
-  border-color: color-mix(in srgb, var(--brand) 18%, var(--line));
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-warm) 72%, transparent)),
-    var(--surface);
-  box-shadow:
-    0 1px 0 color-mix(in srgb, #fff 54%, transparent) inset,
-    0 18px 44px -38px color-mix(in srgb, var(--ink-0) 38%, transparent);
+  border-color: var(--line);
+  background: var(--surface);
+  box-shadow: 0 14px 34px -32px color-mix(in srgb, var(--ink-0) 36%, transparent);
 }
 
 .pricing-clarity-grid a::after {
-  position: absolute;
-  inset-block: 12px;
-  inset-inline-start: 0;
-  width: 3px;
-  border-radius: 0 999px 999px 0;
-  background: var(--landing-pricing-rail);
-  content: "";
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 170ms ease;
-}
-
-.pricing-clarity-grid a:hover::after,
-.pricing-clarity-grid a:focus-visible::after {
-  opacity: 0.72;
-}
-
-html[data-theme="dark"] .pricing-grid.two {
-  --landing-pricing-rail: linear-gradient(90deg, #89d1be, #f3c16d, #8eb7f0);
-  --landing-pricing-wash: linear-gradient(135deg, rgba(255, 247, 233, 0.06), rgba(255, 247, 233, 0.022));
+  content: none;
 }
 
 html[data-theme="dark"] .pricing-grid.two .price-card,
 html[data-theme="dark"] .pricing-clarity-grid a {
   border-color: rgba(255, 247, 233, 0.14);
-  background:
-    linear-gradient(90deg, rgba(255, 247, 233, 0.04) 1px, transparent 1px),
-    var(--landing-pricing-wash),
-    rgba(16, 22, 37, 0.86);
-  box-shadow:
-    0 1px 0 rgba(255, 247, 233, 0.08) inset,
-    0 26px 64px -44px rgba(0, 0, 0, 0.92);
+  background: rgba(16, 22, 37, 0.86);
+  box-shadow: 0 20px 46px -36px rgba(0, 0, 0, 0.9);
 }
 
 html[data-theme="dark"] .pricing-grid.two .price-card.featured {
   border-color: rgba(245, 214, 154, 0.24);
-  background:
-    linear-gradient(90deg, rgba(255, 247, 233, 0.05) 1px, transparent 1px),
-    linear-gradient(135deg, rgba(245, 214, 154, 0.09), transparent 48%),
-    linear-gradient(160deg, #11162f, #0b1028 58%, #211d2c);
+  background: linear-gradient(160deg, #11162f, #0b1028);
 }
 
 html[data-theme="dark"] .price-card.featured .price-status.current {
@@ -28267,7 +28101,7 @@ html[data-theme="dark"] .brand::after {
   }
 }
 
-/* Full-site finish pass: quiet depth, editorial dividers, and restrained motion. */
+/* Full-site finish pass: quiet depth and restrained motion. */
 .rf-ambient-field {
   position: fixed;
   inset: 0;
@@ -28311,20 +28145,7 @@ html[data-theme="dark"] .brand::after {
   isolation: isolate;
 }
 
-.nav::after {
-  position: absolute;
-  inset-inline: max(24px, calc((100% - 1120px) / 2 + 28px));
-  inset-block-end: 3px;
-  height: 1px;
-  background:
-    linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand) 48%, transparent), color-mix(in srgb, var(--accent) 38%, transparent), transparent),
-    linear-gradient(90deg, transparent, color-mix(in srgb, var(--line-2) 78%, transparent), transparent);
-  content: "";
-  opacity: 0.36;
-}
-
 :where(
-  .section-head,
   .templates-head,
   .legal-hero,
   .templates-page-hero,
@@ -28337,7 +28158,6 @@ html[data-theme="dark"] .brand::after {
 }
 
 :where(
-  .section-head,
   .templates-head,
   .legal-hero,
   .templates-page-hero,
@@ -28363,12 +28183,9 @@ html[data-theme="dark"] .brand::after {
 }
 
 :where(
-  .step,
-  .feature-card,
   .template-card,
   .templates-page-card,
   .templates-guide-card,
-  .price-card,
   .legal-card,
   .legal-footer-card,
   .help-signal-card,
@@ -28397,12 +28214,9 @@ html[data-theme="dark"] .brand::after {
 }
 
 :where(
-  .step,
-  .feature-card,
   .template-card,
   .templates-page-card,
   .templates-guide-card,
-  .price-card,
   .legal-card,
   .legal-footer-card,
   .help-signal-card,
@@ -28430,7 +28244,7 @@ html[data-theme="dark"] .brand::after {
     var(--shadow);
 }
 
-:where(.step, .feature-card, .template-card, .templates-page-card, .price-card, .help-action-card, .settings-project-item):hover {
+:where(.template-card, .templates-page-card, .help-action-card, .settings-project-item):hover {
   transform: translateY(-2px);
 }
 

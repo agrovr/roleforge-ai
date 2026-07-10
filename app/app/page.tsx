@@ -2499,6 +2499,8 @@ export default function Page() {
   const workflowRecoveryTitle =
     workflowError?.code === "premium_required"
       ? `${premiumExportFormat} export needs Premium access`
+      : workflowError?.code === "entitlement_verification_failed"
+        ? "Premium access could not be verified"
       : workflowError?.code === "plan_limit_reached"
         ? "Monthly run limit reached"
         : workflowError?.requestId
@@ -2507,6 +2509,8 @@ export default function Page() {
   const workflowRecoveryDetail =
     workflowError?.code === "premium_required"
       ? "Switch to PDF, refresh Billing, or contact support if Premium access should already be active."
+      : workflowError?.code === "entitlement_verification_failed"
+        ? "Your plan and tailored draft are unchanged. Wait a moment, then retry this export."
       : workflowError?.code === "plan_limit_reached"
         ? resetLabel
           ? `Free runs reset ${resetLabel}. Upgrade or wait for the next monthly reset.`
@@ -2517,8 +2521,16 @@ export default function Page() {
   const workflowRecoverySteps = workflowError
     ? [
         workflowError.requestId ? `Copy request ${workflowError.requestId} into a support note.` : "Keep the current resume and target in place.",
-        workflowError.code === "premium_required" ? "Use PDF or refresh Billing before trying the premium export again." : "Check Status for workflow and export readiness.",
-        workflowError.code === "plan_limit_reached" ? "Open Usage or Billing to review the account limit." : "Retry from Studio; contact support if the same step fails again.",
+        workflowError.code === "premium_required"
+          ? "Use PDF or refresh Billing before trying the premium export again."
+          : workflowError.code === "entitlement_verification_failed"
+            ? "Wait a moment, then retry the same export without rerunning Tailor."
+            : "Check Status for workflow and export readiness.",
+        workflowError.code === "plan_limit_reached"
+          ? "Open Usage or Billing to review the account limit."
+          : workflowError.code === "entitlement_verification_failed"
+            ? "Check Status or contact support with the request reference if verification keeps failing."
+            : "Retry from Studio; contact support if the same step fails again.",
       ]
     : [];
   const accountBillingSupportHref = supportRequestHref({
@@ -4053,8 +4065,13 @@ export default function Page() {
                       ))}
                     </div>
                     <div className="rf-callout-actions rf-recovery-actions">
-                      <button className="primary-button" type="button" onClick={onRun} disabled={!canRun || busy}>
-                        Retry workflow <RoleForgeIcon name="arrow" size={14} />
+                      <button
+                        className="primary-button"
+                        type="button"
+                        onClick={workflowError.code === "entitlement_verification_failed" ? () => void onExportSelectedFormat() : onRun}
+                        disabled={workflowError.code === "entitlement_verification_failed" ? !result?.tailored_text?.trim() || busy : !canRun || busy}
+                      >
+                        {workflowError.code === "entitlement_verification_failed" ? `Retry ${selectedFormatLabel} export` : "Retry workflow"} <RoleForgeIcon name="arrow" size={14} />
                       </button>
                       <Link className="ghost-button" href="/status">Check status</Link>
                       <Link className="ghost-button" href="/help#try-first">Help guide</Link>

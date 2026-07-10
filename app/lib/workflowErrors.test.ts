@@ -33,6 +33,18 @@ test("maps account verification failures without exposing backend phrasing", asy
   const state = workflowErrorFromCaught(error, "Fallback copy.");
 
   assert.equal(state.message, "We could not check your plan usage. Wait a moment, then try again.");
+
+  const entitlement = await readApiError(new Response(JSON.stringify({
+    error: {
+      code: "entitlement_verification_failed",
+      message: "Premium entitlement lookup failed upstream.",
+    },
+  }), { status: 503 }), "Fallback copy.");
+
+  assert.equal(
+    workflowErrorFromCaught(entitlement, "Fallback copy.").message,
+    "We could not verify Premium access. Your plan was not changed. Wait a moment, then try the export again.",
+  );
 });
 
 test("maps auth and stale workflow failures without setup-shaped copy", async () => {
