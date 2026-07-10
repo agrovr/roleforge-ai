@@ -27466,9 +27466,9 @@ html[data-theme="dark"] .support-form textarea:hover {
   }
 }
 
-/* Landing pricing refinement: clear plans without decorative rails or grid lines. */
+/* Landing pricing refinement: compact plans without decorative card stacks. */
 .pricing-grid.two {
-  align-items: stretch;
+  align-items: start;
 }
 
 .pricing-grid.two .price-card,
@@ -27478,9 +27478,13 @@ html[data-theme="dark"] .support-form textarea:hover {
 }
 
 .pricing-grid.two .price-card {
+  min-height: 0;
+  gap: 14px;
+  padding: 26px 28px;
+  border-radius: 18px;
   border-color: var(--line);
   background: var(--surface);
-  box-shadow: 0 20px 48px -42px color-mix(in srgb, var(--ink-0) 44%, transparent);
+  box-shadow: 0 16px 38px -34px color-mix(in srgb, var(--ink-0) 38%, transparent);
 }
 
 .pricing-grid.two .price-card::after {
@@ -27490,7 +27494,7 @@ html[data-theme="dark"] .support-form textarea:hover {
 .pricing-grid.two .price-card.featured {
   border-color: rgba(245, 214, 154, 0.2);
   background: linear-gradient(160deg, #11162f, #0d1228);
-  box-shadow: 0 24px 58px -44px rgba(8, 12, 24, 0.78);
+  box-shadow: 0 20px 46px -38px rgba(8, 12, 24, 0.72);
 }
 
 .price-card-top {
@@ -27529,6 +27533,14 @@ html[data-theme="dark"] .support-form textarea:hover {
   padding: 2px 0;
 }
 
+.pricing-grid.two .price-list {
+  gap: 10px;
+}
+
+.pricing-grid.two .price-card .btn {
+  margin-top: 8px;
+}
+
 .pricing-grid.two .price-card .price-list li svg {
   color: var(--good);
 }
@@ -27537,21 +27549,57 @@ html[data-theme="dark"] .support-form textarea:hover {
   color: #a6efb8;
 }
 
+.pricing-clarity-grid {
+  gap: 0;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+}
+
 .pricing-clarity-grid a {
+  padding: 8px 22px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.pricing-clarity-grid a + a {
+  border-inline-start: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+}
+
+.pricing-clarity-grid a:hover,
+.pricing-clarity-grid a:focus-visible {
   border-color: var(--line);
-  background: var(--surface);
-  box-shadow: 0 14px 34px -32px color-mix(in srgb, var(--ink-0) 36%, transparent);
+  background: transparent;
+  box-shadow: none;
+}
+
+.pricing-clarity-grid a > span {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  background: transparent;
 }
 
 .pricing-clarity-grid a::after {
   content: none;
 }
 
-html[data-theme="dark"] .pricing-grid.two .price-card,
-html[data-theme="dark"] .pricing-clarity-grid a {
+html[data-theme="dark"] .pricing-grid.two .price-card {
   border-color: rgba(255, 247, 233, 0.14);
   background: rgba(16, 22, 37, 0.86);
   box-shadow: 0 20px 46px -36px rgba(0, 0, 0, 0.9);
+}
+
+html[data-theme="dark"] .pricing-clarity-grid {
+  border-color: rgba(255, 247, 233, 0.14);
+}
+
+html[data-theme="dark"] .pricing-clarity-grid a {
+  border-color: rgba(255, 247, 233, 0.14);
+  background: transparent;
+  box-shadow: none;
 }
 
 html[data-theme="dark"] .pricing-grid.two .price-card.featured {
@@ -27566,6 +27614,33 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
     rgba(255, 247, 233, 0.03);
   color: #f5d69a;
   text-shadow: none;
+}
+
+@media (max-width: 900px) {
+  .pricing-clarity-grid {
+    grid-template-columns: 1fr;
+    padding-top: 12px;
+  }
+
+  .pricing-clarity-grid a {
+    padding: 12px 0;
+  }
+
+  .pricing-clarity-grid a + a {
+    border-inline-start: 0;
+    border-block-start: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+  }
+
+  html[data-theme="dark"] .pricing-clarity-grid a + a {
+    border-color: rgba(255, 247, 233, 0.14);
+  }
+}
+
+@media (max-width: 640px) {
+  .pricing-grid.two .price-card {
+    gap: 13px;
+    padding: 24px 28px;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
