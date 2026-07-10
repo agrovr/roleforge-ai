@@ -22,10 +22,12 @@ test("landing workflow cards stay separated and free of decorative rails", () =>
   assert.doesNotMatch(globals, /--landing-workflow-rail|--landing-workflow-glint/);
 });
 
-test("feature cards keep checklists readable without nested pills", () => {
-  assert.match(globals, /\.feature-card\s*\{(?=[^}]*position:\s*relative)(?=[^}]*background:\s*var\(--surface\))(?=[^}]*box-shadow:)[^}]*\}/s);
-  assert.match(globals, /\.feature-card-list\s*\{(?=[^}]*padding-top:\s*2px)(?=[^}]*border-top:\s*0)[^}]*\}/s);
-  assert.match(globals, /\.feature-card-list\s+li\s*\{(?=[^}]*padding:\s*0)(?=[^}]*border:\s*0)(?=[^}]*background:\s*transparent)[^}]*\}/s);
-  assert.match(globals, /html\[data-theme="dark"\]\s+\.step,\s*html\[data-theme="dark"\]\s+\.feature-card\s*\{(?=[^}]*background:\s*rgba\(16,\s*22,\s*37,\s*0\.86\))[^}]*\}/s);
-  assert.match(globals, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.step,[\s\S]*?\.feature-card::after\s*\{[\s\S]*?animation:\s*none;[\s\S]*?transition:\s*none;[\s\S]*?\}/s);
+test("feature index removes elevated card chrome and stays compact on phones", () => {
+  assert.match(globals, /\/\* Landing feature refinement: a compact index instead of six elevated cards\. \*\//);
+  assert.match(globals, /\.feature-card\s*\{(?=[^}]*padding:\s*30px 32px 32px)(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)(?=[^}]*transition:\s*none)[^}]*\}/s);
+  assert.match(globals, /\.feature-card:nth-child\(3n \+ 2\),\s*\.feature-card:nth-child\(3n \+ 3\)\s*\{[^}]*border-inline-start:\s*1px solid var\(--line\)[^}]*\}/s);
+  assert.match(globals, /\.feature-card:hover\s*\{(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)(?=[^}]*transform:\s*none)[^}]*\}/s);
+  assert.match(globals, /html\[data-theme="dark"\]\s+\.feature-card:nth-child\(n\),\s*html\[data-theme="dark"\]\s+\.feature-card:nth-child\(n\):hover\s*\{(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
+  assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.feature-card:nth-child\(n\)\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*42px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*24px 4px)[^}]*\}/s);
+  assert.match(globals, /@media\s*\(max-width:\s*640px\)\s*\{[\s\S]*?\.feature-card-list\s*\{[^}]*display:\s*none[^}]*\}/s);
 });

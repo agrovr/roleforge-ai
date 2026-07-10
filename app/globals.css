@@ -27598,6 +27598,135 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
   }
 }
 
+/* Landing feature refinement: a compact index instead of six elevated cards. */
+.features-grid {
+  gap: 0;
+}
+
+.feature-card {
+  padding: 30px 32px 32px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transition: none;
+}
+
+.feature-card:nth-child(3n + 2),
+.feature-card:nth-child(3n + 3) {
+  border-inline-start: 1px solid var(--line);
+}
+
+.feature-card:nth-child(n + 4) {
+  border-block-start: 1px solid var(--line);
+}
+
+.feature-card:hover {
+  border-color: var(--line);
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.feature-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.feature-card-list {
+  margin-top: 2px;
+}
+
+html[data-theme="dark"] .feature-card:nth-child(n),
+html[data-theme="dark"] .feature-card:nth-child(n):hover {
+  border-color: rgba(255, 247, 233, 0.14);
+  background: transparent;
+  box-shadow: none;
+}
+
+@media (max-width: 1180px) {
+  .feature-card:nth-child(n) {
+    border: 0;
+  }
+
+  .feature-card:nth-child(2n) {
+    border-inline-start: 1px solid var(--line);
+  }
+
+  .feature-card:nth-child(n + 3) {
+    border-block-start: 1px solid var(--line);
+  }
+
+  html[data-theme="dark"] .feature-card:nth-child(2n),
+  html[data-theme="dark"] .feature-card:nth-child(n + 3) {
+    border-color: rgba(255, 247, 233, 0.14);
+  }
+}
+
+@media (max-width: 900px) {
+  .feature-card:nth-child(n) {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    column-gap: 16px;
+    row-gap: 8px;
+    padding: 24px 4px;
+    border: 0;
+    border-block-start: 1px solid var(--line);
+  }
+
+  .feature-card:first-child {
+    border-block-start: 0;
+  }
+
+  .feature-card .feature-icon {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+
+  .feature-card h3,
+  .feature-card p,
+  .feature-card-list {
+    grid-column: 2;
+  }
+
+  .feature-card-list {
+    margin-top: 4px;
+  }
+
+  html[data-theme="dark"] .feature-card:nth-child(n) {
+    border-color: rgba(255, 247, 233, 0.14);
+  }
+}
+
+@media (max-width: 640px) {
+  .feature-card:nth-child(n) {
+    grid-template-columns: 36px minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 6px;
+    padding: 20px 2px;
+  }
+
+  .feature-card .feature-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .feature-card h3 {
+    font-size: 19px;
+  }
+
+  .feature-card p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .feature-card-list {
+    display: none;
+  }
+}
+
 /* Interaction finish: consistent focus, tactile controls, and navigable anchors. */
 :where(a, button, summary, input, textarea, select, [role="button"], [tabindex]):focus-visible {
   outline: 3px solid color-mix(in srgb, var(--brand) 30%, transparent);
