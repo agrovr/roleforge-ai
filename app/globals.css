@@ -21252,9 +21252,7 @@ html[data-theme="dark"] .support-routing-step p {
 .admin-support-shell {
   min-height: 100dvh;
   padding: clamp(24px, 5vw, 56px);
-  background:
-    radial-gradient(circle at top right, color-mix(in srgb, var(--accent-soft) 34%, transparent), transparent 32rem),
-    linear-gradient(180deg, var(--bg), var(--bg-alt));
+  background: linear-gradient(180deg, var(--bg), var(--bg-alt));
   color: var(--ink-1);
 }
 
@@ -21262,6 +21260,7 @@ html[data-theme="dark"] .support-routing-step p {
 .admin-support-list,
 .admin-support-readiness,
 .admin-support-filter,
+.admin-support-setup,
 .admin-support-playbook,
 .admin-support-commandbar {
   width: min(1120px, 100%);
@@ -21271,46 +21270,39 @@ html[data-theme="dark"] .support-routing-step p {
 .admin-support-commandbar {
   position: relative;
   display: flex;
-  min-height: 66px;
+  min-height: 64px;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
   margin-bottom: clamp(20px, 3vw, 34px);
+  padding: 7px 8px;
+  border: 1px solid color-mix(in srgb, var(--brand) 14%, var(--line));
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: 0 18px 44px -40px color-mix(in srgb, var(--ink-0) 42%, transparent);
   isolation: isolate;
+  backdrop-filter: blur(16px) saturate(1.04);
+  -webkit-backdrop-filter: blur(16px) saturate(1.04);
 }
 
 .admin-support-commandbar::before {
-  position: absolute;
-  inset-inline: clamp(110px, 18vw, 260px);
-  inset-block-start: 50%;
-  height: 1px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--line) 74%, transparent), transparent);
-  content: "";
-  opacity: 0.68;
-  pointer-events: none;
+  content: none;
 }
 
 .admin-support-commandbar .brand,
 .admin-support-commandbar nav {
   position: relative;
   z-index: 1;
-  border: 1px solid color-mix(in srgb, var(--brand) 15%, var(--line));
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 78%, transparent)),
-    radial-gradient(circle at 96% 0%, color-mix(in srgb, var(--accent-soft) 32%, transparent), transparent 10rem);
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #fff 58%, transparent),
-    0 20px 50px -42px color-mix(in srgb, var(--ink-0) 46%, transparent);
-  backdrop-filter: blur(16px) saturate(1.06);
-  -webkit-backdrop-filter: blur(16px) saturate(1.06);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .admin-support-commandbar .brand {
   min-width: 0;
-  min-height: 58px;
-  padding: 7px 17px 7px 8px;
-  border-radius: 22px;
+  min-height: 48px;
+  padding: 4px 12px 4px 4px;
+  border-radius: 16px;
 }
 
 .admin-support-commandbar nav {
@@ -21319,36 +21311,34 @@ html[data-theme="dark"] .support-routing-step p {
   align-items: center;
   justify-content: flex-end;
   gap: 6px;
-  padding: 5px;
-  border-radius: 24px;
+  padding: 0;
+  border-radius: 16px;
 }
 
 .admin-support-commandbar nav a {
   display: inline-flex;
-  min-height: 46px;
+  min-height: 42px;
   min-width: 0;
   align-items: center;
   justify-content: center;
   gap: 8px;
   padding: 10px 13px;
   border: 1px solid transparent;
-  border-radius: 18px;
+  border-radius: 13px;
   color: var(--ink-1);
   font-size: 0.86rem;
   font-weight: 950;
   line-height: 1.1;
   text-decoration: none;
   text-wrap: balance;
-  transition: border-color 170ms ease, background 170ms ease, box-shadow 170ms ease, transform 170ms ease;
+  transition: border-color 170ms ease, background 170ms ease, color 170ms ease;
 }
 
 .admin-support-commandbar nav a:hover,
 .admin-support-commandbar nav a:focus-visible {
   border-color: color-mix(in srgb, var(--accent) 30%, var(--line));
   background: color-mix(in srgb, var(--accent-soft) 42%, var(--surface));
-  box-shadow: 0 12px 26px -22px color-mix(in srgb, var(--ink-0) 42%, transparent);
   color: var(--ink-0);
-  transform: translateY(-1px);
 }
 
 .admin-support-hero {
@@ -21356,14 +21346,14 @@ html[data-theme="dark"] .support-routing-step p {
   grid-template-columns: minmax(0, 1fr) minmax(240px, 0.58fr);
   gap: 18px;
   align-items: end;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .admin-support-hero h1 {
   margin: 8px 0 0;
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(3rem, 9vw, 6rem);
+  font-size: clamp(2.6rem, 6vw, 4.4rem);
   font-weight: 680;
   letter-spacing: 0;
   line-height: 0.9;
@@ -21382,28 +21372,27 @@ html[data-theme="dark"] .support-routing-step p {
 .admin-support-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--brand) 14%, var(--line));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
 }
 
-.admin-support-stats span,
 .admin-support-readiness-card,
 .admin-support-filter a,
 .admin-support-notice,
-.admin-support-playbook,
 .admin-support-next-step {
   border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line));
   border-radius: 14px;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--brand-soft) 20%, transparent)),
-    var(--surface);
-  box-shadow: 0 18px 46px -40px var(--shadow);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
 }
 
 .admin-support-stats span {
   display: grid;
   min-width: 0;
   gap: 4px;
-  padding: 14px;
+  padding: 13px 12px;
+  border-inline-end: 1px solid color-mix(in srgb, var(--line) 76%, transparent);
   color: var(--ink-2);
   font-size: 0.72rem;
   font-weight: 950;
@@ -21412,10 +21401,14 @@ html[data-theme="dark"] .support-routing-step p {
   text-transform: uppercase;
 }
 
+.admin-support-stats span:last-child {
+  border-inline-end: 0;
+}
+
 .admin-support-stats strong {
   color: var(--ink-0);
   font-family: var(--font-display);
-  font-size: clamp(1.7rem, 4vw, 2.35rem);
+  font-size: clamp(1.45rem, 3vw, 2rem);
   font-weight: 680;
   letter-spacing: 0;
   line-height: 0.95;
@@ -21431,13 +21424,73 @@ html[data-theme="dark"] .support-routing-step p {
   font-weight: 800;
 }
 
+.admin-support-setup {
+  margin-bottom: 14px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--brand) 14%, var(--line));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+}
+
+.admin-support-setup > summary {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  color: var(--ink-1);
+  cursor: pointer;
+  list-style: none;
+}
+
+.admin-support-setup > summary::-webkit-details-marker {
+  display: none;
+}
+
+.admin-support-setup > summary span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--ink-0);
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.admin-support-setup > summary small {
+  color: var(--ink-3);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.admin-support-setup > summary::after {
+  color: var(--ink-3);
+  content: "+";
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.admin-support-setup[open] > summary::after {
+  content: "−";
+}
+
+.admin-support-setup-body {
+  display: grid;
+  gap: 14px;
+  padding: 0 14px 14px;
+  border-top: 1px solid color-mix(in srgb, var(--line) 74%, transparent);
+}
+
 .admin-support-playbook {
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(300px, 1fr);
   gap: clamp(14px, 3vw, 24px);
   align-items: center;
-  margin-bottom: 18px;
-  padding: clamp(16px, 3vw, 22px);
+  margin: 0;
+  padding: 14px 0 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .admin-support-playbook h2 {
@@ -21518,7 +21571,7 @@ html[data-theme="dark"] .support-routing-step p {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 0;
 }
 
 .admin-support-readiness-card {
@@ -21544,6 +21597,12 @@ html[data-theme="dark"] .support-routing-step p {
   border-color: color-mix(in srgb, var(--accent) 28%, var(--line));
   background: color-mix(in srgb, var(--accent-soft) 58%, var(--surface));
   color: var(--accent);
+}
+
+.admin-support-readiness-card.optional.needs-setup > span {
+  border-color: color-mix(in srgb, var(--line) 90%, transparent);
+  background: color-mix(in srgb, var(--surface-warm) 70%, transparent);
+  color: var(--ink-3);
 }
 
 .admin-support-readiness-card small,
@@ -21582,28 +21641,49 @@ html[data-theme="dark"] .support-routing-step p {
 
 .admin-support-filter {
   display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
-  margin-bottom: 18px;
+  gap: 4px;
+  margin-bottom: 14px;
+  padding: 4px;
+  overflow-x: auto;
+  border: 1px solid color-mix(in srgb, var(--brand) 14%, var(--line));
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  scrollbar-width: thin;
 }
 
 .admin-support-filter a {
   display: inline-flex;
-  min-height: 42px;
+  min-height: 40px;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  padding: 10px 14px;
+  gap: 9px;
+  padding: 9px 12px;
+  border-color: transparent;
+  border-radius: 9px;
+  background: transparent;
   color: var(--ink-2);
   font-size: 0.82rem;
   font-weight: 950;
   text-decoration: none;
 }
 
+.admin-support-filter a strong {
+  min-width: 1.5rem;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-warm) 76%, transparent);
+  color: var(--ink-1);
+  font-size: 0.72rem;
+  line-height: 1.3;
+  text-align: center;
+}
+
 .admin-support-filter a.active,
 .admin-support-filter a:hover,
 .admin-support-filter a:focus-visible {
   border-color: color-mix(in srgb, var(--accent) 36%, var(--line));
-  background: color-mix(in srgb, var(--accent-soft) 46%, var(--surface));
+  background: color-mix(in srgb, var(--accent-soft) 38%, var(--surface));
   color: var(--ink-0);
 }
 
@@ -21617,10 +21697,8 @@ html[data-theme="dark"] .support-routing-step p {
   min-width: 0;
   border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line));
   border-radius: 18px;
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--accent-soft) 18%, transparent)),
-    var(--surface);
-  box-shadow: 0 24px 58px -46px var(--shadow);
+  background: var(--surface);
+  box-shadow: 0 18px 44px -40px var(--shadow);
 }
 
 .admin-support-card {
@@ -21719,10 +21797,9 @@ html[data-theme="dark"] .support-routing-step p {
 
 .admin-support-meta div {
   min-width: 0;
-  padding: 11px 12px;
-  border: 1px solid color-mix(in srgb, var(--line) 84%, transparent);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--surface-warm) 58%, transparent);
+  padding: 10px 0;
+  border-top: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  background: transparent;
 }
 
 .admin-support-meta dt {
@@ -21746,9 +21823,7 @@ html[data-theme="dark"] .support-routing-step p {
   align-items: flex-start;
   gap: 10px;
   padding: 11px 12px;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--sky-soft) 32%, transparent), color-mix(in srgb, var(--surface-warm) 54%, transparent)),
-    var(--surface);
+  background: color-mix(in srgb, var(--sky-soft) 26%, var(--surface));
   color: var(--ink-1);
   font-size: 0.86rem;
   font-weight: 780;
@@ -21773,9 +21848,7 @@ html[data-theme="dark"] .support-routing-step p {
   padding: 12px;
   border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--line));
   border-radius: 14px;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 88%, transparent), color-mix(in srgb, var(--brand-soft) 18%, transparent)),
-    var(--surface);
+  background: color-mix(in srgb, var(--surface-warm) 38%, var(--surface));
 }
 
 .admin-support-reply-form label {
@@ -21837,6 +21910,17 @@ html[data-theme="dark"] .support-routing-step p {
   display: flex;
   flex-wrap: wrap;
   gap: 9px;
+  align-items: center;
+  padding-top: 2px;
+}
+
+.admin-support-actions-label {
+  margin-inline-end: 2px;
+  color: var(--ink-3);
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .admin-support-action {
@@ -21846,7 +21930,7 @@ html[data-theme="dark"] .support-routing-step p {
   justify-content: center;
   gap: 8px;
   border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line));
-  border-radius: 999px;
+  border-radius: 10px;
   background: var(--surface);
   color: var(--ink-1);
   cursor: pointer;
@@ -21869,6 +21953,22 @@ html[data-theme="dark"] .support-routing-step p {
 .admin-support-action:disabled {
   cursor: default;
   opacity: 0.48;
+}
+
+.admin-support-action.is-pending svg {
+  animation: admin-support-pending 800ms linear infinite;
+}
+
+@keyframes admin-support-pending {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-support-action.is-pending svg {
+    animation: none;
+  }
 }
 
 .admin-support-empty {
@@ -21927,7 +22027,7 @@ html[data-theme="dark"] .support-routing-step p {
 
   .admin-support-commandbar nav {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     width: 100%;
   }
 
@@ -21936,10 +22036,6 @@ html[data-theme="dark"] .support-routing-step p {
   }
 
   .admin-support-playbook ol {
-    grid-template-columns: 1fr;
-  }
-
-  .admin-support-stats {
     grid-template-columns: 1fr;
   }
 
@@ -21952,6 +22048,15 @@ html[data-theme="dark"] .support-routing-step p {
   .admin-support-reply-footer > div,
   .admin-support-action {
     width: 100%;
+  }
+
+  .admin-support-setup > summary {
+    align-items: flex-start;
+  }
+
+  .admin-support-setup > summary small {
+    margin-left: auto;
+    text-align: right;
   }
 }
 
@@ -25797,11 +25902,7 @@ html[data-theme="dark"] .nav {
 .settings-plan-access,
 .settings-plan-active-card,
 .settings-plan-info-item,
-.settings-billing-timeline-item,
-.admin-support-playbook,
-.admin-support-card,
-.admin-support-empty,
-.admin-support-readiness-card {
+.settings-billing-timeline-item {
   position: relative;
   isolation: isolate;
 }
@@ -25812,9 +25913,7 @@ html[data-theme="dark"] .nav {
 .settings-account-overview::after,
 .settings-activity-panel::after,
 .settings-account-health::after,
-.settings-plan-access::after,
-.admin-support-playbook::after,
-.admin-support-card::after {
+.settings-plan-access::after {
   position: absolute;
   inset: 1px;
   z-index: -1;
@@ -25834,10 +25933,7 @@ html[data-theme="dark"] .nav {
 .settings-activity-panel,
 .settings-account-health,
 .settings-plan-access,
-.settings-plan-active-card,
-.admin-support-playbook,
-.admin-support-card,
-.admin-support-empty {
+.settings-plan-active-card {
   box-shadow:
     0 24px 70px -54px var(--shadow),
     inset 0 1px 0 rgba(255, 255, 255, 0.42);
@@ -25849,11 +25945,7 @@ html[data-theme="dark"] .nav {
 .settings-account-health-card,
 .settings-plan-access-item,
 .settings-plan-info-item,
-.settings-billing-timeline-item,
-.admin-support-readiness-card,
-.admin-support-filter a,
-.admin-support-action,
-.admin-support-meta div {
+.settings-billing-timeline-item {
   position: relative;
   overflow: hidden;
 }
@@ -25864,10 +25956,7 @@ html[data-theme="dark"] .nav {
 .settings-account-health-card::after,
 .settings-plan-access-item::after,
 .settings-plan-info-item::after,
-.settings-billing-timeline-item::after,
-.admin-support-readiness-card::after,
-.admin-support-filter a::after,
-.admin-support-action::after {
+.settings-billing-timeline-item::after {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -25888,12 +25977,7 @@ html[data-theme="dark"] .nav {
 .settings-account-health-card:focus-visible::after,
 .settings-plan-access-item:hover::after,
 .settings-plan-info-item:hover::after,
-.settings-billing-timeline-item:hover::after,
-.admin-support-readiness-card:hover::after,
-.admin-support-filter a:hover::after,
-.admin-support-filter a:focus-visible::after,
-.admin-support-action:hover::after,
-.admin-support-action:focus-visible::after {
+.settings-billing-timeline-item:hover::after {
   opacity: 0.7;
   transform: translateX(62%);
 }
@@ -25927,49 +26011,10 @@ html[data-theme="dark"] .nav {
     0 12px 28px -24px var(--shadow);
 }
 
-.admin-support-card {
-  transform: translateZ(0);
-  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
-}
-
-.admin-support-card::before {
-  position: absolute;
-  inset-block: 18px;
-  inset-inline-start: -1px;
-  width: 4px;
-  border-radius: 0 999px 999px 0;
-  background: linear-gradient(180deg, var(--accent), var(--sky));
-  content: "";
-  opacity: 0.68;
-}
-
-.admin-support-card:has(.admin-support-status.closed)::before {
-  background: linear-gradient(180deg, var(--good), var(--sky));
-}
-
-.admin-support-card:hover,
-.admin-support-card:focus-within {
-  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
-  box-shadow:
-    0 30px 86px -58px var(--shadow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  transform: translateY(-2px);
-}
-
 .admin-support-reply-form textarea:focus-visible {
   border-color: color-mix(in srgb, var(--accent) 44%, var(--line));
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-soft) 48%, transparent);
   outline: none;
-}
-
-.admin-support-playbook li {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.32);
-  transition: border-color 180ms ease, transform 180ms ease;
-}
-
-.admin-support-playbook li:hover {
-  border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
-  transform: translateY(-1px);
 }
 
 .settings-account-overview,
@@ -26023,15 +26068,13 @@ html[data-theme="dark"] .nav {
 
 /* Operational surface finish: saved work, document rows, and support triage. */
 .settings-project-list,
-.settings-document-list,
-.admin-support-list {
+.settings-document-list {
   --ops-rail: linear-gradient(180deg, var(--accent), var(--brand), var(--sky));
 }
 
 .settings-project-item,
 .settings-document-item,
-.studio-account-recent-link,
-.admin-support-meta div {
+.studio-account-recent-link {
   position: relative;
   isolation: isolate;
 }
@@ -26112,25 +26155,6 @@ html[data-theme="dark"] .nav {
   transform: translateY(-1px);
 }
 
-.admin-support-meta div {
-  border-color: color-mix(in srgb, var(--brand) 18%, var(--line));
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-warm) 58%, transparent));
-  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 38%, transparent);
-}
-
-.admin-support-meta div::before {
-  position: absolute;
-  inset-inline: 10px;
-  inset-block-start: 0;
-  height: 2px;
-  border-radius: 0 0 999px 999px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 54%, transparent), transparent);
-  content: "";
-  opacity: 0.72;
-  pointer-events: none;
-}
-
 .admin-support-status {
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -26142,9 +26166,7 @@ html[data-theme="dark"] .export-readiness-panel::after,
 html[data-theme="dark"] .settings-account-overview::after,
 html[data-theme="dark"] .settings-activity-panel::after,
 html[data-theme="dark"] .settings-account-health::after,
-html[data-theme="dark"] .settings-plan-access::after,
-html[data-theme="dark"] .admin-support-playbook::after,
-html[data-theme="dark"] .admin-support-card::after {
+html[data-theme="dark"] .settings-plan-access::after {
   background:
     linear-gradient(126deg, rgba(255, 247, 233, 0.08), transparent 30%, transparent 74%, rgba(245, 214, 154, 0.08)),
     radial-gradient(circle at 92% 8%, rgba(222, 162, 79, 0.14), transparent 14rem);
@@ -26157,10 +26179,7 @@ html[data-theme="dark"] .settings-activity-item::after,
 html[data-theme="dark"] .settings-account-health-card::after,
 html[data-theme="dark"] .settings-plan-access-item::after,
 html[data-theme="dark"] .settings-plan-info-item::after,
-html[data-theme="dark"] .settings-billing-timeline-item::after,
-html[data-theme="dark"] .admin-support-readiness-card::after,
-html[data-theme="dark"] .admin-support-filter a::after,
-html[data-theme="dark"] .admin-support-action::after {
+html[data-theme="dark"] .settings-billing-timeline-item::after {
   background: linear-gradient(110deg, transparent 0 30%, rgba(255, 247, 233, 0.12) 48%, transparent 66% 100%);
 }
 
@@ -26171,25 +26190,14 @@ html[data-theme="dark"] .settings-account-overview,
 html[data-theme="dark"] .settings-activity-panel,
 html[data-theme="dark"] .settings-account-health,
 html[data-theme="dark"] .settings-plan-access,
-html[data-theme="dark"] .settings-plan-active-card,
-html[data-theme="dark"] .admin-support-playbook,
-html[data-theme="dark"] .admin-support-card,
-html[data-theme="dark"] .admin-support-empty {
+html[data-theme="dark"] .settings-plan-active-card {
   box-shadow:
     0 28px 76px -54px rgba(0, 0, 0, 0.96),
     inset 0 1px 0 rgba(255, 247, 233, 0.08);
 }
 
-html[data-theme="dark"] .admin-support-card:hover,
-html[data-theme="dark"] .admin-support-card:focus-within {
-  box-shadow:
-    0 34px 86px -58px rgba(0, 0, 0, 0.98),
-    inset 0 1px 0 rgba(255, 247, 233, 0.11);
-}
-
 html[data-theme="dark"] .settings-project-list,
-html[data-theme="dark"] .settings-document-list,
-html[data-theme="dark"] .admin-support-list {
+html[data-theme="dark"] .settings-document-list {
   --ops-rail: linear-gradient(180deg, #f3c16d, #89d1be, #8eb7f0);
 }
 
@@ -26227,17 +26235,6 @@ html[data-theme="dark"] .settings-document-item:hover,
 html[data-theme="dark"] .settings-document-item:focus-within {
   border-color: rgba(222, 162, 79, 0.3);
   box-shadow: 0 18px 38px -28px rgba(0, 0, 0, 0.96);
-}
-
-html[data-theme="dark"] .admin-support-meta div {
-  border-color: rgba(255, 247, 233, 0.13);
-  background:
-    linear-gradient(180deg, rgba(255, 247, 233, 0.055), rgba(255, 247, 233, 0.022));
-  box-shadow: inset 0 1px 0 rgba(255, 247, 233, 0.08);
-}
-
-html[data-theme="dark"] .admin-support-meta div::before {
-  background: linear-gradient(90deg, transparent, rgba(243, 193, 109, 0.42), transparent);
 }
 
 /* Settings commerce finish: billing trust rails and export document clarity. */
@@ -26778,9 +26775,6 @@ html[data-theme="dark"] .settings-project-delete summary {
   .settings-plan-access-item::after,
   .settings-plan-info-item::after,
   .settings-billing-timeline-item::after,
-  .admin-support-readiness-card::after,
-  .admin-support-filter a::after,
-  .admin-support-action::after,
   .rf-studio-stat-fill {
     animation: none;
     transition: none;
@@ -26806,8 +26800,7 @@ html[data-theme="dark"] .settings-project-delete summary {
 }
 
 /* Support experience polish: traceable request cards and operator queue depth. */
-.support-shell,
-.admin-support-shell {
+.support-shell {
   --support-experience-rail: linear-gradient(180deg, var(--sky), var(--brand), var(--accent));
   --support-experience-glass: linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 70%, transparent));
   --support-experience-glint: linear-gradient(110deg, transparent 0 32%, color-mix(in srgb, #fff 42%, transparent) 48%, transparent 64% 100%);
@@ -26821,11 +26814,7 @@ html[data-theme="dark"] .settings-project-delete summary {
 .support-packet-card,
 .support-response-card,
 .support-history-item,
-.settings-support-item,
-.admin-support-playbook,
-.admin-support-readiness-card,
-.admin-support-filter a,
-.admin-support-empty {
+.settings-support-item {
   position: relative;
   isolation: isolate;
 }
@@ -26838,10 +26827,7 @@ html[data-theme="dark"] .settings-project-delete summary {
 .support-packet-card,
 .support-response-card,
 .support-history-item,
-.settings-support-item,
-.admin-support-playbook,
-.admin-support-readiness-card,
-.admin-support-empty {
+.settings-support-item {
   background:
     radial-gradient(circle at 96% 4%, color-mix(in srgb, var(--sky-soft) 30%, transparent), transparent 12rem),
     var(--support-experience-glass),
@@ -26858,10 +26844,7 @@ html[data-theme="dark"] .settings-project-delete summary {
 .support-packet-card::after,
 .support-response-card::after,
 .support-history-item::after,
-.settings-support-item::after,
-.admin-support-playbook::before,
-.admin-support-readiness-card::before,
-.admin-support-empty::before {
+.settings-support-item::after {
   position: absolute;
   inset-block: 12px;
   inset-inline-start: 0;
@@ -26878,10 +26861,7 @@ html[data-theme="dark"] .settings-project-delete summary {
 .support-packet-item,
 .support-response-item,
 .support-history-item,
-.settings-support-item,
-.admin-support-readiness-card,
-.admin-support-filter a,
-.admin-support-empty {
+.settings-support-item {
   transform: translateZ(0);
   transition:
     border-color 170ms ease,
@@ -26898,11 +26878,7 @@ html[data-theme="dark"] .settings-project-delete summary {
 .support-history-item:hover,
 .support-history-item:focus-within,
 .settings-support-item:hover,
-.settings-support-item:focus-within,
-.admin-support-readiness-card:hover,
-.admin-support-filter a:hover,
-.admin-support-filter a:focus-visible,
-.admin-support-empty:focus-within {
+.settings-support-item:focus-within {
   border-color: color-mix(in srgb, var(--sky) 38%, var(--line));
   box-shadow:
     0 1px 0 color-mix(in srgb, #fff 62%, transparent) inset,
@@ -26918,9 +26894,7 @@ html[data-theme="dark"] .settings-project-delete summary {
 .support-history-item:hover::after,
 .support-history-item:focus-within::after,
 .settings-support-item:hover::after,
-.settings-support-item:focus-within::after,
-.admin-support-readiness-card:hover::before,
-.admin-support-empty:focus-within::before {
+.settings-support-item:focus-within::after {
   opacity: 0.86;
 }
 
@@ -26928,8 +26902,7 @@ html[data-theme="dark"] .settings-project-delete summary {
 .support-triage-item > span,
 .support-packet-item > span,
 .support-admin-entry > span,
-.support-routing-step > span,
-.admin-support-readiness-card > span {
+.support-routing-step > span {
   box-shadow:
     0 1px 0 color-mix(in srgb, #fff 50%, transparent) inset,
     0 14px 26px -22px color-mix(in srgb, var(--ink-0) 54%, transparent);
@@ -26937,10 +26910,7 @@ html[data-theme="dark"] .settings-project-delete summary {
 
 .support-triage-item,
 .support-packet-item,
-.support-response-item,
-.admin-support-meta div,
-.admin-support-next-step,
-.admin-support-reply-form {
+.support-response-item {
   background:
     radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--brand-soft) 22%, transparent), transparent 8rem),
     linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface-warm) 60%, transparent));
@@ -26970,8 +26940,7 @@ html[data-theme="dark"] .settings-project-delete summary {
 
 .support-form input:focus,
 .support-form select:focus,
-.support-form textarea:focus,
-.admin-support-reply-form textarea:focus-visible {
+.support-form textarea:focus {
   transform: translateY(-1px);
 }
 
@@ -27008,24 +26977,15 @@ html[data-theme="dark"] .settings-project-delete summary {
   }
 }
 
-html[data-theme="dark"] .support-shell,
-html[data-theme="dark"] .admin-support-shell {
+html[data-theme="dark"] .support-shell {
   --support-experience-rail: linear-gradient(180deg, #8eb7f0, #89d1be, #f3c16d);
   --support-experience-glass: linear-gradient(135deg, rgba(255, 247, 233, 0.06), rgba(255, 247, 233, 0.024));
   --support-experience-glint: linear-gradient(110deg, transparent 0 34%, rgba(255, 247, 233, 0.1) 50%, transparent 66% 100%);
 }
 
-html[data-theme="dark"] .admin-support-commandbar::before {
-  background: linear-gradient(90deg, transparent, rgba(255, 247, 233, 0.18), rgba(222, 162, 79, 0.16), transparent);
-  opacity: 0.72;
-}
-
-html[data-theme="dark"] .admin-support-commandbar .brand,
-html[data-theme="dark"] .admin-support-commandbar nav {
+html[data-theme="dark"] .admin-support-commandbar {
   border-color: rgba(255, 247, 233, 0.13);
-  background:
-    linear-gradient(180deg, rgba(25, 30, 49, 0.88), rgba(11, 16, 31, 0.78)),
-    radial-gradient(circle at 96% 0%, rgba(137, 209, 190, 0.08), transparent 10rem);
+  background: rgba(16, 22, 37, 0.9);
   box-shadow:
     inset 0 1px 0 rgba(255, 247, 233, 0.08),
     0 20px 52px -42px rgba(0, 0, 0, 0.9);
@@ -27039,7 +26999,6 @@ html[data-theme="dark"] .admin-support-commandbar nav a:hover,
 html[data-theme="dark"] .admin-support-commandbar nav a:focus-visible {
   border-color: rgba(142, 183, 240, 0.3);
   background: rgba(255, 247, 233, 0.06);
-  box-shadow: 0 14px 30px -24px rgba(0, 0, 0, 0.94);
   color: var(--ink-0);
 }
 
@@ -27051,10 +27010,7 @@ html[data-theme="dark"] .support-request-card,
 html[data-theme="dark"] .support-packet-card,
 html[data-theme="dark"] .support-response-card,
 html[data-theme="dark"] .support-history-item,
-html[data-theme="dark"] .settings-support-item,
-html[data-theme="dark"] .admin-support-playbook,
-html[data-theme="dark"] .admin-support-readiness-card,
-html[data-theme="dark"] .admin-support-empty {
+html[data-theme="dark"] .settings-support-item {
   border-color: rgba(255, 247, 233, 0.15);
   background:
     radial-gradient(circle at 96% 4%, rgba(142, 183, 240, 0.1), transparent 12rem),
@@ -27067,10 +27023,7 @@ html[data-theme="dark"] .admin-support-empty {
 
 html[data-theme="dark"] .support-triage-item,
 html[data-theme="dark"] .support-packet-item,
-html[data-theme="dark"] .support-response-item,
-html[data-theme="dark"] .admin-support-meta div,
-html[data-theme="dark"] .admin-support-next-step,
-html[data-theme="dark"] .admin-support-reply-form {
+html[data-theme="dark"] .support-response-item {
   border-color: rgba(255, 247, 233, 0.13);
   background:
     radial-gradient(circle at 100% 0%, rgba(222, 162, 79, 0.09), transparent 8rem),
@@ -27085,11 +27038,7 @@ html[data-theme="dark"] .support-response-item:hover,
 html[data-theme="dark"] .support-history-item:hover,
 html[data-theme="dark"] .support-history-item:focus-within,
 html[data-theme="dark"] .settings-support-item:hover,
-html[data-theme="dark"] .settings-support-item:focus-within,
-html[data-theme="dark"] .admin-support-readiness-card:hover,
-html[data-theme="dark"] .admin-support-filter a:hover,
-html[data-theme="dark"] .admin-support-filter a:focus-visible,
-html[data-theme="dark"] .admin-support-empty:focus-within {
+html[data-theme="dark"] .settings-support-item:focus-within {
   border-color: rgba(142, 183, 240, 0.32);
   box-shadow:
     0 1px 0 rgba(255, 247, 233, 0.1) inset,
@@ -27113,10 +27062,7 @@ html[data-theme="dark"] .support-reference-copy {
   .support-response-item,
   .support-history-item,
   .settings-support-item,
-  .admin-support-commandbar nav a,
-  .admin-support-readiness-card,
-  .admin-support-filter a,
-  .admin-support-empty {
+  .admin-support-commandbar nav a {
     animation: none;
     transition: none;
   }
@@ -27132,14 +27078,9 @@ html[data-theme="dark"] .support-reference-copy {
   .settings-support-item:focus-within,
   .admin-support-commandbar nav a:hover,
   .admin-support-commandbar nav a:focus-visible,
-  .admin-support-readiness-card:hover,
-  .admin-support-filter a:hover,
-  .admin-support-filter a:focus-visible,
-  .admin-support-empty:focus-within,
   .support-form input:focus,
   .support-form select:focus,
-  .support-form textarea:focus,
-  .admin-support-reply-form textarea:focus-visible {
+  .support-form textarea:focus {
     transform: none;
   }
 }
@@ -27637,8 +27578,7 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
   .settings-danger-actions input,
   .rf-target-editor input,
   .rf-target-editor textarea,
-  .rf-run-controls input,
-  .admin-support-reply-form textarea
+  .rf-run-controls input
 ) {
   background-image:
     linear-gradient(180deg, color-mix(in srgb, var(--surface) 34%, transparent), transparent 56%),
@@ -27665,8 +27605,7 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
   .settings-danger-actions input,
   .rf-target-editor input,
   .rf-target-editor textarea,
-  .rf-run-controls input,
-  .admin-support-reply-form textarea
+  .rf-run-controls input
 ):focus {
   border-color: color-mix(in srgb, var(--brand) 46%, var(--line));
   box-shadow:
@@ -27688,8 +27627,7 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
   .settings-danger-actions input,
   .rf-target-editor input,
   .rf-target-editor textarea,
-  .rf-run-controls input,
-  .admin-support-reply-form textarea
+  .rf-run-controls input
 )::placeholder {
   color: color-mix(in srgb, var(--ink-3) 76%, transparent);
 }
@@ -27778,8 +27716,7 @@ html[data-theme="dark"] :where(
   .settings-danger-actions input,
   .rf-target-editor input,
   .rf-target-editor textarea,
-  .rf-run-controls input,
-  .admin-support-reply-form textarea
+  .rf-run-controls input
 ) {
   background-image:
     linear-gradient(180deg, rgba(255, 247, 233, 0.045), transparent 56%),
@@ -27801,8 +27738,7 @@ html[data-theme="dark"] :where(
   .settings-danger-actions input,
   .rf-target-editor input,
   .rf-target-editor textarea,
-  .rf-run-controls input,
-  .admin-support-reply-form textarea
+  .rf-run-controls input
 ):focus {
   border-color: rgba(245, 214, 154, 0.38);
   box-shadow:
@@ -27840,8 +27776,7 @@ html[data-theme="dark"] :where(
     .settings-danger-actions input,
     .rf-target-editor input,
     .rf-target-editor textarea,
-    .rf-run-controls input,
-    .admin-support-reply-form textarea
+    .rf-run-controls input
   ) {
     transition: none;
   }
@@ -28151,8 +28086,7 @@ html[data-theme="dark"] .brand::after {
   .templates-page-hero,
   .settings-page-hero,
   .studio-hero,
-  .rf-studio-hero,
-  .admin-support-hero
+  .rf-studio-hero
 ) {
   position: relative;
 }
@@ -28163,8 +28097,7 @@ html[data-theme="dark"] .brand::after {
   .templates-page-hero,
   .settings-page-hero,
   .studio-hero,
-  .rf-studio-hero,
-  .admin-support-hero
+  .rf-studio-hero
 )::after {
   position: absolute;
   inset-inline: 0 auto;
@@ -28203,8 +28136,7 @@ html[data-theme="dark"] .brand::after {
   .settings-project-item,
   .studio-card,
   .rf-preflight-item,
-  .export-readiness-item,
-  .admin-support-card
+  .export-readiness-item
 ) {
   transition:
     border-color 220ms ease,
@@ -28234,8 +28166,7 @@ html[data-theme="dark"] .brand::after {
   .settings-project-item,
   .studio-card,
   .rf-preflight-item,
-  .export-readiness-item,
-  .admin-support-card
+  .export-readiness-item
 ):hover {
   border-color: color-mix(in srgb, var(--brand) 34%, var(--line));
   box-shadow:
@@ -28361,8 +28292,7 @@ html[data-theme="dark"] :where(.eyebrow, .price-kicker, .settings-price-kicker, 
     .settings-project-item,
     .studio-card,
     .rf-preflight-item,
-    .export-readiness-item,
-    .admin-support-card
+    .export-readiness-item
   ),
   :where(.dash-progress-track, .studio-stat-track, .settings-usage-track, .rf-studio-stat-track, .dash-resume-progress)::after {
     animation: none;

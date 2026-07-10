@@ -6,15 +6,17 @@ import {
   parseAdminSupportStatus,
   updateAdminSupportRequestStatus,
 } from "@/app/lib/supportAdmin";
-import { sendSupportReplyEmail } from "@/app/lib/supportNotifications";
+import { buildSupportReplyIdempotencyKey, sendSupportReplyEmail } from "@/app/lib/supportNotifications";
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
 import { createRoleForgeServiceClient } from "@/app/lib/supabase/service";
 
 const SUPPORT_REQUEST_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-function redirectToInbox(request: Request, result: string) {
+function redirectToInbox(request: Request, result: string, returnStatus?: string) {
   const url = new URL("/admin/support", request.url);
   url.searchParams.set("support", result);
+  const normalizedReturnStatus = returnStatus === "all" ? "all" : parseAdminSupportStatus(returnStatus);
+  if (normalizedReturnStatus) url.searchParams.set("status", normalizedReturnStatus);
   return url;
 }
 
@@ -52,30 +54,43 @@ export async function POST(request: Request) {
 
   const formData = await request.formData();
   const id = String(formData.get("id") || "").trim();
+  const version = String(formData.get("version") || "").trim();
+  const returnStatus = String(formData.get("returnStatus") || "").trim();
   const message = normalizeReplyMessage(formData.get("message"));
   const nextStatus = parseAdminSupportStatus(formData.get("nextStatus")) ?? "reviewing";
 
-  if (!SUPPORT_REQUEST_ID_PATTERN.test(id) || !message || !["reviewing", "closed"].includes(nextStatus)) {
-    return withSupabaseCookies(NextResponse.redirect(redirectToInbox(request, "invalid"), 303), routeClient.cookiesToSet);
+  if (!SUPPORT_REQUEST_ID_PATTERN.test(id) || !version || !message || !["reviewing", "closed"].includes(nextStatus)) {
+    return withSupabaseCookies(NextResponse.redirect(redirectToInbox(request, "invalid", returnStatus), 303), routeClient.cookiesToSet);
   }
 
   try {
     const supportRequest = await loadAdminSupportRequest(serviceClient, id);
+    if (supportRequest.updatedAt !== version) {
+      return withSupabaseCookies(NextResponse.redirect(redirectToInbox(request, "stale", returnStatus), 303), routeClient.cookiesToSet);
+    }
+
     const sent = await sendSupportReplyEmail({
       to: supportRequest.email,
       subject: supportRequest.subject,
       message,
       reference: supportRequest.referenceLabel,
+      idempotencyKey: buildSupportReplyIdempotencyKey({
+        requestId: supportRequest.id,
+        requestVersion: supportRequest.updatedAt,
+        message,
+        nextStatus: nextStatus as "reviewing" | "closed",
+      }),
     });
 
     if (sent.status !== "sent") {
-      return withSupabaseCookies(NextResponse.redirect(redirectToInbox(request, "reply-unavailable"), 303), routeClient.cookiesToSet);
+      return withSupabaseCookies(NextResponse.redirect(redirectToInbox(request, "reply-unavailable", returnStatus), 303), routeClient.cookiesToSet);
     }
 
-    await updateAdminSupportRequestStatus(serviceClient, id, nextStatus);
-    return withSupabaseCookies(NextResponse.redirect(redirectToInbox(request, "reply-sent"), 303), routeClient.cookiesToSet);
+    const updated = await updateAdminSupportRequestStatus(serviceClient, id, nextStatus, { expectedUpdatedAt: version });
+    const result = updated ? "reply-sent" : "reply-sent-status-stale";
+    return withSupabaseCookies(NextResponse.redirect(redirectToInbox(request, result, returnStatus), 303), routeClient.cookiesToSet);
   } catch (error) {
     console.error("Admin support reply failed", error);
-    return withSupabaseCookies(NextResponse.redirect(redirectToInbox(request, "unavailable"), 303), routeClient.cookiesToSet);
+    return withSupabaseCookies(NextResponse.redirect(redirectToInbox(request, "unavailable", returnStatus), 303), routeClient.cookiesToSet);
   }
 }

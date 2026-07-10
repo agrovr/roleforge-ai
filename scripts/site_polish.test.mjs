@@ -45,8 +45,6 @@ test("site polish reveal targets cover public and signed-in product surfaces", (
 
 test("product surface polish adds protected workspace details with reduced-motion safety", () => {
   for (const selector of [
-    ".admin-support-card:hover",
-    ".admin-support-card::before",
     ".settings-plan-active-card::after",
     ".rf-preflight-item::after",
     ".export-readiness-item::after",
@@ -54,6 +52,10 @@ test("product surface polish adds protected workspace details with reduced-motio
   ]) {
     assert.match(globals, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
+
+  assert.doesNotMatch(globals, /\.admin-support-card::before/);
+  assert.doesNotMatch(globals, /\.admin-support-card::after/);
+  assert.match(globals, /\.admin-support-action\.is-pending svg/);
 
   assert.match(globals, /@keyframes\s+rf-status-flow/);
   assert.match(globals, /prefers-reduced-motion:\s*reduce[\s\S]*rf-studio-stat-fill/);

@@ -14,11 +14,15 @@ test("ambient polish field is mounted behind the shared page texture", () => {
 });
 
 test("site depth polish avoids global landing rails while keeping product surfaces consistent", () => {
+  const finishPass = globals.slice(
+    globals.indexOf("/* Full-site finish pass: quiet depth and restrained motion. */"),
+    globals.indexOf("/* Template gallery polish:"),
+  );
   assert.doesNotMatch(globals, /\.nav::after\s*\{/);
   assert.doesNotMatch(globals, /:where\(\s*\.section-head,/);
-  assert.match(globals, /\.templates-head,[\s\S]*?\.admin-support-hero[\s\S]*?\)::after\s*\{/);
-  assert.match(globals, /\.template-card,[\s\S]*?\.admin-support-card[\s\S]*?\)\s*\{/);
-  assert.match(globals, /\.template-card,[\s\S]*?\.admin-support-card[\s\S]*?\):hover\s*\{/);
+  assert.match(finishPass, /\.templates-head,[\s\S]*?\.rf-studio-hero[\s\S]*?\)::after\s*\{/);
+  assert.match(finishPass, /\.template-card,[\s\S]*?\.export-readiness-item[\s\S]*?\)\s*\{/);
+  assert.doesNotMatch(finishPass, /admin-support-(?:hero|card)/);
 });
 
 test("progress polish and ambient motion respect reduced motion", () => {

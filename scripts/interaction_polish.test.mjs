@@ -17,8 +17,9 @@ test("global interaction polish makes controls tactile without animating disable
 });
 
 test("global interaction polish upgrades form fields and anchor jumps safely", () => {
-  assert.match(globals, /\.support-form input,[\s\S]*?\.admin-support-reply-form textarea[\s\S]*?background-image:/);
-  assert.match(globals, /\.rf-target-editor textarea,[\s\S]*?\.admin-support-reply-form textarea[\s\S]*?\):focus\s*\{/);
+  assert.match(globals, /\.support-form input,[\s\S]*?\.rf-run-controls input[\s\S]*?background-image:/);
+  assert.match(globals, /\.admin-support-reply-form textarea\s*\{(?=[^}]*background:\s*color-mix\(in srgb,\s*var\(--surface-warm\) 52%,\s*transparent\))[^}]*\}/s);
+  assert.match(globals, /\.admin-support-reply-form textarea:focus-visible\s*\{(?=[^}]*box-shadow:\s*0 0 0 4px)[^}]*\}/s);
   assert.match(globals, /\.settings-section,[\s\S]*?\.admin-support-card[\s\S]*?\):target\s*\{/);
   assert.match(globals, /@keyframes\s+rf-target-pulse/);
   assert.match(globals, /prefers-reduced-motion:\s*reduce[\s\S]*:target[\s\S]*animation:\s*none/);

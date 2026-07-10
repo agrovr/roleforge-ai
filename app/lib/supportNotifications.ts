@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import type { User } from "@supabase/supabase-js";
 
 import {
@@ -47,6 +49,30 @@ export type SupportReplyEmailResult =
 function compactPreview(value: string, limit = 300) {
   const compacted = value.replace(/\s+/g, " ").trim();
   return compacted.length > limit ? `${compacted.slice(0, limit - 3).trim()}...` : compacted;
+}
+
+function normalizeIdempotencyKey(value: unknown) {
+  if (typeof value !== "string") return "";
+  const candidate = value.trim();
+  return candidate.length >= 1 && candidate.length <= 256 && /^[\x21-\x7e]+$/.test(candidate) ? candidate : "";
+}
+
+export function buildSupportReplyIdempotencyKey({
+  requestId,
+  requestVersion,
+  message,
+  nextStatus,
+}: {
+  requestId: string;
+  requestVersion: string;
+  message: string;
+  nextStatus: "reviewing" | "closed";
+}) {
+  const digest = createHash("sha256")
+    .update(`${requestId}\u0000${requestVersion}\u0000${nextStatus}\u0000${message.trim()}`)
+    .digest("hex")
+    .slice(0, 32);
+  return `support-reply/${requestId}/${digest}`;
 }
 
 export function normalizeSupportWebhookUrl(value: unknown) {
@@ -155,6 +181,7 @@ export async function sendSupportReplyEmail({
   subject,
   message,
   reference,
+  idempotencyKey,
   env = process.env,
   fetcher = globalThis.fetch as SupportNotificationFetch | undefined,
 }: {
@@ -162,6 +189,7 @@ export async function sendSupportReplyEmail({
   subject: string;
   message: string;
   reference: string;
+  idempotencyKey?: string;
   env?: SupportNotificationEnv;
   fetcher?: SupportNotificationFetch;
 }): Promise<SupportReplyEmailResult> {
@@ -176,6 +204,8 @@ export async function sendSupportReplyEmail({
     "content-type": "application/json",
     authorization: `Bearer ${resendApiKey}`,
   };
+  const normalizedIdempotencyKey = normalizeIdempotencyKey(idempotencyKey);
+  if (normalizedIdempotencyKey) headers["Idempotency-Key"] = normalizedIdempotencyKey;
 
   const abortController = typeof AbortController === "function" ? new AbortController() : null;
   const timeout = abortController ? setTimeout(() => abortController.abort(), 3500) : null;

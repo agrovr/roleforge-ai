@@ -26,6 +26,14 @@ export type AdminSupportRequest = {
   statusLabel: string;
   createdAt: string;
   createdLabel: string;
+  updatedAt: string;
+};
+
+export type AdminSupportSummary = {
+  all: number;
+  open: number;
+  reviewing: number;
+  closed: number;
 };
 
 export type SupportOperatorReadiness = {
@@ -129,6 +137,7 @@ function normalizeAdminSupportRequest(row: Record<string, unknown>): AdminSuppor
   const category = normalizeCategory(row.category);
   const status = normalizeStatus(row.status);
   const createdAt = compact(row.created_at);
+  const updatedAt = compact(row.updated_at) || createdAt;
   return {
     id: compact(row.id),
     referenceLabel: supportRequestReference(row.id),
@@ -143,6 +152,7 @@ function normalizeAdminSupportRequest(row: Record<string, unknown>): AdminSuppor
     statusLabel: supportStatusLabel(status),
     createdAt,
     createdLabel: supportRequestDateLabel(createdAt),
+    updatedAt,
   };
 }
 
@@ -151,7 +161,7 @@ export async function loadAdminSupportRequests(client: SupabaseClient, options: 
   const status = options.status ?? "open";
   let query = client
     .from("support_requests")
-    .select("id, user_id, email, category, subject, message, context_url, status, created_at")
+    .select("id, user_id, email, category, subject, message, context_url, status, created_at, updated_at")
     .order("created_at", { ascending: false })
     .limit(limit);
 
@@ -162,10 +172,33 @@ export async function loadAdminSupportRequests(client: SupabaseClient, options: 
   return (data ?? []).map((row) => normalizeAdminSupportRequest(row as Record<string, unknown>));
 }
 
+async function countAdminSupportRequests(client: SupabaseClient, status?: SupportRequestStatus) {
+  let query = client
+    .from("support_requests")
+    .select("id", { count: "exact", head: true });
+
+  if (status) query = query.eq("status", status);
+
+  const { count, error } = await query;
+  if (error) throw error;
+  return Math.max(count ?? 0, 0);
+}
+
+export async function loadAdminSupportSummary(client: SupabaseClient): Promise<AdminSupportSummary> {
+  const [all, open, reviewing, closed] = await Promise.all([
+    countAdminSupportRequests(client),
+    countAdminSupportRequests(client, "open"),
+    countAdminSupportRequests(client, "reviewing"),
+    countAdminSupportRequests(client, "closed"),
+  ]);
+
+  return { all, open, reviewing, closed };
+}
+
 export async function loadAdminSupportRequest(client: SupabaseClient, id: string) {
   const { data, error } = await client
     .from("support_requests")
-    .select("id, user_id, email, category, subject, message, context_url, status, created_at")
+    .select("id, user_id, email, category, subject, message, context_url, status, created_at, updated_at")
     .eq("id", id)
     .single();
 
@@ -173,18 +206,28 @@ export async function loadAdminSupportRequest(client: SupabaseClient, id: string
   return normalizeAdminSupportRequest(data as Record<string, unknown>);
 }
 
-export async function updateAdminSupportRequestStatus(client: SupabaseClient, id: string, status: SupportRequestStatus) {
+export async function updateAdminSupportRequestStatus(
+  client: SupabaseClient,
+  id: string,
+  status: SupportRequestStatus,
+  options: { expectedUpdatedAt?: string } = {},
+) {
   const normalizedStatus = parseAdminSupportStatus(status);
   if (!normalizedStatus) throw new Error("Unsupported support request status.");
 
-  const { data, error } = await client
+  let query = client
     .from("support_requests")
     .update({ status: normalizedStatus, updated_at: new Date().toISOString() })
-    .eq("id", id)
+    .eq("id", id);
+
+  if (options.expectedUpdatedAt) query = query.eq("updated_at", options.expectedUpdatedAt);
+
+  const { data, error } = await query
     .select("id, status")
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
+  if (!data) return null;
   return {
     id: compact(data?.id),
     status: normalizeStatus(data?.status),

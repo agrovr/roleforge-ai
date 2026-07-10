@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  buildSupportReplyIdempotencyKey,
   buildSupportRequestNotificationPayload,
   normalizeSupportWebhookUrl,
   notifySupportRequestCreated,
@@ -160,6 +161,41 @@ test("sends customer replies from the RoleForge support sender without exposing 
   assert.doesNotMatch(calls[0]?.init?.body ?? "", /private-admin@gmail\.com/);
   assert.match(body.subject, /Re: Premium sync \(RF-70A225\)/);
   assert.match(body.text, /Request: RF-70A225/);
+});
+
+test("uses stable Resend idempotency keys for the same support reply", async () => {
+  const base = {
+    requestId: saved.id,
+    requestVersion: "2026-06-06T05:30:00.000Z",
+    message: "Hi, Premium access is now active on your account.",
+    nextStatus: "reviewing" as const,
+  };
+  const key = buildSupportReplyIdempotencyKey(base);
+
+  assert.equal(key, buildSupportReplyIdempotencyKey(base));
+  assert.notEqual(key, buildSupportReplyIdempotencyKey({ ...base, message: `${base.message} Thanks.` }));
+  assert.match(key, new RegExp(`^support-reply/${saved.id}/[a-f0-9]{32}$`));
+  assert.doesNotMatch(key, /Premium access/);
+
+  const calls: Array<{ init?: { headers?: Record<string, string> } }> = [];
+  const result = await sendSupportReplyEmail({
+    to: "person@example.com",
+    subject: "Premium sync",
+    message: base.message,
+    reference: "RF-70A225",
+    idempotencyKey: key,
+    env: {
+      RESEND_API_KEY: "re_secret_value",
+      ROLEFORGE_SUPPORT_EMAIL_FROM: "RoleForge Support <support@roleforgeai.com>",
+    },
+    fetcher: async (_requestUrl, init) => {
+      calls.push({ init });
+      return { ok: true, status: 202 };
+    },
+  });
+
+  assert.deepEqual(result, { status: "sent" });
+  assert.equal(calls[0]?.init?.headers?.["Idempotency-Key"], key);
 });
 
 test("skips customer replies without a verified support sender", async () => {
