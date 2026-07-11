@@ -28371,9 +28371,9 @@ html[data-theme="dark"] .step:nth-child(n):hover {
 .faq-item.open,
 .faq-item[open] {
   border-color: var(--line);
-  background: color-mix(in srgb, var(--surface) 66%, transparent);
+  background: color-mix(in srgb, var(--surface) 74%, transparent);
   box-shadow: 0 18px 38px -36px color-mix(in srgb, var(--ink-0) 46%, transparent);
-  transform: translateX(4px);
+  transform: translateX(3px);
 }
 
 .faq-q {
@@ -28396,6 +28396,31 @@ html[data-theme="dark"] .step:nth-child(n):hover {
   line-height: 1.4;
   text-align: start;
   transition: color 220ms ease, transform 260ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.faq-question-copy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.faq-topic {
+  color: color-mix(in srgb, var(--brand-dark) 76%, var(--ink-2));
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  transition: color 220ms ease, transform 260ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.faq-item:hover .faq-topic,
+.faq-item:focus-within .faq-topic,
+.faq-item.open .faq-topic,
+.faq-item[open] .faq-topic {
+  color: var(--brand);
+  transform: translateX(2px);
 }
 
 .faq-item:hover .faq-q::before,
@@ -28429,12 +28454,21 @@ html[data-theme="dark"] .step:nth-child(n):hover {
 .faq-a {
   margin-inline-start: 62px;
   padding-inline-end: 48px;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    max-height 260ms ease,
+    margin-top 260ms ease,
+    opacity 200ms ease,
+    transform 260ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .faq-item.open .faq-a,
 .faq-item[open] .faq-a {
   margin-top: -4px;
   padding-block-end: 20px;
+  opacity: 1;
+  transform: translateY(0);
 }
 
 html[data-theme="dark"] .faq-grid,
@@ -28442,12 +28476,10 @@ html[data-theme="dark"] .faq-item + .faq-item {
   border-color: rgba(255, 247, 233, 0.14);
 }
 
-html[data-theme="dark"] .faq-item:nth-child(n),
-html[data-theme="dark"] .faq-item:nth-child(n):hover,
-html[data-theme="dark"] .faq-item:nth-child(n):focus-within,
-html[data-theme="dark"] .faq-item:nth-child(n).open,
-html[data-theme="dark"] .faq-item:nth-child(n)[open] {
+html[data-theme="dark"] .faq-item:nth-child(n) {
   border-color: rgba(255, 247, 233, 0.14);
+  background: transparent;
+  box-shadow: none;
 }
 
 html[data-theme="dark"] .faq-item:nth-child(n):hover,
@@ -28462,6 +28494,10 @@ html[data-theme="dark"] .faq-q::before {
   border: 0;
   background: transparent;
   color: #f0bb69;
+}
+
+html[data-theme="dark"] .faq-topic {
+  color: #d8a65e;
 }
 
 html[data-theme="dark"] .faq-toggle,
@@ -28496,6 +28532,11 @@ html[data-theme="dark"] .faq-item[open] .faq-toggle {
   .faq-a {
     margin-inline-start: 46px;
     padding-inline-end: 34px;
+  }
+
+  .faq-topic {
+    font-size: 0.59rem;
+    letter-spacing: 0.1em;
   }
 
   .faq-item.open .faq-a,

@@ -689,13 +689,13 @@ function Pricing({
 
 function FAQ({ checkoutReady }: Pick<LandingLinks, "checkoutReady">) {
   const items = [
-    ["Does RoleForge replace my judgment?", "No. The app surfaces generated guidance and exports a draft for your review."],
-    ["Can I use a job posting URL?", "Yes, if the posting is public and RoleForge can access it. Pasted text is the most reliable target input."],
-    ["What file formats can I export?", "The free workflow exports PDF. Premium enables DOCX and TXT exports when your plan is active."],
-    ["Can I use templates?", "Yes. Pick a template direction before opening the studio, and RoleForge sends that direction with new exports."],
-    ["Is sign-in available?", "Yes. Google and email magic-link sign-in are available. Saved projects sync after sign-in."],
-    ["Can I cancel Premium?", "Yes. Manage billing opens Stripe from Settings for plan changes and cancellation. If you cancel during a paid period, Premium access remains active until that period ends."],
-    ["How much is Premium?", checkoutReady
+    ["AI guidance", "Does RoleForge replace my judgment?", "No. The app surfaces generated guidance and exports a draft for your review."],
+    ["Job target", "Can I use a job posting URL?", "Yes, if the posting is public and RoleForge can access it. Pasted text is the most reliable target input."],
+    ["Exports", "What file formats can I export?", "The free workflow exports PDF. Premium enables DOCX and TXT exports when your plan is active."],
+    ["Templates", "Can I use templates?", "Yes. Pick a template direction before opening the studio, and RoleForge sends that direction with new exports."],
+    ["Account", "Is sign-in available?", "Yes. Google and email magic-link sign-in are available. Saved projects sync after sign-in."],
+    ["Billing", "Can I cancel Premium?", "Yes. Manage billing opens Stripe from Settings for plan changes and cancellation. If you cancel during a paid period, Premium access remains active until that period ends."],
+    ["Pricing", "How much is Premium?", checkoutReady
       ? `The launch price is $${PREMIUM_MONTHLY_PRICE}/month or $${PREMIUM_YEARLY_PRICE}/year. Billing management is handled by Stripe.`
       : `The launch price is $${PREMIUM_MONTHLY_PRICE}/month or $${PREMIUM_YEARLY_PRICE}/year. Premium checkout is currently unavailable while the free studio stays open.`],
   ] as const;
