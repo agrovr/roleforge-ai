@@ -37,9 +37,24 @@ test("resume previews expose complete role-specific document structures", () => 
   assert.match(preview, /variant === "impact"/);
   assert.match(preview, /title:\s*"Projects"/);
   assert.match(preview, /title:\s*"Education"/);
+  assert.match(preview, /Product Operations Associate/);
+  assert.match(preview, /Systems Analyst/);
+  assert.match(preview, /Customer Retention Analysis/);
+  assert.match(preview, /Director, Business Operations/);
+  assert.match(preview, /Brand Designer/);
+  assert.match(preview, /Graduate Research Fellow/);
+  assert.match(preview, /Lifecycle Marketing Manager/);
   assert.match(page, /role=\{template\.previewRole\}/);
   assert.match(stylesheet, /\.template-thumb,\s*\.settings-template-thumb\s*\{(?=[^}]*aspect-ratio:\s*8\.5\s*\/\s*11)(?=[^}]*height:\s*auto)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
   assert.match(stylesheet, /\.template-thumb \.r-doc,\s*\.settings-template-thumb \.r-doc\s*\{(?=[^}]*aspect-ratio:\s*8\.5\s*\/\s*11)(?=[^}]*height:\s*auto)[^}]*\}/s);
+});
+
+test("hero restores the full layered resume composition from the product reference", () => {
+  assert.match(stylesheet, /\.hero-stage\s*\{(?=[^}]*inline-size:\s*min\(100%,\s*620px\))(?=[^}]*block-size:\s*clamp\(520px,\s*39vw,\s*610px\))(?=[^}]*overflow:\s*visible)(?=[^}]*contain:\s*none)[^}]*\}/s);
+  assert.match(stylesheet, /\.hero-stage \.resume-card-front\s*\{(?=[^}]*inline-size:\s*clamp\(330px,\s*23\.5vw,\s*390px\))(?=[^}]*block-size:\s*clamp\(460px,\s*32vw,\s*530px\))[^}]*\}/s);
+  assert.match(stylesheet, /\.hero-stage \.resume-card-back-l\s*\{(?=[^}]*inline-size:\s*clamp\(268px,\s*18\.5vw,\s*318px\))(?=[^}]*rotate\(-9deg\))[^}]*\}/s);
+  assert.match(stylesheet, /\.hero-stage \.resume-card-back-r\s*\{(?=[^}]*inline-size:\s*clamp\(252px,\s*17\.5vw,\s*296px\))(?=[^}]*rotate\(7deg\))[^}]*\}/s);
+  assert.match(stylesheet, /\.hero-badge\s*\{(?=[^}]*max-inline-size:\s*min\(292px,\s*66%\))(?=[^}]*padding:\s*13px 16px)[^}]*\}/s);
 });
 
 test("featured gallery removes the horizontal rail and document rule clutter", () => {

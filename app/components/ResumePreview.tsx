@@ -29,6 +29,12 @@ const SHARED_EXPERIENCE = [
     date: "2019 - 2022",
     bullets: ["Improved handoffs by documenting owners, risks, and next steps.", "Coordinated beta feedback across customer-facing teams."],
   },
+  {
+    title: "Product Operations Associate",
+    organization: "Morrow & Field",
+    date: "2017 - 2019",
+    bullets: ["Built launch checklists used across product and customer teams.", "Maintained adoption reporting for quarterly planning reviews."],
+  },
 ] as const;
 
 function sectionsFor(variant: ResumeTemplateVariant): PreviewSection[] {
@@ -44,9 +50,34 @@ function sectionsFor(variant: ResumeTemplateVariant): PreviewSection[] {
   if (variant === "academic") {
     return [
       { title: "Education", copy: "Ph.D. Candidate, Information Science - University program" },
-      { title: "Research", copy: "Studies how teams use evidence and decision systems in complex organizations." },
+      {
+        title: "Research Experience",
+        jobs: [
+          {
+            title: "Graduate Research Fellow",
+            organization: "Decision Systems Lab",
+            date: "2022 - Present",
+            bullets: ["Studies how teams use evidence in complex organizations.", "Designed mixed-method research across interviews and operational data."],
+          },
+          {
+            title: "Research Assistant",
+            organization: "Human-Centered Computing Group",
+            date: "2020 - 2022",
+            bullets: ["Synthesized field studies into peer-reviewed findings.", "Maintained reproducible analysis and research documentation."],
+          },
+        ],
+      },
       { title: "Publications", copy: "Selected peer-reviewed articles and conference proceedings available on request." },
-      { title: "Teaching", copy: "Instructor for research methods, data communication, and collaborative systems." },
+      {
+        title: "Teaching",
+        jobs: [{
+          title: "Instructor of Record",
+          organization: "School of Information",
+          date: "2023 - Present",
+          bullets: ["Teaches research methods and data communication.", "Mentors student teams through applied research projects."],
+        }],
+      },
+      { title: "Methods", skills: ["Qualitative research", "Survey design", "Python", "Data visualization"] },
     ];
   }
 
@@ -60,8 +91,14 @@ function sectionsFor(variant: ResumeTemplateVariant): PreviewSection[] {
           organization: "Juniper Market",
           date: "2022 - Present",
           bullets: ["Improved qualified pipeline through role-specific campaigns.", "Built reporting that tied launches to adoption and revenue.", "Aligned lifecycle programs with sales enablement and customer insight."],
+        }, {
+          title: "Lifecycle Marketing Manager",
+          organization: "Northline Commerce",
+          date: "2019 - 2022",
+          bullets: ["Built segmented programs across acquisition and retention.", "Turned customer research into clearer campaign priorities."],
         }],
       },
+      { title: "Selected Impact", copy: "Led launch and lifecycle programs across product, sales, and customer success teams." },
       { title: "Core Skills", skills: ["Growth strategy", "Lifecycle", "Analytics", "Sales enablement"] },
       { title: "Education", copy: "B.B.A. Marketing - University program" },
     ];
@@ -77,9 +114,22 @@ function sectionsFor(variant: ResumeTemplateVariant): PreviewSection[] {
           organization: "Harborline Platforms",
           date: "2021 - Present",
           bullets: ["Built reliable workflow APIs used across customer teams.", "Reduced release risk through automated test coverage.", "Documented recovery paths for account-safe exports."],
+        }, {
+          title: "Systems Analyst",
+          organization: "Cedar Peak Software",
+          date: "2018 - 2021",
+          bullets: ["Automated operational reporting across product systems.", "Improved incident handoffs with documented recovery runbooks."],
         }],
       },
-      { title: "Projects", copy: "Designed an account-safe export pipeline with auditable recovery states." },
+      {
+        title: "Selected Project",
+        jobs: [{
+          title: "Export Reliability Toolkit",
+          organization: "Independent project",
+          date: "2024",
+          bullets: ["Designed an account-safe export pipeline with auditable recovery states.", "Added format validation and repeatable integration checks."],
+        }],
+      },
       { title: "Education", copy: "B.S. Computer Science - University program" },
     ];
   }
@@ -87,7 +137,20 @@ function sectionsFor(variant: ResumeTemplateVariant): PreviewSection[] {
   if (variant === "student") {
     return [
       { title: "Education", copy: "B.S. Business Analytics - University program - Expected 2027" },
-      { title: "Projects", copy: "Analyzed customer retention data and presented a measurable action plan." },
+      {
+        title: "Projects",
+        jobs: [{
+          title: "Customer Retention Analysis",
+          organization: "Analytics capstone",
+          date: "Spring 2026",
+          bullets: ["Analyzed retention patterns across customer segments.", "Presented a measurable action plan to program leaders."],
+        }, {
+          title: "Operations Dashboard",
+          organization: "Student consulting team",
+          date: "Fall 2025",
+          bullets: ["Built a weekly KPI view from messy source data.", "Documented definitions so the report could be maintained."],
+        }],
+      },
       {
         title: "Experience",
         jobs: [{
@@ -97,6 +160,7 @@ function sectionsFor(variant: ResumeTemplateVariant): PreviewSection[] {
           bullets: ["Organized research findings for weekly team decisions.", "Improved documentation for a recurring support workflow.", "Presented a measurable recommendation to program leaders."],
         }],
       },
+      { title: "Leadership", copy: "Analytics Club project lead and peer mentor for introductory SQL workshops." },
       { title: "Skills", skills: ["Excel", "SQL", "Research", "Presentations"] },
     ];
   }
@@ -111,8 +175,14 @@ function sectionsFor(variant: ResumeTemplateVariant): PreviewSection[] {
           organization: "Northstar Systems",
           date: "2020 - Present",
           bullets: ["Led operating cadence across a multi-team product portfolio.", "Improved executive visibility into adoption, risk, and commitments.", "Developed senior leaders through clearer ownership and review systems."],
+        }, {
+          title: "Director, Business Operations",
+          organization: "Harbor & Pine",
+          date: "2015 - 2020",
+          bullets: ["Scaled planning systems through a period of rapid growth.", "Connected portfolio investment to customer and revenue signals."],
         }],
       },
+      { title: "Advisory Work", copy: "Advises emerging product leaders on operating cadence, portfolio reviews, and cross-functional accountability." },
       { title: "Areas of Expertise", skills: ["Portfolio strategy", "Team leadership", "Operating systems"] },
       { title: "Education", copy: "Master of Business Administration - University program" },
     ];
@@ -128,8 +198,14 @@ function sectionsFor(variant: ResumeTemplateVariant): PreviewSection[] {
           organization: "Common Thread Studio",
           date: "2021 - Present",
           bullets: ["Shaped launch narratives across product and editorial teams.", "Built a research-led system for campaign decisions.", "Directed workshops that aligned brand, product, and customer evidence."],
+        }, {
+          title: "Brand Designer",
+          organization: "Fieldwork Creative",
+          date: "2018 - 2021",
+          bullets: ["Developed identity systems for digital products and publications.", "Translated audience research into practical creative direction."],
         }],
       },
+      { title: "Selected Projects", copy: "Launch systems, editorial toolkits, research synthesis, and cross-channel campaign direction." },
       { title: "Capabilities", skills: ["Brand systems", "Editorial", "Research", "Workshops"] },
       { title: "Education", copy: "B.A. Communication Design - University program" },
     ];

@@ -25022,11 +25022,11 @@ html[data-theme="dark"] .nav {
   inline-size: min(100%, var(--container));
   max-inline-size: min(var(--container), calc(100vw - clamp(28px, 4.8vw, 84px)));
   margin-inline: auto;
-  grid-template-columns: minmax(0, 1fr) minmax(380px, 520px);
+  grid-template-columns: minmax(0, 1fr) minmax(460px, 600px);
   align-items: center;
   gap: clamp(34px, 4vw, 58px);
   padding-inline: clamp(24px, 3.4vw, 48px);
-  overflow: clip;
+  overflow: visible;
 }
 
 .hero-copy {
@@ -25059,11 +25059,11 @@ html[data-theme="dark"] .nav {
 
 .hero-stage {
   justify-self: end;
-  inline-size: min(100%, 520px);
-  block-size: clamp(430px, 35vw, 560px);
+  inline-size: min(100%, 620px);
+  block-size: clamp(520px, 39vw, 610px);
   max-inline-size: 100%;
-  overflow: hidden;
-  contain: paint;
+  overflow: visible;
+  contain: none;
 }
 
 .hero-stage::before {
@@ -25076,48 +25076,63 @@ html[data-theme="dark"] .nav {
 }
 
 .hero-stage .resume-card-front {
-  inline-size: clamp(292px, 22vw, 360px);
-  block-size: clamp(410px, 31vw, 500px);
-  transform: rotate(-2deg) translateX(0);
+  inline-size: clamp(330px, 23.5vw, 390px);
+  block-size: clamp(460px, 32vw, 530px);
+  transform: rotate(-2deg) translateX(-8px);
 }
 
 .hero-stage .resume-card-back-l {
-  inline-size: clamp(226px, 16vw, 288px);
-  block-size: clamp(336px, 24vw, 430px);
-  transform: rotate(-8deg) translate(clamp(-88px, -5.2vw, -54px), 20px);
+  inline-size: clamp(268px, 18.5vw, 318px);
+  block-size: clamp(382px, 26vw, 448px);
+  transform: rotate(-9deg) translate(clamp(-118px, -6.5vw, -92px), 22px);
 }
 
 .hero-stage .resume-card-back-r {
-  inline-size: clamp(218px, 15.5vw, 274px);
-  block-size: clamp(326px, 23vw, 410px);
-  transform: rotate(7deg) translate(clamp(60px, 5vw, 94px), 28px);
+  inline-size: clamp(252px, 17.5vw, 296px);
+  block-size: clamp(366px, 25vw, 430px);
+  transform: rotate(7deg) translate(clamp(108px, 7vw, 138px), 30px);
 }
 
 .hero-stage:hover .resume-card-front {
-  transform: rotate(-1deg) translateY(-5px);
+  transform: rotate(-1deg) translateX(-8px) translateY(-6px);
 }
 
 .hero-stage:hover .resume-card-back-l {
-  transform: rotate(-9deg) translate(clamp(-96px, -5.8vw, -62px), 23px);
+  transform: rotate(-11deg) translate(clamp(-132px, -7vw, -104px), 25px);
 }
 
 .hero-stage:hover .resume-card-back-r {
-  transform: rotate(8deg) translate(clamp(68px, 5.8vw, 104px), 32px);
+  transform: rotate(9deg) translate(clamp(122px, 7.8vw, 154px), 36px);
 }
 
 .hero-badge {
-  max-inline-size: min(222px, 58%);
+  max-inline-size: min(292px, 66%);
   min-inline-size: 0;
-  padding: 10px 12px;
-  gap: 10px;
-  font-size: clamp(0.78rem, 1.2vw, 0.88rem);
+  padding: 13px 16px;
+  gap: 12px;
+  font-size: clamp(0.82rem, 1.2vw, 0.94rem);
   line-height: 1.18;
 }
 
 .hero-badge .b-icon {
-  flex: 0 0 32px;
-  inline-size: 32px;
-  block-size: 32px;
+  flex: 0 0 38px;
+  inline-size: 38px;
+  block-size: 38px;
+}
+
+.hero-stage .b-score {
+  top: 30px;
+  right: 4px;
+}
+
+.hero-stage .b-keyword {
+  top: 228px;
+  right: -4px;
+}
+
+.hero-stage .b-ats {
+  bottom: 72px;
+  left: 2px;
 }
 
 .dash-section,
@@ -25492,7 +25507,7 @@ html[data-theme="dark"] .nav {
     inline-size: min(100%, 680px);
     height: clamp(500px, 56vw, 560px);
     block-size: clamp(500px, 56vw, 560px);
-    overflow: hidden;
+    overflow: visible;
   }
 }
 
