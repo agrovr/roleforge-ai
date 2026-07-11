@@ -576,7 +576,7 @@ async function checkPublicShell(baseUrl) {
   requireCondition(home.text.includes("Free plan") && /Premium plan|Unavailable/.test(home.text), "landing pricing is missing plan-aware status labels");
   requireCondition(
     /\.price-card-top\s*\{(?=[^}]*display:\s*flex)(?=[^}]*min-inline-size:\s*0)(?=[^}]*justify-content:\s*space-between)[^}]*\}/s.test(stylesheetText) &&
-      /\.pricing-grid\.two\s+\.price-status\s*\{(?=[^}]*justify-content:\s*flex-end)(?=[^}]*padding:\s*2px 0)(?=[^}]*border:\s*0)(?=[^}]*background:\s*(?:transparent|none))(?=[^}]*box-shadow:\s*none)[^}]*\}/s.test(stylesheetText),
+      /\.pricing-grid\.two\s+\.price-status\s*\{(?=[^}]*justify-content:\s*flex-end)(?=[^}]*padding:\s*2px 0)(?=[^}]*border:\s*0)(?=[^}]*background:\s*(?:transparent|none|0 0))(?=[^}]*box-shadow:\s*none)[^}]*\}/s.test(stylesheetText),
     "pricing plan status labels can still crowd price cards",
   );
   requireCondition(/\.price-amount\s+\.v\s*\{(?=[^}]*font-size:\s*clamp\(2\.35rem,\s*15cqi,\s*3\.25rem\))(?=[^}]*line-height:\s*1)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "pricing amounts can still clip or overflow");
