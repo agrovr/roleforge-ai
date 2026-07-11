@@ -4,6 +4,7 @@ import { useEffect } from "react";
 
 const REVEAL_SELECTORS = [
   ".templates-head",
+  ".steps",
   ".template-card",
   ".cta-band",
   ".legal-hero",

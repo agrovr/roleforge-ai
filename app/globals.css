@@ -27948,7 +27948,10 @@ html[data-theme="dark"] .pricing-grid.two .price-card.featured .price-status.pau
 
 /* Landing workflow refinement: expressive indexes without a card matrix. */
 .steps {
+  --workflow-track: color-mix(in srgb, var(--brand) 20%, var(--line));
+  --workflow-progress: linear-gradient(90deg, var(--accent), var(--brand), var(--sky));
   position: relative;
+  isolation: isolate;
   gap: clamp(18px, 2.4vw, 34px);
   padding: clamp(14px, 2vw, 22px);
   border: 0;
@@ -27960,13 +27963,45 @@ html[data-theme="dark"] .pricing-grid.two .price-card.featured .price-status.pau
   box-shadow: 0 30px 70px -64px color-mix(in srgb, var(--ink-0) 56%, transparent);
 }
 
+.steps::before,
+.steps::after {
+  position: absolute;
+  z-index: 0;
+  inset-inline: 12.5%;
+  top: clamp(98px, 7vw, 105px);
+  height: 2px;
+  border-radius: 999px;
+  content: "";
+  pointer-events: none;
+}
+
+.steps::before {
+  background: var(--workflow-track);
+}
+
+.steps::after {
+  background: var(--workflow-progress);
+  box-shadow: 0 0 18px -5px color-mix(in srgb, var(--brand) 58%, transparent);
+  transform: scaleX(1);
+  transform-origin: left center;
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.rf-polish-ready .steps[data-polish-reveal="true"]::after {
+  transform: scaleX(0);
+}
+
+html.rf-polish-ready .steps[data-polish-reveal="true"][data-polish-visible="true"]::after {
+  transform: scaleX(1);
+}
+
 .step {
   display: grid;
-  grid-template-columns: 42px minmax(0, 1fr);
-  grid-template-rows: auto auto auto;
+  grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr);
+  grid-template-rows: auto 42px auto auto;
   align-content: start;
-  column-gap: 14px;
-  row-gap: 8px;
+  column-gap: 10px;
+  row-gap: 10px;
   padding: 22px 18px 24px;
   border: 0;
   border-radius: 18px;
@@ -27986,15 +28021,19 @@ html[data-theme="dark"] .pricing-grid.two .price-card.featured .price-status.pau
 }
 
 .step-num {
-  grid-column: 1 / -1;
+  grid-column: 2;
   grid-row: 1;
-  margin-bottom: 8px;
-  font-size: 32px;
+  align-self: center;
+  justify-self: center;
+  margin: 0;
+  font-size: 30px;
 }
 
 .step .step-icon {
-  grid-column: 1;
-  grid-row: 2 / span 2;
+  z-index: 2;
+  grid-column: 2;
+  grid-row: 2;
+  outline: 6px solid color-mix(in srgb, var(--surface-warm) 88%, transparent);
   box-shadow: 0 12px 24px -18px color-mix(in srgb, var(--brand-dark) 58%, transparent);
   transition: transform 260ms cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 260ms ease;
 }
@@ -28005,13 +28044,14 @@ html[data-theme="dark"] .pricing-grid.two .price-card.featured .price-status.pau
 }
 
 .step .step-title {
-  grid-column: 2;
-  grid-row: 2;
+  grid-column: 1 / -1;
+  grid-row: 3;
+  margin-top: 4px;
 }
 
 .step p {
-  grid-column: 2;
-  grid-row: 3;
+  grid-column: 1 / -1;
+  grid-row: 4;
 }
 
 .feature-card {
@@ -28109,6 +28149,8 @@ html[data-theme="dark"] .feature-card:nth-child(n):hover {
 }
 
 html[data-theme="dark"] .steps {
+  --workflow-track: rgba(255, 247, 233, 0.11);
+  --workflow-progress: linear-gradient(90deg, #d9a14f, #9c8de0, #7fc8b8);
   background:
     radial-gradient(circle at 12% 18%, rgba(221, 160, 74, 0.1), transparent 25%),
     radial-gradient(circle at 84% 74%, rgba(127, 200, 184, 0.08), transparent 26%),
@@ -28116,12 +28158,14 @@ html[data-theme="dark"] .steps {
   box-shadow: 0 32px 70px -58px rgba(0, 0, 0, 0.9);
 }
 
-html[data-theme="dark"] .step:nth-child(n),
-html[data-theme="dark"] .step:nth-child(n):hover {
-  border-color: rgba(255, 247, 233, 0.14);
+html[data-theme="dark"] .step:nth-child(n) {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
 }
 
 html[data-theme="dark"] .step:nth-child(n):hover {
+  border-color: rgba(255, 247, 233, 0.14);
   background: rgba(255, 247, 233, 0.045);
   box-shadow: 0 18px 36px -30px rgba(0, 0, 0, 0.9);
 }
@@ -28161,6 +28205,30 @@ html[data-theme="dark"] .step:nth-child(n):hover {
     border: 0;
   }
 
+  .steps::before,
+  .steps::after {
+    inset-inline-start: clamp(81px, 12vw, 92px);
+    inset-inline-end: auto;
+    top: 48px;
+    bottom: 48px;
+    width: 2px;
+    height: auto;
+  }
+
+  .steps::after {
+    background: linear-gradient(180deg, var(--accent), var(--brand), var(--sky));
+    transform: scaleY(1);
+    transform-origin: center top;
+  }
+
+  html.rf-polish-ready .steps[data-polish-reveal="true"]::after {
+    transform: scaleY(0);
+  }
+
+  html.rf-polish-ready .steps[data-polish-reveal="true"][data-polish-visible="true"]::after {
+    transform: scaleY(1);
+  }
+
   .step .step-num {
     grid-column: 1;
     grid-row: 1 / span 2;
@@ -28173,6 +28241,7 @@ html[data-theme="dark"] .step:nth-child(n):hover {
     grid-row: 1 / span 2;
     width: 36px;
     height: 36px;
+    outline-width: 5px;
   }
 
   .step .step-title {
@@ -28259,6 +28328,17 @@ html[data-theme="dark"] .step:nth-child(n):hover {
 
   .feature-card-list {
     display: grid;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .steps::after {
+    transition: none;
+  }
+
+  html.rf-polish-ready .steps[data-polish-reveal="true"]::after,
+  html.rf-polish-ready .steps[data-polish-reveal="true"][data-polish-visible="true"]::after {
+    transform: none;
   }
 }
 
