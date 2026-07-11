@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const page = readFileSync("app/admin/support/page.tsx", "utf8");
+const loadingPage = readFileSync("app/admin/support/loading.tsx", "utf8");
 const submitButton = readFileSync("app/admin/support/SupportSubmitButton.tsx", "utf8");
 const actionRoute = readFileSync("app/admin/support/actions/route.ts", "utf8");
 const replyRoute = readFileSync("app/admin/support/reply/route.ts", "utf8");
@@ -22,7 +23,7 @@ test("admin support inbox is protected and reads real queue data", () => {
 });
 
 test("admin support setup stays available without burying the queue", () => {
-  assert.match(page, /<details className="admin-support-setup" open=\{!serviceClient \|\| requiredSetupCount > 0\}>/);
+  assert.match(page, /<details className="admin-support-setup" open=\{!serviceClient \|\| loadError \|\| requiredSetupCount > 0\}>/);
   assert.match(page, /Operations setup/);
   assert.match(page, /Required systems ready/);
   assert.match(page, /ROLEFORGE_ADMIN_EMAILS controls who can open this inbox/);
@@ -42,6 +43,29 @@ test("admin command bar and request cards use restrained operator surfaces", () 
   assert.doesNotMatch(stylesheet, /\.admin-support-card::before/);
   assert.doesNotMatch(stylesheet, /\.admin-support-card::after/);
   assert.doesNotMatch(stylesheet, /\.admin-support-meta div::before/);
+});
+
+test("admin request cards separate case context from the response workbench", () => {
+  assert.match(page, /className="admin-support-card" data-status=\{request\.status\} aria-labelledby=/);
+  assert.match(page, /className="admin-support-card-body"/);
+  assert.match(page, /className="admin-support-case"/);
+  assert.match(page, /className="admin-support-workbench"/);
+  assert.match(page, /Customer request/);
+  assert.match(page, /Response workspace/);
+  assert.match(stylesheet, /\.admin-support-card-body\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0\.9fr\) minmax\(420px,\s*1\.1fr\))[^}]*\}/s);
+  assert.match(stylesheet, /\.admin-support-workbench\s*\{(?=[^}]*padding:\s*14px)(?=[^}]*border-radius:\s*16px)(?=[^}]*background:)[^}]*\}/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*940px\)\s*\{[\s\S]*?\.admin-support-card-body,[\s\S]*?\.admin-support-loading-columns\s*\{[^}]*grid-template-columns:\s*1fr/s);
+});
+
+test("admin support exposes honest loading and database failure states", () => {
+  assert.match(page, /let loadError = false/);
+  assert.match(page, /catch \(error\) \{[\s\S]*?loadError = true;[\s\S]*?Admin support inbox load failed/s);
+  assert.match(page, /Could not load this queue/);
+  assert.match(page, /Existing requests remain unchanged/);
+  assert.match(loadingPage, /aria-busy="true"/);
+  assert.match(loadingPage, /Loading operator inbox…/);
+  assert.match(loadingPage, /admin-support-loading-columns/);
+  assert.match(stylesheet, /@keyframes\s+admin-support-loading-pulse/);
 });
 
 test("admin queue filters show aggregate counts and preserve the current view", () => {
@@ -85,6 +109,8 @@ test("customer replies are idempotent and never expose the admin inbox", () => {
   assert.match(notifications, /createHash\("sha256"\)/);
   assert.doesNotMatch(replyRoute, /ROLEFORGE_SUPPORT_EMAIL_TO/);
   assert.doesNotMatch(replyRoute, /user\.email/);
+  assert.doesNotMatch(notifications, /reply_to/);
+  assert.match(notifications, /Reply only from the web inbox so the configured RoleForge support sender is used/);
 });
 
 test("support email alerts still point operators to the real web inbox", () => {

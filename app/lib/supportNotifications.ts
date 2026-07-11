@@ -155,7 +155,7 @@ function buildSupportRequestEmailText(payload: SupportRequestNotificationPayload
     "",
     "Operator actions:",
     adminInboxUrl ? `- Open the support inbox: ${adminInboxUrl}` : "- Open the support inbox from /admin/support.",
-    `- Reply to the customer by email and keep ${payload.reference} in the subject.`,
+    `- Reply only from the web inbox so the configured RoleForge support sender is used for ${payload.reference}.`,
     "- Mark the request reviewing or closed from the web inbox.",
   ].join("\n");
 }
@@ -330,7 +330,6 @@ export async function notifySupportRequestCreated({
       body: JSON.stringify({
         from: emailFrom,
         to: emailTo,
-        reply_to: user.email ? [user.email] : undefined,
         subject: `[RoleForge Support] ${payload.reference} ${payload.categoryLabel}: ${payload.subject}`,
         text: buildSupportRequestEmailText(payload, adminInboxUrl),
       }),

@@ -80,17 +80,26 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
   const requestedStatus = getParam(params?.status);
   const status = requestedStatus === "all" ? "all" : parseAdminSupportStatus(requestedStatus) ?? "open";
   const notice = statusNotice(getParam(params?.support));
-  const [requests, summary] = serviceClient
-    ? await Promise.all([
+  let requests: AdminSupportRequest[] = [];
+  let summary = { all: 0, open: 0, reviewing: 0, closed: 0 };
+  let loadError = false;
+
+  if (serviceClient) {
+    try {
+      [requests, summary] = await Promise.all([
         loadAdminSupportRequests(serviceClient, { status, limit: 40 }),
         loadAdminSupportSummary(serviceClient),
-      ])
-    : [[], { all: 0, open: 0, reviewing: 0, closed: 0 }];
+      ]);
+    } catch (error) {
+      loadError = true;
+      console.error("Admin support inbox load failed", error);
+    }
+  }
   const readiness = supportOperatorReadiness();
   const operatorSteps = [
     {
       label: "Reply",
-      detail: "Open a drafted email to the customer with the support reference included.",
+      detail: "Write and send a customer-safe reply from this inbox with the support reference included.",
     },
     {
       label: "Reviewing",
@@ -171,9 +180,9 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
       </section>
 
       {notice ? <p className="admin-support-notice">{notice}</p> : null}
-      {!serviceClient ? <p className="admin-support-notice">The operator inbox is unavailable right now.</p> : null}
+      {!serviceClient || loadError ? <p className="admin-support-notice">The operator inbox is temporarily unavailable. No request data was changed.</p> : null}
 
-      <details className="admin-support-setup" open={!serviceClient || requiredSetupCount > 0}>
+      <details className="admin-support-setup" open={!serviceClient || loadError || requiredSetupCount > 0}>
         <summary>
           <span><RoleForgeIcon name="settings" size={16} /> Operations setup</span>
           <small>{requiredSetupCount ? `${requiredSetupCount} required ${requiredSetupCount === 1 ? "item needs" : "items need"} attention` : "Required systems ready"}</small>
@@ -222,86 +231,101 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
       <section className="admin-support-list" aria-label="Support request list">
         {requests.length ? requests.map((request) => {
           return (
-            <article className="admin-support-card" key={request.id}>
+            <article className="admin-support-card" data-status={request.status} aria-labelledby={`support-request-${request.id}`} key={request.id}>
               <header>
                 <div>
                   <span className="admin-support-reference">{request.referenceLabel}</span>
-                  <h2>{request.subject}</h2>
-                  <p>{request.categoryLabel} · {request.createdLabel} · {request.statusLabel}</p>
+                  <h2 id={`support-request-${request.id}`}>{request.subject}</h2>
+                  <p>{request.categoryLabel} · {request.createdLabel}</p>
                 </div>
                 <span className={`admin-support-status ${request.status}`}>{request.statusLabel}</span>
               </header>
-              <p className="admin-support-message">{request.message}</p>
-              <dl className="admin-support-meta">
-                <div>
-                  <dt>Customer</dt>
-                  <dd>{request.email}</dd>
-                </div>
-                {request.contextUrl ? (
-                  <div>
-                    <dt>Context</dt>
-                    <dd>{request.contextUrl}</dd>
-                  </div>
-                ) : null}
-              </dl>
-              <div className="admin-support-next-step" aria-label="Recommended support workflow">
-                <RoleForgeIcon name={request.status === "closed" ? "check" : "sparkle"} size={15} />
-                <span>
-                  {request.status === "closed"
-                    ? "Resolved. Reopen only if the customer needs another pass."
-                    : "Recommended: send a customer-safe reply, mark reviewing while you investigate, then close after the customer has an answer."}
-                </span>
-              </div>
-              <form className="admin-support-reply-form" action="/admin/support/reply" method="post">
-                <input type="hidden" name="id" value={request.id} />
-                <input type="hidden" name="version" value={request.updatedAt} />
-                <input type="hidden" name="returnStatus" value={status} />
-                <label htmlFor={`reply-${request.id}`}>Customer-safe reply</label>
-                <textarea
-                  id={`reply-${request.id}`}
-                  name="message"
-                  rows={4}
-                  minLength={12}
-                  maxLength={2000}
-                  placeholder={`Hi,\n\nThanks for reaching out. I checked ${request.referenceLabel} and...`}
-                  disabled={!readiness.customerReplyReady || request.email === "No email"}
-                />
-                <div className="admin-support-reply-footer">
-                  <span>
-                    {readiness.customerReplyReady
-                      ? "Sent from the configured support sender, not your private Gmail."
-                      : "Customer replies are paused until a verified support sender is configured. Your private Gmail stays hidden."}
-                  </span>
-                  <div>
-                    <SupportSubmitButton
-                      className="admin-support-action primary"
-                      name="nextStatus"
-                      value="reviewing"
-                      disabled={!readiness.customerReplyReady || request.email === "No email"}
-                      icon="mail"
-                      label="Send reply"
-                      pendingLabel="Sending…"
-                    />
-                    <SupportSubmitButton
-                      name="nextStatus"
-                      value="closed"
-                      disabled={!readiness.customerReplyReady || request.email === "No email"}
-                      icon="check"
-                      label="Send and close"
-                      pendingLabel="Sending and closing…"
-                    />
+              <div className="admin-support-card-body">
+                <div className="admin-support-case">
+                  <span className="admin-support-panel-label">Customer request</span>
+                  <p className="admin-support-message">{request.message}</p>
+                  <dl className="admin-support-meta">
+                    <div>
+                      <dt>Customer</dt>
+                      <dd>{request.email}</dd>
+                    </div>
+                    {request.contextUrl ? (
+                      <div>
+                        <dt>Context</dt>
+                        <dd>{request.contextUrl}</dd>
+                      </div>
+                    ) : null}
+                  </dl>
+                  <div className="admin-support-next-step" aria-label="Recommended support workflow">
+                    <RoleForgeIcon name={request.status === "closed" ? "check" : "sparkle"} size={15} />
+                    <span>
+                      {request.status === "closed"
+                        ? "Resolved. Reopen only if the customer needs another pass."
+                        : "Recommended: send a customer-safe reply, mark reviewing while you investigate, then close after the customer has an answer."}
+                    </span>
                   </div>
                 </div>
-              </form>
-              <div className="admin-support-actions">
-                <span className="admin-support-actions-label">Queue status</span>
-                <SupportStatusForm request={request} status="reviewing" label="Reviewing" icon="mail" returnStatus={status} />
-                <SupportStatusForm request={request} status="closed" label="Close" icon="check" returnStatus={status} />
-                {request.status === "closed" ? <SupportStatusForm request={request} status="open" label="Reopen" icon="undo" returnStatus={status} /> : null}
+
+                <div className="admin-support-workbench">
+                  <span className="admin-support-panel-label">Response workspace</span>
+                  <form className="admin-support-reply-form" action="/admin/support/reply" method="post">
+                    <input type="hidden" name="id" value={request.id} />
+                    <input type="hidden" name="version" value={request.updatedAt} />
+                    <input type="hidden" name="returnStatus" value={status} />
+                    <label htmlFor={`reply-${request.id}`}>Customer-safe reply</label>
+                    <textarea
+                      id={`reply-${request.id}`}
+                      name="message"
+                      rows={5}
+                      minLength={12}
+                      maxLength={2000}
+                      placeholder={`Hi,\n\nThanks for reaching out. I checked ${request.referenceLabel} and...`}
+                      disabled={!readiness.customerReplyReady || request.email === "No email"}
+                    />
+                    <div className="admin-support-reply-footer">
+                      <span>
+                        {readiness.customerReplyReady
+                          ? "Sent from the configured support sender, not your private Gmail."
+                          : "Customer replies are paused until a verified support sender is configured. Your private Gmail stays hidden."}
+                      </span>
+                      <div>
+                        <SupportSubmitButton
+                          className="admin-support-action primary"
+                          name="nextStatus"
+                          value="reviewing"
+                          disabled={!readiness.customerReplyReady || request.email === "No email"}
+                          icon="mail"
+                          label="Send reply"
+                          pendingLabel="Sending…"
+                        />
+                        <SupportSubmitButton
+                          name="nextStatus"
+                          value="closed"
+                          disabled={!readiness.customerReplyReady || request.email === "No email"}
+                          icon="check"
+                          label="Send and close"
+                          pendingLabel="Sending and closing…"
+                        />
+                      </div>
+                    </div>
+                  </form>
+                  <div className="admin-support-actions">
+                    <span className="admin-support-actions-label">Queue status</span>
+                    <SupportStatusForm request={request} status="reviewing" label="Reviewing" icon="mail" returnStatus={status} />
+                    <SupportStatusForm request={request} status="closed" label="Close" icon="check" returnStatus={status} />
+                    {request.status === "closed" ? <SupportStatusForm request={request} status="open" label="Reopen" icon="undo" returnStatus={status} /> : null}
+                  </div>
+                </div>
               </div>
             </article>
           );
-        }) : (
+        }) : loadError ? (
+          <article className="admin-support-empty is-error">
+            <RoleForgeIcon name="settings" size={18} />
+            <strong>Could not load this queue</strong>
+            <p>Refresh the page or check the support database connection. Existing requests remain unchanged.</p>
+          </article>
+        ) : (
           <article className="admin-support-empty">
             <RoleForgeIcon name="check" size={18} />
             <strong>No support requests in this view</strong>

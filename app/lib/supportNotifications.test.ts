@@ -113,10 +113,12 @@ test("sends support notifications to Resend email when configured", async () => 
   const body = JSON.parse(calls[0]?.init?.body ?? "{}");
   assert.equal(body.from, "RoleForge Support <support@roleforgeai.com>");
   assert.deepEqual(body.to, ["owner@example.com"]);
-  assert.deepEqual(body.reply_to, ["person@example.com"]);
+  assert.equal(body.reply_to, undefined);
   assert.match(body.subject, /\[RoleForge Support\] RF-70A225 Billing: Premium sync/);
   assert.match(body.text, /Open the support inbox from \/admin\/support/);
+  assert.match(body.text, /Reply only from the web inbox so the configured RoleForge support sender is used/);
   assert.match(body.text, /Mark the request reviewing or closed from the web inbox/);
+  assert.doesNotMatch(calls[0]?.init?.body ?? "", /reply_to/);
 });
 
 test("skips partially configured support email notifications", async () => {
