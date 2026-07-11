@@ -3,8 +3,6 @@
 import { useEffect } from "react";
 
 const REVEAL_SELECTORS = [
-  ".hero-copy",
-  ".hero-stage",
   ".templates-head",
   ".template-card",
   ".cta-band",

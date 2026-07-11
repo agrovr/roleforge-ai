@@ -25,14 +25,13 @@ test("site polish keeps ambient depth without global line overlays", () => {
 });
 
 test("landing information stays immediately visible instead of cascading in", () => {
-  for (const selector of [".feature-card", ".price-card", ".pricing-clarity-grid a", ".step-card"]) {
+  for (const selector of [".hero-copy", ".hero-stage", ".feature-card", ".price-card", ".pricing-clarity-grid a", ".step-card"]) {
     assert.doesNotMatch(sitePolish, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
 });
 
 test("site polish reveal targets cover public and signed-in product surfaces", () => {
   for (const selector of [
-    ".hero-stage",
     ".template-card",
     ".legal-card",
     ".support-request-card",

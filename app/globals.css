@@ -27402,7 +27402,7 @@ html[data-theme="dark"] .support-form textarea:hover {
   }
 }
 
-/* Landing pricing refinement: compact plans without decorative card stacks. */
+/* Landing pricing refinement: compact plans with quiet depth and clear status. */
 .pricing-grid.two {
   width: min(100%, 1040px);
   margin-inline: auto;
@@ -27424,7 +27424,17 @@ html[data-theme="dark"] .support-form textarea:hover {
   border-radius: 18px;
   border-color: var(--line);
   background: var(--surface);
-  box-shadow: 0 16px 38px -34px color-mix(in srgb, var(--ink-0) 38%, transparent);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 72%, transparent) inset,
+    0 18px 42px -34px color-mix(in srgb, var(--ink-0) 42%, transparent);
+  transition: transform 260ms cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 260ms ease, border-color 200ms ease;
+}
+
+.pricing-grid.two .price-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 78%, transparent) inset,
+    0 26px 54px -38px color-mix(in srgb, var(--ink-0) 52%, transparent);
 }
 
 .pricing-grid.two .price-card::after {
@@ -27434,7 +27444,9 @@ html[data-theme="dark"] .support-form textarea:hover {
 .pricing-grid.two .price-card.featured {
   border-color: rgba(245, 214, 154, 0.2);
   background: linear-gradient(160deg, #11162f, #0d1228);
-  box-shadow: 0 20px 46px -38px rgba(8, 12, 24, 0.72);
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.08) inset,
+    0 24px 52px -38px rgba(8, 12, 24, 0.78);
 }
 
 .price-card-top {
@@ -27442,24 +27454,24 @@ html[data-theme="dark"] .support-form textarea:hover {
 }
 
 .pricing-grid.two .price-status {
-  min-height: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  color: var(--ink-3);
-  line-height: 1.4;
+  min-height: 30px;
+  padding: 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--brand) 22%, var(--line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface-warm) 78%, var(--surface));
+  box-shadow: 0 8px 20px -18px color-mix(in srgb, var(--brand-dark) 46%, transparent);
+  color: var(--brand-dark);
+  line-height: 1.15;
 }
 
 .pricing-grid.two .price-card.featured .price-status,
 .pricing-grid.two .price-card.featured .price-status.current,
 .pricing-grid.two .price-card.featured .price-status.upgrade,
 .pricing-grid.two .price-card.featured .price-status.paused {
-  border: 0;
-  background: transparent;
+  border: 1px solid rgba(245, 214, 154, 0.3);
+  background: rgba(255, 247, 233, 0.08);
   color: #f5d69a;
-  box-shadow: none;
+  box-shadow: 0 10px 24px -20px rgba(245, 214, 154, 0.5);
   text-shadow: none;
 }
 
@@ -27550,10 +27562,10 @@ html[data-theme="dark"] .pricing-grid.two .price-card.featured {
 }
 
 html[data-theme="dark"] .price-card.featured .price-status.current {
-  border-color: transparent;
-  background: transparent;
+  border-color: rgba(245, 214, 154, 0.32);
+  background: rgba(255, 247, 233, 0.08);
   color: #f5d69a;
-  box-shadow: none;
+  box-shadow: 0 10px 24px -20px rgba(245, 214, 154, 0.42);
   text-shadow: none;
 }
 
@@ -27595,12 +27607,18 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
   }
 }
 
-/* Landing workflow refinement: compact indexes instead of elevated cards. */
+/* Landing workflow refinement: expressive indexes without a card matrix. */
 .steps {
-  gap: clamp(28px, 4vw, 58px);
+  position: relative;
+  gap: clamp(18px, 2.4vw, 34px);
+  padding: clamp(14px, 2vw, 22px);
   border: 0;
-  background: transparent;
-  box-shadow: none;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--accent-soft) 48%, transparent), transparent 23%),
+    radial-gradient(circle at 84% 74%, color-mix(in srgb, var(--sky-soft) 45%, transparent), transparent 24%),
+    color-mix(in srgb, var(--surface-warm) 48%, transparent);
+  box-shadow: 0 30px 70px -64px color-mix(in srgb, var(--ink-0) 56%, transparent);
 }
 
 .step {
@@ -27610,12 +27628,12 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
   align-content: start;
   column-gap: 14px;
   row-gap: 8px;
-  padding: 20px 0 24px;
+  padding: 22px 18px 24px;
   border: 0;
-  border-radius: 0;
+  border-radius: 18px;
   background: transparent;
   box-shadow: none;
-  transition: none;
+  transition: transform 280ms cubic-bezier(0.2, 0.7, 0.2, 1), background 220ms ease, box-shadow 280ms ease;
 }
 
 .step + .step {
@@ -27623,10 +27641,9 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
 }
 
 .step:hover {
-  border-color: var(--line);
-  background: transparent;
-  box-shadow: none;
-  transform: none;
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  box-shadow: 0 18px 36px -32px color-mix(in srgb, var(--ink-0) 48%, transparent);
+  transform: translateY(-4px);
 }
 
 .step-num {
@@ -27639,7 +27656,13 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
 .step .step-icon {
   grid-column: 1;
   grid-row: 2 / span 2;
-  box-shadow: none;
+  box-shadow: 0 12px 24px -18px color-mix(in srgb, var(--brand-dark) 58%, transparent);
+  transition: transform 260ms cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 260ms ease;
+}
+
+.step:hover .step-icon {
+  transform: translateY(-2px) rotate(-4deg) scale(1.05);
+  box-shadow: 0 16px 28px -18px color-mix(in srgb, var(--brand-dark) 68%, transparent);
 }
 
 .step .step-title {
@@ -27658,17 +27681,29 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
   grid-template-rows: auto auto auto;
   column-gap: 16px;
   row-gap: 8px;
-  padding: 0;
+  padding: 16px 18px 18px;
   border: 0;
-  border-radius: 0;
+  border-radius: 18px;
   background: transparent;
   box-shadow: none;
-  transition: none;
+  transition: transform 260ms cubic-bezier(0.2, 0.7, 0.2, 1), background 220ms ease, box-shadow 260ms ease;
 }
 
 .features-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(34px, 5vw, 64px) clamp(44px, 7vw, 88px);
+  gap: clamp(18px, 3vw, 34px) clamp(24px, 4vw, 48px);
+}
+
+.feature-card:nth-child(3n + 1) {
+  background: radial-gradient(circle at 7% 10%, color-mix(in srgb, var(--accent-soft) 42%, transparent), transparent 42%);
+}
+
+.feature-card:nth-child(3n + 2) {
+  background: radial-gradient(circle at 7% 10%, color-mix(in srgb, var(--sky-soft) 48%, transparent), transparent 42%);
+}
+
+.feature-card:nth-child(3n + 3) {
+  background: radial-gradient(circle at 7% 10%, color-mix(in srgb, var(--coral-soft) 38%, transparent), transparent 42%);
 }
 
 .feature-card:nth-child(3n + 2),
@@ -27678,10 +27713,11 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
 }
 
 .feature-card:hover {
-  border-color: var(--line);
-  background: transparent;
-  box-shadow: none;
-  transform: none;
+  background:
+    radial-gradient(circle at 8% 8%, color-mix(in srgb, var(--accent-soft) 54%, transparent), transparent 36%),
+    color-mix(in srgb, var(--surface) 84%, transparent);
+  box-shadow: 0 24px 46px -38px color-mix(in srgb, var(--ink-0) 48%, transparent);
+  transform: translateY(-3px);
 }
 
 .feature-icon {
@@ -27690,7 +27726,13 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
   width: 42px;
   height: 42px;
   border-radius: 10px;
-  box-shadow: none;
+  box-shadow: 0 12px 24px -18px color-mix(in srgb, currentColor 52%, transparent);
+  transition: transform 260ms cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 260ms ease;
+}
+
+.feature-card:hover .feature-icon {
+  transform: translateY(-2px) rotate(3deg) scale(1.05);
+  box-shadow: 0 16px 28px -18px color-mix(in srgb, currentColor 62%, transparent);
 }
 
 .feature-card h3,
@@ -27706,20 +27748,43 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
 html[data-theme="dark"] .feature-card:nth-child(n),
 html[data-theme="dark"] .feature-card:nth-child(n):hover {
   border-color: transparent;
-  background: transparent;
-  box-shadow: none;
+}
+
+html[data-theme="dark"] .feature-card:nth-child(3n + 1) {
+  background: radial-gradient(circle at 7% 10%, rgba(127, 200, 184, 0.08), transparent 44%);
+}
+
+html[data-theme="dark"] .feature-card:nth-child(3n + 2) {
+  background: radial-gradient(circle at 7% 10%, rgba(143, 181, 255, 0.08), transparent 44%);
+}
+
+html[data-theme="dark"] .feature-card:nth-child(3n + 3) {
+  background: radial-gradient(circle at 7% 10%, rgba(237, 127, 105, 0.07), transparent 44%);
+}
+
+html[data-theme="dark"] .feature-card:nth-child(n):hover {
+  background:
+    radial-gradient(circle at 8% 8%, rgba(127, 200, 184, 0.12), transparent 38%),
+    rgba(255, 247, 233, 0.035);
+  box-shadow: 0 24px 46px -36px rgba(0, 0, 0, 0.82);
 }
 
 html[data-theme="dark"] .steps {
-  background: transparent;
-  box-shadow: none;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(221, 160, 74, 0.1), transparent 25%),
+    radial-gradient(circle at 84% 74%, rgba(127, 200, 184, 0.08), transparent 26%),
+    rgba(255, 247, 233, 0.025);
+  box-shadow: 0 32px 70px -58px rgba(0, 0, 0, 0.9);
 }
 
 html[data-theme="dark"] .step:nth-child(n),
 html[data-theme="dark"] .step:nth-child(n):hover {
   border-color: rgba(255, 247, 233, 0.14);
-  background: transparent;
-  box-shadow: none;
+}
+
+html[data-theme="dark"] .step:nth-child(n):hover {
+  background: rgba(255, 247, 233, 0.045);
+  box-shadow: 0 18px 36px -30px rgba(0, 0, 0, 0.9);
 }
 
 @media (max-width: 1180px) {
@@ -27753,7 +27818,7 @@ html[data-theme="dark"] .step:nth-child(n):hover {
     align-items: start;
     column-gap: 12px;
     row-gap: 6px;
-    padding: 0 2px;
+    padding: 14px 12px;
     border: 0;
   }
 
@@ -27786,7 +27851,7 @@ html[data-theme="dark"] .step:nth-child(n):hover {
     grid-template-columns: 42px minmax(0, 1fr);
     column-gap: 16px;
     row-gap: 8px;
-    padding: 0 4px;
+    padding: 14px 12px;
     border: 0;
   }
 
@@ -27811,7 +27876,7 @@ html[data-theme="dark"] .step:nth-child(n):hover {
   .step:nth-child(n) {
     grid-template-columns: 32px 34px minmax(0, 1fr);
     column-gap: 10px;
-    padding: 0 2px;
+    padding: 12px 8px;
   }
 
   .step .step-num {
@@ -27836,7 +27901,7 @@ html[data-theme="dark"] .step:nth-child(n):hover {
     grid-template-columns: 36px minmax(0, 1fr);
     column-gap: 12px;
     row-gap: 6px;
-    padding: 0 2px;
+    padding: 12px 8px;
   }
 
   .feature-card .feature-icon {
@@ -27858,7 +27923,7 @@ html[data-theme="dark"] .step:nth-child(n):hover {
   }
 }
 
-/* Landing FAQ refinement: a divided disclosure list without card chrome. */
+/* Landing FAQ refinement: a calm disclosure ledger with responsive feedback. */
 .faq-grid {
   grid-template-columns: 1fr;
   gap: 0;
@@ -27872,10 +27937,10 @@ html[data-theme="dark"] .step:nth-child(n):hover {
   overflow: visible;
   padding: 0;
   border: 0;
-  border-radius: 0;
+  border-radius: 14px;
   background: transparent;
   box-shadow: none;
-  transition: none;
+  transition: background 220ms ease, box-shadow 260ms ease, transform 260ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .faq-item + .faq-item {
@@ -27887,9 +27952,9 @@ html[data-theme="dark"] .step:nth-child(n):hover {
 .faq-item.open,
 .faq-item[open] {
   border-color: var(--line);
-  background: transparent;
-  box-shadow: none;
-  transform: none;
+  background: color-mix(in srgb, var(--surface) 66%, transparent);
+  box-shadow: 0 18px 38px -36px color-mix(in srgb, var(--ink-0) 46%, transparent);
+  transform: translateX(4px);
 }
 
 .faq-q {
@@ -27911,14 +27976,23 @@ html[data-theme="dark"] .step:nth-child(n):hover {
   font-size: 0.7rem;
   line-height: 1.4;
   text-align: start;
+  transition: color 220ms ease, transform 260ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.faq-item:hover .faq-q::before,
+.faq-item.open .faq-q::before,
+.faq-item[open] .faq-q::before {
+  color: var(--brand);
+  transform: translateX(3px);
 }
 
 .faq-toggle {
   width: 28px;
   height: 28px;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  box-shadow: 0 10px 20px -18px color-mix(in srgb, var(--ink-0) 46%, transparent);
 }
 
 .faq-toggle span {
@@ -27927,9 +28001,10 @@ html[data-theme="dark"] .step:nth-child(n):hover {
 
 .faq-item.open .faq-toggle,
 .faq-item[open] .faq-toggle {
-  border-color: transparent;
-  background: transparent;
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 72%, var(--surface));
   color: var(--accent);
+  transform: rotate(180deg);
 }
 
 .faq-a {
@@ -27954,8 +28029,14 @@ html[data-theme="dark"] .faq-item:nth-child(n):focus-within,
 html[data-theme="dark"] .faq-item:nth-child(n).open,
 html[data-theme="dark"] .faq-item:nth-child(n)[open] {
   border-color: rgba(255, 247, 233, 0.14);
-  background: transparent;
-  box-shadow: none;
+}
+
+html[data-theme="dark"] .faq-item:nth-child(n):hover,
+html[data-theme="dark"] .faq-item:nth-child(n):focus-within,
+html[data-theme="dark"] .faq-item:nth-child(n).open,
+html[data-theme="dark"] .faq-item:nth-child(n)[open] {
+  background: rgba(255, 247, 233, 0.035);
+  box-shadow: 0 18px 38px -32px rgba(0, 0, 0, 0.86);
 }
 
 html[data-theme="dark"] .faq-q::before {
@@ -27967,8 +28048,8 @@ html[data-theme="dark"] .faq-q::before {
 html[data-theme="dark"] .faq-toggle,
 html[data-theme="dark"] .faq-item.open .faq-toggle,
 html[data-theme="dark"] .faq-item[open] .faq-toggle {
-  border-color: transparent;
-  background: transparent;
+  border-color: rgba(255, 247, 233, 0.14);
+  background: rgba(255, 247, 233, 0.035);
 }
 
 html[data-theme="dark"] .faq-item.open .faq-toggle,
@@ -29134,14 +29215,21 @@ html[data-theme="dark"] .template-thumb {
   background: transparent;
   box-shadow: none;
   overflow: visible;
-  animation: none;
+  transform: translateY(0) rotate(var(--template-tilt, 0deg));
+  transform-origin: 50% 82%;
+  transition: transform 300ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .template-card:hover,
 .template-card:focus-within {
   box-shadow: none;
-  transform: none;
+  transform: translateY(-7px) rotate(0deg);
 }
+
+.template-card:nth-child(4n + 1) { --template-tilt: -0.65deg; }
+.template-card:nth-child(4n + 2) { --template-tilt: 0.55deg; }
+.template-card:nth-child(4n + 3) { --template-tilt: -0.35deg; }
+.template-card:nth-child(4n + 4) { --template-tilt: 0.7deg; }
 
 .template-thumb,
 .settings-template-thumb {
@@ -29153,8 +29241,35 @@ html[data-theme="dark"] .template-thumb {
   padding: clamp(9px, 1.2vw, 14px);
   overflow: hidden;
   border: 0;
-  border-radius: 10px;
-  background: color-mix(in srgb, var(--surface-2) 70%, var(--surface-warm));
+  border: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--accent-soft) 50%, transparent), transparent 34%),
+    color-mix(in srgb, var(--surface-2) 68%, var(--surface-warm));
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 72%, transparent) inset,
+    0 20px 44px -38px color-mix(in srgb, var(--ink-0) 46%, transparent);
+  transition: background 260ms ease, border-color 220ms ease, box-shadow 300ms ease;
+}
+
+.template-card:nth-child(2) .template-thumb {
+  background: radial-gradient(circle at 82% 14%, color-mix(in srgb, var(--sky-soft) 62%, transparent), transparent 36%), color-mix(in srgb, var(--surface-2) 68%, var(--surface-warm));
+}
+
+.template-card:nth-child(3) .template-thumb {
+  background: radial-gradient(circle at 18% 12%, color-mix(in srgb, var(--accent-soft) 64%, transparent), transparent 36%), color-mix(in srgb, var(--surface-2) 68%, var(--surface-warm));
+}
+
+.template-card:nth-child(4) .template-thumb {
+  background: radial-gradient(circle at 82% 14%, color-mix(in srgb, var(--coral-soft) 54%, transparent), transparent 36%), color-mix(in srgb, var(--surface-2) 68%, var(--surface-warm));
+}
+
+.template-card:hover .template-thumb,
+.template-card:focus-within .template-thumb {
+  border-color: color-mix(in srgb, var(--brand) 32%, var(--line));
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 80%, transparent) inset,
+    0 30px 58px -40px color-mix(in srgb, var(--ink-0) 58%, transparent);
 }
 
 .template-thumb .r-doc,
@@ -29502,8 +29617,41 @@ html[data-theme="dark"] .template-thumb {
 html[data-theme="dark"] .template-card,
 html[data-theme="dark"] .template-thumb,
 html[data-theme="dark"] .settings-template-thumb {
-  background: transparent;
-  box-shadow: none;
+  border-color: rgba(255, 247, 233, 0.12);
+  box-shadow: 0 22px 48px -38px rgba(0, 0, 0, 0.9);
+}
+
+html[data-theme="dark"] .template-thumb,
+html[data-theme="dark"] .settings-template-thumb {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(221, 160, 74, 0.1), transparent 34%),
+    rgba(255, 247, 233, 0.035);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step,
+  .step .step-icon,
+  .feature-card,
+  .feature-icon,
+  .template-card,
+  .template-thumb,
+  .pricing-grid.two .price-card,
+  .faq-item,
+  .faq-q::before,
+  .faq-toggle {
+    animation: none;
+    transition: none;
+  }
+
+  .step:hover,
+  .feature-card:hover,
+  .template-card:hover,
+  .pricing-grid.two .price-card:hover,
+  .faq-item:hover,
+  .faq-item.open,
+  .faq-item[open] {
+    transform: none;
+  }
 }
 
 @media (max-width: 1100px) {

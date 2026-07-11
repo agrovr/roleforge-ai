@@ -45,6 +45,8 @@ test("resume previews expose complete role-specific document structures", () => 
 test("featured gallery removes the horizontal rail and document rule clutter", () => {
   assert.match(stylesheet, /\.templates-row\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\))(?=[^}]*overflow:\s*visible)(?=[^}]*scroll-snap-type:\s*none)[^}]*\}/s);
   assert.match(stylesheet, /\.template-card\s*\{(?=[^}]*border:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
+  assert.match(stylesheet, /\.template-card:nth-child\(4n \+ 1\)\s*\{\s*--template-tilt:\s*-0\.65deg;/s);
+  assert.match(stylesheet, /\.template-card:hover \.template-thumb,[\s\S]*?\.template-card:focus-within \.template-thumb\s*\{(?=[^}]*border-color:)(?=[^}]*box-shadow:)[^}]*\}/s);
   assert.match(stylesheet, /\.templates-head::after,[\s\S]*?\.r-section-title::after\s*\{[^}]*content:\s*none;/s);
   assert.match(stylesheet, /\.r-section-title\s*\{(?=[^}]*border:\s*0)(?=[^}]*padding:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*640px\)\s*\{[\s\S]*?\.templates-row\s*\{[^}]*grid-template-columns:\s*1fr/s);

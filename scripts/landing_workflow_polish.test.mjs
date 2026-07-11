@@ -14,25 +14,28 @@ test("landing workflow sections keep their real product structure", () => {
   assert.match(landing, /className="feature-card-list"/);
 });
 
-test("landing process index removes elevated step cards across breakpoints", () => {
-  assert.match(globals, /\/\* Landing workflow refinement: compact indexes instead of elevated cards\. \*\//);
-  assert.match(globals, /\.steps\s*\{(?=[^}]*gap:\s*clamp\(28px,\s*4vw,\s*58px\))(?=[^}]*border:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
-  assert.match(globals, /\.step\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*42px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*20px 0 24px)(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)(?=[^}]*transition:\s*none)[^}]*\}/s);
+test("landing process index adds localized depth without restoring divider rails", () => {
+  assert.match(globals, /\/\* Landing workflow refinement: expressive indexes without a card matrix\. \*\//);
+  assert.match(globals, /\.steps\s*\{(?=[^}]*gap:\s*clamp\(18px,\s*2\.4vw,\s*34px\))(?=[^}]*padding:\s*clamp\(14px,\s*2vw,\s*22px\))(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*28px)(?=[^}]*radial-gradient)[^}]*\}/s);
+  assert.match(globals, /\.step\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*42px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*22px 18px 24px)(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*18px)(?=[^}]*background:\s*transparent)(?=[^}]*transition:\s*transform 280ms)[^}]*\}/s);
   assert.match(globals, /\.step \+ \.step\s*\{[^}]*border-inline-start:\s*0[^}]*\}/s);
-  assert.match(globals, /\.step:hover\s*\{(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)(?=[^}]*transform:\s*none)[^}]*\}/s);
-  assert.match(globals, /html\[data-theme="dark"\]\s+\.step:nth-child\(n\),\s*html\[data-theme="dark"\]\s+\.step:nth-child\(n\):hover\s*\{(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
-  assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.steps,\s*\.features-grid\s*\{(?=[^}]*grid-template-columns:\s*1fr)(?=[^}]*gap:\s*28px)[^}]*\}[\s\S]*?\.step:nth-child\(n\)\s*\{(?=[^}]*grid-template-columns:\s*36px 36px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*0 2px)(?=[^}]*border:\s*0)[^}]*\}/s);
-  assert.match(globals, /@media\s*\(max-width:\s*640px\)\s*\{[\s\S]*?\.step:nth-child\(n\)\s*\{(?=[^}]*grid-template-columns:\s*32px 34px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*0 2px)[^}]*\}/s);
+  assert.match(globals, /\.step:hover\s*\{(?=[^}]*background:)(?=[^}]*box-shadow:)(?=[^}]*transform:\s*translateY\(-4px\))[^}]*\}/s);
+  assert.match(globals, /\.step:hover \.step-icon\s*\{(?=[^}]*rotate\(-4deg\))(?=[^}]*scale\(1\.05\))[^}]*\}/s);
+  assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.steps,\s*\.features-grid\s*\{(?=[^}]*grid-template-columns:\s*1fr)(?=[^}]*gap:\s*28px)[^}]*\}[\s\S]*?\.step:nth-child\(n\)\s*\{(?=[^}]*grid-template-columns:\s*36px 36px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*14px 12px)(?=[^}]*border:\s*0)[^}]*\}/s);
+  assert.match(globals, /@media\s*\(max-width:\s*640px\)\s*\{[\s\S]*?\.step:nth-child\(n\)\s*\{(?=[^}]*grid-template-columns:\s*32px 34px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*12px 8px)[^}]*\}/s);
   assert.doesNotMatch(globals, /--landing-workflow-rail|--landing-workflow-glint/);
 });
 
-test("feature index uses a two-column whitespace-led list without divider rails", () => {
-  assert.match(globals, /\/\* Landing workflow refinement: compact indexes instead of elevated cards\. \*\//);
-  assert.match(globals, /\.features-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*gap:\s*clamp\(34px,\s*5vw,\s*64px\) clamp\(44px,\s*7vw,\s*88px\))[^}]*\}/s);
-  assert.match(globals, /\.feature-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*44px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*0)(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)(?=[^}]*transition:\s*none)[^}]*\}/s);
+test("feature index uses responsive spotlights and restrained icon motion", () => {
+  assert.match(globals, /\/\* Landing workflow refinement: expressive indexes without a card matrix\. \*\//);
+  assert.match(globals, /\.features-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*gap:\s*clamp\(18px,\s*3vw,\s*34px\) clamp\(24px,\s*4vw,\s*48px\))[^}]*\}/s);
+  assert.match(globals, /\.feature-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*44px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*16px 18px 18px)(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*18px)(?=[^}]*background:\s*transparent)(?=[^}]*transition:\s*transform 260ms)[^}]*\}/s);
   assert.match(globals, /\.feature-card:nth-child\(3n \+ 2\),\s*\.feature-card:nth-child\(3n \+ 3\),\s*\.feature-card:nth-child\(n \+ 4\)\s*\{[^}]*border:\s*0[^}]*\}/s);
-  assert.match(globals, /\.feature-card:hover\s*\{(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)(?=[^}]*transform:\s*none)[^}]*\}/s);
-  assert.match(globals, /html\[data-theme="dark"\]\s+\.feature-card:nth-child\(n\),\s*html\[data-theme="dark"\]\s+\.feature-card:nth-child\(n\):hover\s*\{(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
-  assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.feature-card:nth-child\(n\)\s*\{(?=[^}]*grid-template-columns:\s*42px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*0 4px)[^}]*\}/s);
+  assert.match(globals, /\.feature-card:nth-child\(3n \+ 1\)\s*\{[^}]*radial-gradient[^}]*var\(--accent-soft\)[^}]*\}/s);
+  assert.match(globals, /\.feature-card:nth-child\(3n \+ 2\)\s*\{[^}]*radial-gradient[^}]*var\(--sky-soft\)[^}]*\}/s);
+  assert.match(globals, /\.feature-card:nth-child\(3n \+ 3\)\s*\{[^}]*radial-gradient[^}]*var\(--coral-soft\)[^}]*\}/s);
+  assert.match(globals, /\.feature-card:hover\s*\{(?=[^}]*radial-gradient)(?=[^}]*box-shadow:)(?=[^}]*transform:\s*translateY\(-3px\))[^}]*\}/s);
+  assert.match(globals, /\.feature-card:hover \.feature-icon\s*\{(?=[^}]*rotate\(3deg\))(?=[^}]*scale\(1\.05\))[^}]*\}/s);
+  assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.feature-card:nth-child\(n\)\s*\{(?=[^}]*grid-template-columns:\s*42px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*14px 12px)[^}]*\}/s);
   assert.match(globals, /@media\s*\(max-width:\s*640px\)\s*\{[\s\S]*?\.feature-card-list\s*\{[^}]*display:\s*grid[^}]*\}/s);
 });
