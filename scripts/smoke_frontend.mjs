@@ -383,7 +383,7 @@ async function checkPublicShell(baseUrl) {
   });
   requireCondition(templates.response.ok, `templates returned ${templates.response.status}`);
   requireCondition(
-    /Selected direction[\s\S]*?<strong>Engineer<\/strong>/.test(templates.text),
+    /Selected direction[\s\S]*?<strong>Technical<\/strong>/.test(templates.text),
     "templates page did not render the cookie-selected resume direction",
   );
   pass("templates page respects the saved template direction");
@@ -420,7 +420,12 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.template-card-actions\s+\.btn,\s*\.template-card-actions\s+button\s*\{(?=[^}]*width:\s*100%)(?=[^}]*min-width:\s*0)(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "template card action buttons can still render cramped labels");
   pass("templates page includes overflow-safe cards and actions");
 
-  requireCondition(/\.steps,\s*\.features-grid\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "landing step and feature grids were missing overflow-safe containers");
+  requireCondition(
+    /\.steps,\s*\.features-grid\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*display:\s*grid)[^}]*\}/s.test(stylesheetText) &&
+      /\.steps\s*\{(?=[^}]*overflow:\s*visible)[^}]*\}/s.test(stylesheetText) &&
+      /\.features-grid\s*\{(?=[^}]*overflow:\s*visible)[^}]*\}/s.test(stylesheetText),
+    "landing step and feature grids were missing overflow-safe grid tracks",
+  );
   requireCondition(/\.feature-card,\s*\.step\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "landing step and feature cards can still overflow their grid tracks");
   requireCondition(/\.feature-card\s*\{(?=[^}]*container:\s*feature-card\s*\/\s*inline-size)[^}]*\}/s.test(stylesheetText), "feature cards were missing container sizing");
   requireCondition(/\.step\s+\.step-title,\s*\.step\s+h4,\s*\.step\s+h3,\s*\.feature-card\s+h3,\s*\.feature-card\s+h4\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "landing card headings can still render cramped text");
@@ -511,7 +516,7 @@ async function checkPublicShell(baseUrl) {
     "landing final CTA mobile buttons are missing fitted label containment",
   );
   requireCondition(/html,\s*body,\s*\.page-shell,\s*\.settings-page-shell\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*overflow-x:\s*clip)[^}]*\}/s.test(stylesheetText), "page shells can still keep a horizontal-scroll layout after visual QA fixes");
-  requireCondition(/@media\s*\(min-width:\s*1181px\)\s+and\s+\(max-width:\s*1320px\)\s*\{[\s\S]*?\.hero\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0?\.98fr\)\s+minmax\(390px,\s*0?\.78fr\))(?=[^}]*gap:\s*clamp\(28px,\s*3vw,\s*42px\))[^}]*\}/s.test(stylesheetText), "landing hero is missing mid-width visual containment");
+  requireCondition(/@media\s*\(min-width:\s*1181px\)\s+and\s+\(max-width:\s*1320px\)\s*\{[\s\S]*?\.hero\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0?\.98fr\)\s+minmax\(500px,\s*0?\.78fr\))(?=[^}]*gap:\s*clamp\(28px,\s*3vw,\s*42px\))[^}]*\}/s.test(stylesheetText), "landing hero is missing mid-width visual containment");
   requireCondition(/@media\s*\(min-width:\s*981px\)\s+and\s+\(max-width:\s*1440px\)\s*\{[\s\S]*?\.cta-band\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(min\(100%,\s*240px\),\s*320px\))(?=[^}]*min-height:\s*auto)(?=[^}]*padding:\s*clamp\(34px,\s*4\.2vw,\s*52px\))(?=[^}]*padding-block-start:\s*clamp\(82px,\s*7vw,\s*104px\))[^}]*\}/s.test(stylesheetText), "landing final CTA can still stack into a too-tall desktop-zoom card");
   requireCondition(/@media\s*\(min-width:\s*981px\)\s+and\s+\(max-width:\s*1440px\)\s*\{[\s\S]*?\.cta-visual\s*\{(?=[^}]*justify-self:\s*end)(?=[^}]*inline-size:\s*min\(100%,\s*320px\))(?=[^}]*min-block-size:\s*clamp\(292px,\s*26vw,\s*338px\))[^}]*\}[\s\S]*?\.cta-visual\s+\.resume-card\s*\{(?=[^}]*left:\s*52%)(?=[^}]*transform:\s*translate(?:X)?\(-30%\)\s*rotate\(5deg\))[^}]*\}/s.test(stylesheetText), "landing final CTA front resume art is missing desktop-zoom containment");
   requireCondition(/\.footer-inner\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "footer columns can still force overflow");
@@ -548,7 +553,7 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/@media\s*\(min-width:\s*1181px\)\s+and\s+\(max-width:\s*1580px\)\s*\{[\s\S]*?\.cta-visual\s+\.resume-card\s*\{(?=[^}]*left:\s*52%)(?=[^}]*transform:\s*translateX\(-18%\)\s*rotate\(5deg\))[^}]*\}/s.test(finalCtaGuard), "landing final CTA screenshot guard does not keep desktop-zoom resume art inside the card");
   pass("landing final CTA screenshot guard is cascade-final");
 
-  requireCondition(/@media\s*\(max-width:\s*1040px\)[\s\S]*?\.login-panel\s*\{[^}]*grid-template-columns:\s*1fr/.test(stylesheetText), "login page can still stay cramped at tablet widths");
+  requireCondition(/@media\s*\(max-width:\s*1040px\)[\s\S]*?\.login-panel\s*\{(?=[^}]*(?:grid-template-columns:\s*1fr|grid-template:[^}]*\/\s*1fr))[^}]*\}/.test(stylesheetText), "login page can still stay cramped at tablet widths");
   requireCondition(/\.login-shell\s*\{(?=[^}]*overflow-x:\s*clip)[^}]*\}/s.test(stylesheetText), "login page can still create horizontal overflow");
   requireCondition(/\.login-nav\s+\.brand\s*\{(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "login nav brand can still force the home action off-screen");
   requireCondition(/@media\s*\(max-width:\s*760px\)[\s\S]*?\.login-nav-actions\s+\.btn-sm\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*padding-inline:\s*12px)[^}]*\}/.test(stylesheetText), "login mobile nav actions can still overflow");
@@ -568,10 +573,10 @@ async function checkPublicShell(baseUrl) {
 
   requireCondition(/\.pricing-grid\.two\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(min\(100%,\s*360px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "pricing cards can still shrink below comfortable desktop widths");
   requireCondition(/\.price-card\s*\{(?=[^}]*container:\s*price-card\s*\/\s*inline-size)(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "pricing cards were missing container overflow safeguards");
-  requireCondition(home.text.includes("Starter plan") && /Upgrade|Paused/.test(home.text), "landing pricing is missing plan-aware status labels");
+  requireCondition(home.text.includes("Free plan") && /Premium plan|Unavailable/.test(home.text), "landing pricing is missing plan-aware status labels");
   requireCondition(
     /\.price-card-top\s*\{(?=[^}]*display:\s*flex)(?=[^}]*min-inline-size:\s*0)(?=[^}]*justify-content:\s*space-between)[^}]*\}/s.test(stylesheetText) &&
-      /\.price-status\s*\{(?=[^}]*max-inline-size:\s*52%)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText),
+      /\.pricing-grid\.two\s+\.price-status\s*\{(?=[^}]*justify-content:\s*flex-end)(?=[^}]*padding:\s*2px 0)(?=[^}]*border:\s*0)(?=[^}]*background:\s*(?:transparent|none))(?=[^}]*box-shadow:\s*none)[^}]*\}/s.test(stylesheetText),
     "pricing plan status labels can still crowd price cards",
   );
   requireCondition(/\.price-amount\s+\.v\s*\{(?=[^}]*font-size:\s*clamp\(2\.35rem,\s*15cqi,\s*3\.25rem\))(?=[^}]*line-height:\s*1)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "pricing amounts can still clip or overflow");

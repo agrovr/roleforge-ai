@@ -593,9 +593,15 @@ function Pricing({
   premiumEnding,
   checkoutReady,
 }: Pick<LandingLinks, "studioHref" | "premiumHref" | "signedIn" | "premiumActive" | "premiumEnding" | "checkoutReady">) {
-  const freeStatus = signedIn && !premiumActive ? "Current plan" : "Starter plan";
+  const freeStatus = signedIn && !premiumActive ? "Current plan" : "Free plan";
   const premiumPaused = !premiumActive && !checkoutReady;
-  const premiumStatus = premiumActive ? (premiumEnding ? "Active until period end" : "Current plan") : premiumPaused ? "Paused" : "Upgrade";
+  const premiumStatus = premiumActive
+    ? (premiumEnding ? "Active until period end" : "Current plan")
+    : premiumPaused
+      ? "Unavailable"
+      : signedIn
+        ? "Available"
+        : "Premium plan";
   const premiumCta = premiumActive ? "Manage Premium" : premiumPaused ? "Use free studio" : signedIn ? "View plans" : "Sign in to upgrade";
   const freeStatusTone = signedIn && !premiumActive ? "current" : "starter";
   const premiumStatusTone = premiumActive ? "current" : premiumPaused ? "paused" : "upgrade";
@@ -651,8 +657,9 @@ function Pricing({
                 : `$${PREMIUM_YEARLY_PRICE}/year for early users. Premium unlocks unlimited runs plus DOCX and TXT exports.`}
             </div>
             <ul className="price-list">
+              <li><RoleForgeIcon name="check" size={14} />Everything in Studio</li>
               <li><RoleForgeIcon name="check" size={14} />Unlimited tailoring runs</li>
-              <li><RoleForgeIcon name="check" size={14} />DOCX and TXT exports</li>
+              <li><RoleForgeIcon name="check" size={14} />PDF, DOCX, and TXT exports</li>
               <li><RoleForgeIcon name="check" size={14} />No monthly run cap</li>
             </ul>
             <Link className="btn btn-brand btn-lg" href={premiumHref}>{premiumCta}</Link>
