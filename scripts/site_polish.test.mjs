@@ -11,17 +11,23 @@ test("site polish layer is mounted once in the app shell", () => {
   assert.match(layout, /<SitePolish \/>/);
 });
 
-test("site polish layer adds motion and texture without hiding content for reduced motion", () => {
+test("site polish keeps ambient depth without global line overlays", () => {
   assert.match(sitePolish, /prefers-reduced-motion: reduce/);
   assert.match(sitePolish, /IntersectionObserver/);
   assert.match(sitePolish, /rf-reveal-disabled/);
-  assert.match(sitePolish, /rf-scroll-progress/);
-  assert.match(sitePolish, /rf-page-texture/);
-  assert.match(globals, /\.rf-scroll-progress/);
-  assert.match(globals, /animation-timeline:\s*scroll/);
-  assert.match(globals, /\.rf-page-texture/);
+  assert.match(sitePolish, /rf-ambient-field/);
+  assert.doesNotMatch(sitePolish, /rf-scroll-progress/);
+  assert.doesNotMatch(sitePolish, /rf-page-texture/);
+  assert.doesNotMatch(globals, /\.rf-scroll-progress/);
+  assert.doesNotMatch(globals, /\.rf-page-texture/);
   assert.match(globals, /html\.rf-polish-ready \[data-polish-reveal="true"\]/);
   assert.match(globals, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+});
+
+test("landing information stays immediately visible instead of cascading in", () => {
+  for (const selector of [".feature-card", ".price-card", ".pricing-clarity-grid a", ".step-card"]) {
+    assert.doesNotMatch(sitePolish, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
 });
 
 test("site polish reveal targets cover public and signed-in product surfaces", () => {

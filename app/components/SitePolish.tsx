@@ -7,10 +7,6 @@ const REVEAL_SELECTORS = [
   ".hero-stage",
   ".templates-head",
   ".template-card",
-  ".step-card",
-  ".feature-card",
-  ".price-card",
-  ".pricing-clarity-grid a",
   ".cta-band",
   ".legal-hero",
   ".legal-index",
@@ -112,16 +108,10 @@ export function SitePolish() {
   }, []);
 
   return (
-    <>
-      <div className="rf-scroll-progress" aria-hidden="true">
-        <span />
-      </div>
-      <div className="rf-ambient-field" aria-hidden="true">
-        <span />
-        <span />
-        <span />
-      </div>
-      <div className="rf-page-texture" aria-hidden="true" />
-    </>
+    <div className="rf-ambient-field" aria-hidden="true">
+      <span />
+      <span />
+      <span />
+    </div>
   );
 }

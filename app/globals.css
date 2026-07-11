@@ -170,54 +170,6 @@ html[data-theme="dark"] textarea {
   background: var(--brand-soft);
 }
 
-.rf-scroll-progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 2147482500;
-  width: 100%;
-  height: 3px;
-  pointer-events: none;
-}
-
-.rf-scroll-progress span {
-  display: block;
-  width: 100%;
-  height: 100%;
-  transform: scaleX(0);
-  transform-origin: left center;
-  background:
-    linear-gradient(90deg, transparent, color-mix(in srgb, var(--surface) 34%, transparent) 18%, transparent 34%),
-    linear-gradient(90deg, var(--accent), var(--brand) 48%, var(--coral));
-  box-shadow: 0 0 22px color-mix(in srgb, var(--brand) 46%, transparent);
-  animation: rf-scroll-progress linear both;
-  animation-timeline: scroll(root block);
-}
-
-.rf-page-texture {
-  position: fixed;
-  inset: 0;
-  z-index: 80;
-  pointer-events: none;
-  opacity: 0.16;
-  mix-blend-mode: multiply;
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--ink-0) 5%, transparent) 1px, transparent 1px),
-    linear-gradient(180deg, color-mix(in srgb, var(--ink-0) 4%, transparent) 1px, transparent 1px),
-    repeating-linear-gradient(135deg, transparent 0 10px, color-mix(in srgb, var(--surface) 28%, transparent) 10px 11px);
-  background-size: 54px 54px, 54px 54px, 18px 18px;
-  mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 86%, transparent 100%);
-}
-
-html[data-theme="dark"] .rf-page-texture {
-  opacity: 0.13;
-  mix-blend-mode: screen;
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--surface) 8%, transparent) 1px, transparent 1px),
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 7%, transparent) 1px, transparent 1px),
-    repeating-linear-gradient(135deg, transparent 0 10px, color-mix(in srgb, var(--brand) 10%, transparent) 10px 11px);
-}
-
 html.rf-polish-ready [data-polish-reveal="true"] {
   opacity: 0;
   transform: scale(0.992);
@@ -442,23 +394,7 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   opacity: 1;
 }
 
-@keyframes rf-scroll-progress {
-  from {
-    transform: scaleX(0);
-  }
-
-  to {
-    transform: scaleX(1);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .rf-scroll-progress span {
-    animation: none;
-    opacity: 0.56;
-    transform: scaleX(1);
-  }
-
   html.rf-polish-ready [data-polish-reveal="true"],
   html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
     opacity: 1;
@@ -27468,7 +27404,10 @@ html[data-theme="dark"] .support-form textarea:hover {
 
 /* Landing pricing refinement: compact plans without decorative card stacks. */
 .pricing-grid.two {
-  align-items: start;
+  width: min(100%, 1040px);
+  margin-inline: auto;
+  align-items: stretch;
+  gap: 20px;
 }
 
 .pricing-grid.two .price-card,
@@ -27478,6 +27417,7 @@ html[data-theme="dark"] .support-form textarea:hover {
 }
 
 .pricing-grid.two .price-card {
+  height: 100%;
   min-height: 0;
   gap: 14px;
   padding: 26px 28px;
@@ -27501,31 +27441,32 @@ html[data-theme="dark"] .support-form textarea:hover {
   padding-bottom: 2px;
 }
 
-.price-status.current {
-  border-color: color-mix(in srgb, var(--accent) 34%, var(--line));
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 82%, var(--accent-soft)), color-mix(in srgb, var(--surface-warm) 86%, transparent));
-  color: color-mix(in srgb, var(--ink-0) 72%, var(--brand-dark));
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, #fff 58%, transparent),
-    0 12px 24px -22px color-mix(in srgb, var(--accent) 42%, transparent);
+.pricing-grid.two .price-status {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--ink-3);
+  line-height: 1.4;
 }
 
-.price-card.featured .price-status.current {
-  border-color: rgba(245, 214, 154, 0.34);
-  background:
-    linear-gradient(180deg, rgba(255, 247, 233, 0.105), rgba(255, 247, 233, 0.045)),
-    rgba(255, 247, 233, 0.035);
+.pricing-grid.two .price-card.featured .price-status,
+.pricing-grid.two .price-card.featured .price-status.current,
+.pricing-grid.two .price-card.featured .price-status.upgrade,
+.pricing-grid.two .price-card.featured .price-status.paused {
+  border: 0;
+  background: transparent;
   color: #f5d69a;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 247, 233, 0.08),
-    0 12px 28px -24px rgba(0, 0, 0, 0.78);
+  box-shadow: none;
   text-shadow: none;
 }
 
-.price-card.featured .price-status.current::before {
+.pricing-grid.two .price-card.featured .price-status::before,
+.pricing-grid.two .price-card.featured .price-status.current::before {
   background: #f5d69a;
-  box-shadow: 0 0 0 3px rgba(245, 214, 154, 0.12);
+  box-shadow: none;
 }
 
 .pricing-grid.two .price-card .price-list li {
@@ -27550,14 +27491,15 @@ html[data-theme="dark"] .support-form textarea:hover {
 }
 
 .pricing-clarity-grid {
-  gap: 0;
-  margin-top: 20px;
-  padding-top: 18px;
-  border-top: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+  width: min(100%, 1040px);
+  gap: clamp(22px, 4vw, 40px);
+  margin: 26px auto 0;
+  padding-top: 0;
+  border-top: 0;
 }
 
 .pricing-clarity-grid a {
-  padding: 8px 22px;
+  padding: 0;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -27565,7 +27507,7 @@ html[data-theme="dark"] .support-form textarea:hover {
 }
 
 .pricing-clarity-grid a + a {
-  border-inline-start: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+  border-inline-start: 0;
 }
 
 .pricing-clarity-grid a:hover,
@@ -27593,7 +27535,7 @@ html[data-theme="dark"] .pricing-grid.two .price-card {
 }
 
 html[data-theme="dark"] .pricing-clarity-grid {
-  border-color: rgba(255, 247, 233, 0.14);
+  border-color: transparent;
 }
 
 html[data-theme="dark"] .pricing-clarity-grid a {
@@ -27608,27 +27550,27 @@ html[data-theme="dark"] .pricing-grid.two .price-card.featured {
 }
 
 html[data-theme="dark"] .price-card.featured .price-status.current {
-  border-color: rgba(245, 214, 154, 0.36);
-  background:
-    linear-gradient(180deg, rgba(245, 214, 154, 0.12), rgba(245, 214, 154, 0.052)),
-    rgba(255, 247, 233, 0.03);
+  border-color: transparent;
+  background: transparent;
   color: #f5d69a;
+  box-shadow: none;
   text-shadow: none;
 }
 
 @media (max-width: 900px) {
   .pricing-clarity-grid {
     grid-template-columns: 1fr;
-    padding-top: 12px;
+    gap: 18px;
+    padding-top: 0;
   }
 
   .pricing-clarity-grid a {
-    padding: 12px 0;
+    padding: 0;
   }
 
   .pricing-clarity-grid a + a {
     border-inline-start: 0;
-    border-block-start: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+    border-block-start: 0;
   }
 
   html[data-theme="dark"] .pricing-clarity-grid a + a {
@@ -27643,26 +27585,6 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .pricing-grid.two .price-card {
-    animation: landing-pricing-card-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  .pricing-grid.two .price-card.featured {
-    animation-delay: 80ms;
-  }
-}
-
-@keyframes landing-pricing-card-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .pricing-grid.two .price-card,
   .pricing-grid.two .price-card::after,
@@ -27674,9 +27596,11 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
 }
 
 /* Landing workflow refinement: compact indexes instead of elevated cards. */
-.steps,
-.features-grid {
-  gap: 0;
+.steps {
+  gap: clamp(28px, 4vw, 58px);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .step {
@@ -27686,7 +27610,7 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
   align-content: start;
   column-gap: 14px;
   row-gap: 8px;
-  padding: 28px 26px 30px;
+  padding: 20px 0 24px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -27695,7 +27619,7 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
 }
 
 .step + .step {
-  border-inline-start: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  border-inline-start: 0;
 }
 
 .step:hover {
@@ -27729,7 +27653,12 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
 }
 
 .feature-card {
-  padding: 30px 32px 32px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
+  column-gap: 16px;
+  row-gap: 8px;
+  padding: 0;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -27737,13 +27666,15 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
   transition: none;
 }
 
-.feature-card:nth-child(3n + 2),
-.feature-card:nth-child(3n + 3) {
-  border-inline-start: 1px solid var(--line);
+.features-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(34px, 5vw, 64px) clamp(44px, 7vw, 88px);
 }
 
+.feature-card:nth-child(3n + 2),
+.feature-card:nth-child(3n + 3),
 .feature-card:nth-child(n + 4) {
-  border-block-start: 1px solid var(--line);
+  border: 0;
 }
 
 .feature-card:hover {
@@ -27754,19 +27685,27 @@ html[data-theme="dark"] .price-card.featured .price-status.current {
 }
 
 .feature-icon {
+  grid-column: 1;
+  grid-row: 1 / span 3;
   width: 42px;
   height: 42px;
   border-radius: 10px;
   box-shadow: none;
 }
 
+.feature-card h3,
+.feature-card p,
 .feature-card-list {
-  margin-top: 2px;
+  grid-column: 2;
+}
+
+.feature-card-list {
+  margin-top: 0;
 }
 
 html[data-theme="dark"] .feature-card:nth-child(n),
 html[data-theme="dark"] .feature-card:nth-child(n):hover {
-  border-color: rgba(255, 247, 233, 0.14);
+  border-color: transparent;
   background: transparent;
   box-shadow: none;
 }
@@ -27788,51 +27727,34 @@ html[data-theme="dark"] .step:nth-child(n):hover {
     border: 0;
   }
 
-  .step:nth-child(2n) {
-    border-inline-start: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
-  }
-
-  .step:nth-child(n + 3) {
-    border-block-start: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+  .steps {
+    gap: 28px 48px;
   }
 
   .feature-card:nth-child(n) {
     border: 0;
   }
 
-  .feature-card:nth-child(2n) {
-    border-inline-start: 1px solid var(--line);
-  }
-
-  .feature-card:nth-child(n + 3) {
-    border-block-start: 1px solid var(--line);
-  }
-
-  html[data-theme="dark"] .feature-card:nth-child(2n),
-  html[data-theme="dark"] .feature-card:nth-child(n + 3) {
-    border-color: rgba(255, 247, 233, 0.14);
-  }
-
-  html[data-theme="dark"] .step:nth-child(2n),
-  html[data-theme="dark"] .step:nth-child(n + 3) {
-    border-color: rgba(255, 247, 233, 0.14);
+  .features-grid {
+    gap: 34px 48px;
   }
 }
 
 @media (max-width: 900px) {
+  .steps,
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
   .step:nth-child(n) {
     grid-template-columns: 36px 36px minmax(0, 1fr);
     grid-template-rows: auto auto;
     align-items: start;
     column-gap: 12px;
     row-gap: 6px;
-    padding: 22px 2px;
+    padding: 0 2px;
     border: 0;
-    border-block-start: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
-  }
-
-  .step:first-child {
-    border-block-start: 0;
   }
 
   .step .step-num {
@@ -27864,13 +27786,8 @@ html[data-theme="dark"] .step:nth-child(n):hover {
     grid-template-columns: 42px minmax(0, 1fr);
     column-gap: 16px;
     row-gap: 8px;
-    padding: 24px 4px;
+    padding: 0 4px;
     border: 0;
-    border-block-start: 1px solid var(--line);
-  }
-
-  .feature-card:first-child {
-    border-block-start: 0;
   }
 
   .feature-card .feature-icon {
@@ -27888,20 +27805,13 @@ html[data-theme="dark"] .step:nth-child(n):hover {
     margin-top: 4px;
   }
 
-  html[data-theme="dark"] .feature-card:nth-child(n) {
-    border-color: rgba(255, 247, 233, 0.14);
-  }
-
-  html[data-theme="dark"] .step:nth-child(n) {
-    border-color: rgba(255, 247, 233, 0.14);
-  }
 }
 
 @media (max-width: 640px) {
   .step:nth-child(n) {
     grid-template-columns: 32px 34px minmax(0, 1fr);
     column-gap: 10px;
-    padding: 20px 2px;
+    padding: 0 2px;
   }
 
   .step .step-num {
@@ -27926,7 +27836,7 @@ html[data-theme="dark"] .step:nth-child(n):hover {
     grid-template-columns: 36px minmax(0, 1fr);
     column-gap: 12px;
     row-gap: 6px;
-    padding: 20px 2px;
+    padding: 0 2px;
   }
 
   .feature-card .feature-icon {
@@ -27944,7 +27854,7 @@ html[data-theme="dark"] .step:nth-child(n):hover {
   }
 
   .feature-card-list {
-    display: none;
+    display: grid;
   }
 }
 
