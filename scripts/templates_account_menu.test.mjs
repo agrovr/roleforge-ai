@@ -21,8 +21,9 @@ test("templates page keeps signed-in account controls in the topbar", () => {
   assert.match(templatesPage, /Account ref \{accountReferenceLabel\}/);
   assert.match(templatesPage, /className="studio-account-reference"/);
   assert.match(templatesPage, /className="studio-account-reference-copy"/);
-  assert.match(templatesPage, /selectedTemplate\.name/);
-  assert.match(templatesPage, /href=\{resumeTemplateStudioHref\(initialTemplateSlug\)\}/);
+  assert.doesNotMatch(templatesPage, /selectedTemplate\.name/);
+  assert.match(templatesPage, /<span>Template library<\/span>/);
+  assert.match(templatesPage, /<strong>Templates<\/strong>/);
   assert.match(templatesPage, /href="\/settings#billing"/);
   assert.match(templatesPage, /href="\/settings#security"/);
   assert.match(templatesPage, /href="\/help"/);
@@ -35,7 +36,7 @@ test("templates page keeps signed-in account controls in the topbar", () => {
   assert.match(templatesPage, /href=\{billingSupportHref\}/);
   assert.match(templatesPage, /Recommended account actions/);
   assert.match(templatesPage, /templates-account-next-actions/);
-  assert.match(templatesPage, /Use selected/);
+  assert.match(templatesPage, /Open studio/);
   assert.match(templatesPage, /Save preference/);
   assert.match(templatesPage, /Export access/);
   assert.match(templatesPage, /href="\/api\/account\/export"/);
@@ -61,6 +62,8 @@ test("templates page explains the selected template without cramped status pills
   assert.match(templateLibrary, /function layoutDetail\(variant:\s*ResumeTemplateVariant\)/);
   assert.match(templateLibrary, /className="templates-fit-guide"/);
   assert.match(templateLibrary, /aria-label="Selected template guidance"/);
+  assert.match(templateLibrary, /role="status" aria-live="polite"/);
+  assert.doesNotMatch(templateLibrary, /templates-selection-status/);
   assert.match(templateLibrary, /New PDF and premium DOCX exports use this direction; older saved exports stay unchanged\./);
   assert.match(stylesheet, /\.templates-fit-guide\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(min\(100%,\s*220px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.templates-fit-guide\s+article\s*\{(?=[^}]*grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\))(?=[^}]*min-width:\s*0)[^}]*\}/s);

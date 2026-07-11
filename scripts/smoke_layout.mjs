@@ -78,7 +78,7 @@ const PAGE_CHECKS = [
   {
     path: "/templates",
     name: "templates",
-    selectors: [".public-page-topbar", ".templates-page-hero", ".templates-hero-preview", ".templates-page-actions", ".templates-selection-status", ".templates-decision-guide", ".templates-page-grid"],
+    selectors: [".public-page-topbar", ".templates-page-hero", ".templates-hero-preview", ".templates-page-actions", ".templates-decision-guide", ".templates-page-grid"],
     textFitSelectors: [
       ".public-page-topbar .brand-name",
       ".public-page-topbar .btn",
@@ -88,8 +88,6 @@ const PAGE_CHECKS = [
       ".templates-hero-preview-head strong",
       ".templates-page-actions .primary-button",
       ".templates-page-actions .ghost-button",
-      ".templates-selection-status strong",
-      ".templates-selection-status .btn",
       ".templates-decision-head h2",
       ".templates-decision-head p",
       ".templates-guide-card strong",
@@ -107,7 +105,6 @@ const PAGE_CHECKS = [
       { container: ".templates-page-hero", selector: ".templates-hero-preview", tolerance: 4 },
       { container: ".templates-hero-preview", selector: ".templates-hero-thumb", tolerance: 4 },
       { container: ".templates-hero-thumb", selector: ".templates-hero-thumb .r-doc", tolerance: 4 },
-      { container: ".templates-page-shell", selector: ".templates-selection-status", tolerance: 4 },
       { container: ".templates-page-shell", selector: ".templates-decision-guide", tolerance: 4 },
       { container: ".templates-page-shell", selector: ".templates-page-grid", tolerance: 4 },
       { container: "closest:.templates-guide-card", selector: ".templates-guide-card strong", tolerance: 4 },

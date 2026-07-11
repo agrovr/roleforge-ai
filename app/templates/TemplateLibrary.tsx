@@ -95,9 +95,11 @@ function layoutDetail(variant: ResumeTemplateVariant) {
 export function TemplateLibrary({
   signedIn,
   initialTemplateSlug = "classic",
+  settingsHref,
 }: {
   signedIn: boolean;
   initialTemplateSlug?: ResumeTemplateSlug;
+  settingsHref: string;
 }) {
   const [selectedSlug, setSelectedSlug] = useState<ResumeTemplateSlug>(initialTemplateSlug);
 
@@ -113,15 +115,41 @@ export function TemplateLibrary({
 
   return (
     <>
-      <div className="templates-selection-status" role="status">
-        <div>
-          <span className="eyebrow">Selected direction</span>
-          <strong>{selectedTemplate.name}</strong>
+      <section className="templates-page-hero" aria-labelledby="templates-title">
+        <div className="templates-page-hero-copy">
+          <div className="eyebrow">Template library</div>
+          <h1 id="templates-title">Resume formats for cleaner exports.</h1>
+          <p>
+            Choose the visual direction RoleForge should carry into new PDF and premium DOCX exports. You can change it before each run.
+          </p>
+          <div className="templates-page-actions">
+            <Link className="primary-button" href={resumeTemplateEntryHref(selectedSlug, signedIn)}>
+              Use {selectedTemplate.name} <RoleForgeIcon name="arrow" size={14} />
+            </Link>
+            <Link className="ghost-button" href={settingsHref}>
+              Export access
+            </Link>
+          </div>
         </div>
-        <Link className="btn btn-soft btn-sm" href={resumeTemplateEntryHref(selectedSlug, signedIn)}>
-          Use in studio <RoleForgeIcon name="arrow" size={12} />
-        </Link>
-      </div>
+        <aside className="templates-hero-preview" aria-label={`${selectedTemplate.name} template preview`}>
+          <div className="templates-hero-preview-head">
+            <span>Selected now</span>
+            <strong>{selectedTemplate.name}</strong>
+          </div>
+          <div className="template-thumb templates-hero-thumb" key={selectedTemplate.slug}>
+            <ResumePreview
+              variant={selectedTemplate.variant}
+              name={selectedTemplate.previewName}
+              role={selectedTemplate.previewRole}
+              highlight
+            />
+          </div>
+        </aside>
+      </section>
+
+      <p className="sr-only" role="status" aria-live="polite">
+        Selected template: {selectedTemplate.name}
+      </p>
 
       <section className="templates-fit-guide" aria-label="Selected template guidance">
         <article>

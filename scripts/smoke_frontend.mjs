@@ -383,7 +383,7 @@ async function checkPublicShell(baseUrl) {
   });
   requireCondition(templates.response.ok, `templates returned ${templates.response.status}`);
   requireCondition(
-    /Selected direction[\s\S]*?<strong>Technical<\/strong>/.test(templates.text),
+    /Selected now[\s\S]*?<strong>Technical<\/strong>/.test(templates.text),
     "templates page did not render the cookie-selected resume direction",
   );
   pass("templates page respects the saved template direction");
@@ -407,9 +407,6 @@ async function checkPublicShell(baseUrl) {
   requireCondition(/\.templates-page-actions\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*max-width:\s*100%)(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s.test(stylesheetText), "templates hero actions can still crowd the hero");
   requireCondition(/\.templates-page-actions\s+\.primary-button,\s*\.templates-page-actions\s+\.ghost-button\s*\{(?=[^}]*flex:\s*(?:1\s+1\s+)?150px)(?=[^}]*min-width:\s*min\(100%,\s*150px\))(?=[^}]*line-height:\s*1\.12)(?=[^}]*white-space:\s*normal)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "templates hero buttons can still render cramped labels");
   requireCondition(/@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?\.templates-page-actions\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*1fr)[^}]*\}/s.test(stylesheetText), "templates hero actions can still squeeze side-by-side on mobile");
-  requireCondition(/\.templates-selection-status\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "templates selected-status row can still overflow");
-  requireCondition(/\.templates-selection-status\s+strong\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s.test(stylesheetText), "templates selected label can still overflow");
-  requireCondition(/\.templates-selection-status\s+\.btn\s*\{(?=[^}]*(?:flex:\s*0\s+0\s+auto|flex:\s*none))(?=[^}]*min-height:\s*42px)[^}]*\}/s.test(stylesheetText), "templates selected action can still become an oversized mobile button");
   requireCondition(/\.templates-page-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(min\(100%,\s*260px\),\s*1fr\)\))[^}]*\}/s.test(stylesheetText), "templates cards can still shrink below a comfortable width");
   requireCondition(/\.templates-page-card\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*overflow:\s*hidden)(?=[^}]*container:\s*template-page-card\s*\/\s*inline-size)[^}]*\}/s.test(stylesheetText), "templates cards were missing container overflow safeguards");
   requireCondition(/\.template-title-row\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s+max-content)(?=[^}]*min-width:\s*0)[^}]*\}/s.test(stylesheetText), "template card title rows can still squeeze names and tags");

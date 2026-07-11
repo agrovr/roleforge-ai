@@ -47,6 +47,9 @@ test("resume previews expose complete role-specific document structures", () => 
   assert.match(page, /role=\{template\.previewRole\}/);
   assert.match(stylesheet, /\.template-thumb,\s*\.settings-template-thumb\s*\{(?=[^}]*aspect-ratio:\s*8\.5\s*\/\s*11)(?=[^}]*height:\s*auto)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
   assert.match(stylesheet, /\.template-thumb \.r-doc,\s*\.settings-template-thumb \.r-doc\s*\{(?=[^}]*aspect-ratio:\s*8\.5\s*\/\s*11)(?=[^}]*height:\s*auto)[^}]*\}/s);
+  assert.match(stylesheet, /\.template-thumb \.r-copy,\s*\.template-thumb \.r-bullet,[\s\S]*?\.settings-template-thumb \.r-bullet\s*\{[^}]*font-size:\s*6\.3px[^}]*\}/s);
+  assert.match(stylesheet, /\.template-thumb \.r-section,\s*\.settings-template-thumb \.r-section\s*\{[^}]*margin-bottom:\s*12px[^}]*\}/s);
+  assert.match(stylesheet, /\.template-thumb \.r-job,\s*\.settings-template-thumb \.r-job\s*\{[^}]*margin-bottom:\s*7px[^}]*\}/s);
 });
 
 test("hero restores the full layered resume composition from the product reference", () => {

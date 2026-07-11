@@ -4,25 +4,27 @@ import test from "node:test";
 
 const globals = readFileSync("app/globals.css", "utf8");
 const templatesPage = readFileSync("app/templates/page.tsx", "utf8");
+const templateLibrary = readFileSync("app/templates/TemplateLibrary.tsx", "utf8");
 const sectionStart = globals.indexOf("/* Template gallery restraint:");
 assert.notEqual(sectionStart, -1, "template gallery restraint section is missing");
 const section = globals.slice(sectionStart);
 
 test("templates hero renders the selected template as a real preview", () => {
-  assert.match(templatesPage, /import \{ ResumePreview \} from "\.\.\/components\/ResumePreview"/);
-  assert.match(templatesPage, /className="templates-page-hero-copy"/);
-  assert.match(templatesPage, /className="templates-hero-preview"/);
-  assert.match(templatesPage, /aria-label=\{`\$\{selectedTemplate\.name\} template preview`\}/);
-  assert.match(templatesPage, /<strong>\{selectedTemplate\.name\}<\/strong>/);
-  assert.match(templatesPage, /className="template-thumb templates-hero-thumb"/);
-  assert.match(templatesPage, /variant=\{selectedTemplate\.variant\}/);
-  assert.match(templatesPage, /name=\{selectedTemplate\.previewName\}/);
-  assert.match(templatesPage, /highlight/);
+  assert.match(templateLibrary, /import \{ ResumePreview \} from "\.\.\/components\/ResumePreview"/);
+  assert.match(templateLibrary, /className="templates-page-hero-copy"/);
+  assert.match(templateLibrary, /className="templates-hero-preview"/);
+  assert.match(templateLibrary, /aria-label=\{`\$\{selectedTemplate\.name\} template preview`\}/);
+  assert.match(templateLibrary, /<strong>\{selectedTemplate\.name\}<\/strong>/);
+  assert.match(templateLibrary, /className="template-thumb templates-hero-thumb" key=\{selectedTemplate\.slug\}/);
+  assert.match(templateLibrary, /variant=\{selectedTemplate\.variant\}/);
+  assert.match(templateLibrary, /name=\{selectedTemplate\.previewName\}/);
+  assert.match(templateLibrary, /highlight/);
+  assert.doesNotMatch(templatesPage, /className="templates-hero-preview"/);
 });
 
 test("template gallery removes decorative rails and flattens guidance surfaces", () => {
-  assert.match(section, /\.templates-page-hero::before,\s*\.templates-page-hero::after,\s*\.templates-selection-status::after,[\s\S]*?\.templates-page-card::after\s*\{[^}]*content:\s*none;/s);
-  assert.match(section, /\.templates-selection-status\s*\{(?=[^}]*border-bottom:\s*1px solid var\(--line\))(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
+  assert.match(section, /\.templates-page-hero::before,\s*\.templates-page-hero::after,\s*\.templates-hero-preview::after,[\s\S]*?\.templates-page-card::after\s*\{[^}]*content:\s*none;/s);
+  assert.doesNotMatch(templateLibrary, /templates-selection-status/);
   assert.match(section, /\.templates-decision-guide\s*\{(?=[^}]*border-block:\s*1px solid var\(--line\))(?=[^}]*border-radius:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
 });
 
@@ -45,6 +47,7 @@ test("template preview cards stay calm in light, dark, and reduced-motion modes"
 test("templates hero preview stays responsive without decorative motion", () => {
   assert.match(section, /\.templates-hero-preview\s*\{(?=[^}]*border-radius:\s*18px)(?=[^}]*transition:\s*border-color 180ms ease)[^}]*\}/s);
   assert.match(section, /\.templates-hero-thumb\s*\{(?=[^}]*box-shadow:)[^}]*\}/s);
+  assert.match(section, /@keyframes\s+template-preview-enter\s*\{[\s\S]*?opacity:\s*0\.62[\s\S]*?transform:\s*translateY\(5px\) scale\(0\.992\)[\s\S]*?opacity:\s*1/s);
   assert.match(section, /\.templates-hero-thumb\s+\.r-doc\s*\{(?=[^}]*inline-size:\s*min\(100%,\s*220px\))(?=[^}]*margin-inline:\s*auto)[^}]*\}/s);
   assert.match(section, /\.templates-hero-preview:hover,\s*\.templates-hero-preview:focus-within\s*\{(?=[^}]*transform:\s*none)[^}]*\}/s);
   assert.match(section, /html\[data-theme="dark"\]\s+\.templates-page-hero,\s*html\[data-theme="dark"\]\s+\.templates-hero-preview,[\s\S]*?\.templates-page-card\s*\{(?=[^}]*border-color:\s*rgba\(255,\s*247,\s*233,\s*0\.15\))(?=[^}]*box-shadow:\s*none)[^}]*\}/s);

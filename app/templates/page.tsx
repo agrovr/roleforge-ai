@@ -4,10 +4,9 @@ import { cookies } from "next/headers";
 import { AccountAvatar } from "../components/AccountAvatar";
 import { AccountReferenceCopyButton } from "../components/AccountReferenceCopyButton";
 import { Brand } from "../components/Brand";
-import { ResumePreview } from "../components/ResumePreview";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { accountAvatarUrl, accountDisplayName, accountReference } from "../lib/accountUser";
-import { RESUME_TEMPLATE_COOKIE, getResumeTemplate, resumeTemplateStudioHref } from "../lib/resumeTemplates";
+import { RESUME_TEMPLATE_COOKIE, getResumeTemplate } from "../lib/resumeTemplates";
 import { supportRequestHref } from "../lib/supportRequests";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
@@ -45,7 +44,6 @@ async function getTemplateLinks() {
 
 export default async function TemplatesPage() {
   const { accountImageUrl, accountInitials, accountName, accountReferenceLabel, email, signedIn, initialTemplateSlug, billingSupportHref, studioHref, settingsHref } = await getTemplateLinks();
-  const selectedTemplate = getResumeTemplate(initialTemplateSlug);
 
   return (
     <main className="templates-page-shell">
@@ -69,7 +67,7 @@ export default async function TemplatesPage() {
                   </div>
                   <div>
                     <strong className="studio-account-email" title={email}>{accountName}</strong>
-                    <span>{selectedTemplate.name} direction</span>
+                    <span>Template library</span>
                     {accountReferenceLabel ? (
                       <span className="studio-account-reference">
                         <span>Account ref {accountReferenceLabel}</span>
@@ -79,9 +77,9 @@ export default async function TemplatesPage() {
                   </div>
                 </div>
                 <div className="studio-account-insights" aria-label="Template account summary">
-                  <Link href={resumeTemplateStudioHref(initialTemplateSlug)}>
-                    <strong>{selectedTemplate.name}</strong>
-                    <span>Selected direction</span>
+                  <Link href="/templates">
+                    <strong>Templates</strong>
+                    <span>Choose a direction</span>
                   </Link>
                   <Link href="/settings#exports">
                     <strong>Exports</strong>
@@ -93,7 +91,7 @@ export default async function TemplatesPage() {
                   </Link>
                 </div>
                 <div className="studio-account-next-actions templates-account-next-actions" aria-label="Recommended account actions">
-                  <Link href={resumeTemplateStudioHref(initialTemplateSlug)}><RoleForgeIcon name="file" size={14} /> Use selected</Link>
+                  <Link href="/app"><RoleForgeIcon name="file" size={14} /> Open studio</Link>
                   <Link href="/settings#preferences"><RoleForgeIcon name="layers" size={14} /> Save preference</Link>
                   <Link href="/settings#exports"><RoleForgeIcon name="download" size={14} /> Export access</Link>
                   <Link href={billingSupportHref}><RoleForgeIcon name="mail" size={14} /> Billing support</Link>
@@ -141,39 +139,7 @@ export default async function TemplatesPage() {
         </div>
       </header>
 
-      <section className="templates-page-hero" aria-labelledby="templates-title">
-        <div className="templates-page-hero-copy">
-          <div className="eyebrow">Template library</div>
-          <h1 id="templates-title">Resume formats for cleaner exports.</h1>
-          <p>
-            Choose the visual direction RoleForge should carry into new PDF and premium DOCX exports. You can change it before each run.
-          </p>
-          <div className="templates-page-actions">
-            <Link className="primary-button" href={studioHref}>
-              Open studio <RoleForgeIcon name="arrow" size={14} />
-            </Link>
-            <Link className="ghost-button" href={settingsHref}>
-              Export access
-            </Link>
-          </div>
-        </div>
-        <aside className="templates-hero-preview" aria-label={`${selectedTemplate.name} template preview`}>
-          <div className="templates-hero-preview-head">
-            <span>Selected now</span>
-            <strong>{selectedTemplate.name}</strong>
-          </div>
-          <div className="template-thumb templates-hero-thumb">
-            <ResumePreview
-              variant={selectedTemplate.variant}
-              name={selectedTemplate.previewName}
-              role={selectedTemplate.previewRole}
-              highlight
-            />
-          </div>
-        </aside>
-      </section>
-
-      <TemplateLibrary signedIn={signedIn} initialTemplateSlug={initialTemplateSlug} />
+      <TemplateLibrary signedIn={signedIn} initialTemplateSlug={initialTemplateSlug} settingsHref={settingsHref} />
     </main>
   );
 }
