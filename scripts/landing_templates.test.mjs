@@ -55,6 +55,7 @@ test("hero restores the full layered resume composition from the product referen
   assert.match(stylesheet, /\.hero-stage \.resume-card-back-l\s*\{(?=[^}]*inline-size:\s*clamp\(268px,\s*18\.5vw,\s*318px\))(?=[^}]*rotate\(-9deg\))[^}]*\}/s);
   assert.match(stylesheet, /\.hero-stage \.resume-card-back-r\s*\{(?=[^}]*inline-size:\s*clamp\(252px,\s*17\.5vw,\s*296px\))(?=[^}]*rotate\(7deg\))[^}]*\}/s);
   assert.match(stylesheet, /\.hero-badge\s*\{(?=[^}]*max-inline-size:\s*min\(292px,\s*66%\))(?=[^}]*padding:\s*13px 16px)[^}]*\}/s);
+  assert.match(stylesheet, /@media \(min-width: 1181px\) and \(max-width: 1320px\)\s*\{[\s\S]*?\.hero\s*\{(?=[^}]*grid-template-columns:\s*minmax\(0,\s*0\.98fr\)\s*minmax\(500px,\s*0\.78fr\))[^}]*\}/s);
 });
 
 test("featured gallery removes the horizontal rail and document rule clutter", () => {

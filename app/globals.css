@@ -25550,7 +25550,7 @@ html[data-theme="dark"] .nav {
 
 @media (min-width: 1181px) and (max-width: 1320px) {
   .hero {
-    grid-template-columns: minmax(0, 0.98fr) minmax(390px, 0.78fr);
+    grid-template-columns: minmax(0, 0.98fr) minmax(500px, 0.78fr);
     gap: clamp(28px, 3vw, 42px);
   }
 }
