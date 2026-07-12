@@ -41,7 +41,7 @@ import {
   reviewSuggestionWorkspaceKey,
   type ReviewSuggestionCard,
 } from "../lib/reviewSuggestions";
-import { parseTargetUrl } from "../lib/targetLabel";
+import { normalizePublicUrlInput, parseTargetUrl } from "../lib/targetLabel";
 import {
   formatHistoryTimestamp,
   groupHistoryItems,
@@ -1584,7 +1584,11 @@ export default function Page() {
     return () => controller.abort();
   }, [accountStatus?.entitlement, downloadFormat, downloadUrl]);
 
-  const hasTarget = Boolean(jdUrl.trim() || jdText.trim());
+  const normalizedJobUrl = normalizePublicUrlInput(jdUrl);
+  const normalizedCompanyUrl = normalizePublicUrlInput(companyUrl);
+  const jobUrlInvalid = Boolean(jdUrl.trim() && !normalizedJobUrl);
+  const companyUrlInvalid = Boolean(companyUrl.trim() && !normalizedCompanyUrl);
+  const hasTarget = Boolean(normalizedJobUrl || jdText.trim());
   const readyItems = [Boolean(baseUrl), Boolean(file), hasTarget];
   const readiness = Math.round((readyItems.filter(Boolean).length / readyItems.length) * 100);
   const tailorAction = tailorActionState({
@@ -1637,7 +1641,6 @@ export default function Page() {
   async function tailor(resume_id: string): Promise<TailorResult> {
     if (!baseUrl) throw new Error("Resume tailoring is temporarily unavailable. Try again shortly.");
 
-    const isHttp = (value: string) => /^https?:\/\//i.test(value.trim());
     const payload: {
       resume_id: string;
       jd_url?: string;
@@ -1646,9 +1649,9 @@ export default function Page() {
       tailoring_mode: TailoringMode;
     } = { resume_id, tailoring_mode: tailoringMode };
 
-    if (jdUrl.trim() && isHttp(jdUrl)) payload.jd_url = jdUrl.trim();
+    if (normalizedJobUrl) payload.jd_url = normalizedJobUrl;
     if (jdText.trim()) payload.jd_text = jdText.trim();
-    if (companyUrl.trim() && isHttp(companyUrl)) payload.company_url = companyUrl.trim();
+    if (normalizedCompanyUrl) payload.company_url = normalizedCompanyUrl;
 
     const response = await fetch(`${baseUrl}/tailor`, {
       method: "POST",
@@ -1719,8 +1722,8 @@ export default function Page() {
       const savedRun = await saveCompletedRun({
         ...item,
         sourceResumeName: item.filename,
-        jobTarget: item.snapshot?.jdText?.trim() || item.snapshot?.jdUrl?.trim() || jdText.trim() || jdUrl.trim() || item.roleHint,
-        companyUrl: item.snapshot?.companyUrl?.trim() || companyUrl.trim() || undefined,
+        jobTarget: item.snapshot?.jdText?.trim() || item.snapshot?.jdUrl?.trim() || jdText.trim() || normalizedJobUrl || item.roleHint,
+        companyUrl: item.snapshot?.companyUrl?.trim() || normalizedCompanyUrl || undefined,
         atsScore: output.score_summary?.ats_after,
         keywordMatchCount: outputPresent.length,
         readTimeSeconds: outputReadSeconds,
@@ -1954,8 +1957,8 @@ export default function Page() {
       sourcePreviewText: typeof uploadData.text_preview === "string" ? uploadData.text_preview : sourcePreviewText,
       uploadMeta: uploadData,
       jdText,
-      jdUrl,
-      companyUrl,
+      jdUrl: normalizedJobUrl ?? "",
+      companyUrl: normalizedCompanyUrl ?? "",
       inputMode,
       tailoringMode: output.tailoring_mode ?? tailoringMode,
       downloadUrl: url,
@@ -2075,7 +2078,7 @@ export default function Page() {
       downloadUrl,
       downloadFormat,
       downloads: copiedDownloads,
-      roleHint: (jdText || jdUrl || companyUrl || "Role target").slice(0, 90),
+      roleHint: (jdText || normalizedJobUrl || normalizedCompanyUrl || "Role target").slice(0, 90),
       saved: false,
       source: "local",
       snapshot,
@@ -2260,7 +2263,7 @@ export default function Page() {
         downloadUrl: url,
         downloadFormat: "pdf",
         downloads: { pdf: url },
-        roleHint: (jdText || jdUrl || "Role target").slice(0, 90),
+        roleHint: (jdText || normalizedJobUrl || "Role target").slice(0, 90),
         saved: false,
         source: "local",
         snapshot,
@@ -2424,7 +2427,7 @@ export default function Page() {
     setAssetCopyState("Copy unavailable");
   }
 
-  const firstTargetLine = (jdText || jdUrl).split(/\r?\n/).map((line) => line.trim()).find(Boolean) || "";
+  const firstTargetLine = (jdText || normalizedJobUrl || "").split(/\r?\n/).map((line) => line.trim()).find(Boolean) || "";
   const activeResumeName = (file?.name || uploadMeta?.filename)?.replace(/\.(docx|pdf|txt)$/i, "") || "Resume studio";
   const targetUrlInfo = parseTargetUrl(firstTargetLine);
   const activeRole = targetUrlInfo?.label || firstTargetLine || (hasTarget ? "Role target loaded" : "Add a role target");
@@ -2456,7 +2459,9 @@ export default function Page() {
   const atsDetail = result?.score_summary?.issues_resolved ? `${result.score_summary.issues_resolved} issues fixed` : result ? "Parser notes returned" : "Waiting for run";
   const keywordDetail = keywordTotal ? `${missingKeywords.length} missing` : "Waiting for target terms";
   const runLabel = tailorAction.label;
-  const runDisabledReason = tailorAction.disabledReason;
+  const runDisabledReason = inputMode === "url" && jobUrlInvalid && !jdText.trim()
+    ? "Enter a public job URL such as jobs.example.com/role before running Tailor."
+    : tailorAction.disabledReason;
   const downloadReady = Boolean(downloadUrl && downloadState === "ready");
   const coverLetterText = result?.cover_letter?.trim() ?? "";
   const canDuplicateCurrentRun = Boolean(result?.tailored_text?.trim() && uploadMeta && downloadUrl);
@@ -2635,6 +2640,20 @@ export default function Page() {
   const targetUrlPlaceholder = fileSelected
     ? "https://company.com/careers/job - add the role link next"
     : "https://company.com/careers/job";
+  const jobUrlHint = !jdUrl.trim()
+    ? "Paste a public job link. URLs without https:// are accepted."
+    : jobUrlInvalid
+      ? "Enter a public role link such as jobs.example.com/role."
+      : normalizedJobUrl !== jdUrl.trim()
+        ? `Ready to use as ${normalizedJobUrl}`
+        : "Public job URL ready.";
+  const companyUrlHint = !companyUrl.trim()
+    ? "Optional. Add a public company site for extra context."
+    : companyUrlInvalid
+      ? "Use a public company URL or leave this field blank."
+      : normalizedCompanyUrl !== companyUrl.trim()
+        ? `Ready to use as ${normalizedCompanyUrl}`
+        : "Company context URL ready.";
   const preflightItems: Array<{
     icon: RoleForgeIconName;
     label: string;
@@ -3760,11 +3779,11 @@ export default function Page() {
                 </div>
                 <div className="studio-jd">
                   <div className="studio-jd-meta">
-                    <span><RoleForgeIcon name="briefcase" size={12} />{companyUrl ? "Company context added" : "Company optional"}</span>
-                    <span><RoleForgeIcon name="globe" size={12} />{jdUrl ? "Public URL target" : "Pasted text target"}</span>
+                    <span><RoleForgeIcon name="briefcase" size={12} />{normalizedCompanyUrl ? "Company context added" : "Company optional"}</span>
+                    <span><RoleForgeIcon name="globe" size={12} />{normalizedJobUrl ? "Public URL target" : "Pasted text target"}</span>
                     <span><RoleForgeIcon name="sparkle" size={12} />{tailoringMode} mode</span>
                   </div>
-                  <p>{jdText || jdUrl || "Add a job description or public posting URL to give RoleForge a role target."}</p>
+                  <p>{jdText || normalizedJobUrl || "Add a job description or public posting URL to give RoleForge a role target."}</p>
                 </div>
                 <div className="kw-section">
                   <div className="kw-label">Matched <span className="kw-count">{presentKeywords.length}</span></div>
@@ -3914,7 +3933,27 @@ export default function Page() {
                       {inputMode === "text" ? (
                         <textarea id="jdText" value={jdText} onChange={(event) => setJdText(event.target.value)} placeholder={targetTextPlaceholder} aria-label="Job description" />
                       ) : (
-                        <input id="jdUrl" value={jdUrl} onChange={(event) => setJdUrl(event.target.value)} placeholder={targetUrlPlaceholder} aria-label="Job posting URL" />
+                        <>
+                          <input
+                            id="jdUrl"
+                            type="url"
+                            inputMode="url"
+                            autoCapitalize="none"
+                            spellCheck={false}
+                            value={jdUrl}
+                            onChange={(event) => setJdUrl(event.target.value)}
+                            onBlur={() => {
+                              if (normalizedJobUrl && normalizedJobUrl !== jdUrl.trim()) setJdUrl(normalizedJobUrl);
+                            }}
+                            placeholder={targetUrlPlaceholder}
+                            aria-label="Job posting URL"
+                            aria-invalid={jobUrlInvalid}
+                            aria-describedby="jdUrlHint"
+                          />
+                          <small className={`rf-url-hint${jobUrlInvalid ? " invalid" : normalizedJobUrl ? " ready" : ""}`} id="jdUrlHint">
+                            {jobUrlHint}
+                          </small>
+                        </>
                       )}
                     </div>
                   </div>
@@ -3932,7 +3971,24 @@ export default function Page() {
                       </div>
                       <label className="rf-company-field">
                         <span>Company context</span>
-                        <input value={companyUrl} onChange={(event) => setCompanyUrl(event.target.value)} placeholder="Optional company URL" aria-label="Company URL" />
+                        <input
+                          type="url"
+                          inputMode="url"
+                          autoCapitalize="none"
+                          spellCheck={false}
+                          value={companyUrl}
+                          onChange={(event) => setCompanyUrl(event.target.value)}
+                          onBlur={() => {
+                            if (normalizedCompanyUrl && normalizedCompanyUrl !== companyUrl.trim()) setCompanyUrl(normalizedCompanyUrl);
+                          }}
+                          placeholder="Optional company URL"
+                          aria-label="Company URL"
+                          aria-invalid={companyUrlInvalid}
+                          aria-describedby="companyUrlHint"
+                        />
+                        <small className={`rf-url-hint${companyUrlInvalid ? " invalid" : normalizedCompanyUrl ? " ready" : ""}`} id="companyUrlHint">
+                          {companyUrlHint}
+                        </small>
                       </label>
                       <span className="sr-only" aria-live="polite">Workflow status: {stage}</span>
                       <button className="primary-button" type="button" onClick={onRun} disabled={!canRun} title={runDisabledReason || undefined}>{runLabel} <RoleForgeIcon name="sparkle" size={14} /></button>

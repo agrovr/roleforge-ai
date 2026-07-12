@@ -3,8 +3,30 @@ export type TargetUrlInfo = {
   label: string;
 };
 
+const SCHEMELESS_PUBLIC_HOST = /^(?:www\.)?[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.[a-z]{2,}(?::\d+)?(?:[/?#].*)?$/i;
+
+export function normalizePublicUrlInput(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  const candidate = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : SCHEMELESS_PUBLIC_HOST.test(trimmed)
+      ? `https://${trimmed}`
+      : "";
+  if (!candidate) return null;
+
+  try {
+    const url = new URL(candidate);
+    if (!/^https?:$/.test(url.protocol) || !url.hostname.includes(".")) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
 export function isUrlTarget(value: string) {
-  return /^(https?:\/\/|www\.)/i.test(value.trim());
+  return Boolean(normalizePublicUrlInput(value));
 }
 
 const READABLE_SEGMENT_OVERRIDES: Record<string, string> = {
@@ -69,11 +91,11 @@ function companyNameFromJobBoardUrl(url: URL, host: string) {
 }
 
 export function parseTargetUrl(value: string): TargetUrlInfo | null {
-  const trimmed = value.trim();
-  if (!trimmed || !isUrlTarget(trimmed)) return null;
+  const normalized = normalizePublicUrlInput(value);
+  if (!normalized) return null;
 
   try {
-    const url = new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
+    const url = new URL(normalized);
     const host = url.hostname.replace(/^www\./i, "");
     const labelName = companyNameFromJobBoardUrl(url, host) || readableDomainName(host);
 
@@ -82,9 +104,6 @@ export function parseTargetUrl(value: string): TargetUrlInfo | null {
       label: `${labelName} job target`,
     };
   } catch {
-    return {
-      host: "Job URL",
-      label: "Job URL target",
-    };
+    return null;
   }
 }

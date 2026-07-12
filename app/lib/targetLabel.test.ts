@@ -1,7 +1,23 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { parseTargetUrl } from "./targetLabel";
+import { normalizePublicUrlInput, parseTargetUrl } from "./targetLabel";
+
+test("normalizes full and schemeless public URLs for the workflow payload", () => {
+  assert.equal(
+    normalizePublicUrlInput(" https://jobs.example.com/roles/123?team=platform "),
+    "https://jobs.example.com/roles/123?team=platform",
+  );
+  assert.equal(normalizePublicUrlInput("jobs.example.com/roles/123"), "https://jobs.example.com/roles/123");
+  assert.equal(normalizePublicUrlInput("www.example.jobs/openings/42"), "https://www.example.jobs/openings/42");
+});
+
+test("rejects malformed and non-http public URL input", () => {
+  assert.equal(normalizePublicUrlInput("not a job URL"), null);
+  assert.equal(normalizePublicUrlInput("javascript:alert(1)"), null);
+  assert.equal(normalizePublicUrlInput("localhost:3000/jobs/1"), null);
+  assert.equal(normalizePublicUrlInput("https://localhost/jobs/1"), null);
+});
 
 test("uses company slugs from common job boards", () => {
   assert.deepEqual(parseTargetUrl("https://job-boards.greenhouse.io/affirm/jobs/7675533003"), {
@@ -56,4 +72,11 @@ test("falls back to readable domains for normal career sites", () => {
 
 test("ignores pasted job descriptions that are not URLs", () => {
   assert.equal(parseTargetUrl("Senior engineer role with API ownership"), null);
+});
+
+test("uses schemeless public job URLs in readable labels", () => {
+  assert.deepEqual(parseTargetUrl("jobs.ashbyhq.com/roleforge-ai/example"), {
+    host: "jobs.ashbyhq.com",
+    label: "RoleForge AI job target",
+  });
 });
