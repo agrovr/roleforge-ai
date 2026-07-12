@@ -17952,6 +17952,16 @@ html[data-theme="dark"] .rf-rail-upgrade p {
     left: 18px;
   }
 
+  .landing-account-popover {
+    right: 0;
+    left: auto;
+  }
+
+  .landing-account-popover::before {
+    right: 18px;
+    left: auto;
+  }
+
   .rf-studio-rail,
   .rf-rail-upgrade,
   .rail-item {
@@ -28563,12 +28573,23 @@ html.rf-polish-ready .steps[data-polish-reveal="true"][data-polish-visible="true
 
 .step .step-icon {
   z-index: 2;
+  isolation: isolate;
   grid-column: 2;
   grid-row: 2;
   background: color-mix(in srgb, var(--brand) 18%, var(--surface-warm));
-  outline: 6px solid var(--surface-warm);
+  outline: 0;
   box-shadow: 0 12px 24px -18px color-mix(in srgb, var(--brand-dark) 58%, transparent);
   transition: transform 260ms cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 260ms ease;
+}
+
+.step .step-icon::before {
+  position: absolute;
+  inset: -10px;
+  z-index: -1;
+  border-radius: 15px;
+  background: var(--surface-warm);
+  content: "";
+  pointer-events: none;
 }
 
 .step:hover .step-icon {
@@ -28814,7 +28835,6 @@ html[data-theme="dark"] .step:nth-child(n):hover {
     grid-row: 1 / span 2;
     width: 36px;
     height: 36px;
-    outline-width: 5px;
   }
 
   .step .step-title {

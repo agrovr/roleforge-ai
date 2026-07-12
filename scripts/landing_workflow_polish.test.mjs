@@ -23,7 +23,8 @@ test("landing process reads as a connected workflow without restoring card divid
   assert.match(globals, /\.step \+ \.step\s*\{[^}]*border-inline-start:\s*0[^}]*\}/s);
   assert.match(globals, /\.step:hover\s*\{(?=[^}]*background:)(?=[^}]*box-shadow:)(?=[^}]*transform:\s*translateY\(-4px\))[^}]*\}/s);
   assert.match(globals, /\.step:hover \.step-icon\s*\{(?=[^}]*rotate\(-4deg\))(?=[^}]*scale\(1\.05\))[^}]*\}/s);
-  assert.match(globals, /\.step \.step-icon\s*\{(?=[^}]*background:\s*color-mix\(in srgb,\s*var\(--brand\) 18%,\s*var\(--surface-warm\)\))(?=[^}]*outline:\s*6px solid var\(--surface-warm\))[^}]*\}/s);
+  assert.match(globals, /\.step \.step-icon\s*\{(?=[^}]*isolation:\s*isolate)(?=[^}]*background:\s*color-mix\(in srgb,\s*var\(--brand\) 18%,\s*var\(--surface-warm\)\))(?=[^}]*outline:\s*0)[^}]*\}/s);
+  assert.match(globals, /\.step \.step-icon::before\s*\{(?=[^}]*inset:\s*-10px)(?=[^}]*z-index:\s*-1)(?=[^}]*background:\s*var\(--surface-warm\))(?=[^}]*content:\s*"")[^}]*\}/s);
   assert.match(globals, /html\[data-theme="dark"\] \.step:nth-child\(n\)\s*\{(?=[^}]*border-color:\s*transparent)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
   assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.steps,\s*\.features-grid\s*\{(?=[^}]*grid-template-columns:\s*1fr)(?=[^}]*gap:\s*28px)[^}]*\}[\s\S]*?\.step:nth-child\(n\)\s*\{(?=[^}]*grid-template-columns:\s*36px 36px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*14px 12px)(?=[^}]*border:\s*0)[^}]*\}/s);
   assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.steps::before,\s*\.steps::after\s*\{(?=[^}]*inset-inline-start:\s*clamp\(81px,\s*12vw,\s*92px\))(?=[^}]*top:\s*48px)(?=[^}]*bottom:\s*48px)(?=[^}]*width:\s*2px)[^}]*\}/s);
