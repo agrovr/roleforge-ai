@@ -9,6 +9,7 @@ const readyInput: TailorActionInput = {
   limitReached: false,
   busy: false,
   readingResume: false,
+  uploadFailed: false,
   restoredWithoutFile: false,
   hasResult: false,
   hasFile: true,
@@ -56,11 +57,20 @@ test("keeps re-tailor available after a completed run when source and target are
   });
 });
 
+test("requires a replacement after the resume upload fails", () => {
+  assert.deepEqual(tailorActionState({ ...readyInput, uploadFailed: true }), {
+    canRun: false,
+    label: "Replace resume",
+    disabledReason: "Replace the resume file before running Tailor.",
+  });
+});
+
 test("prioritizes account, usage, and busy blockers", () => {
   assert.equal(tailorActionState({ ...readyInput, signedIn: false }).label, "Sign in to run");
   assert.equal(tailorActionState({ ...readyInput, limitReached: true }).label, "Monthly limit reached");
   assert.equal(tailorActionState({ ...readyInput, busy: true }).label, "Tailoring...");
   assert.equal(tailorActionState({ ...readyInput, readingResume: true }).label, "Reading resume...");
+  assert.equal(tailorActionState({ ...readyInput, uploadFailed: true }).label, "Replace resume");
 });
 
 test("uses customer-facing copy when tailoring is temporarily unavailable", () => {

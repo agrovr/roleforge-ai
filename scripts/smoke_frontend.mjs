@@ -973,6 +973,11 @@ async function checkBackendCapabilities(backendUrl) {
   const exportFormats = Object.fromEntries((payload.export_formats || []).map((item) => [item.format, item]));
   const exportTemplates = Object.fromEntries((payload.export_templates || []).map((item) => [item.template, item]));
 
+  requireCondition(
+    Number.isSafeInteger(payload.max_upload_bytes) && payload.max_upload_bytes > 0,
+    "backend upload limit is missing or invalid",
+  );
+
   for (const format of ["docx", "pdf", "txt"]) {
     requireCondition(uploadFormats[format]?.enabled === true, `backend upload format ${format} is not enabled`);
   }

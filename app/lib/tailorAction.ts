@@ -4,6 +4,7 @@ export type TailorActionInput = {
   limitReached: boolean;
   busy: boolean;
   readingResume: boolean;
+  uploadFailed: boolean;
   restoredWithoutFile: boolean;
   hasResult: boolean;
   hasFile: boolean;
@@ -24,6 +25,7 @@ export function tailorActionState(input: TailorActionInput): TailorActionState {
       input.hasTarget &&
       !input.busy &&
       !input.readingResume &&
+      !input.uploadFailed &&
       (!input.accountConfigured || input.signedIn) &&
       !input.limitReached,
   );
@@ -57,6 +59,14 @@ export function tailorActionState(input: TailorActionInput): TailorActionState {
       canRun,
       label: "Reading resume...",
       disabledReason: canRun ? "" : "The resume is still being read.",
+    };
+  }
+
+  if (input.uploadFailed) {
+    return {
+      canRun,
+      label: "Replace resume",
+      disabledReason: canRun ? "" : "Replace the resume file before running Tailor.",
     };
   }
 

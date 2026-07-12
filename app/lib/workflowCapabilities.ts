@@ -15,10 +15,13 @@ export type ExportTemplateCapability = {
 };
 
 export type WorkflowCapabilities = {
+  max_upload_bytes: number;
   upload_formats: UploadCapability[];
   export_formats: ExportCapability[];
   export_templates: ExportTemplateCapability[];
 };
+
+export const DEFAULT_MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
 
 export const DEFAULT_UPLOAD_FORMATS: UploadCapability[] = [
   { format: "docx", label: "DOCX", enabled: true },
@@ -35,6 +38,10 @@ function readString(value: unknown) {
 
 function readBoolean(value: unknown, fallback: boolean) {
   return typeof value === "boolean" ? value : fallback;
+}
+
+function readPositiveInteger(value: unknown, fallback: number) {
+  return typeof value === "number" && Number.isSafeInteger(value) && value > 0 ? value : fallback;
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -107,6 +114,7 @@ export function normalizeWorkflowCapabilities(value: unknown): WorkflowCapabilit
   const record = asRecord(value);
 
   return {
+    max_upload_bytes: readPositiveInteger(record?.max_upload_bytes, DEFAULT_MAX_UPLOAD_BYTES),
     upload_formats: normalizeUploadCapabilities(record?.upload_formats),
     export_formats: normalizeExportCapabilities(record?.export_formats) ?? [],
     export_templates: normalizeTemplateCapabilities(record?.export_templates),

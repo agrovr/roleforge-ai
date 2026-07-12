@@ -10,7 +10,7 @@ test("studio exposes a workflow preflight checklist from real state", () => {
   assert.match(studioPage, /label:\s*"Account"/);
   assert.match(studioPage, /value:\s*signedIn \? "Signed in" : "Needed"/);
   assert.match(studioPage, /label:\s*"Resume"/);
-  assert.match(studioPage, /value:\s*previewUploadState === "reading" \? "Reading" : fileSelected \? "Ready" : "Needed"/);
+  assert.match(studioPage, /value:\s*previewUploadState === "reading" \? "Reading" : uploadFailed \? "Replace" : fileSelected \? "Ready" : "Needed"/);
   assert.match(studioPage, /label:\s*"Target"/);
   assert.match(studioPage, /value:\s*hasTarget \? "Ready" : "Needed"/);
   assert.match(studioPage, /label:\s*"Usage"/);
@@ -23,6 +23,7 @@ test("studio exposes a workflow preflight checklist from real state", () => {
   assert.match(studioPage, /label:\s*"Upload resume"/);
   assert.match(studioPage, /label:\s*"Add target"/);
   assert.match(studioPage, /label:\s*"Upload source"/);
+  assert.match(studioPage, /label:\s*"Replace resume"/);
   assert.match(studioPage, /label:\s*"Review usage"/);
   assert.match(studioPage, /label:\s*"Check status"/);
   assert.match(studioPage, /className="studio-run-next-action"/);

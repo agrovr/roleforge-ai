@@ -35,6 +35,7 @@ import {
   type ResumeTemplateSlug,
 } from "../lib/resumeTemplates";
 import { savedRunHistoryHref } from "../lib/savedRunLinks";
+import { formatUploadSize, validateResumeUpload } from "../lib/resumeUpload";
 import { supportRequestHref } from "../lib/supportRequests";
 import {
   buildReviewSuggestionCards,
@@ -85,6 +86,7 @@ import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun
 import { tailorActionState } from "../lib/tailorAction";
 import { accountUsageSummary, monthlyRunAllowanceSentence, runWord } from "../lib/usage";
 import {
+  DEFAULT_MAX_UPLOAD_BYTES,
   DEFAULT_UPLOAD_FORMATS,
   normalizeWorkflowCapabilities,
   type UploadFormat,
@@ -1003,6 +1005,19 @@ export default function Page() {
   const [confirmingClearHistory, setConfirmingClearHistory] = useState(false);
   const [confirmingDeleteProjectId, setConfirmingDeleteProjectId] = useState<string | null>(null);
   const [capabilities, setCapabilities] = useState<WorkflowCapabilities | null>(null);
+  const uploadFormats = useMemo(
+    () => capabilities?.upload_formats?.length ? capabilities.upload_formats : DEFAULT_UPLOAD_FORMATS,
+    [capabilities],
+  );
+  const enabledUploadFormats = useMemo(
+    () => uploadFormats.filter((format) => format.enabled),
+    [uploadFormats],
+  );
+  const allowedUploadFormats = useMemo(
+    () => enabledUploadFormats.map((format) => format.format),
+    [enabledUploadFormats],
+  );
+  const maxUploadBytes = capabilities?.max_upload_bytes ?? DEFAULT_MAX_UPLOAD_BYTES;
   const editorSectionRef = useRef<HTMLElement | null>(null);
   const historySectionRef = useRef<HTMLElement | null>(null);
   const historyDetailRef = useRef<HTMLElement | null>(null);
@@ -1493,7 +1508,7 @@ export default function Page() {
     setResumeId(null);
     setUploadMeta(null);
     setUploadFileKey(currentFileKey);
-    setPreviewUploadState(baseUrl ? "reading" : "idle");
+    setPreviewUploadState("idle");
     setPreviewUploadError("");
     setSourcePreviewText("");
     setResult(null);
@@ -1507,6 +1522,18 @@ export default function Page() {
     setCopyState("");
     setPreviewMode("original");
     setRestoredHistoryId(null);
+
+    const uploadValidation = validateResumeUpload(file, {
+      maxBytes: maxUploadBytes,
+      allowedFormats: allowedUploadFormats,
+    });
+    if (!uploadValidation.valid) {
+      setPreviewUploadState("error");
+      setPreviewUploadError(uploadValidation.message);
+      return () => controller.abort();
+    }
+
+    setPreviewUploadState(baseUrl ? "reading" : "idle");
 
     if (/\.txt$/i.test(file.name)) {
       file.text()
@@ -1546,7 +1573,7 @@ export default function Page() {
     return () => {
       controller.abort();
     };
-  }, [baseUrl, file, restoredHistoryId, workflowHeaders]);
+  }, [allowedUploadFormats, baseUrl, file, maxUploadBytes, restoredHistoryId, workflowHeaders]);
 
   useEffect(() => {
     if (!downloadUrl) {
@@ -1589,7 +1616,8 @@ export default function Page() {
   const jobUrlInvalid = Boolean(jdUrl.trim() && !normalizedJobUrl);
   const companyUrlInvalid = Boolean(companyUrl.trim() && !normalizedCompanyUrl);
   const hasTarget = Boolean(normalizedJobUrl || jdText.trim());
-  const readyItems = [Boolean(baseUrl), Boolean(file), hasTarget];
+  const uploadFailed = previewUploadState === "error";
+  const readyItems = [Boolean(baseUrl), Boolean(file && !uploadFailed), hasTarget];
   const readiness = Math.round((readyItems.filter(Boolean).length / readyItems.length) * 100);
   const tailorAction = tailorActionState({
     accountConfigured: Boolean(accountStatus?.configured),
@@ -1597,6 +1625,7 @@ export default function Page() {
     limitReached,
     busy,
     readingResume: previewUploadState === "reading",
+    uploadFailed,
     restoredWithoutFile: Boolean(result && !file),
     hasResult: Boolean(result),
     hasFile: Boolean(file),
@@ -1616,6 +1645,14 @@ export default function Page() {
   async function upload(): Promise<UploadResponse> {
     if (!baseUrl) throw new Error("Resume tailoring is temporarily unavailable. Try again shortly.");
     if (!file) throw new Error("Select a resume file first.");
+    const uploadValidation = validateResumeUpload(file, {
+      maxBytes: maxUploadBytes,
+      allowedFormats: allowedUploadFormats,
+    });
+    if (!uploadValidation.valid) throw new Error(uploadValidation.message);
+    if (previewUploadState === "error") {
+      throw new Error(previewUploadError || "Replace the resume file before running Tailor.");
+    }
     const currentFileKey = fileUploadKey(file);
 
     if (resumeId && uploadMeta && uploadFileKey === currentFileKey) {
@@ -2375,11 +2412,28 @@ export default function Page() {
     }
   }
 
+  function selectResumeFile(nextFile: File | null) {
+    if (!nextFile) {
+      setFile(null);
+      setPreviewUploadState("idle");
+      setPreviewUploadError("");
+      return;
+    }
+
+    const uploadValidation = validateResumeUpload(nextFile, {
+      maxBytes: maxUploadBytes,
+      allowedFormats: allowedUploadFormats,
+    });
+    setFile(nextFile);
+    setPreviewUploadState(uploadValidation.valid ? "idle" : "error");
+    setPreviewUploadError(uploadValidation.valid ? "" : uploadValidation.message);
+  }
+
   function onDrop(event: React.DragEvent<HTMLLabelElement>) {
     event.preventDefault();
     setDragActive(false);
     const droppedFile = event.dataTransfer.files?.[0];
-    if (droppedFile) setFile(droppedFile);
+    if (droppedFile) selectResumeFile(droppedFile);
   }
 
   function selectGeneratedAssetText(elementId: string) {
@@ -2466,7 +2520,6 @@ export default function Page() {
   const coverLetterText = result?.cover_letter?.trim() ?? "";
   const canDuplicateCurrentRun = Boolean(result?.tailored_text?.trim() && uploadMeta && downloadUrl);
   const hasActiveWorkspace = Boolean(file || uploadMeta || result || downloadUrl || hasTarget || sourcePreviewText.trim() || restoredHistoryId);
-  const uploadFormats = capabilities?.upload_formats?.length ? capabilities.upload_formats : DEFAULT_UPLOAD_FORMATS;
   const exportFormats = customerExportFormats(capabilities?.export_formats, accountStatus?.entitlement);
   const selectedExportCapability = exportFormats.find((format) => format.format === selectedExportFormat) ?? exportFormats[0];
   const selectedExportAllowed = Boolean(selectedExportCapability?.enabled);
@@ -2614,26 +2667,26 @@ export default function Page() {
       tone: selectedDownloadReady ? "good" : hasTailoredDraft ? "ready" : "warn",
     },
   ];
-  const enabledUploadFormats = uploadFormats.filter((format) => format.enabled);
   const uploadAccept = enabledUploadFormats.length
     ? enabledUploadFormats.map((format) => `.${format.format}`).join(",")
     : ".docx,.pdf,.txt";
+  const uploadLimitLabel = formatUploadSize(maxUploadBytes);
   const uploadFormatHint = enabledUploadFormats.length
-    ? `${enabledUploadFormats.map((format) => format.label).join(", ")}. Drop your file here or browse from your computer.`
-    : "DOCX, PDF, or TXT. Drop your file here or browse from your computer.";
+    ? `${enabledUploadFormats.map((format) => format.label).join(", ")} up to ${uploadLimitLabel}. Drop your file here or browse from your computer.`
+    : `DOCX, PDF, or TXT up to ${uploadLimitLabel}. Drop your file here or browse from your computer.`;
   const fileSelected = Boolean(file || uploadMeta);
   const uploadStatusCopy = file
     ? previewUploadState === "reading"
       ? "Reading resume..."
       : previewUploadState === "error"
-        ? "Resume selected. Replace it if the preview looks incomplete."
+        ? previewUploadError || "This resume could not be read. Replace the file to continue."
         : uploadMeta
           ? hasTarget
             ? "Resume ready. Run Tailor when the target looks right."
             : "Resume ready. Add the job target next."
           : "Resume selected. Add the job target next."
     : uploadFormatHint;
-  const showTargetNext = Boolean(fileSelected && !hasTarget && !result);
+  const showTargetNext = Boolean(fileSelected && !uploadFailed && !hasTarget && !result);
   const targetTextPlaceholder = fileSelected
     ? "Paste the full job description here to unlock Run Tailor..."
     : "Paste the full job description here...";
@@ -2673,9 +2726,9 @@ export default function Page() {
     {
       icon: "file",
       label: "Resume",
-      value: previewUploadState === "reading" ? "Reading" : fileSelected ? "Ready" : "Needed",
+      value: previewUploadState === "reading" ? "Reading" : uploadFailed ? "Replace" : fileSelected ? "Ready" : "Needed",
       detail: fileSelected ? uploadStatusCopy : uploadFormatHint,
-      tone: previewUploadState === "error" ? "warn" : fileSelected ? "good" : "ready",
+      tone: uploadFailed ? "warn" : fileSelected ? "good" : "ready",
     },
     {
       icon: "briefcase",
@@ -2722,15 +2775,17 @@ export default function Page() {
         ? { label: "Review usage", href: "/settings#usage", detail: runDisabledReason }
         : previewUploadState === "reading"
           ? { label: "View resume", href: "#input", detail: "Resume reading is still in progress." }
-          : result && !file
-            ? { label: "Upload source", href: "#input", detail: "Restored runs need the source file before re-tailoring." }
-            : !fileSelected
-              ? { label: "Upload resume", href: "#input", detail: "Start by adding the resume file you want to tailor." }
-              : !hasTarget
-                ? { label: "Add target", href: "#target", detail: "Add a job description or public posting URL next." }
-                : !baseUrl
-                  ? { label: "Check status", href: "/status", detail: "Resume tailoring is unavailable right now." }
-                  : { label: "Review preflight", href: "#preflight", detail: preflightStatusDetail };
+          : uploadFailed
+            ? { label: "Replace resume", href: "#input", detail: previewUploadError || "Choose another resume file before running Tailor." }
+            : result && !file
+              ? { label: "Upload source", href: "#input", detail: "Restored runs need the source file before re-tailoring." }
+              : !fileSelected
+                ? { label: "Upload resume", href: "#input", detail: "Start by adding the resume file you want to tailor." }
+                : !hasTarget
+                  ? { label: "Add target", href: "#target", detail: "Add a job description or public posting URL next." }
+                  : !baseUrl
+                    ? { label: "Check status", href: "/status", detail: "Resume tailoring is unavailable right now." }
+                    : { label: "Review preflight", href: "#preflight", detail: preflightStatusDetail };
   const coverLetterWordCount = countReadableWords(coverLetterText);
   const interviewQuestionCount = interviewPrep.length;
   const hasGeneratedAssets = Boolean(coverLetterText || interviewQuestionCount);
@@ -3908,11 +3963,23 @@ export default function Page() {
                       onDragLeave={() => setDragActive(false)}
                       onDrop={onDrop}
                     >
-                      <input key={fileInputVersion} className="rf-file-input" type="file" accept={uploadAccept} onChange={(event) => setFile(event.target.files?.[0] ?? null)} aria-label="Upload resume file" />
+                      <input
+                        key={fileInputVersion}
+                        className="rf-file-input"
+                        type="file"
+                        accept={uploadAccept}
+                        onChange={(event) => {
+                          selectResumeFile(event.currentTarget.files?.[0] ?? null);
+                          event.currentTarget.value = "";
+                        }}
+                        aria-label="Upload resume file"
+                        aria-invalid={uploadFailed}
+                        aria-describedby="resumeUploadHint"
+                      />
                       <span className="rf-file-icon"><RoleForgeIcon name="file" size={24} /></span>
                       <span className="rf-file-copy">
                         <strong>{file ? file.name : "Choose a resume file"}</strong>
-                        <small aria-live="polite">{uploadStatusCopy}</small>
+                        <small id="resumeUploadHint" aria-live="polite">{uploadStatusCopy}</small>
                       </span>
                       <span className="rf-file-action">{file ? "Replace file" : "Choose File"}</span>
                     </label>
