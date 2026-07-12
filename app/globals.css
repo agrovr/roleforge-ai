@@ -29711,16 +29711,17 @@ html[data-theme="dark"] .brand::after {
   isolation: isolate;
 }
 
+#how,
+#studio,
+#features,
+#pricing,
+#faq {
+  scroll-margin-top: 0;
+}
+
 @media (max-width: 900px) {
   html:root {
-    scroll-padding-top: 112px;
-  }
-
-  #how,
-  #features,
-  #pricing,
-  #faq {
-    scroll-margin-top: 112px;
+    scroll-padding-top: 84px;
   }
 
   .nav {
