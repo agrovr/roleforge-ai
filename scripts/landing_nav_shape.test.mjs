@@ -29,3 +29,10 @@ test("mobile landing dock stays opaque and clears anchored sections", () => {
   assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.nav > \.nav-inner\s*\{(?=[^}]*background-color:\s*color-mix\(in srgb, var\(--surface\) 96%, var\(--surface-warm\)\))(?=[^}]*background-image:\s*none)(?=[^}]*backdrop-filter:\s*none)[^}]*\}/s);
   assert.match(globals, /html\[data-theme="dark"\]\s+\.nav > \.nav-inner\s*\{[^}]*background-color:\s*color-mix\(in srgb, var\(--surface\) 94%, #11182a\)[^}]*\}/s);
 });
+
+test("mobile landing dock keeps the compact primary action until the narrowest phones", () => {
+  assert.match(landing, /<span className="nav-cta-short">Build<\/span>/);
+  assert.match(globals, /@media\s*\(max-width:\s*620px\)\s*\{[\s\S]*?\.nav-cta-full\s*\{[^}]*display:\s*none[^}]*\}[\s\S]*?\.nav-cta-short\s*\{[^}]*display:\s*inline[^}]*\}/s);
+  assert.doesNotMatch(globals, /@media\s*\(max-width:\s*560px\)\s*\{\s*\.nav \.btn-brand\s*\{[^}]*display:\s*none/s);
+  assert.match(globals, /@media\s*\(max-width:\s*355px\)\s*\{[\s\S]*?\.nav \.btn-brand\s*\{(?=[^}]*display:\s*none)(?=[^}]*min-height:\s*42px)[^}]*\}/s);
+});

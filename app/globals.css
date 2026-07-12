@@ -25141,10 +25141,6 @@ html[data-theme="dark"] .studio-account-utilities {
 }
 
 @media (max-width: 560px) {
-  .nav .btn-brand {
-    display: none;
-  }
-
   .landing-account-popover {
     right: -12px;
     width: min(340px, calc(100vw - 18px));
@@ -25210,6 +25206,7 @@ html[data-theme="dark"] .studio-account-utilities {
   }
 
   .nav .btn-brand {
+    display: none;
     min-height: 42px;
     padding: 0 12px;
   }
