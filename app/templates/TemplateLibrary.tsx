@@ -6,11 +6,11 @@ import { useEffect, useState } from "react";
 import { ResumePreview } from "../components/ResumePreview";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import {
-  RESUME_TEMPLATE_COOKIE,
   RESUME_TEMPLATE_STORAGE_KEY,
   RESUME_TEMPLATES,
   getResumeTemplate,
-  isResumeTemplateSlug,
+  resolveResumeTemplatePreference,
+  resumeTemplateCookieAssignment,
   resumeTemplateEntryHref,
   resumeTemplateStudioHref,
   type ResumeTemplateSlug,
@@ -40,7 +40,7 @@ const TEMPLATE_DECISION_GROUPS = [
 
 function rememberTemplate(slug: ResumeTemplateSlug) {
   window.localStorage.setItem(RESUME_TEMPLATE_STORAGE_KEY, slug);
-  document.cookie = `${RESUME_TEMPLATE_COOKIE}=${encodeURIComponent(slug)}; Path=/; Max-Age=31536000; SameSite=Lax`;
+  document.cookie = resumeTemplateCookieAssignment(slug);
 }
 
 function layoutLabel(variant: ResumeTemplateVariant) {
@@ -94,22 +94,23 @@ function layoutDetail(variant: ResumeTemplateVariant) {
 
 export function TemplateLibrary({
   signedIn,
-  initialTemplateSlug = "classic",
+  initialTemplateSlug = null,
   settingsHref,
 }: {
   signedIn: boolean;
-  initialTemplateSlug?: ResumeTemplateSlug;
+  initialTemplateSlug?: ResumeTemplateSlug | null;
   settingsHref: string;
 }) {
-  const [selectedSlug, setSelectedSlug] = useState<ResumeTemplateSlug>(initialTemplateSlug);
+  const [selectedSlug, setSelectedSlug] = useState<ResumeTemplateSlug>(initialTemplateSlug ?? "classic");
 
   useEffect(() => {
     const stored = window.localStorage.getItem(RESUME_TEMPLATE_STORAGE_KEY);
-    if (!isResumeTemplateSlug(stored)) return;
+    const resolved = resolveResumeTemplatePreference({ cookie: initialTemplateSlug, stored });
+    rememberTemplate(resolved);
 
-    const frame = window.requestAnimationFrame(() => setSelectedSlug(stored));
+    const frame = window.requestAnimationFrame(() => setSelectedSlug(resolved));
     return () => window.cancelAnimationFrame(frame);
-  }, []);
+  }, [initialTemplateSlug]);
 
   const selectedTemplate = getResumeTemplate(selectedSlug);
 

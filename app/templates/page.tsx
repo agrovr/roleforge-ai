@@ -6,7 +6,7 @@ import { AccountReferenceCopyButton } from "../components/AccountReferenceCopyBu
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { accountAvatarUrl, accountDisplayName, accountReference } from "../lib/accountUser";
-import { RESUME_TEMPLATE_COOKIE, getResumeTemplate } from "../lib/resumeTemplates";
+import { RESUME_TEMPLATE_COOKIE, isResumeTemplateSlug } from "../lib/resumeTemplates";
 import { supportRequestHref } from "../lib/supportRequests";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
@@ -19,7 +19,7 @@ async function getTemplateLinks() {
   } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
   const signedIn = Boolean(user);
   const templateCookie = (await cookies()).get(RESUME_TEMPLATE_COOKIE)?.value;
-  const initialTemplateSlug = getResumeTemplate(templateCookie).slug;
+  const initialTemplateSlug = isResumeTemplateSlug(templateCookie) ? templateCookie : null;
   const displayName = accountDisplayName(user);
   const accountInitials = (displayName || user?.email || "RF").slice(0, 2).toUpperCase();
   const billingSupportHref = supportRequestHref({

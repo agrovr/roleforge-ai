@@ -1,7 +1,17 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { RESUME_TEMPLATES, getResumeTemplate, isResumeTemplateSlug, resumeTemplateEntryHref, resumeTemplateStudioHref } from "./resumeTemplates";
+import {
+  RESUME_TEMPLATE_COOKIE,
+  RESUME_TEMPLATES,
+  getResumeTemplate,
+  isResumeTemplateSlug,
+  readResumeTemplateCookie,
+  resolveResumeTemplatePreference,
+  resumeTemplateCookieAssignment,
+  resumeTemplateEntryHref,
+  resumeTemplateStudioHref,
+} from "./resumeTemplates";
 
 test("keeps template slugs unique", () => {
   const slugs = RESUME_TEMPLATES.map((template) => template.slug);
@@ -43,4 +53,23 @@ test("covers specialist audiences without duplicating the featured gallery", () 
     RESUME_TEMPLATES.slice(-3).map((template) => template.name),
     ["Career Pivot", "Academic", "Impact"],
   );
+});
+
+test("resolves template preferences in query cookie storage order", () => {
+  assert.equal(resolveResumeTemplatePreference({ requested: "engineer", cookie: "academic", stored: "impact" }), "engineer");
+  assert.equal(resolveResumeTemplatePreference({ requested: "missing", cookie: "academic", stored: "impact" }), "academic");
+  assert.equal(resolveResumeTemplatePreference({ requested: null, cookie: "missing", stored: "impact" }), "impact");
+  assert.equal(resolveResumeTemplatePreference({ requested: "missing", cookie: "unknown", stored: "stale" }), "classic");
+
+  for (const template of RESUME_TEMPLATES) {
+    assert.equal(resolveResumeTemplatePreference({ cookie: template.slug }), template.slug);
+  }
+});
+
+test("reads and writes the shared template cookie defensively", () => {
+  assert.equal(readResumeTemplateCookie(`other=1; ${RESUME_TEMPLATE_COOKIE}=academic; theme=dark`), "academic");
+  assert.equal(readResumeTemplateCookie(`${RESUME_TEMPLATE_COOKIE}=missing`), null);
+  assert.equal(readResumeTemplateCookie(`${RESUME_TEMPLATE_COOKIE}=%E0%A4%A`), null);
+  assert.equal(readResumeTemplateCookie(null), null);
+  assert.equal(resumeTemplateCookieAssignment("impact"), `${RESUME_TEMPLATE_COOKIE}=impact; Path=/; Max-Age=31536000; SameSite=Lax`);
 });

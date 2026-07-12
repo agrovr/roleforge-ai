@@ -134,6 +134,43 @@ export function isResumeTemplateSlug(value?: string | null): value is ResumeTemp
   return RESUME_TEMPLATES.some((template) => template.slug === value);
 }
 
+export type ResumeTemplatePreferenceOptions = {
+  requested?: string | null;
+  cookie?: string | null;
+  stored?: string | null;
+};
+
+export function resolveResumeTemplatePreference(options: ResumeTemplatePreferenceOptions) {
+  for (const value of [options.requested, options.cookie, options.stored]) {
+    if (isResumeTemplateSlug(value)) return value;
+  }
+  return RESUME_TEMPLATES[0].slug;
+}
+
+export function readResumeTemplateCookie(cookieHeader?: string | null) {
+  if (!cookieHeader) return null;
+
+  for (const part of cookieHeader.split(";")) {
+    const separatorIndex = part.indexOf("=");
+    if (separatorIndex < 1) continue;
+    const name = part.slice(0, separatorIndex).trim();
+    if (name !== RESUME_TEMPLATE_COOKIE) continue;
+
+    try {
+      const value = decodeURIComponent(part.slice(separatorIndex + 1).trim());
+      return isResumeTemplateSlug(value) ? value : null;
+    } catch {
+      return null;
+    }
+  }
+
+  return null;
+}
+
+export function resumeTemplateCookieAssignment(slug: ResumeTemplateSlug) {
+  return `${RESUME_TEMPLATE_COOKIE}=${encodeURIComponent(slug)}; Path=/; Max-Age=31536000; SameSite=Lax`;
+}
+
 export function getResumeTemplate(value?: string | null) {
   return RESUME_TEMPLATES.find((template) => template.slug === value) ?? RESUME_TEMPLATES[0];
 }

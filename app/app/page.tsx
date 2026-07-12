@@ -28,10 +28,12 @@ import {
   type PreviewMode,
 } from "../lib/previewPanel";
 import {
-  RESUME_TEMPLATE_COOKIE,
   RESUME_TEMPLATE_STORAGE_KEY,
   getResumeTemplate,
   isResumeTemplateSlug,
+  readResumeTemplateCookie,
+  resolveResumeTemplatePreference,
+  resumeTemplateCookieAssignment,
   type ResumeTemplateSlug,
 } from "../lib/resumeTemplates";
 import { savedRunHistoryHref } from "../lib/savedRunLinks";
@@ -259,7 +261,7 @@ function savedSnapshotTarget(snapshot?: SavedRunSnapshot | null) {
 
 function saveResumeTemplatePreference(slug: ResumeTemplateSlug) {
   window.localStorage.setItem(RESUME_TEMPLATE_STORAGE_KEY, slug);
-  document.cookie = `${RESUME_TEMPLATE_COOKIE}=${encodeURIComponent(slug)}; Path=/; Max-Age=31536000; SameSite=Lax`;
+  document.cookie = resumeTemplateCookieAssignment(slug);
 }
 
 function countReadableWords(text?: string) {
@@ -1085,14 +1087,14 @@ export default function Page() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const requestedTemplate = params.get("template");
+    const cookieTemplate = readResumeTemplateCookie(document.cookie);
     const storedTemplate = window.localStorage.getItem(RESUME_TEMPLATE_STORAGE_KEY);
-    const nextTemplate = isResumeTemplateSlug(requestedTemplate)
-      ? requestedTemplate
-      : isResumeTemplateSlug(storedTemplate)
-        ? storedTemplate
-        : "classic";
-
-    if (isResumeTemplateSlug(requestedTemplate)) saveResumeTemplatePreference(requestedTemplate);
+    const nextTemplate = resolveResumeTemplatePreference({
+      requested: requestedTemplate,
+      cookie: cookieTemplate,
+      stored: storedTemplate,
+    });
+    saveResumeTemplatePreference(nextTemplate);
 
     const frame = window.requestAnimationFrame(() => setSelectedTemplateSlug(nextTemplate));
     return () => window.cancelAnimationFrame(frame);
