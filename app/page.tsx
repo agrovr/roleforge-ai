@@ -340,6 +340,11 @@ function HowItWorks() {
           <p className="lede">Drop your resume, point at the role, review the suggested changes, and export a cleaner draft from the same workspace.</p>
         </div>
         <div className="steps">
+          <div className="steps-track" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
           {steps.map(([icon, title, text], index) => (
             <article className="step" key={title}>
               <div className="step-num">{String(index + 1).padStart(2, "0")}</div>

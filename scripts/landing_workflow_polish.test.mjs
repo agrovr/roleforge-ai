@@ -17,19 +17,20 @@ test("landing workflow sections keep their real product structure", () => {
 test("landing process reads as a connected workflow without restoring card dividers", () => {
   assert.match(globals, /\/\* Landing workflow refinement: expressive indexes without a card matrix\. \*\//);
   assert.match(globals, /\.steps\s*\{(?=[^}]*--workflow-track:)(?=[^}]*--workflow-progress:)(?=[^}]*gap:\s*clamp\(18px,\s*2\.4vw,\s*34px\))(?=[^}]*padding:\s*clamp\(14px,\s*2vw,\s*22px\))(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*28px)(?=[^}]*radial-gradient)[^}]*\}/s);
-  assert.match(globals, /\.steps::before,\s*\.steps::after\s*\{(?=[^}]*inset-inline:\s*12\.5%)(?=[^}]*top:\s*clamp\(98px,\s*7vw,\s*105px\))(?=[^}]*height:\s*2px)(?=[^}]*content:\s*"")[^}]*\}/s);
-  assert.match(globals, /html\.rf-polish-ready \.steps\[data-polish-reveal="true"\]\[data-polish-visible="true"\]::after\s*\{[^}]*transform:\s*scaleX\(1\)[^}]*\}/s);
+  assert.match(landing, /<div className="steps-track" aria-hidden="true">\s*<span \/>\s*<span \/>\s*<span \/>\s*<\/div>/s);
+  assert.match(globals, /\.steps-track\s*\{(?=[^}]*inset-inline:\s*12\.5%)(?=[^}]*top:\s*clamp\(98px,\s*7vw,\s*105px\))(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\))[^}]*\}/s);
+  assert.match(globals, /\.steps-track span\s*\{(?=[^}]*height:\s*2px)(?=[^}]*margin-inline:\s*46px)[^}]*\}/s);
+  assert.match(globals, /html\.rf-polish-ready \.steps\[data-polish-reveal="true"\]\[data-polish-visible="true"\] \.steps-track\s*\{[^}]*transform:\s*scaleX\(1\)[^}]*\}/s);
   assert.match(globals, /\.step\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\) 42px minmax\(0,\s*1fr\))(?=[^}]*grid-template-rows:\s*auto 42px auto auto)(?=[^}]*padding:\s*22px 18px 24px)(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*18px)(?=[^}]*background:\s*transparent)(?=[^}]*transition:\s*transform 280ms)[^}]*\}/s);
   assert.match(globals, /\.step \+ \.step\s*\{[^}]*border-inline-start:\s*0[^}]*\}/s);
   assert.match(globals, /\.step:hover\s*\{(?=[^}]*background:)(?=[^}]*box-shadow:)(?=[^}]*transform:\s*translateY\(-4px\))[^}]*\}/s);
   assert.match(globals, /\.step:hover \.step-icon\s*\{(?=[^}]*rotate\(-4deg\))(?=[^}]*scale\(1\.05\))[^}]*\}/s);
   assert.match(globals, /\.step \.step-icon\s*\{(?=[^}]*isolation:\s*isolate)(?=[^}]*background:\s*color-mix\(in srgb,\s*var\(--brand\) 18%,\s*var\(--surface-warm\)\))(?=[^}]*outline:\s*0)[^}]*\}/s);
-  assert.match(globals, /\.step \.step-icon::before\s*\{(?=[^}]*inset:\s*-10px)(?=[^}]*z-index:\s*-1)(?=[^}]*background:\s*var\(--surface-warm\))(?=[^}]*content:\s*"")[^}]*\}/s);
   assert.match(globals, /html\[data-theme="dark"\] \.step:nth-child\(n\)\s*\{(?=[^}]*border-color:\s*transparent)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
   assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.steps,\s*\.features-grid\s*\{(?=[^}]*grid-template-columns:\s*1fr)(?=[^}]*gap:\s*28px)[^}]*\}[\s\S]*?\.step:nth-child\(n\)\s*\{(?=[^}]*grid-template-columns:\s*36px 36px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*14px 12px)(?=[^}]*border:\s*0)[^}]*\}/s);
-  assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.steps::before,\s*\.steps::after\s*\{(?=[^}]*inset-inline-start:\s*clamp\(81px,\s*12vw,\s*92px\))(?=[^}]*top:\s*48px)(?=[^}]*bottom:\s*48px)(?=[^}]*width:\s*2px)[^}]*\}/s);
+  assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.steps-track\s*\{[^}]*display:\s*none[^}]*\}/s);
   assert.match(globals, /@media\s*\(max-width:\s*640px\)\s*\{[\s\S]*?\.step:nth-child\(n\)\s*\{(?=[^}]*grid-template-columns:\s*32px 34px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*12px 8px)[^}]*\}/s);
-  assert.match(globals, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.steps::after\s*\{[^}]*transition:\s*none[^}]*\}[\s\S]*?\.steps\[data-polish-reveal="true"\][\s\S]*?transform:\s*none/s);
+  assert.match(globals, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.steps-track\s*\{[^}]*transition:\s*none[^}]*\}[\s\S]*?\.steps\[data-polish-reveal="true"\][\s\S]*?transform:\s*none/s);
   assert.doesNotMatch(globals, /--landing-workflow-rail|--landing-workflow-glint/);
 });
 
