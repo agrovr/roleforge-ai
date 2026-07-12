@@ -22445,9 +22445,21 @@ html[data-theme="dark"] .support-routing-step p {
   text-decoration: none;
 }
 
-.admin-support-action.primary,
-.admin-support-action:hover,
-.admin-support-action:focus-visible {
+.admin-support-action.primary {
+  border-color: var(--ink-0);
+  background: var(--ink-0);
+  color: var(--surface);
+}
+
+.admin-support-action.primary:not(:disabled):hover,
+.admin-support-action.primary:not(:disabled):focus-visible {
+  border-color: color-mix(in srgb, var(--ink-0) 84%, var(--brand));
+  background: color-mix(in srgb, var(--ink-0) 88%, var(--brand));
+  color: var(--surface);
+}
+
+.admin-support-action:not(.primary):hover,
+.admin-support-action:not(.primary):focus-visible {
   border-color: color-mix(in srgb, var(--accent) 34%, var(--line));
   background: color-mix(in srgb, var(--accent-soft) 50%, var(--surface));
   color: var(--ink-0);

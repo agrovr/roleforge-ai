@@ -86,6 +86,11 @@ test("admin support actions expose pending, stale, and mobile-safe states", () =
   assert.match(page, /pendingLabel="Sending…"/);
   assert.match(page, /pendingLabel="Sending and closing…"/);
   assert.match(page, /pendingLabel="Updating…"/);
+  assert.match(page, /className="admin-support-action primary"[\s\S]*?label="Send reply"/s);
+  assert.match(stylesheet, /\.admin-support-action\.primary\s*\{(?=[^}]*border-color:\s*var\(--ink-0\))(?=[^}]*background:\s*var\(--ink-0\))(?=[^}]*color:\s*var\(--surface\))[^}]*\}/s);
+  assert.match(stylesheet, /\.admin-support-action\.primary:not\(:disabled\):hover,\s*\.admin-support-action\.primary:not\(:disabled\):focus-visible\s*\{(?=[^}]*background:\s*color-mix\(in srgb, var\(--ink-0\) 88%, var\(--brand\)\))(?=[^}]*color:\s*var\(--surface\))[^}]*\}/s);
+  assert.match(stylesheet, /\.admin-support-action:not\(\.primary\):hover,\s*\.admin-support-action:not\(\.primary\):focus-visible\s*\{(?=[^}]*background:\s*color-mix\(in srgb, var\(--accent-soft\) 50%, var\(--surface\)\))(?=[^}]*color:\s*var\(--ink-0\))[^}]*\}/s);
+  assert.doesNotMatch(stylesheet, /\.admin-support-action\.primary,\s*\.admin-support-action:hover/);
   assert.match(page, /name="version" value=\{request\.updatedAt\}/);
   assert.match(stylesheet, /@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?\.admin-support-commandbar nav\s*\{(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\))[^}]*\}/s);
   assert.match(stylesheet, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.admin-support-action\.is-pending svg\s*\{[^}]*animation:\s*none/s);
