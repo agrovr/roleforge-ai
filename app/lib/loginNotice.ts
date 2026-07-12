@@ -1,5 +1,13 @@
 export type LoginNoticeTone = "success" | "error" | "neutral" | "info";
 
+const TRANSIENT_LOGIN_NOTICES = new Set([
+  "check-email",
+  "signed-out",
+  "account-deleted",
+  "account-not-configured",
+  "signin-error",
+]);
+
 export function loginNoticeCopy(account: string | undefined) {
   switch (account) {
     case "signin-required":
@@ -24,4 +32,8 @@ export function loginNoticeTone(account: string | undefined): LoginNoticeTone {
   if (account === "signin-error" || account === "account-not-configured") return "error";
   if (account === "signed-out" || account === "account-deleted") return "neutral";
   return "info";
+}
+
+export function shouldShowLoginStatus(account: string | undefined) {
+  return Boolean(account && TRANSIENT_LOGIN_NOTICES.has(account));
 }

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { loginNoticeCopy, loginNoticeTone } from "./loginNotice";
+import { loginNoticeCopy, loginNoticeTone, shouldShowLoginStatus } from "./loginNotice";
 
 test("formats login status notices for auth redirects", () => {
   assert.equal(loginNoticeCopy("signin-required"), "Sign in to start tailoring resumes and keep saved projects tied to your account.");
@@ -23,4 +23,13 @@ test("assigns customer-facing tones to login statuses", () => {
   assert.equal(loginNoticeTone("signed-out"), "neutral");
   assert.equal(loginNoticeTone("account-deleted"), "neutral");
   assert.equal(loginNoticeTone("signin-required"), "info");
+});
+
+test("shows status treatment only for real auth outcomes", () => {
+  assert.equal(shouldShowLoginStatus("check-email"), true);
+  assert.equal(shouldShowLoginStatus("signin-error"), true);
+  assert.equal(shouldShowLoginStatus("signed-out"), true);
+  assert.equal(shouldShowLoginStatus("signin-required"), false);
+  assert.equal(shouldShowLoginStatus("unknown"), false);
+  assert.equal(shouldShowLoginStatus(undefined), false);
 });

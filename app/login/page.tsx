@@ -6,7 +6,7 @@ import { ActionSubmitButton } from "../components/ActionSubmitButton";
 import { NativeActionForm } from "../components/NativeActionForm";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
-import { loginNoticeCopy, loginNoticeTone } from "../lib/loginNotice";
+import { loginNoticeCopy, loginNoticeTone, shouldShowLoginStatus } from "../lib/loginNotice";
 import { safeRedirectPath } from "../lib/safeRedirect";
 import { getSupabaseConfig } from "../lib/supabase/config";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
@@ -23,7 +23,9 @@ export default async function LoginPage({ searchParams }: { searchParams: LoginS
   const statusNext = `/login?next=${encodeURIComponent(next)}`;
   const account = getParam(params.account);
   const notice = loginNoticeCopy(account);
+  const introNotice = account === "signin-required" ? notice : loginNoticeCopy(undefined);
   const tone = loginNoticeTone(account);
+  const showStatus = shouldShowLoginStatus(account);
   const config = getSupabaseConfig();
   const supabase = await createRoleForgeServerClient();
 
@@ -51,14 +53,22 @@ export default async function LoginPage({ searchParams }: { searchParams: LoginS
         <div className="login-copy">
           <div className="eyebrow">Account required</div>
           <h1 id="login-title" className="display">Sign in to your RoleForge studio.</h1>
-          <p>{notice}</p>
+          <p>{introNotice}</p>
         </div>
 
         <div className="login-card">
           {config.configured ? (
             <>
               <div className="login-card-head">
-                <span className={`login-status ${tone}`}>{notice}</span>
+                {showStatus ? (
+                  <span
+                    className={`login-status ${tone}`}
+                    role={tone === "error" ? "alert" : "status"}
+                    aria-live={tone === "error" ? "assertive" : "polite"}
+                  >
+                    {notice}
+                  </span>
+                ) : null}
                 <h2>Choose your sign-in method</h2>
                 <p>Use Google for the fastest path, or send a secure email link to continue.</p>
               </div>

@@ -8,6 +8,10 @@ const loginPage = readFileSync("app/login/page.tsx", "utf8");
 test("login gateway keeps real auth actions while using a polished shell", () => {
   assert.match(loginPage, /href=\{`\/auth\/oauth\?provider=google&next=/);
   assert.match(loginPage, /action="\/auth\/signin"/);
+  assert.match(loginPage, /const showStatus = shouldShowLoginStatus\(account\)/);
+  assert.match(loginPage, /showStatus \? \(/);
+  assert.match(loginPage, /role=\{tone === "error" \? "alert" : "status"\}/);
+  assert.match(loginPage, /aria-live=\{tone === "error" \? "assertive" : "polite"\}/);
   assert.match(globals, /\.login-shell\s*\{(?=[^}]*position:\s*relative)(?=[^}]*isolation:\s*isolate)(?=[^}]*background-size:\s*38px 38px,\s*38px 38px)[^}]*\}/s);
   assert.match(globals, /\.login-shell::before,\s*\.login-shell::after\s*\{/);
 });
@@ -31,12 +35,11 @@ test("collapsed login layouts place authentication before secondary proof", () =
   assert.match(globals, /@media\s*\(max-width:\s*760px\)[\s\S]*?\.login-studio-preview,\s*\.login-session-strip\s*\{[^}]*display:\s*none[^}]*\}/s);
 });
 
-test("login protected preview has restrained motion with dark and reduced-motion support", () => {
-  assert.match(globals, /\.login-studio-preview::after\s*\{(?=[^}]*linear-gradient\(90deg,\s*var\(--good\),\s*var\(--brand\),\s*var\(--accent\)\))[^}]*\}/s);
-  assert.match(globals, /\.login-preview-sheet div::before\s*\{/);
-  assert.match(globals, /@keyframes\s+login-preview-meter/);
-  assert.match(globals, /prefers-reduced-motion:\s*reduce[\s\S]*\.login-studio-preview::after[\s\S]*animation:\s*none/);
+test("login protected preview avoids decorative rails and keeps dark mode support", () => {
+  assert.doesNotMatch(globals, /\.login-studio-preview::after\s*\{/);
+  assert.doesNotMatch(globals, /\.login-preview-sheet div::before\s*\{/);
+  assert.doesNotMatch(globals, /@keyframes\s+login-preview-meter/);
   assert.match(globals, /html\[data-theme="dark"\]\s+\.login-nav\s*\{/);
   assert.match(globals, /html\[data-theme="dark"\]\s+\.login-card::after\s*\{/);
-  assert.match(globals, /html\[data-theme="dark"\]\s+\.login-preview-sheet div::before\s*\{/);
+  assert.match(globals, /html\[data-theme="dark"\]\s+\.login-preview-sheet div\s*\{[^}]*border-color:/s);
 });
