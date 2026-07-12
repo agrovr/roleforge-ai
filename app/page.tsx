@@ -3,6 +3,7 @@ import { AccountAvatar } from "./components/AccountAvatar";
 import { AccountReferenceCopyButton } from "./components/AccountReferenceCopyButton";
 import { Brand } from "./components/Brand";
 import { FaqAccordion } from "./components/FaqAccordion";
+import { LandingStudioDemo } from "./components/LandingStudioDemo";
 import { ResumePreview } from "./components/ResumePreview";
 import { RESUME_TEMPLATES } from "./lib/resumeTemplates";
 import { RoleForgeIcon } from "./components/RoleForgeIcons";
@@ -354,32 +355,6 @@ function HowItWorks() {
 }
 
 function StudioPreview({ studioHref }: Pick<LandingLinks, "studioHref">) {
-  const navItems = [
-    ["doc", "Resume", "Ready"],
-    ["target", "Job target", "Set"],
-    ["sparkle", "AI tailor", "Review"],
-    ["chart", "History", "Saved"],
-  ] as const;
-
-  const toolItems = [
-    ["scan", "ATS check"],
-    ["download", "Export"],
-    ["settings", "Settings"],
-  ] as const;
-
-  const stats = [
-    ["Resume", "Ready", "PDF, DOCX, TXT"],
-    ["Target", "Added", "Text or URL"],
-    ["Review", "Checked", "Review changes"],
-    ["Export", "PDF", "Free export"],
-  ] as const;
-
-  const tips = [
-    ["sparkle", "Clarify the impact", "Review bullets that could use a stronger outcome, scope, or responsibility signal before export."],
-    ["check", "Check target terms", "Compare matched and missing terms against the role so edits stay relevant to the job."],
-    ["scan", "Keep parsing simple", "Review common layout risks before sending a draft through an application form."],
-  ] as const;
-
   return (
     <section className="dash-section" id="studio">
       <div className="section-inner">
@@ -390,84 +365,7 @@ function StudioPreview({ studioHref }: Pick<LandingLinks, "studioHref">) {
           </div>
           <p className="lede">A focused workspace that shows your resume, the job, and generated suggestions side-by-side. Fit signals, gaps, and export controls stay in one calm panel.</p>
         </div>
-        <div className="dash-mock">
-          <div className="dash-mock-head">
-            <div className="dash-traffic"><span /><span /><span /></div>
-            <div className="dash-mock-url">roleforgeai.vercel.app/app</div>
-          </div>
-          <div className="dash-mock-body">
-            <aside className="dash-side">
-              <div className="dash-side-label">Workspace</div>
-              {navItems.map(([icon, label, meta], index) => (
-                <div className={`dash-side-item ${index === 0 ? "active" : ""}`} key={label}>
-                  <RoleForgeIcon name={icon} size={15} />
-                  <span>{label}</span>
-                  {meta ? <span className="dash-pill">{meta}</span> : null}
-                </div>
-              ))}
-              <div className="dash-side-divider" />
-              <div className="dash-side-label">Tools</div>
-              {toolItems.map(([icon, label]) => (
-                <div className="dash-side-item" key={label}>
-                  <RoleForgeIcon name={icon} size={15} />
-                  <span>{label}</span>
-                </div>
-              ))}
-            </aside>
-            <div className="dash-main">
-              <div className="dash-main-head">
-                <div>
-                  <h3>Resume studio</h3>
-                  <p>Current run · saved project ready</p>
-                </div>
-                <Link className="btn btn-brand btn-sm" href={studioHref}><RoleForgeIcon name="plus" size={14} />New resume</Link>
-              </div>
-              <div className="dash-stats">
-                {stats.map(([label, value, delta]) => (
-                  <div className="dash-stat" key={label}>
-                    <div className="dash-stat-label">{label}</div>
-                    <div className="dash-stat-value">{value}</div>
-                    <div className="dash-stat-delta">{delta}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="dash-resume-card">
-                <div className="dash-resume-thumb"><ResumePreview highlight /></div>
-                <div className="dash-resume-info">
-                  <div>
-                    <h4 className="dash-resume-title">Role-targeted resume draft</h4>
-                    <div className="dash-resume-meta">
-                      <span>Sample preview</span><span>·</span><span>PDF export</span><span>·</span><span>Review before sending</span>
-                    </div>
-                    <div className="dash-progress">
-                      <div className="dash-progress-row"><span>Workflow status</span><span>Ready</span></div>
-                      <div className="dash-progress-track"><span /></div>
-                    </div>
-                  </div>
-                  <div className="dash-resume-actions">
-                    <span className="btn btn-soft btn-sm"><RoleForgeIcon name="edit" size={13} />Edit</span>
-                    <span className="btn btn-soft btn-sm"><RoleForgeIcon name="download" size={13} />Download</span>
-                    <span className="btn btn-soft btn-sm"><RoleForgeIcon name="copy" size={13} />Duplicate</span>
-                    <span className="btn btn-soft btn-sm"><RoleForgeIcon name="chart" size={13} />Fit signals</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <aside className="dash-aside">
-              <div>
-                <div className="eyebrow">AI guidance</div>
-                <h4>Review notes</h4>
-                <p>Generated suggestions stay tied to the resume and target in the active run.</p>
-              </div>
-              {tips.map(([icon, title, text]) => (
-                <div className="dash-aside-tip" key={title}>
-                  <div className="dash-aside-tip-head"><RoleForgeIcon name={icon} size={12} />{title}</div>
-                  <p>{text}</p>
-                </div>
-              ))}
-            </aside>
-          </div>
-        </div>
+        <LandingStudioDemo studioHref={studioHref} />
       </div>
     </section>
   );
