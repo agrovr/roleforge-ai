@@ -15,6 +15,7 @@ export type ExportTemplateCapability = {
 };
 
 export type WorkflowCapabilities = {
+  max_job_description_chars: number;
   max_upload_bytes: number;
   upload_formats: UploadCapability[];
   export_formats: ExportCapability[];
@@ -22,6 +23,7 @@ export type WorkflowCapabilities = {
 };
 
 export const DEFAULT_MAX_UPLOAD_BYTES = 8 * 1024 * 1024;
+export const DEFAULT_MAX_JOB_DESCRIPTION_CHARS = 30000;
 
 export const DEFAULT_UPLOAD_FORMATS: UploadCapability[] = [
   { format: "docx", label: "DOCX", enabled: true },
@@ -114,6 +116,7 @@ export function normalizeWorkflowCapabilities(value: unknown): WorkflowCapabilit
   const record = asRecord(value);
 
   return {
+    max_job_description_chars: readPositiveInteger(record?.max_job_description_chars, DEFAULT_MAX_JOB_DESCRIPTION_CHARS),
     max_upload_bytes: readPositiveInteger(record?.max_upload_bytes, DEFAULT_MAX_UPLOAD_BYTES),
     upload_formats: normalizeUploadCapabilities(record?.upload_formats),
     export_formats: normalizeExportCapabilities(record?.export_formats) ?? [],

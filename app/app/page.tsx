@@ -43,6 +43,7 @@ import {
   type ReviewSuggestionCard,
 } from "../lib/reviewSuggestions";
 import { normalizePublicUrlInput, parseTargetUrl } from "../lib/targetLabel";
+import { activeTargetPayload, deriveTargetInputState, type TargetInputMode } from "../lib/targetInput";
 import {
   formatHistoryTimestamp,
   groupHistoryItems,
@@ -86,6 +87,7 @@ import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun
 import { tailorActionState } from "../lib/tailorAction";
 import { accountUsageSummary, monthlyRunAllowanceSentence, runWord } from "../lib/usage";
 import {
+  DEFAULT_MAX_JOB_DESCRIPTION_CHARS,
   DEFAULT_MAX_UPLOAD_BYTES,
   DEFAULT_UPLOAD_FORMATS,
   normalizeWorkflowCapabilities,
@@ -159,7 +161,7 @@ type UploadResponse = {
 };
 type ExportResponse = { saved_to: string; download_filename: string };
 type Stage = "idle" | "uploading" | "tailoring" | "exporting" | "ready" | "error";
-type InputMode = "text" | "url";
+type InputMode = TargetInputMode;
 type HistoryFilter = "all" | "account" | "local";
 type PreviewUploadState = "idle" | "reading" | "ready" | "error";
 type DownloadState = "idle" | "checking" | "ready" | "expired";
@@ -247,6 +249,12 @@ function StudioMetric({
 
 function fileUploadKey(file: File | null) {
   return file ? `${file.name}:${file.size}:${file.lastModified}` : "";
+}
+
+function savedSnapshotTarget(snapshot?: SavedRunSnapshot | null) {
+  if (!snapshot) return "";
+  if (snapshot.inputMode === "url") return snapshot.jdUrl?.trim() ?? "";
+  return snapshot.jdText?.trim() || snapshot.jdUrl?.trim() || "";
 }
 
 function saveResumeTemplatePreference(slug: ResumeTemplateSlug) {
@@ -1018,6 +1026,7 @@ export default function Page() {
     [enabledUploadFormats],
   );
   const maxUploadBytes = capabilities?.max_upload_bytes ?? DEFAULT_MAX_UPLOAD_BYTES;
+  const maxJobDescriptionChars = capabilities?.max_job_description_chars ?? DEFAULT_MAX_JOB_DESCRIPTION_CHARS;
   const editorSectionRef = useRef<HTMLElement | null>(null);
   const historySectionRef = useRef<HTMLElement | null>(null);
   const historyDetailRef = useRef<HTMLElement | null>(null);
@@ -1613,11 +1622,20 @@ export default function Page() {
 
   const normalizedJobUrl = normalizePublicUrlInput(jdUrl);
   const normalizedCompanyUrl = normalizePublicUrlInput(companyUrl);
-  const jobUrlInvalid = Boolean(jdUrl.trim() && !normalizedJobUrl);
+  const targetInput = deriveTargetInputState({
+    mode: inputMode,
+    jdText,
+    jdUrl,
+    normalizedJobUrl,
+    maxJobDescriptionChars,
+  });
+  const jobUrlInvalid = targetInput.jobUrlInvalid;
   const companyUrlInvalid = Boolean(companyUrl.trim() && !normalizedCompanyUrl);
-  const hasTarget = Boolean(normalizedJobUrl || jdText.trim());
+  const hasTarget = targetInput.hasTarget;
+  const targetInvalid = targetInput.invalid;
+  const activeTargetValue = targetInput.activeValue;
   const uploadFailed = previewUploadState === "error";
-  const readyItems = [Boolean(baseUrl), Boolean(file && !uploadFailed), hasTarget];
+  const readyItems = [Boolean(baseUrl), Boolean(file && !uploadFailed), hasTarget && !targetInvalid];
   const readiness = Math.round((readyItems.filter(Boolean).length / readyItems.length) * 100);
   const tailorAction = tailorActionState({
     accountConfigured: Boolean(accountStatus?.configured),
@@ -1630,6 +1648,7 @@ export default function Page() {
     hasResult: Boolean(result),
     hasFile: Boolean(file),
     hasTarget,
+    targetInvalid,
     backendReady: Boolean(baseUrl),
   });
   const canRun = tailorAction.canRun;
@@ -1686,8 +1705,7 @@ export default function Page() {
       tailoring_mode: TailoringMode;
     } = { resume_id, tailoring_mode: tailoringMode };
 
-    if (normalizedJobUrl) payload.jd_url = normalizedJobUrl;
-    if (jdText.trim()) payload.jd_text = jdText.trim();
+    Object.assign(payload, activeTargetPayload({ mode: inputMode, jdText, normalizedJobUrl }));
     if (normalizedCompanyUrl) payload.company_url = normalizedCompanyUrl;
 
     const response = await fetch(`${baseUrl}/tailor`, {
@@ -1759,7 +1777,7 @@ export default function Page() {
       const savedRun = await saveCompletedRun({
         ...item,
         sourceResumeName: item.filename,
-        jobTarget: item.snapshot?.jdText?.trim() || item.snapshot?.jdUrl?.trim() || jdText.trim() || normalizedJobUrl || item.roleHint,
+        jobTarget: savedSnapshotTarget(item.snapshot) || activeTargetValue || item.roleHint,
         companyUrl: item.snapshot?.companyUrl?.trim() || normalizedCompanyUrl || undefined,
         atsScore: output.score_summary?.ats_after,
         keywordMatchCount: outputPresent.length,
@@ -2115,7 +2133,7 @@ export default function Page() {
       downloadUrl,
       downloadFormat,
       downloads: copiedDownloads,
-      roleHint: (jdText || normalizedJobUrl || normalizedCompanyUrl || "Role target").slice(0, 90),
+      roleHint: (activeTargetValue || normalizedCompanyUrl || "Role target").slice(0, 90),
       saved: false,
       source: "local",
       snapshot,
@@ -2300,7 +2318,7 @@ export default function Page() {
         downloadUrl: url,
         downloadFormat: "pdf",
         downloads: { pdf: url },
-        roleHint: (jdText || normalizedJobUrl || "Role target").slice(0, 90),
+        roleHint: (activeTargetValue || "Role target").slice(0, 90),
         saved: false,
         source: "local",
         snapshot,
@@ -2481,7 +2499,7 @@ export default function Page() {
     setAssetCopyState("Copy unavailable");
   }
 
-  const firstTargetLine = (jdText || normalizedJobUrl || "").split(/\r?\n/).map((line) => line.trim()).find(Boolean) || "";
+  const firstTargetLine = activeTargetValue.split(/\r?\n/).map((line) => line.trim()).find(Boolean) || "";
   const activeResumeName = (file?.name || uploadMeta?.filename)?.replace(/\.(docx|pdf|txt)$/i, "") || "Resume studio";
   const targetUrlInfo = parseTargetUrl(firstTargetLine);
   const activeRole = targetUrlInfo?.label || firstTargetLine || (hasTarget ? "Role target loaded" : "Add a role target");
@@ -2513,8 +2531,8 @@ export default function Page() {
   const atsDetail = result?.score_summary?.issues_resolved ? `${result.score_summary.issues_resolved} issues fixed` : result ? "Parser notes returned" : "Waiting for run";
   const keywordDetail = keywordTotal ? `${missingKeywords.length} missing` : "Waiting for target terms";
   const runLabel = tailorAction.label;
-  const runDisabledReason = inputMode === "url" && jobUrlInvalid && !jdText.trim()
-    ? "Enter a public job URL such as jobs.example.com/role before running Tailor."
+  const runDisabledReason = targetInvalid && tailorAction.label === "Fix job target"
+    ? targetInput.disabledReason
     : tailorAction.disabledReason;
   const downloadReady = Boolean(downloadUrl && downloadState === "ready");
   const coverLetterText = result?.cover_letter?.trim() ?? "";
@@ -2733,9 +2751,13 @@ export default function Page() {
     {
       icon: "briefcase",
       label: "Target",
-      value: hasTarget ? "Ready" : "Needed",
-      detail: hasTarget ? compactLabel(activeRole, 86) : "Paste a job description or add a public posting URL.",
-      tone: hasTarget ? "good" : "ready",
+      value: targetInvalid ? "Fix needed" : hasTarget ? "Ready" : "Needed",
+      detail: targetInvalid
+        ? targetInput.disabledReason
+        : hasTarget
+          ? compactLabel(activeRole, 86)
+          : "Paste a job description or add a public posting URL.",
+      tone: targetInvalid ? "warn" : hasTarget ? "good" : "ready",
     },
     {
       icon: limitReached ? "lock" : "sparkle",
@@ -2781,11 +2803,17 @@ export default function Page() {
               ? { label: "Upload source", href: "#input", detail: "Restored runs need the source file before re-tailoring." }
               : !fileSelected
                 ? { label: "Upload resume", href: "#input", detail: "Start by adding the resume file you want to tailor." }
-                : !hasTarget
-                  ? { label: "Add target", href: "#target", detail: "Add a job description or public posting URL next." }
-                  : !baseUrl
-                    ? { label: "Check status", href: "/status", detail: "Resume tailoring is unavailable right now." }
-                    : { label: "Review preflight", href: "#preflight", detail: preflightStatusDetail };
+                : targetInvalid
+                  ? {
+                      label: targetInput.descriptionTooLong ? "Shorten target" : "Fix job URL",
+                      href: "#target",
+                      detail: targetInput.disabledReason,
+                    }
+                  : !hasTarget
+                    ? { label: "Add target", href: "#target", detail: "Add a job description or public posting URL next." }
+                    : !baseUrl
+                      ? { label: "Check status", href: "/status", detail: "Resume tailoring is unavailable right now." }
+                      : { label: "Review preflight", href: "#preflight", detail: preflightStatusDetail };
   const coverLetterWordCount = countReadableWords(coverLetterText);
   const interviewQuestionCount = interviewPrep.length;
   const hasGeneratedAssets = Boolean(coverLetterText || interviewQuestionCount);
@@ -3835,10 +3863,10 @@ export default function Page() {
                 <div className="studio-jd">
                   <div className="studio-jd-meta">
                     <span><RoleForgeIcon name="briefcase" size={12} />{normalizedCompanyUrl ? "Company context added" : "Company optional"}</span>
-                    <span><RoleForgeIcon name="globe" size={12} />{normalizedJobUrl ? "Public URL target" : "Pasted text target"}</span>
+                    <span><RoleForgeIcon name="globe" size={12} />{inputMode === "url" ? "Public URL target" : "Pasted text target"}</span>
                     <span><RoleForgeIcon name="sparkle" size={12} />{tailoringMode} mode</span>
                   </div>
-                  <p>{jdText || normalizedJobUrl || "Add a job description or public posting URL to give RoleForge a role target."}</p>
+                  <p>{activeTargetValue || "Add a job description or public posting URL to give RoleForge a role target."}</p>
                 </div>
                 <div className="kw-section">
                   <div className="kw-label">Matched <span className="kw-count">{presentKeywords.length}</span></div>
@@ -3993,12 +4021,30 @@ export default function Page() {
                   </h3>
                   <div className="rf-intake-card-body">
                     <div className="rf-target-editor" id="target">
-                      <div className="segment rf-target-segment" role="tablist" aria-label="Job description input mode">
-                        <button className={inputMode === "text" ? "active" : ""} type="button" onClick={() => setInputMode("text")}>Paste text</button>
-                        <button className={inputMode === "url" ? "active" : ""} type="button" onClick={() => setInputMode("url")}>Job URL</button>
+                      <div className="segment rf-target-segment" role="group" aria-label="Job description input mode">
+                        <button className={inputMode === "text" ? "active" : ""} type="button" aria-pressed={inputMode === "text"} onClick={() => setInputMode("text")}>Paste text</button>
+                        <button className={inputMode === "url" ? "active" : ""} type="button" aria-pressed={inputMode === "url"} onClick={() => setInputMode("url")}>Job URL</button>
                       </div>
                       {inputMode === "text" ? (
-                        <textarea id="jdText" value={jdText} onChange={(event) => setJdText(event.target.value)} placeholder={targetTextPlaceholder} aria-label="Job description" />
+                        <>
+                          <textarea
+                            id="jdText"
+                            value={jdText}
+                            onChange={(event) => setJdText(event.target.value)}
+                            placeholder={targetTextPlaceholder}
+                            aria-label="Job description"
+                            aria-invalid={targetInput.descriptionTooLong}
+                            aria-describedby="jdTextHint"
+                          />
+                          <small
+                            className={`rf-target-text-hint${targetInput.descriptionTooLong ? " invalid" : targetInput.nearDescriptionLimit ? " near" : ""}`}
+                            id="jdTextHint"
+                            aria-live="polite"
+                          >
+                            <span>{targetInput.descriptionTooLong ? targetInput.disabledReason : "Paste the full role description; your text stays editable."}</span>
+                            <strong>{targetInput.countLabel}</strong>
+                          </small>
+                        </>
                       ) : (
                         <>
                           <input
@@ -4031,10 +4077,10 @@ export default function Page() {
                   <div className="rf-intake-card-body">
                     <div className="rf-run-controls">
                       <div className="rf-config-label">Tailoring mode</div>
-                      <div className="segment mode-segment" role="tablist" aria-label="Tailoring mode">
-                        <button className={tailoringMode === "conservative" ? "active" : ""} type="button" onClick={() => setTailoringMode("conservative")}>Conservative</button>
-                        <button className={tailoringMode === "balanced" ? "active" : ""} type="button" onClick={() => setTailoringMode("balanced")}>Balanced</button>
-                        <button className={tailoringMode === "aggressive" ? "active" : ""} type="button" onClick={() => setTailoringMode("aggressive")}>Aggressive</button>
+                      <div className="segment mode-segment" role="group" aria-label="Tailoring mode">
+                        <button className={tailoringMode === "conservative" ? "active" : ""} type="button" aria-pressed={tailoringMode === "conservative"} onClick={() => setTailoringMode("conservative")}>Conservative</button>
+                        <button className={tailoringMode === "balanced" ? "active" : ""} type="button" aria-pressed={tailoringMode === "balanced"} onClick={() => setTailoringMode("balanced")}>Balanced</button>
+                        <button className={tailoringMode === "aggressive" ? "active" : ""} type="button" aria-pressed={tailoringMode === "aggressive"} onClick={() => setTailoringMode("aggressive")}>Aggressive</button>
                       </div>
                       <label className="rf-company-field">
                         <span>Company context</span>

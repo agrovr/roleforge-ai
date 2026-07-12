@@ -16575,12 +16575,50 @@ html[data-theme="dark"] input::file-selector-button {
   color: var(--danger);
 }
 
+.rf-target-text-hint {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px 14px;
+  flex-wrap: wrap;
+  margin-top: -2px;
+  color: var(--ink-3);
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.rf-target-text-hint span {
+  min-width: 0;
+  flex: 1 1 190px;
+  overflow-wrap: anywhere;
+}
+
+.rf-target-text-hint strong {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+  color: inherit;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.rf-target-text-hint.near {
+  color: color-mix(in srgb, var(--brand-dark) 82%, var(--ink-2));
+}
+
+.rf-target-text-hint.invalid {
+  color: var(--danger);
+}
+
+.rf-target-editor textarea[aria-invalid="true"],
 .rf-target-editor input[aria-invalid="true"],
 .rf-company-field input[aria-invalid="true"] {
   border-color: color-mix(in srgb, var(--danger) 54%, var(--line));
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--danger-soft) 68%, transparent);
 }
 
+.rf-target-editor textarea[aria-invalid="true"]:focus,
 .rf-target-editor input[aria-invalid="true"]:focus,
 .rf-company-field input[aria-invalid="true"]:focus {
   border-color: var(--danger);

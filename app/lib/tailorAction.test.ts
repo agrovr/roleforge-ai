@@ -14,6 +14,7 @@ const readyInput: TailorActionInput = {
   hasResult: false,
   hasFile: true,
   hasTarget: true,
+  targetInvalid: false,
   backendReady: true,
 };
 
@@ -65,12 +66,28 @@ test("requires a replacement after the resume upload fails", () => {
   });
 });
 
+test("blocks an invalid active job target", () => {
+  assert.deepEqual(tailorActionState({ ...readyInput, targetInvalid: true }), {
+    canRun: false,
+    label: "Fix job target",
+    disabledReason: "Fix the active job target before running Tailor.",
+  });
+  assert.deepEqual(tailorActionState({ ...readyInput, hasFile: false, targetInvalid: true }), {
+    canRun: false,
+    label: "Upload to run",
+    disabledReason: "Upload a resume file before running Tailor.",
+  });
+  assert.equal(tailorActionState({ ...readyInput, signedIn: false, targetInvalid: true }).disabledReason, "Sign in before running the studio workflow.");
+  assert.equal(tailorActionState({ ...readyInput, limitReached: true, targetInvalid: true }).disabledReason, "Your free monthly run limit is reached. Upgrade or wait for the next cycle.");
+});
+
 test("prioritizes account, usage, and busy blockers", () => {
   assert.equal(tailorActionState({ ...readyInput, signedIn: false }).label, "Sign in to run");
   assert.equal(tailorActionState({ ...readyInput, limitReached: true }).label, "Monthly limit reached");
   assert.equal(tailorActionState({ ...readyInput, busy: true }).label, "Tailoring...");
   assert.equal(tailorActionState({ ...readyInput, readingResume: true }).label, "Reading resume...");
   assert.equal(tailorActionState({ ...readyInput, uploadFailed: true }).label, "Replace resume");
+  assert.equal(tailorActionState({ ...readyInput, targetInvalid: true }).label, "Fix job target");
 });
 
 test("uses customer-facing copy when tailoring is temporarily unavailable", () => {

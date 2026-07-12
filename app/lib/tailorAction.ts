@@ -9,6 +9,7 @@ export type TailorActionInput = {
   hasResult: boolean;
   hasFile: boolean;
   hasTarget: boolean;
+  targetInvalid: boolean;
   backendReady: boolean;
 };
 
@@ -23,6 +24,7 @@ export function tailorActionState(input: TailorActionInput): TailorActionState {
     input.backendReady &&
       input.hasFile &&
       input.hasTarget &&
+      !input.targetInvalid &&
       !input.busy &&
       !input.readingResume &&
       !input.uploadFailed &&
@@ -78,19 +80,27 @@ export function tailorActionState(input: TailorActionInput): TailorActionState {
     };
   }
 
-  if (input.hasResult) {
-    return {
-      canRun,
-      label: "Re-tailor",
-      disabledReason: canRun ? "" : "Complete the required fields before running Tailor.",
-    };
-  }
-
   if (!input.hasFile) {
     return {
       canRun,
       label: "Upload to run",
       disabledReason: canRun ? "" : "Upload a resume file before running Tailor.",
+    };
+  }
+
+  if (input.targetInvalid) {
+    return {
+      canRun,
+      label: "Fix job target",
+      disabledReason: canRun ? "" : "Fix the active job target before running Tailor.",
+    };
+  }
+
+  if (input.hasResult) {
+    return {
+      canRun,
+      label: "Re-tailor",
+      disabledReason: canRun ? "" : "Complete the required fields before running Tailor.",
     };
   }
 

@@ -12,7 +12,7 @@ test("studio exposes a workflow preflight checklist from real state", () => {
   assert.match(studioPage, /label:\s*"Resume"/);
   assert.match(studioPage, /value:\s*previewUploadState === "reading" \? "Reading" : uploadFailed \? "Replace" : fileSelected \? "Ready" : "Needed"/);
   assert.match(studioPage, /label:\s*"Target"/);
-  assert.match(studioPage, /value:\s*hasTarget \? "Ready" : "Needed"/);
+  assert.match(studioPage, /value:\s*targetInvalid \? "Fix needed" : hasTarget \? "Ready" : "Needed"/);
   assert.match(studioPage, /label:\s*"Usage"/);
   assert.match(studioPage, /value:\s*limitReached \? "Limit reached" : usageSummary\.monthlyRunLimit === null \? "Unlimited" : usageLabel/);
   assert.match(studioPage, /label:\s*"Export"/);
@@ -22,6 +22,7 @@ test("studio exposes a workflow preflight checklist from real state", () => {
   assert.match(studioPage, /runNextAction = canRun/);
   assert.match(studioPage, /label:\s*"Upload resume"/);
   assert.match(studioPage, /label:\s*"Add target"/);
+  assert.match(studioPage, /label:\s*targetInput\.descriptionTooLong \? "Shorten target" : "Fix job URL"/);
   assert.match(studioPage, /label:\s*"Upload source"/);
   assert.match(studioPage, /label:\s*"Replace resume"/);
   assert.match(studioPage, /label:\s*"Review usage"/);
