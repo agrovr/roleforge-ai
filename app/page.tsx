@@ -567,10 +567,13 @@ function Features() {
           <p className="lede">RoleForge compares the target role with your resume and shows practical next steps without rewriting your career.</p>
         </div>
         <div className="features-grid">
-          {features.map(([icon, tone, title, text, bullets]) => (
+          {features.map(([icon, tone, title, text, bullets], index) => (
             <article className="feature-card" key={title}>
               <div className={`feature-icon${tone ? ` ${tone}` : ""}`}><RoleForgeIcon name={icon} size={22} /></div>
-              <h3>{title}</h3>
+              <div className="feature-card-heading">
+                <h3>{title}</h3>
+                <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+              </div>
               <p>{text}</p>
               <ul className="feature-card-list">
                 {bullets.map((bullet) => (

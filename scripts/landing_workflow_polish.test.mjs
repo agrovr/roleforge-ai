@@ -33,14 +33,20 @@ test("landing process reads as a connected workflow without restoring card divid
 
 test("feature index uses responsive spotlights and restrained icon motion", () => {
   assert.match(globals, /\/\* Landing workflow refinement: expressive indexes without a card matrix\. \*\//);
-  assert.match(globals, /\.features-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*gap:\s*clamp\(18px,\s*3vw,\s*34px\) clamp\(24px,\s*4vw,\s*48px\))[^}]*\}/s);
-  assert.match(globals, /\.feature-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*44px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*16px 18px 18px)(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*18px)(?=[^}]*background:\s*transparent)(?=[^}]*transition:\s*transform 260ms)[^}]*\}/s);
+  assert.match(landing, /className="feature-card-heading"/);
+  assert.match(landing, /String\(index \+ 1\)\.padStart\(2, "0"\)/);
+  assert.match(globals, /\.features-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(12,\s*minmax\(0,\s*1fr\)\))(?=[^}]*gap:\s*clamp\(18px,\s*2\.2vw,\s*28px\))[^}]*\}/s);
+  assert.match(globals, /\.feature-card:nth-child\(1\),\s*\.feature-card:nth-child\(4\),\s*\.feature-card:nth-child\(5\)\s*\{[^}]*grid-column:\s*span 7[^}]*\}/s);
+  assert.match(globals, /\.feature-card:nth-child\(2\),\s*\.feature-card:nth-child\(3\),\s*\.feature-card:nth-child\(6\)\s*\{[^}]*grid-column:\s*span 5[^}]*\}/s);
+  assert.match(globals, /\.feature-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*44px minmax\(0,\s*1fr\))(?=[^}]*min-height:\s*220px)(?=[^}]*padding:\s*22px 24px 24px)(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*20px)(?=[^}]*background:\s*transparent)(?=[^}]*transition:\s*transform 260ms)[^}]*\}/s);
   assert.match(globals, /\.feature-card:nth-child\(3n \+ 2\),\s*\.feature-card:nth-child\(3n \+ 3\),\s*\.feature-card:nth-child\(n \+ 4\)\s*\{[^}]*border:\s*0[^}]*\}/s);
   assert.match(globals, /\.feature-card:nth-child\(3n \+ 1\)\s*\{[^}]*radial-gradient[^}]*var\(--accent-soft\)[^}]*\}/s);
   assert.match(globals, /\.feature-card:nth-child\(3n \+ 2\)\s*\{[^}]*radial-gradient[^}]*var\(--sky-soft\)[^}]*\}/s);
   assert.match(globals, /\.feature-card:nth-child\(3n \+ 3\)\s*\{[^}]*radial-gradient[^}]*var\(--coral-soft\)[^}]*\}/s);
-  assert.match(globals, /\.feature-card:hover\s*\{(?=[^}]*radial-gradient)(?=[^}]*box-shadow:)(?=[^}]*transform:\s*translateY\(-3px\))[^}]*\}/s);
+  assert.match(globals, /\.feature-card:hover\s*\{(?=[^}]*radial-gradient)(?=[^}]*box-shadow:)(?=[^}]*transform:\s*translateY\(-4px\))[^}]*\}/s);
   assert.match(globals, /\.feature-card:hover \.feature-icon\s*\{(?=[^}]*rotate\(3deg\))(?=[^}]*scale\(1\.05\))[^}]*\}/s);
-  assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.feature-card:nth-child\(n\)\s*\{(?=[^}]*grid-template-columns:\s*42px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*14px 12px)[^}]*\}/s);
+  assert.match(globals, /@media\s*\(max-width:\s*1180px\)\s*\{[\s\S]*?\.features-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*gap:\s*28px)[^}]*\}[\s\S]*?\.feature-card:nth-child\(n\)\s*\{[^}]*grid-column:\s*auto/s);
+  assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.feature-card:nth-child\(n\)\s*\{(?=[^}]*grid-template-columns:\s*42px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*18px 16px)[^}]*\}/s);
   assert.match(globals, /@media\s*\(max-width:\s*640px\)\s*\{[\s\S]*?\.feature-card-list\s*\{[^}]*display:\s*grid[^}]*\}/s);
+  assert.match(globals, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.feature-card-heading span\s*\{[^}]*transition:\s*none[^}]*\}[\s\S]*?\.feature-card:hover \.feature-card-heading span\s*\{[^}]*transform:\s*none/s);
 });
