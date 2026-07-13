@@ -57,6 +57,25 @@ test("admin request cards separate case context from the response workbench", ()
   assert.match(stylesheet, /@media\s*\(max-width:\s*940px\)\s*\{[\s\S]*?\.admin-support-card-body,[\s\S]*?\.admin-support-loading-columns\s*\{[^}]*grid-template-columns:\s*1fr/s);
 });
 
+test("admin request cards keep status readable without tinting the whole workspace", () => {
+  assert.match(stylesheet, /\.admin-support-card\[data-status\]\s*\{[^}]*background:\s*var\(--surface\)[^}]*\}/s);
+  assert.match(stylesheet, /html\[data-theme="dark"\] \.admin-support-card\[data-status\]\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--surface\) 94%, var\(--bg\)\)[^}]*\}/s);
+  assert.doesNotMatch(stylesheet, /\.admin-support-card\[data-status="(?:open|reviewing|closed)"\][^{]*\{[^}]*radial-gradient/s);
+  assert.match(stylesheet, /\.admin-support-status\s*\{(?=[^}]*min-height:\s*32px)(?=[^}]*border-radius:\s*999px)[^}]*\}/s);
+});
+
+test("admin request identifiers stay quieter than queue state", () => {
+  assert.match(stylesheet, /\.admin-support-reference\s*\{(?=[^}]*font-family:\s*var\(--font-mono\))(?=[^}]*padding:\s*0)(?=[^}]*border:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
+  assert.doesNotMatch(stylesheet, /\.support-status-badge,\s*\.admin-support-status,\s*\.admin-support-reference/);
+});
+
+test("admin request focus is stable and only fine-pointer hover lifts cards", () => {
+  const focusBlock = stylesheet.match(/\.admin-support-card:hover,\s*\.admin-support-card:focus-within\s*\{[^}]*\}/s)?.[0] ?? "";
+  assert.match(focusBlock, /border-color:/);
+  assert.doesNotMatch(focusBlock, /transform:/);
+  assert.match(stylesheet, /@media\s*\(hover:\s*hover\) and \(pointer:\s*fine\)\s*\{\s*\.admin-support-card:hover\s*\{[^}]*transform:\s*translateY\(-2px\)/s);
+});
+
 test("admin support exposes honest loading and database failure states", () => {
   assert.match(page, /let loadError = false/);
   assert.match(page, /catch \(error\) \{[\s\S]*?loadError = true;[\s\S]*?Admin support inbox load failed/s);
@@ -76,6 +95,7 @@ test("admin queue filters show aggregate counts and preserve the current view", 
   assert.match(actionRoute, /normalizedReturnStatus/);
   assert.match(replyRoute, /normalizedReturnStatus/);
   assert.match(stylesheet, /\.admin-support-filter\s*\{(?=[^}]*overflow-x:\s*auto)(?=[^}]*padding:\s*4px)[^}]*\}/s);
+  assert.match(stylesheet, /\.admin-support-filter\s*\{(?=[^}]*position:\s*sticky)(?=[^}]*backdrop-filter:\s*none)[^}]*\}/s);
 });
 
 test("admin support actions expose pending, stale, and mobile-safe states", () => {
@@ -94,6 +114,7 @@ test("admin support actions expose pending, stale, and mobile-safe states", () =
   assert.match(page, /name="version" value=\{request\.updatedAt\}/);
   assert.match(stylesheet, /@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?\.admin-support-commandbar nav\s*\{(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\))[^}]*\}/s);
   assert.match(stylesheet, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.admin-support-action\.is-pending svg\s*\{[^}]*animation:\s*none/s);
+  assert.match(stylesheet, /\.admin-support-actions form:has\(\.admin-support-action:disabled\)\s*\{[^}]*display:\s*none[^}]*\}/s);
 });
 
 test("admin support status updates fail closed on stale forms", () => {

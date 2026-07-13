@@ -22251,7 +22251,6 @@ html[data-theme="dark"] .support-routing-step p {
   align-items: start;
 }
 
-.admin-support-reference,
 .admin-support-status {
   display: inline-flex;
   min-height: 32px;
@@ -22266,11 +22265,20 @@ html[data-theme="dark"] .support-routing-step p {
 }
 
 .admin-support-reference {
+  display: inline-flex;
+  width: fit-content;
   margin-bottom: 8px;
-  padding: 7px 10px;
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
-  background: color-mix(in srgb, var(--accent-soft) 52%, var(--surface));
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
   color: var(--brand-dark);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.045em;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
 .admin-support-status {
@@ -22614,8 +22622,9 @@ html[data-theme="dark"] .support-routing-step p {
   position: sticky;
   top: 12px;
   z-index: 4;
-  backdrop-filter: blur(14px) saturate(1.04);
-  -webkit-backdrop-filter: blur(14px) saturate(1.04);
+  background: color-mix(in srgb, var(--surface) 97%, var(--bg));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .admin-support-card {
@@ -22624,22 +22633,8 @@ html[data-theme="dark"] .support-routing-step p {
   transition: border-color 180ms ease, box-shadow 240ms ease, transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.admin-support-card[data-status="open"] {
-  background:
-    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent-soft) 34%, transparent), transparent 19rem),
-    var(--surface);
-}
-
-.admin-support-card[data-status="reviewing"] {
-  background:
-    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--sky-soft) 38%, transparent), transparent 19rem),
-    var(--surface);
-}
-
-.admin-support-card[data-status="closed"] {
-  background:
-    radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--good-soft) 32%, transparent), transparent 19rem),
-    var(--surface);
+.admin-support-card[data-status] {
+  background: var(--surface);
 }
 
 .admin-support-card:hover,
@@ -22648,7 +22643,12 @@ html[data-theme="dark"] .support-routing-step p {
   box-shadow:
     0 1px 0 color-mix(in srgb, #fff 68%, transparent) inset,
     0 28px 58px -46px color-mix(in srgb, var(--ink-0) 56%, transparent);
-  transform: translateY(-2px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .admin-support-card:hover {
+    transform: translateY(-2px);
+  }
 }
 
 .admin-support-card-body {
@@ -22730,6 +22730,10 @@ html[data-theme="dark"] .support-routing-step p {
 .admin-support-actions {
   padding-top: 12px;
   border-top: 1px solid color-mix(in srgb, var(--line) 76%, transparent);
+}
+
+.admin-support-actions form:has(.admin-support-action:disabled) {
+  display: none;
 }
 
 .admin-support-action {
@@ -22843,16 +22847,8 @@ html[data-theme="dark"] .support-routing-step p {
   to { opacity: 0.9; }
 }
 
-html[data-theme="dark"] .admin-support-card[data-status="open"] {
-  background: radial-gradient(circle at 100% 0%, rgba(127, 200, 184, 0.09), transparent 19rem), rgba(16, 22, 37, 0.88);
-}
-
-html[data-theme="dark"] .admin-support-card[data-status="reviewing"] {
-  background: radial-gradient(circle at 100% 0%, rgba(142, 183, 240, 0.1), transparent 19rem), rgba(16, 22, 37, 0.88);
-}
-
-html[data-theme="dark"] .admin-support-card[data-status="closed"] {
-  background: radial-gradient(circle at 100% 0%, rgba(133, 215, 158, 0.09), transparent 19rem), rgba(16, 22, 37, 0.88);
+html[data-theme="dark"] .admin-support-card[data-status] {
+  background: color-mix(in srgb, var(--surface) 94%, var(--bg));
 }
 
 html[data-theme="dark"] .admin-support-workbench,
@@ -27862,7 +27858,6 @@ html[data-theme="dark"] .settings-project-delete summary {
 
 .support-status-badge,
 .admin-support-status,
-.admin-support-reference,
 .support-reference-copy {
   letter-spacing: 0.045em;
   box-shadow:
@@ -27979,7 +27974,6 @@ html[data-theme="dark"] .settings-support-item:focus-within {
 
 html[data-theme="dark"] .support-status-badge,
 html[data-theme="dark"] .admin-support-status,
-html[data-theme="dark"] .admin-support-reference,
 html[data-theme="dark"] .support-reference-copy {
   box-shadow:
     inset 0 1px 0 rgba(255, 247, 233, 0.09),

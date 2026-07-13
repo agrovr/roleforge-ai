@@ -16,7 +16,7 @@ test("customer support rails do not spill into the operator inbox", () => {
   assert.doesNotMatch(globals, /\.admin-support-playbook::before/);
   assert.doesNotMatch(globals, /\.admin-support-readiness-card::before/);
   assert.doesNotMatch(globals, /\.admin-support-empty::before/);
-  assert.match(globals, /\.support-status-badge,\s*\.admin-support-status,\s*\.admin-support-reference,\s*\.support-reference-copy\s*\{(?=[^}]*letter-spacing:\s*0\.045em)(?=[^}]*box-shadow:)[^}]*\}/s);
+  assert.match(globals, /\.support-status-badge,\s*\.admin-support-status,\s*\.support-reference-copy\s*\{(?=[^}]*letter-spacing:\s*0\.045em)(?=[^}]*box-shadow:)[^}]*\}/s);
 });
 
 test("customer support polish keeps dark mode and reduced motion coverage", () => {
