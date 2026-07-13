@@ -48,8 +48,12 @@ async function getLandingLinks(): Promise<LandingLinks> {
     data: { user },
   } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
   const signedIn = Boolean(user);
-  const entitlement = user && supabase ? await loadAccountEntitlement(supabase, user.id) : FREE_ENTITLEMENT;
-  const profile = user && supabase ? await loadAccountProfile(supabase, user.id) : null;
+  const [entitlement, profile] = user && supabase
+    ? await Promise.all([
+        loadAccountEntitlement(supabase, user.id),
+        loadAccountProfile(supabase, user.id),
+      ])
+    : [FREE_ENTITLEMENT, null];
   const premiumActive = entitlement.plan === "premium" && ["active", "trialing"].includes(entitlement.billingStatus);
   const billing = billingReadiness(getStripeBillingConfig(), {
     hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()),

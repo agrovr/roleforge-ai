@@ -16,21 +16,22 @@ export async function proxy(request: NextRequest) {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet, headersToSet) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
         });
+        Object.entries(headersToSet ?? {}).forEach(([name, value]) => {
+          response.headers.set(name, value);
+        });
       },
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: claimsData } = await supabase.auth.getClaims();
 
-  if (!user && request.nextUrl.pathname.startsWith("/app")) {
+  if (!claimsData?.claims?.sub && request.nextUrl.pathname.startsWith("/app")) {
     const signInUrl = new URL("/login", request.url);
     signInUrl.searchParams.set("next", `${request.nextUrl.pathname}${request.nextUrl.search}`);
     signInUrl.searchParams.set("account", "signin-required");

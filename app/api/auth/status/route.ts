@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 
 import { loadAccountProfile } from "@/app/lib/accountProfile";
 import { accountAvatarUrl, accountDisplayName, accountReference } from "@/app/lib/accountUser";
-import { reconcileUserSubscriptionEntitlement } from "@/app/lib/billing/entitlements";
 import { billingReadiness } from "@/app/lib/billing/readiness";
 import { getStripeBillingConfig } from "@/app/lib/billing/stripe";
 import { FREE_ENTITLEMENT, loadAccountEntitlement } from "@/app/lib/entitlements";
@@ -12,6 +11,20 @@ import { createRoleForgeServerClient } from "@/app/lib/supabase/server";
 import { loadAccountUsage } from "@/app/lib/usage";
 
 type CountResult = { count: number | null; error: unknown };
+
+function privateJson(payload: unknown) {
+  const response = NextResponse.json(payload);
+  response.headers.set("Cache-Control", "private, no-store");
+  return response;
+}
+
+function claimRecord(value: unknown) {
+  return value && typeof value === "object" ? value as Record<string, unknown> : {};
+}
+
+function claimString(value: unknown) {
+  return typeof value === "string" ? value : "";
+}
 
 async function countAccountRows(
   supabase: NonNullable<Awaited<ReturnType<typeof createRoleForgeServerClient>>>,
@@ -30,7 +43,7 @@ export async function GET() {
   const config = getSupabaseConfig();
 
   if (!config.configured) {
-    return NextResponse.json({
+    return privateJson({
       configured: false,
       enabled: false,
       provider: "supabase",
@@ -41,45 +54,66 @@ export async function GET() {
   }
 
   const supabase = await createRoleForgeServerClient();
-  const { data, error } = supabase
-    ? await supabase.auth.getUser()
-    : { data: { user: null }, error: null };
-  const profile = !error && data.user && supabase
-    ? await loadAccountProfile(supabase, data.user.id).catch(() => null)
-    : null;
-  const userId = !error && data.user ? data.user.id : "";
-  const user = userId && data.user
+  const { data: claimsData, error } = supabase
+    ? await supabase.auth.getClaims()
+    : { data: { claims: null }, error: null };
+  const claims = !error ? claimsData?.claims : null;
+  const userId = claimString(claims?.sub);
+  const userMetadata = claimRecord(claims?.user_metadata);
+  const appMetadata = claimRecord(claims?.app_metadata);
+  const identity = userId
     ? {
-        reference: accountReference(userId),
-        email: data.user.email ?? "",
-        name: accountDisplayName(data.user, profile?.displayName),
-        imageUrl: accountAvatarUrl(data.user),
+        email: claimString(claims?.email),
+        user_metadata: {
+          avatar_url: userMetadata.avatar_url,
+          full_name: userMetadata.full_name,
+          name: userMetadata.name,
+          picture: userMetadata.picture,
+        },
+        app_metadata: {
+          provider: appMetadata.provider,
+          providers: appMetadata.providers,
+        },
       }
     : null;
-
-  if (userId) {
-    await reconcileUserSubscriptionEntitlement(userId).catch(() => false);
-  }
-
-  const entitlement = userId && supabase ? await loadAccountEntitlement(supabase, userId) : FREE_ENTITLEMENT;
-  const usage = userId && supabase
-    ? await loadAccountUsage(supabase, userId, entitlement).catch(() => null)
-    : null;
-  const accountSummary = userId && supabase
-    ? await Promise.all([
+  const entitlementPromise = userId && supabase
+    ? loadAccountEntitlement(supabase, userId)
+    : Promise.resolve(FREE_ENTITLEMENT);
+  const profilePromise = userId && supabase
+    ? loadAccountProfile(supabase, userId).catch(() => null)
+    : Promise.resolve(null);
+  const usagePromise = entitlementPromise.then((entitlement) => userId && supabase
+    ? loadAccountUsage(supabase, userId, entitlement).catch(() => null)
+    : null);
+  const accountSummaryPromise = userId && supabase
+    ? Promise.all([
         countAccountRows(supabase, "resume_projects", userId).catch(() => null),
         countAccountRows(supabase, "support_requests", userId).catch(() => null),
       ]).then(([savedProjectCount, supportRequestCount]) => ({
         savedProjectCount,
         supportRequestCount,
       }))
+    : Promise.resolve(null);
+  const [profile, entitlement, usage, accountSummary] = await Promise.all([
+    profilePromise,
+    entitlementPromise,
+    usagePromise,
+    accountSummaryPromise,
+  ]);
+  const user = userId && identity
+    ? {
+        reference: accountReference(userId),
+        email: identity.email,
+        name: accountDisplayName(identity, profile?.displayName),
+        imageUrl: accountAvatarUrl(identity),
+      }
     : null;
   const billing = billingReadiness(getStripeBillingConfig(), {
     hasServiceRole: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()),
     billingStatus: entitlement.billingStatus,
   });
 
-  return NextResponse.json({
+  return privateJson({
     configured: true,
     enabled: true,
     provider: "supabase",
@@ -88,7 +122,7 @@ export async function GET() {
     usage,
     accountSummary,
     operations: {
-      supportAdmin: Boolean(data.user && isSupportAdminUser(data.user)),
+      supportAdmin: Boolean(identity && isSupportAdminUser(identity)),
     },
     billing,
     next: user

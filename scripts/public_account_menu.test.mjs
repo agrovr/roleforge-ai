@@ -13,8 +13,8 @@ const stylesheet = readFileSync("app/globals.css", "utf8");
 
 test("public account menu turns static topbars into signed-in command centers", () => {
   assert.match(publicAccountMenu, /"use client"/);
-  assert.match(publicAccountMenu, /fetch\("\/api\/auth\/status"/);
-  assert.match(publicAccountMenu, /credentials:\s*"same-origin"/);
+  assert.match(publicAccountMenu, /loadAccountStatus<PublicAccountStatus>\(\)/);
+  assert.doesNotMatch(publicAccountMenu, /fetch\("\/api\/auth\/status"/);
   assert.match(publicAccountMenu, /AccountReferenceCopyButton/);
   assert.match(accountReferenceCopyButton, /writeClipboardText\(referenceLabel\)/);
   assert.match(publicAccountMenu, /useState<PublicAccountStatus \| null \| undefined>\(undefined\)/);
@@ -79,9 +79,10 @@ test("public account menu turns static topbars into signed-in command centers", 
 
 test("auth status exposes safe account counts for public menus", () => {
   assert.match(authStatusRoute, /accountReference/);
-  assert.match(authStatusRoute, /const userId = !error && data\.user \? data\.user\.id : ""/);
+  assert.match(authStatusRoute, /supabase\.auth\.getClaims\(\)/);
+  assert.match(authStatusRoute, /const userId = claimString\(claims\?\.sub\)/);
   assert.match(authStatusRoute, /reference:\s*accountReference\(userId\)/);
-  assert.doesNotMatch(authStatusRoute, /\n\s*id:\s*data\.user\.id/);
+  assert.doesNotMatch(authStatusRoute, /reconcileUserSubscriptionEntitlement/);
   assert.match(authStatusRoute, /countAccountRows/);
   assert.match(authStatusRoute, /table:\s*"resume_projects"\s*\|\s*"support_requests"/);
   assert.match(authStatusRoute, /\.select\("id",\s*\{\s*count:\s*"exact",\s*head:\s*true\s*\}\)/);
@@ -93,7 +94,9 @@ test("auth status exposes safe account counts for public menus", () => {
   assert.match(authStatusRoute, /supportRequestCount/);
   assert.match(authStatusRoute, /isSupportAdminUser/);
   assert.match(authStatusRoute, /operations/);
-  assert.match(authStatusRoute, /supportAdmin:\s*Boolean\(data\.user && isSupportAdminUser\(data\.user\)\)/);
+  assert.match(authStatusRoute, /supportAdmin:\s*Boolean\(identity && isSupportAdminUser\(identity\)\)/);
+  assert.match(authStatusRoute, /await Promise\.all\(\[/);
+  assert.match(authStatusRoute, /Cache-Control", "private, no-store"/);
   assert.doesNotMatch(authStatusRoute, /ROLEFORGE_ADMIN_EMAILS[^;]*json/i);
 });
 

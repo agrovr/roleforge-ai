@@ -14,11 +14,15 @@ import { TemplateLibrary } from "./TemplateLibrary";
 
 async function getTemplateLinks() {
   const supabase = await createRoleForgeServerClient();
+  const [authResult, cookieStore] = await Promise.all([
+    supabase ? supabase.auth.getUser() : Promise.resolve({ data: { user: null } }),
+    cookies(),
+  ]);
   const {
     data: { user },
-  } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
+  } = authResult;
   const signedIn = Boolean(user);
-  const templateCookie = (await cookies()).get(RESUME_TEMPLATE_COOKIE)?.value;
+  const templateCookie = cookieStore.get(RESUME_TEMPLATE_COOKIE)?.value;
   const initialTemplateSlug = isResumeTemplateSlug(templateCookie) ? templateCookie : null;
   const displayName = accountDisplayName(user);
   const accountInitials = (displayName || user?.email || "RF").slice(0, 2).toUpperCase();

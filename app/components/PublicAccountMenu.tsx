@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+import { loadAccountStatus } from "../lib/accountStatusClient";
 import { AccountAvatar } from "./AccountAvatar";
 import { AccountReferenceCopyButton } from "./AccountReferenceCopyButton";
 import { RoleForgeIcon } from "./RoleForgeIcons";
@@ -68,8 +69,7 @@ export function PublicAccountMenu({ supportHref = "/support" }: PublicAccountMen
   useEffect(() => {
     let alive = true;
 
-    fetch("/api/auth/status", { credentials: "same-origin" })
-      .then((response) => response.ok ? response.json() as Promise<PublicAccountStatus> : null)
+    loadAccountStatus<PublicAccountStatus>()
       .then((payload) => {
         if (alive) setStatus(payload);
       })

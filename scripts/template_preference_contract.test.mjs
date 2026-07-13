@@ -25,6 +25,7 @@ test("generic Studio entry resolves query then cookie then storage and synchroni
 
 test("Settings writes the same cookie consumed by Templates and Studio", () => {
   assert.match(settingsPage, /cookieStore\.set\(RESUME_TEMPLATE_COOKIE,\s*template/);
-  assert.match(templatesPage, /cookies\(\)\)\.get\(RESUME_TEMPLATE_COOKIE\)/);
+  assert.match(templatesPage, /cookies\(\)/);
+  assert.match(templatesPage, /cookieStore\.get\(RESUME_TEMPLATE_COOKIE\)/);
   assert.match(studioPage, /readResumeTemplateCookie\(document\.cookie\)/);
 });

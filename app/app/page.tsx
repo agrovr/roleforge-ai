@@ -7,6 +7,7 @@ import { AccountReferenceCopyButton } from "../components/AccountReferenceCopyBu
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { loadAccountStatus } from "../lib/accountStatusClient";
 import { writeClipboardText } from "../lib/clipboard";
 import { APPLICATION_STATUS_OPTIONS, applicationStatusCopy, type ApplicationStatus } from "../lib/applicationStatus";
 import { downloadStatusFromHead } from "../lib/downloadStatus";
@@ -1097,13 +1098,9 @@ export default function Page() {
     return { ...extra, Authorization: `Bearer ${token.accessToken}` };
   }, [loadWorkflowAccessToken]);
 
-  const refreshAccountStatus = useCallback(async (signal?: AbortSignal) => {
-    const response = await fetch("/api/auth/status", {
-      credentials: "include",
-      signal,
-    });
-    if (!response.ok) throw new Error("Account status failed");
-    const data = (await response.json()) as AccountStatus;
+  const refreshAccountStatus = useCallback(async (signal?: AbortSignal, force = false) => {
+    const data = await loadAccountStatus<AccountStatus>({ force });
+    if (signal?.aborted) throw new DOMException("Account status request was cancelled.", "AbortError");
     setAccountStatus(data);
     return data;
   }, []);
@@ -1868,7 +1865,7 @@ export default function Page() {
       );
       if (options.countUsage === false) return true;
 
-      const refreshed = await refreshAccountStatus()
+      const refreshed = await refreshAccountStatus(undefined, true)
         .then(() => true)
         .catch(() => false);
 
@@ -2408,7 +2405,7 @@ export default function Page() {
             }
           : current);
       } else if (tailoredOutput && signedIn && accountReady) {
-        void refreshAccountStatus().catch(() => undefined);
+        void refreshAccountStatus(undefined, true).catch(() => undefined);
       }
       setStage("error");
     } finally {
