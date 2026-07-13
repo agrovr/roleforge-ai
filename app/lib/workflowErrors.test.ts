@@ -97,6 +97,18 @@ test("maps job URL and export ownership failures to recovery copy", async () => 
     workflowErrorFromCaught(exportForbidden, "Fallback copy.").message,
     "This export belongs to another signed-in account.",
   );
+
+  const resumeForbidden = await readApiError(new Response(JSON.stringify({
+    error: {
+      code: "resume_forbidden",
+      message: "This resume belongs to a different account.",
+    },
+  }), { status: 403 }), "Fallback copy.");
+
+  assert.equal(
+    workflowErrorFromCaught(resumeForbidden, "Fallback copy.").message,
+    "This resume was uploaded from another signed-in account. Upload the source resume again to continue.",
+  );
 });
 
 test("keeps unknown API messages and falls back when the response is not JSON", async () => {

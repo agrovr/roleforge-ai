@@ -44,6 +44,8 @@ function customerWorkflowMessage(code: string | undefined, apiMessage: string | 
       return "Choose a resume file before uploading.";
     case "resume_not_found":
       return "Upload the source resume again before re-running Tailor.";
+    case "resume_forbidden":
+      return "This resume was uploaded from another signed-in account. Upload the source resume again to continue.";
     case "usage_verification_failed":
       return "We could not check your plan usage. Wait a moment, then try again.";
     case "usage_recording_failed":

@@ -84,7 +84,6 @@ import {
   type ParsedResumeSection,
   type PlainResumeLine,
 } from "../lib/previewResume";
-import { createRoleForgeBrowserClient } from "../lib/supabase/client";
 import { deleteSavedProject, loadSavedRuns, renameSavedProject, saveCompletedRun, updateSavedProjectStatus } from "../lib/supabase/savedProjectClient";
 import { tailorActionState } from "../lib/tailorAction";
 import { accountUsageSummary, monthlyRunAllowanceSentence, runWord } from "../lib/usage";
@@ -212,6 +211,7 @@ type AccountStatus = {
 };
 type ExportNotice = { format: ExportFormat; label: string };
 type ReviewDecision = "reviewed" | "edit";
+type WorkflowAccessToken = { accessToken: string; expiresAt: number };
 
 const HISTORY_KEY = "resume-tailor-history-v1";
 const SYNCED_HISTORY_KEY = "roleforge-synced-history-v1";
@@ -961,7 +961,6 @@ export default function Page() {
     const value = process.env.NEXT_PUBLIC_BACKEND_URL;
     return value && value.trim() ? value.trim() : "";
   }, []);
-  const supabaseClient = useMemo(() => createRoleForgeBrowserClient(), []);
 
   const [file, setFile] = useState<File | null>(null);
   const [fileInputVersion, setFileInputVersion] = useState(0);
@@ -1034,10 +1033,14 @@ export default function Page() {
   const historyDetailRef = useRef<HTMLElement | null>(null);
   const accountMenuRef = useRef<HTMLDivElement | null>(null);
   const handledHistoryRunRef = useRef("");
+  const workflowAccessTokenRef = useRef<WorkflowAccessToken | null>(null);
+  const workflowTokenRequestRef = useRef<Promise<WorkflowAccessToken> | null>(null);
+  const workflowTokenGenerationRef = useRef(0);
 
   const accountUser = accountStatus?.user ?? null;
   const accountReady = Boolean(accountStatus?.configured && accountStatus.enabled);
   const signedIn = Boolean(accountUser);
+  const accountSessionKey = `${accountUser?.reference ?? ""}|${accountUser?.email ?? ""}`;
   const usageLimited = Boolean(accountStatus?.usage?.runLimited);
   const limitError = workflowError?.code === "plan_limit_reached";
   const limitReached = usageLimited || limitError;
@@ -1056,17 +1059,43 @@ export default function Page() {
   const resetLabel = formatResetDate(resetAt);
   const usageLabel = usageSummary.label;
 
+  const loadWorkflowAccessToken = useCallback(async () => {
+    const cached = workflowAccessTokenRef.current;
+    const refreshBufferMs = 60_000;
+    if (cached?.accessToken && cached.expiresAt * 1000 - refreshBufferMs > Date.now()) return cached;
+    if (workflowTokenRequestRef.current) return workflowTokenRequestRef.current;
+
+    const generation = workflowTokenGenerationRef.current;
+    const request: Promise<WorkflowAccessToken> = fetch("/api/auth/workflow-token", {
+      cache: "no-store",
+      credentials: "include",
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("We could not confirm your session. Refresh or sign in again, then retry.");
+        const payload = (await response.json()) as Partial<WorkflowAccessToken>;
+        if (!payload.accessToken) throw new Error("Sign in to use the resume workflow.");
+        const token = {
+          accessToken: payload.accessToken,
+          expiresAt: typeof payload.expiresAt === "number" ? payload.expiresAt : 0,
+        };
+        if (generation !== workflowTokenGenerationRef.current) {
+          throw new Error("Your account session changed. Try the workflow again.");
+        }
+        workflowAccessTokenRef.current = token;
+        return token;
+      })
+      .finally(() => {
+        if (workflowTokenRequestRef.current === request) workflowTokenRequestRef.current = null;
+      });
+
+    workflowTokenRequestRef.current = request;
+    return request;
+  }, []);
+
   const workflowHeaders = useCallback(async (extra: Record<string, string> = {}) => {
-    if (!supabaseClient) return extra;
-
-    const { data, error: sessionError } = await supabaseClient.auth.getSession();
-    if (sessionError) throw new Error("We could not confirm your session. Try again in a moment.");
-
-    const token = data.session?.access_token;
-    if (!token) throw new Error("Sign in to use the resume workflow.");
-
-    return { ...extra, Authorization: `Bearer ${token}` };
-  }, [supabaseClient]);
+    const token = await loadWorkflowAccessToken();
+    return { ...extra, Authorization: `Bearer ${token.accessToken}` };
+  }, [loadWorkflowAccessToken]);
 
   const refreshAccountStatus = useCallback(async (signal?: AbortSignal) => {
     const response = await fetch("/api/auth/status", {
@@ -1453,6 +1482,29 @@ export default function Page() {
 
     return () => controller.abort();
   }, [refreshAccountStatus]);
+
+  useEffect(() => {
+    workflowTokenGenerationRef.current += 1;
+    workflowAccessTokenRef.current = null;
+    workflowTokenRequestRef.current = null;
+    if (!signedIn) return;
+
+    const warmWorkflowSession = () => {
+      void loadWorkflowAccessToken().catch(() => undefined);
+    };
+
+    const idleWindow = window as unknown as {
+      requestIdleCallback?: Window["requestIdleCallback"];
+      cancelIdleCallback?: Window["cancelIdleCallback"];
+    };
+    if (idleWindow.requestIdleCallback && idleWindow.cancelIdleCallback) {
+      const idleId = idleWindow.requestIdleCallback(warmWorkflowSession, { timeout: 1_800 });
+      return () => idleWindow.cancelIdleCallback?.(idleId);
+    }
+
+    const timeoutId = window.setTimeout(warmWorkflowSession, 1_600);
+    return () => window.clearTimeout(timeoutId);
+  }, [accountSessionKey, loadWorkflowAccessToken, signedIn]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
