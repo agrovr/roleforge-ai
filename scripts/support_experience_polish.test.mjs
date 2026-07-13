@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const globals = readFileSync("app/globals.css", "utf8");
+const adminStyles = readFileSync("app/admin/support/admin-support.css", "utf8");
 
 test("customer support experience keeps its traceable request surfaces", () => {
   assert.match(globals, /\/\* Support experience polish: traceable request cards and operator queue depth\. \*\//);
@@ -16,7 +17,8 @@ test("customer support rails do not spill into the operator inbox", () => {
   assert.doesNotMatch(globals, /\.admin-support-playbook::before/);
   assert.doesNotMatch(globals, /\.admin-support-readiness-card::before/);
   assert.doesNotMatch(globals, /\.admin-support-empty::before/);
-  assert.match(globals, /\.support-status-badge,\s*\.admin-support-status,\s*\.support-reference-copy\s*\{(?=[^}]*letter-spacing:\s*0\.045em)(?=[^}]*box-shadow:)[^}]*\}/s);
+  assert.match(globals, /\.support-status-badge,\s*\.support-reference-copy\s*\{(?=[^}]*letter-spacing:\s*0\.045em)(?=[^}]*box-shadow:)[^}]*\}/s);
+  assert.match(adminStyles, /\.admin-support-status\s*\{(?=[^}]*letter-spacing:\s*0\.045em)(?=[^}]*box-shadow:)[^}]*\}/s);
 });
 
 test("customer support polish keeps dark mode and reduced motion coverage", () => {

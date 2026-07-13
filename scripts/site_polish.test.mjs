@@ -5,6 +5,7 @@ import test from "node:test";
 const layout = readFileSync("app/layout.tsx", "utf8");
 const sitePolish = readFileSync("app/components/SitePolish.tsx", "utf8");
 const globals = readFileSync("app/globals.css", "utf8");
+const adminStyles = readFileSync("app/admin/support/admin-support.css", "utf8");
 
 test("site polish layer is mounted once in the app shell", () => {
   assert.match(layout, /import \{ SitePolish \}/);
@@ -64,9 +65,10 @@ test("product surface polish adds protected workspace details with reduced-motio
     assert.match(globals, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
 
-  assert.doesNotMatch(globals, /\.admin-support-card::before/);
-  assert.doesNotMatch(globals, /\.admin-support-card::after/);
-  assert.match(globals, /\.admin-support-action\.is-pending svg/);
+  assert.doesNotMatch(adminStyles, /\.admin-support-card::before/);
+  assert.doesNotMatch(adminStyles, /\.admin-support-card::after/);
+  assert.match(adminStyles, /\.admin-support-action\.is-pending svg/);
+  assert.doesNotMatch(globals, /admin-support-/);
 
   assert.match(globals, /@keyframes\s+rf-status-flow/);
   assert.match(globals, /prefers-reduced-motion:\s*reduce[\s\S]*rf-studio-stat-fill/);

@@ -3,13 +3,22 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const page = readFileSync("app/admin/support/page.tsx", "utf8");
+const routeLayout = readFileSync("app/admin/support/layout.tsx", "utf8");
 const loadingPage = readFileSync("app/admin/support/loading.tsx", "utf8");
 const submitButton = readFileSync("app/admin/support/SupportSubmitButton.tsx", "utf8");
 const actionRoute = readFileSync("app/admin/support/actions/route.ts", "utf8");
 const replyRoute = readFileSync("app/admin/support/reply/route.ts", "utf8");
 const supportAdmin = readFileSync("app/lib/supportAdmin.ts", "utf8");
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const globalStylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = readFileSync("app/admin/support/admin-support.css", "utf8");
 const notifications = readFileSync("app/lib/supportNotifications.ts", "utf8");
+
+test("admin support styles are scoped to the protected route segment", () => {
+  assert.match(routeLayout, /import "\.\/admin-support\.css"/);
+  assert.match(stylesheet, /\.admin-support-shell\s*\{/);
+  assert.doesNotMatch(globalStylesheet, /admin-support-/);
+  assert.ok(Buffer.byteLength(globalStylesheet) < 700_000, "universal stylesheet should stay below the post-extraction budget");
+});
 
 test("admin support inbox is protected and reads real queue data", () => {
   assert.match(supportAdmin, /ROLEFORGE_ADMIN_EMAILS/);
