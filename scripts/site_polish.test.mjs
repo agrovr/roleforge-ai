@@ -30,22 +30,28 @@ test("landing information stays immediately visible instead of cascading in", ()
   }
 });
 
-test("site polish reveal targets cover public and signed-in product surfaces", () => {
+test("site polish reveal targets stay at section level instead of every repeated card", () => {
   for (const selector of [
-    ".template-card",
-    ".legal-card",
-    ".support-request-card",
-    ".updates-card",
+    ".templates-page-grid",
+    ".legal-index",
+    ".updates-ledger",
     ".settings-section",
-    ".settings-account-health-card",
-    ".settings-activity-item",
     ".rf-preflight-panel",
     ".export-readiness-panel",
-    ".studio-card",
-    ".admin-support-card",
+    ".admin-support-list",
   ]) {
     assert.match(sitePolish, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
+
+  for (const selector of [".template-card", ".settings-activity-item", ".studio-card", ".admin-support-card", ".suggestion", ".ats-item"]) {
+    assert.doesNotMatch(sitePolish, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  }
+});
+
+test("offscreen marketing sections can skip paint without changing their measured layout", () => {
+  assert.match(globals, /\.page-shell > section:not\(\.hero\)[\s\S]*content-visibility:\s*auto/);
+  assert.match(globals, /\.templates-page-shell > \.templates-page-grid\s*\{[^}]*contain-intrinsic-size:\s*auto 1800px/s);
+  assert.match(globals, /data-polish-visible="true"[^}]*will-change:\s*auto/s);
 });
 
 test("product surface polish adds protected workspace details with reduced-motion safety", () => {

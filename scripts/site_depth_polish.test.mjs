@@ -25,10 +25,9 @@ test("site depth polish avoids global landing rails while keeping product surfac
   assert.doesNotMatch(finishPass, /admin-support-(?:hero|card)/);
 });
 
-test("progress polish and ambient motion respect reduced motion", () => {
+test("progress polish keeps ambient depth static and inexpensive", () => {
   assert.match(globals, /\.dash-progress-track,[\s\S]*?\.dash-resume-progress[\s\S]*?\)::after\s*\{/);
-  assert.match(globals, /@keyframes\s+rf-ambient-drift-a/);
-  assert.match(globals, /@keyframes\s+rf-ambient-drift-b/);
-  assert.match(globals, /@keyframes\s+rf-ambient-drift-c/);
-  assert.match(globals, /prefers-reduced-motion:\s*reduce[\s\S]*\.rf-ambient-field span[\s\S]*animation:\s*none/);
+  assert.match(globals, /\.rf-ambient-field span\s*\{[^}]*filter:\s*none/s);
+  assert.doesNotMatch(globals, /@keyframes\s+rf-ambient-drift-/);
+  assert.doesNotMatch(globals, /\.rf-ambient-field span:nth-child\([^)]*\)\s*\{[^}]*animation:/s);
 });

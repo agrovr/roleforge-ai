@@ -43,3 +43,13 @@ test("context menu supports keyboard and native-menu escape hatches", () => {
   assert.match(pointerEffects, /Press Ctrl\/Command\+K for quick actions/);
   assert.match(pointerEffects, /Hold Shift while right-clicking/);
 });
+
+test("viewport listeners only run while the quick menu is open", () => {
+  const guardedListeners = pointerEffects.slice(
+    pointerEffects.indexOf("if (!menu.open) return;"),
+    pointerEffects.indexOf("function handleGlobalKeyDown"),
+  );
+  assert.match(guardedListeners, /window\.addEventListener\("scroll", closeFromViewportChange/);
+  assert.match(guardedListeners, /window\.addEventListener\("resize", closeFromViewportChange/);
+  assert.doesNotMatch(pointerEffects.slice(0, pointerEffects.indexOf("if (!menu.open) return;")), /window\.addEventListener\("scroll"/);
+});

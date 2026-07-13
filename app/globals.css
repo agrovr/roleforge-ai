@@ -186,6 +186,18 @@ html.rf-polish-ready [data-polish-reveal="true"] {
 html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   opacity: 1;
   transform: scale(1);
+  will-change: auto;
+}
+
+/* Skip below-the-fold paint and layout work until those sections approach the viewport. */
+.page-shell > section:not(.hero),
+.templates-page-shell > section:not(.templates-page-hero) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
+}
+
+.templates-page-shell > .templates-page-grid {
+  contain-intrinsic-size: auto 1800px;
 }
 
 .page-shell,
@@ -1074,9 +1086,8 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   inset: 8% 5%;
   z-index: 0;
   background: radial-gradient(ellipse at center, var(--brand-soft) 0%, transparent 65%);
-  filter: blur(40px);
+  filter: none;
   opacity: 0.72;
-  animation: halo-breathe 7s ease-in-out infinite;
 }
 
 .resume-card {
@@ -1140,7 +1151,6 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   color: var(--ink-1);
   font-size: 0.9rem;
   font-weight: 700;
-  animation: float-y 4s ease-in-out infinite;
 }
 
 .hero-badge .b-icon {
@@ -1178,17 +1188,6 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   animation-delay: -2s;
 }
 
-@keyframes float-y {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
 @keyframes rise-in {
   from {
     opacity: 0.82;
@@ -1198,19 +1197,6 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes halo-breathe {
-  0%,
-  100% {
-    opacity: 0.56;
-    transform: scale(0.98);
-  }
-
-  50% {
-    opacity: 0.86;
-    transform: scale(1.04);
   }
 }
 
@@ -29633,20 +29619,19 @@ html[data-theme="dark"] .brand::after {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .brand-mark-sheet::after {
-    animation: rf-brand-glint 7s ease-in-out infinite;
+  .brand:hover .brand-mark-sheet::after,
+  .brand:focus-visible .brand-mark-sheet::after {
+    animation: rf-brand-glint 1s ease-out both;
   }
 
-  .hero-stage:not(:hover) .resume-card .r-doc::after {
-    animation: rf-resume-paper-glint 8.8s ease-in-out infinite;
+  .hero-stage:hover .resume-card .r-doc::after,
+  .template-card:hover .r-doc::after,
+  .templates-page-card:hover .r-doc::after {
+    animation: rf-resume-paper-glint 1.2s ease-out both;
   }
 
-  .r-hl {
-    animation: rf-highlight-scan 6.5s ease-in-out infinite;
-  }
-
-  .r-hl-good {
-    animation: rf-highlight-scan 7.2s ease-in-out infinite;
+  :where(.hero-stage, .template-card, .templates-page-card):hover :where(.r-hl, .r-hl-good) {
+    animation: rf-highlight-scan 1.1s ease-out both;
   }
 }
 
@@ -29729,9 +29714,8 @@ html[data-theme="dark"] .brand::after {
   width: clamp(18rem, 30vw, 36rem);
   aspect-ratio: 1;
   border-radius: 999px;
-  filter: blur(42px);
-  opacity: 0.28;
-  transform: translate3d(0, 0, 0);
+  filter: none;
+  opacity: 0.22;
 }
 
 .rf-ambient-field span:nth-child(1) {
@@ -29925,58 +29909,11 @@ html[data-theme="dark"] .rf-ambient-field {
 
 html[data-theme="dark"] .rf-ambient-field span {
   opacity: 0.2;
-  filter: blur(48px);
+  filter: none;
 }
 
 html[data-theme="dark"] :where(.eyebrow, .price-kicker, .settings-price-kicker, .dash-side-label, .updates-card-meta, .status-pill) {
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.42);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .rf-ambient-field span:nth-child(1) {
-    animation: rf-ambient-drift-a 22s ease-in-out infinite;
-  }
-
-  .rf-ambient-field span:nth-child(2) {
-    animation: rf-ambient-drift-b 26s ease-in-out infinite;
-  }
-
-  .rf-ambient-field span:nth-child(3) {
-    animation: rf-ambient-drift-c 30s ease-in-out infinite;
-  }
-}
-
-@keyframes rf-ambient-drift-a {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-
-  50% {
-    transform: translate3d(4rem, 1.5rem, 0) scale(1.08);
-  }
-}
-
-@keyframes rf-ambient-drift-b {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-
-  50% {
-    transform: translate3d(-3rem, -2rem, 0) scale(1.06);
-  }
-}
-
-@keyframes rf-ambient-drift-c {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-
-  50% {
-    transform: translate3d(2rem, -2.5rem, 0) scale(1.1);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {

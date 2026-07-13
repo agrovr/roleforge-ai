@@ -151,26 +151,34 @@ export function PointerEffects() {
       openQuickMenu(point);
     }
 
+    document.addEventListener("contextmenu", openMenu);
+
+    return () => {
+      document.removeEventListener("contextmenu", openMenu);
+    };
+  }, [openQuickMenu]);
+
+  useEffect(() => {
+    if (!menu.open) return;
+
     function closeFromPointer(event: PointerEvent) {
       if (!menuRef.current?.contains(event.target as Node)) closeMenu();
     }
 
-    function closeFromScroll() {
+    function closeFromViewportChange() {
       closeMenu();
     }
 
-    document.addEventListener("contextmenu", openMenu);
     document.addEventListener("pointerdown", closeFromPointer, { passive: true });
-    window.addEventListener("scroll", closeFromScroll, { passive: true });
-    window.addEventListener("resize", closeFromScroll, { passive: true });
+    window.addEventListener("scroll", closeFromViewportChange, { passive: true });
+    window.addEventListener("resize", closeFromViewportChange, { passive: true });
 
     return () => {
-      document.removeEventListener("contextmenu", openMenu);
       document.removeEventListener("pointerdown", closeFromPointer);
-      window.removeEventListener("scroll", closeFromScroll);
-      window.removeEventListener("resize", closeFromScroll);
+      window.removeEventListener("scroll", closeFromViewportChange);
+      window.removeEventListener("resize", closeFromViewportChange);
     };
-  }, [closeMenu, openQuickMenu]);
+  }, [closeMenu, menu.open]);
 
   useEffect(() => {
     function handleGlobalKeyDown(event: globalThis.KeyboardEvent) {
