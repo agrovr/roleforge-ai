@@ -31,6 +31,11 @@ test("landing information stays immediately visible instead of cascading in", ()
   for (const selector of [".hero-copy", ".hero-stage", ".feature-card", ".price-card", ".pricing-clarity-grid a", ".step-card"]) {
     assert.doesNotMatch(sitePolish, new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
+
+  assert.equal((globals.match(/animation:\s*rise-in/g) ?? []).length, 2);
+  assert.match(globals, /\.hero-copy\s*\{[^}]*animation:\s*rise-in/s);
+  assert.match(globals, /\.hero-stage\s*\{[^}]*animation:\s*rise-in/s);
+  assert.doesNotMatch(globals, /\.step,\s*\.feature-card,\s*\.template-card,\s*\.price-card,\s*\.faq-item/);
 });
 
 test("site polish reveal targets stay at section level instead of every repeated card", () => {

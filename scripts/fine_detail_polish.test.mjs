@@ -3,7 +3,6 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const globals = readFileSync("app/globals.css", "utf8");
-const pointerEffects = readFileSync("app/components/PointerEffects.tsx", "utf8");
 
 test("fine-detail polish styles native scrollbars and keyboard hints", () => {
   assert.match(globals, /html\s*\{[\s\S]*?scrollbar-color:/);
@@ -24,6 +23,5 @@ test("fine-detail polish covers form autofill and keeps the native cursor", () =
   assert.match(globals, /accent-color:\s*var\(--brand-dark\)/);
   assert.match(globals, /@keyframes\s+rf-token-breathe/);
   assert.match(globals, /prefers-reduced-motion:\s*reduce[\s\S]*rf-token-breathe[\s\S]*animation:\s*none/);
-  assert.doesNotMatch(pointerEffects, /pointermove/);
   assert.doesNotMatch(globals, /cursor:\s*none/);
 });

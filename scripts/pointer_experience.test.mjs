@@ -3,53 +3,30 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const layout = readFileSync("app/layout.tsx", "utf8");
-const pointerEffects = readFileSync("app/components/PointerEffects.tsx", "utf8");
 const globals = readFileSync("app/globals.css", "utf8");
+const accountMenuBehavior = readFileSync("app/components/AccountMenuBehavior.tsx", "utf8");
+const sitePolish = readFileSync("app/components/SitePolish.tsx", "utf8");
 
-test("global pointer experience is mounted once in the app shell", () => {
-  assert.match(layout, /import \{ PointerEffects \}/);
-  assert.match(layout, /<PointerEffects \/>/);
+test("the app shell preserves native browser pointer and keyboard behavior", () => {
+  assert.doesNotMatch(layout, /PointerEffects/);
+  assert.doesNotMatch(`${accountMenuBehavior}\n${sitePolish}`, /contextmenu/);
+  assert.doesNotMatch(`${accountMenuBehavior}\n${sitePolish}`, /event\.key\.toLowerCase\(\) === "k"/);
 });
 
-test("pointer experience keeps the native cursor fast and accessibility-aware", () => {
-  assert.match(pointerEffects, /isEditableTarget/);
-  assert.match(pointerEffects, /rf-native-context/);
-  assert.doesNotMatch(pointerEffects, /pointermove/);
-  assert.doesNotMatch(pointerEffects, /requestAnimationFrame/);
-  assert.doesNotMatch(pointerEffects, /rf-custom-pointer/);
+test("native cursor styling stays fast and accessible", () => {
   assert.doesNotMatch(globals, /cursor:\s*none/);
   assert.doesNotMatch(globals, /\.rf-cursor-ring/);
   assert.doesNotMatch(globals, /\.rf-cursor-dot/);
   assert.doesNotMatch(globals, /\.pointer-glow/);
 });
 
-test("context menu supports keyboard and native-menu escape hatches", () => {
-  assert.match(pointerEffects, /document\.addEventListener\("contextmenu"/);
-  assert.match(pointerEffects, /document\.addEventListener\("keydown", handleGlobalKeyDown\)/);
-  assert.match(pointerEffects, /event\.key\.toLowerCase\(\) === "k"/);
-  assert.match(pointerEffects, /event\.ctrlKey \|\| event\.metaKey/);
-  assert.match(pointerEffects, /openQuickMenu\(\)/);
-  assert.match(pointerEffects, /event\.shiftKey \|\| event\.ctrlKey \|\| event\.metaKey \|\| event\.altKey/);
-  assert.match(pointerEffects, /role="menu"/);
-  assert.match(pointerEffects, /role="menuitem"/);
-  assert.match(pointerEffects, /ArrowDown/);
-  assert.match(pointerEffects, /ArrowUp/);
-  assert.match(pointerEffects, /Escape/);
-  assert.match(pointerEffects, /quickActionHandlers/);
-  assert.match(pointerEffects, /\["s", "t", "a", "d", "c", "r"\]\.includes\(shortcut\)/);
-  assert.match(pointerEffects, /runMenuAction\(quickActionHandlers\(\)\[shortcut as QuickActionKey\]\)/);
-  assert.match(pointerEffects, /clampMenuPosition/);
-  assert.match(globals, /\.rf-context-menu/);
-  assert.match(pointerEffects, /Press Ctrl\/Command\+K for quick actions/);
-  assert.match(pointerEffects, /Hold Shift while right-clicking/);
+test("the retired custom context menu leaves no global styles or keyframes", () => {
+  assert.doesNotMatch(globals, /\.rf-context-menu/);
+  assert.doesNotMatch(globals, /@keyframes\s+rf-menu-in/);
 });
 
-test("viewport listeners only run while the quick menu is open", () => {
-  const guardedListeners = pointerEffects.slice(
-    pointerEffects.indexOf("if (!menu.open) return;"),
-    pointerEffects.indexOf("function handleGlobalKeyDown"),
-  );
-  assert.match(guardedListeners, /window\.addEventListener\("scroll", closeFromViewportChange/);
-  assert.match(guardedListeners, /window\.addEventListener\("resize", closeFromViewportChange/);
-  assert.doesNotMatch(pointerEffects.slice(0, pointerEffects.indexOf("if (!menu.open) return;")), /window\.addEventListener\("scroll"/);
+test("shared runtime listeners remain scoped to real account-menu behavior", () => {
+  assert.match(accountMenuBehavior, /details\[data-account-menu\]/);
+  assert.doesNotMatch(accountMenuBehavior, /window\.addEventListener\("scroll"/);
+  assert.doesNotMatch(accountMenuBehavior, /window\.addEventListener\("resize"/);
 });
