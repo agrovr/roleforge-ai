@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { stylesFor } from "./style_sources.mjs";
+
 const notFoundPage = readFileSync("app/not-found.tsx", "utf8");
-const globals = readFileSync("app/globals.css", "utf8");
+const globals = stylesFor("public-pages.css");
 const smokeLayout = readFileSync("scripts/smoke_layout.mjs", "utf8");
 
 test("not found page provides branded recovery without generic framework UI", () => {

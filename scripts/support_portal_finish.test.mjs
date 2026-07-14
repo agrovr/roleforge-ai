@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { stylesFor } from "./style_sources.mjs";
+
 const supportPage = readFileSync("app/support/page.tsx", "utf8");
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = stylesFor("public-pages.css", "support/support.css");
 
 test("support portal finish keeps the customer support workspace polished", () => {
   assert.match(supportPage, /support-request-card/);

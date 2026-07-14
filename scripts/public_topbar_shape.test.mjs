@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { stylesFor } from "./style_sources.mjs";
+
 const templatesPage = readFileSync("app/templates/page.tsx", "utf8");
-const globals = readFileSync("app/globals.css", "utf8");
+const globals = stylesFor("public-pages.css", "templates/templates.css");
 
 test("public legal topbar uses a rounded floating command dock", () => {
   assert.match(globals, /\/\* Public masthead refinement: rounded floating command dock/);

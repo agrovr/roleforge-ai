@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { stylesFor } from "./style_sources.mjs";
+
 const helpPage = readFileSync("app/help/page.tsx", "utf8");
 const helpSearch = readFileSync("app/help/HelpSearch.tsx", "utf8");
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = stylesFor("public-pages.css", "help/help.css");
 
 test("help center has client-side search over topics and actions", () => {
   assert.match(helpPage, /HelpSearch/);

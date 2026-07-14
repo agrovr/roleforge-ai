@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const globals = readFileSync("app/globals.css", "utf8");
+import { allPublicStyles } from "./style_sources.mjs";
+
+const globals = allPublicStyles;
 const adminStyles = readFileSync("app/admin/support/admin-support.css", "utf8");
 
 test("global interaction polish gives keyboard users a consistent focus ring", () => {

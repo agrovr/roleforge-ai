@@ -1,8 +1,7 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+import { allPublicStyles as css } from "./style_sources.mjs";
 
 test("keeps visual fit guardrails consolidated", () => {
   const canonicalMarkers = css.match(/Visual fit guardrails: the canonical layer/g) ?? [];

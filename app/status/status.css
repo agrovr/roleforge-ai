@@ -1,0 +1,635 @@
+/* Route-owned styles extracted from the universal bundle. */
+.status-shell {
+  --status-good: color-mix(in srgb, var(--good) 86%, var(--brand-dark));
+  --status-ready: color-mix(in srgb, var(--brand) 82%, var(--good));
+  --status-warn: color-mix(in srgb, var(--accent) 88%, var(--danger));
+}
+
+.status-hero-card {
+  border-color: color-mix(in srgb, var(--brand) 22%, var(--line));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--brand-soft) 42%, transparent), transparent),
+    color-mix(in srgb, var(--surface) 88%, var(--bg-alt));
+}
+
+.status-hero-card svg {
+  color: var(--brand-dark);
+}
+
+.status-grid {
+  width: min(1280px, 100%);
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(min(100%, 230px), 1fr));
+  gap: 14px;
+  min-width: 0;
+  margin: 0 auto;
+}
+
+.status-card {
+  container: status-card / inline-size;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  overflow: hidden;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--bg-alt) 76%, transparent)),
+    var(--surface);
+  box-shadow: 0 20px 54px -44px var(--shadow);
+}
+
+.status-card.good {
+  border-color: color-mix(in srgb, var(--status-good) 24%, var(--line));
+}
+
+.status-card.ready {
+  border-color: color-mix(in srgb, var(--status-ready) 24%, var(--line));
+}
+
+.status-card.warn {
+  border-color: color-mix(in srgb, var(--status-warn) 28%, var(--line));
+}
+
+.status-card-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, currentColor 20%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, currentColor 9%, var(--surface));
+}
+
+.status-card.good .status-card-icon {
+  color: var(--status-good);
+}
+
+.status-card.ready .status-card-icon {
+  color: var(--status-ready);
+}
+
+.status-card.warn .status-card-icon {
+  color: var(--status-warn);
+}
+
+.status-card div:last-child {
+  min-width: 0;
+}
+
+.status-card span {
+  display: block;
+  color: var(--ink-3);
+  font-size: 0.74rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.status-card strong {
+  display: block;
+  margin-top: 6px;
+  color: var(--ink-0);
+  font-family: var(--font-display);
+  font-size: clamp(1.52rem, 11cqi, 2rem);
+  line-height: 1.02;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.status-card p {
+  margin: 10px 0 0;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  font-weight: 680;
+  line-height: 1.48;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+@container status-card (max-width: 250px) {
+  .status-card {
+    grid-template-columns: 1fr;
+  }
+
+  .status-card strong {
+    font-size: clamp(1.35rem, 14cqi, 1.72rem);
+  }
+}
+
+.status-diagnostics {
+  width: min(1280px, 100%);
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1fr);
+  gap: 14px;
+  min-width: 0;
+  margin: 0 auto;
+}
+
+.status-incident-card,
+.status-diagnostic-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--bg-alt) 76%, transparent)),
+    var(--surface);
+  box-shadow: 0 20px 54px -46px var(--shadow);
+}
+
+.status-incident-card {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  overflow: hidden;
+  padding: 16px;
+}
+
+.status-incident-card.good {
+  border-color: color-mix(in srgb, var(--status-good) 28%, var(--line));
+}
+
+.status-incident-card.warn {
+  border-color: color-mix(in srgb, var(--status-warn) 32%, var(--line));
+}
+
+.status-incident-card > span {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, currentColor 20%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, currentColor 9%, var(--surface));
+}
+
+.status-incident-card.good > span {
+  color: var(--status-good);
+}
+
+.status-incident-card.warn > span {
+  color: var(--status-warn);
+}
+
+.status-incident-card div {
+  min-width: 0;
+}
+
+.status-incident-card strong,
+.status-incident-card p,
+.status-diagnostic-card span,
+.status-diagnostic-card strong,
+.status-diagnostic-card small {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.status-incident-card strong {
+  color: var(--ink-0);
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 4vw, 1.85rem);
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+.status-incident-card p {
+  margin: 10px 0 0;
+  color: var(--ink-2);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.status-diagnostic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 142px), 1fr));
+  gap: 10px;
+  min-width: 0;
+}
+
+.status-diagnostic-card {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+  padding: 13px;
+}
+
+.status-diagnostic-card.good {
+  border-color: color-mix(in srgb, var(--status-good) 24%, var(--line));
+}
+
+.status-diagnostic-card.ready {
+  border-color: color-mix(in srgb, var(--status-ready) 24%, var(--line));
+}
+
+.status-diagnostic-card.warn {
+  border-color: color-mix(in srgb, var(--status-warn) 28%, var(--line));
+}
+
+.status-diagnostic-card span {
+  color: var(--ink-3);
+  font-size: 0.67rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1.12;
+  text-transform: uppercase;
+}
+
+.status-diagnostic-card strong {
+  color: var(--ink-0);
+  font-size: 0.96rem;
+  font-weight: 950;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.status-diagnostic-card small {
+  color: var(--ink-3);
+  font-size: 0.75rem;
+  font-weight: 740;
+  line-height: 1.3;
+  text-wrap: pretty;
+}
+
+.status-action-grid {
+  width: min(1280px, 100%);
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+  min-width: 0;
+  margin: 0 auto;
+}
+
+.status-action-card {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  grid-template-areas:
+    "icon title"
+    "icon detail";
+  gap: 5px 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line));
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--bg-alt) 76%, transparent)),
+    var(--surface);
+  color: inherit;
+  text-decoration: none;
+  box-shadow: 0 20px 54px -46px var(--shadow);
+  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+
+.status-action-card:hover,
+.status-action-card:focus-visible {
+  border-color: color-mix(in srgb, var(--brand) 42%, var(--line));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--brand-soft) 32%, transparent), color-mix(in srgb, var(--bg-alt) 72%, transparent)),
+    var(--surface);
+  transform: translateY(-1px);
+}
+
+.status-action-card > span {
+  grid-area: icon;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--line));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--brand-soft) 50%, var(--surface));
+  color: var(--brand-dark);
+}
+
+.status-action-card strong,
+.status-action-card small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.status-action-card strong {
+  grid-area: title;
+  align-self: end;
+  color: var(--ink-0);
+  font-size: 0.95rem;
+  font-weight: 950;
+  line-height: 1.14;
+  text-wrap: balance;
+}
+
+.status-action-card small {
+  grid-area: detail;
+  color: var(--ink-3);
+  font-size: 0.78rem;
+  font-weight: 740;
+  line-height: 1.32;
+  text-wrap: pretty;
+}
+
+@media (max-width: 900px) {
+
+  .status-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .status-diagnostics {
+    grid-template-columns: 1fr;
+  }
+
+  .status-diagnostic-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .status-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+
+  .status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .status-diagnostic-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .status-action-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+html[data-theme="dark"] .status-hero-card svg {
+  color: #f3c16d;
+}
+
+html[data-theme="dark"] .status-action-card > span {
+  border-color: rgba(222, 162, 79, 0.28);
+  background: rgba(222, 162, 79, 0.16);
+  color: #f3c16d;
+}
+
+html[data-theme="dark"] .status-card.good {
+  border-color: rgba(137, 209, 190, 0.28);
+}
+
+html[data-theme="dark"] .status-card.ready {
+  border-color: rgba(141, 181, 214, 0.28);
+}
+
+html[data-theme="dark"] .status-card.warn {
+  border-color: rgba(231, 188, 111, 0.3);
+}
+
+html[data-theme="dark"] .status-incident-card.good,
+html[data-theme="dark"] .status-diagnostic-card.good {
+  border-color: rgba(137, 209, 190, 0.28);
+}
+
+html[data-theme="dark"] .status-diagnostic-card.ready {
+  border-color: rgba(141, 181, 214, 0.28);
+}
+
+html[data-theme="dark"] .status-incident-card.warn,
+html[data-theme="dark"] .status-diagnostic-card.warn {
+  border-color: rgba(231, 188, 111, 0.3);
+}
+
+html[data-theme="dark"] .status-card-icon {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: rgba(255, 247, 233, 0.055);
+}
+
+html[data-theme="dark"] .status-incident-card > span {
+  border-color: rgba(255, 247, 233, 0.16);
+  background: rgba(255, 247, 233, 0.055);
+}
+
+html[data-theme="dark"] .status-incident-card.good > span {
+  color: #b7e5c4;
+}
+
+html[data-theme="dark"] .status-incident-card.warn > span {
+  color: #f0c978;
+}
+.status-shell {
+  --status-surface-grid: linear-gradient(90deg, color-mix(in srgb, var(--line) 18%, transparent) 1px, transparent 1px);
+  --status-good-rail: linear-gradient(90deg, var(--good), var(--accent));
+  --status-ready-rail: linear-gradient(90deg, var(--brand), var(--sky));
+  --status-warn-rail: linear-gradient(90deg, var(--warn), var(--coral));
+}
+
+.status-hero-card,
+.status-card,
+.status-incident-card,
+.status-diagnostic-card,
+.status-action-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.status-card > *,
+.status-incident-card > *,
+.status-diagnostic-card > *,
+.status-action-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.status-card,
+.status-incident-card,
+.status-diagnostic-card,
+.status-action-card {
+  border-color: color-mix(in srgb, var(--brand) 14%, var(--line));
+  background:
+    var(--status-surface-grid),
+    linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 70%, transparent)),
+    var(--surface);
+  background-size: 30px 30px, auto, auto;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 52%, transparent),
+    0 24px 62px -48px color-mix(in srgb, var(--ink-0) 42%, transparent);
+}
+
+.status-card::after,
+.status-incident-card::after,
+.status-diagnostic-card::after,
+.status-action-card::after {
+  position: absolute;
+  inset-inline: 16px;
+  inset-block-start: 0;
+  z-index: 0;
+  height: 3px;
+  border-radius: 0 0 999px 999px;
+  background: var(--status-ready-rail);
+  content: "";
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.status-card.good::after,
+.status-incident-card.good::after,
+.status-diagnostic-card.good::after {
+  background: var(--status-good-rail);
+}
+
+.status-card.ready::after,
+.status-diagnostic-card.ready::after {
+  background: var(--status-ready-rail);
+}
+
+.status-card.warn::after,
+.status-incident-card.warn::after,
+.status-diagnostic-card.warn::after {
+  background: var(--status-warn-rail);
+}
+
+.status-card {
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.status-card:hover,
+.status-card:focus-within {
+  border-color: color-mix(in srgb, var(--brand-dark) 32%, var(--line));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 58%, transparent),
+    0 28px 70px -50px color-mix(in srgb, var(--ink-0) 48%, transparent);
+  transform: translateY(-1px);
+}
+
+.status-card-icon,
+.status-incident-card > span,
+.status-action-card > span {
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 44%, transparent),
+    0 12px 24px -22px currentColor;
+}
+
+.status-card.good .status-card-icon,
+.status-incident-card.good > span,
+.status-diagnostic-card.good {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--good-soft) 42%, transparent), color-mix(in srgb, var(--surface) 82%, transparent));
+}
+
+.status-card.ready .status-card-icon,
+.status-diagnostic-card.ready {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--brand-soft) 38%, transparent), color-mix(in srgb, var(--surface) 84%, transparent));
+}
+
+.status-card.warn .status-card-icon,
+.status-incident-card.warn > span,
+.status-diagnostic-card.warn {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--warn-soft) 44%, transparent), color-mix(in srgb, var(--surface) 84%, transparent));
+}
+
+.status-diagnostics {
+  gap: 16px;
+}
+
+.status-incident-card {
+  border-radius: 16px;
+  padding: clamp(16px, 2vw, 20px);
+}
+
+.status-diagnostic-grid {
+  gap: 12px;
+}
+
+.status-diagnostic-card {
+  border-radius: 13px;
+  padding: 14px;
+}
+
+.status-action-grid {
+  gap: 14px;
+}
+
+.status-action-card {
+  border-radius: 16px;
+}
+
+.status-action-card:hover::after,
+.status-action-card:focus-visible::after,
+.status-card:hover::after,
+.status-card:focus-within::after {
+  opacity: 0.88;
+}
+
+html[data-theme="dark"] .status-shell {
+  --status-surface-grid: linear-gradient(90deg, rgba(255, 247, 233, 0.042) 1px, transparent 1px);
+  --status-good-rail: linear-gradient(90deg, #a6efb8, #89d1be);
+  --status-ready-rail: linear-gradient(90deg, #f3c16d, #8eb7f0);
+  --status-warn-rail: linear-gradient(90deg, #f0c978, #ff9a86);
+}
+
+html[data-theme="dark"] .status-card,
+html[data-theme="dark"] .status-incident-card,
+html[data-theme="dark"] .status-diagnostic-card,
+html[data-theme="dark"] .status-action-card {
+  border-color: rgba(255, 247, 233, 0.14);
+  background:
+    var(--status-surface-grid),
+    linear-gradient(135deg, rgba(255, 247, 233, 0.07), rgba(255, 247, 233, 0.024)),
+    rgba(12, 17, 31, 0.82);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.08),
+    0 26px 66px -48px rgba(0, 0, 0, 0.92);
+}
+
+html[data-theme="dark"] .status-card:hover,
+html[data-theme="dark"] .status-card:focus-within {
+  border-color: rgba(245, 214, 154, 0.26);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.1),
+    0 30px 76px -52px rgba(0, 0, 0, 0.96);
+}
+
+html[data-theme="dark"] .status-card.good .status-card-icon,
+html[data-theme="dark"] .status-incident-card.good > span,
+html[data-theme="dark"] .status-diagnostic-card.good {
+  background:
+    linear-gradient(180deg, rgba(137, 209, 190, 0.12), rgba(255, 247, 233, 0.028));
+}
+
+html[data-theme="dark"] .status-card.ready .status-card-icon,
+html[data-theme="dark"] .status-diagnostic-card.ready {
+  background:
+    linear-gradient(180deg, rgba(243, 193, 109, 0.12), rgba(255, 247, 233, 0.028));
+}
+
+html[data-theme="dark"] .status-card.warn .status-card-icon,
+html[data-theme="dark"] .status-incident-card.warn > span,
+html[data-theme="dark"] .status-diagnostic-card.warn {
+  background:
+    linear-gradient(180deg, rgba(240, 201, 120, 0.13), rgba(255, 247, 233, 0.028));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-card,
+  .status-action-card,
+  .status-card::after,
+  .status-action-card::after {
+    transition: none;
+  }
+
+  .status-card:hover,
+  .status-card:focus-within {
+    transform: none;
+  }
+}

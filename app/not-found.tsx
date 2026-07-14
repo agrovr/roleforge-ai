@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import "./public-pages.css";
+
 import { Brand } from "./components/Brand";
 import { RoleForgeIcon } from "./components/RoleForgeIcons";
 import { ThemeToggle } from "./components/ThemeToggle";

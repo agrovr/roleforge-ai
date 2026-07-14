@@ -388,10 +388,15 @@ async function checkPublicShell(baseUrl) {
   );
   pass("templates page respects the saved template direction");
 
-  const stylesheetPaths = Array.from(home.text.matchAll(/href="([^"]+\.css[^"]*)"/g))
-    .map((match) => match[1])
-    .filter((path) => path.startsWith("/_next/static/"));
-  requireCondition(stylesheetPaths.length > 0, "home did not include Next.js stylesheets");
+  const stylesheetPaths = Array.from(
+    new Set(
+      [home.text, templates.text]
+        .flatMap((pageText) => Array.from(pageText.matchAll(/href="([^"]+\.css[^"]*)"/g)))
+        .map((match) => match[1])
+        .filter((path) => path.startsWith("/_next/static/")),
+    ),
+  );
+  requireCondition(stylesheetPaths.length > 0, "public pages did not include Next.js stylesheets");
 
   const stylesheetText = (
     await Promise.all(stylesheetPaths.map(async (path) => {

@@ -2,12 +2,14 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { stylesFor } from "./style_sources.mjs";
+
 const helpPage = readFileSync("app/help/page.tsx", "utf8");
 const landingPage = readFileSync("app/page.tsx", "utf8");
 const legalPage = readFileSync("app/components/LegalPage.tsx", "utf8");
 const robotsRoute = readFileSync("app/robots.ts", "utf8");
 const sitemapRoute = readFileSync("app/sitemap.ts", "utf8");
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = stylesFor("public-pages.css", "help/help.css");
 
 test("help page covers account, exports, billing, and saved project guidance", () => {
   assert.match(helpPage, /title: "Help Center"/);

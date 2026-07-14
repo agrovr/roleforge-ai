@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Brand } from "./Brand";
 import { RoleForgeIcon } from "./RoleForgeIcons";
 import { ThemeToggle } from "./ThemeToggle";
+import "../public-pages.css";
 
 type LegalSection = {
   title: string;

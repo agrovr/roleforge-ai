@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const globals = readFileSync("app/globals.css", "utf8");
+import { stylesFor } from "./style_sources.mjs";
+
+const globals = stylesFor("public-pages.css", "support/support.css");
 const adminStyles = readFileSync("app/admin/support/admin-support.css", "utf8");
 
 test("customer support experience keeps its traceable request surfaces", () => {

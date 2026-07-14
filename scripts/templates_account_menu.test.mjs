@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { stylesFor } from "./style_sources.mjs";
+
 const templatesPage = readFileSync("app/templates/page.tsx", "utf8");
 const templateLibrary = readFileSync("app/templates/TemplateLibrary.tsx", "utf8");
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = stylesFor("templates/templates.css");
 
 test("templates page keeps signed-in account controls in the topbar", () => {
   assert.match(templatesPage, /AccountAvatar/);

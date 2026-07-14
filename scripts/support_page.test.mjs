@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { stylesFor } from "./style_sources.mjs";
+
 const supportPage = readFileSync("app/support/page.tsx", "utf8");
 const supportRoute = readFileSync("app/api/support-requests/route.ts", "utf8");
 const supportLib = readFileSync("app/lib/supportRequests.ts", "utf8");
@@ -19,7 +21,7 @@ const templatesPage = readFileSync("app/templates/page.tsx", "utf8");
 const legalPage = readFileSync("app/components/LegalPage.tsx", "utf8");
 const robotsRoute = readFileSync("app/robots.ts", "utf8");
 const sitemapRoute = readFileSync("app/sitemap.ts", "utf8");
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = stylesFor("public-pages.css", "support/support.css");
 const smokeFrontend = readFileSync("scripts/smoke_frontend.mjs", "utf8");
 const smokeLayout = readFileSync("scripts/smoke_layout.mjs", "utf8");
 

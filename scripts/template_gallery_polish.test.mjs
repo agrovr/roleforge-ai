@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const globals = readFileSync("app/globals.css", "utf8");
+import { stylesFor } from "./style_sources.mjs";
+
+const globals = stylesFor("templates/templates.css");
 const templatesPage = readFileSync("app/templates/page.tsx", "utf8");
 const templateLibrary = readFileSync("app/templates/TemplateLibrary.tsx", "utf8");
 const sectionStart = globals.indexOf("/* Template gallery restraint:");

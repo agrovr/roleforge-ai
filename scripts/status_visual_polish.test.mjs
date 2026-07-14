@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const stylesheet = readFileSync("app/globals.css", "utf8");
+import { stylesFor } from "./style_sources.mjs";
+
+const stylesheet = stylesFor("public-pages.css", "status/status.css");
 
 test("status page polish adds trust-oriented card texture and tone rails", () => {
   assert.match(stylesheet, /\/\*\s*Status surface finish: trust-oriented cards, clearer diagnostics, and calm health rails\.\s*\*\//);

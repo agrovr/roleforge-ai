@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { allPublicStyles } from "./style_sources.mjs";
+
 const legalPage = readFileSync("app/components/LegalPage.tsx", "utf8");
-const globals = readFileSync("app/globals.css", "utf8");
+const globals = allPublicStyles;
 
 test("shared legal page keeps a legitimate policy footer", () => {
   assert.match(legalPage, /aria-label="Policy footer"/);

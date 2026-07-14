@@ -2,9 +2,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { allPublicStyles } from "./style_sources.mjs";
+
 const layout = readFileSync("app/layout.tsx", "utf8");
 const sitePolish = readFileSync("app/components/SitePolish.tsx", "utf8");
-const globals = readFileSync("app/globals.css", "utf8");
+const globals = allPublicStyles;
 const adminStyles = readFileSync("app/admin/support/admin-support.css", "utf8");
 
 test("site polish layer is mounted once in the app shell", () => {
