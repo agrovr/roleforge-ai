@@ -17289,26 +17289,6 @@ html[data-theme="dark"] .rf-diff-column {
     0 14px 24px -20px rgba(0, 0, 0, 0.24);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .rf-live-card .studio-tabs-mini button.active::before {
-    animation: rf-studio-preview-tab-glow 6s ease-in-out infinite;
-  }
-}
-
-@keyframes rf-studio-preview-tab-glow {
-  0%,
-  100% {
-    opacity: 0;
-    transform: translateX(-8%);
-  }
-
-  44%,
-  58% {
-    opacity: 0.3;
-    transform: translateX(8%);
-  }
-}
-
 @media (max-width: 760px) {
   .rf-preview-wrap::after {
     inset: 6px;

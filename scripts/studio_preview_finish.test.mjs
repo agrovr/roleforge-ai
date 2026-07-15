@@ -16,12 +16,13 @@ test("studio preview markup keeps the review desk surfaces available", () => {
   assert.match(appPage, /className="rf-preview-empty-steps"/);
 });
 
-test("studio preview tabs get a compact animated command rail", () => {
+test("studio preview tabs get a compact interactive command rail", () => {
   assert.match(section, /\.rf-live-card\s+\.studio-tabs-mini\s*\{(?=[^}]*position:\s*relative)(?=[^}]*isolation:\s*isolate)(?=[^}]*overflow:\s*hidden)(?=[^}]*box-shadow:)[^}]*\}/s);
   assert.match(section, /\.rf-live-card\s+\.studio-tabs-mini::before\s*\{(?=[^}]*height:\s*1px)(?=[^}]*linear-gradient\(90deg,\s*transparent,\s*color-mix\(in srgb,\s*var\(--brand\) 52%)(?=[^}]*opacity:\s*0\.72)[^}]*\}/s);
   assert.match(section, /\.rf-live-card\s+\.studio-tabs-mini\s+button\s*\{(?=[^}]*position:\s*relative)(?=[^}]*overflow:\s*hidden)(?=[^}]*transition:)[^}]*\}/s);
   assert.match(section, /\.rf-live-card\s+\.studio-tabs-mini\s+button:hover,\s*\.rf-live-card\s+\.studio-tabs-mini\s+button:focus-visible\s*\{(?=[^}]*transform:\s*translateY\(-1px\))(?=[^}]*border-color:)[^}]*\}/s);
   assert.match(section, /\.rf-live-card\s+\.studio-tabs-mini\s+button\.active\s*\{(?=[^}]*radial-gradient\(circle at 18% 0%)(?=[^}]*box-shadow:)[^}]*\}/s);
+  assert.doesNotMatch(section, /rf-studio-preview-tab-glow/);
 });
 
 test("studio preview status and paper surfaces have layered review polish", () => {
