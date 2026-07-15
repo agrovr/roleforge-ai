@@ -112,8 +112,14 @@ export function LandingStudioDemo({ studioHref }: { studioHref: string }) {
     <div className="dash-mock dash-demo" data-demo-view={activeView} aria-label="Interactive sample of the RoleForge studio">
       <div className="dash-mock-head">
         <div className="dash-traffic" aria-hidden="true"><span /><span /><span /></div>
-        <div className="dash-mock-url">Interactive sample · roleforgeai.vercel.app/app</div>
-        <button className="dash-demo-reset" type="button" onClick={resetDemo}>
+        <div className="dash-mock-url">Try the sample · choose a workspace view</div>
+        <button
+          aria-label="Reset interactive sample"
+          className="dash-demo-reset"
+          title="Reset interactive sample"
+          type="button"
+          onClick={resetDemo}
+        >
           <RoleForgeIcon name="undo" size={13} /> <span>Reset</span>
         </button>
       </div>

@@ -16,6 +16,9 @@ test("landing studio is isolated as an honest client-side sample", () => {
 });
 
 test("landing studio exposes keyboard-operable sample views and state", () => {
+  assert.match(demo, /Try the sample · choose a workspace view/);
+  assert.match(demo, /aria-label="Reset interactive sample"/);
+  assert.match(demo, /title="Reset interactive sample"/);
   assert.match(demo, /type="button"[\s\S]*?aria-pressed=\{activeView === item\.id\}/);
   assert.match(demo, /aria-label="Sample studio views"/);
   assert.match(demo, /role="status" aria-live="polite"/);
