@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { allStudioStyles } from "./style_sources.mjs";
 
 const appPage = readFileSync("app/app/page.tsx", "utf8");
-const globals = readFileSync("app/globals.css", "utf8");
+const globals = allStudioStyles;
 const sectionStart = globals.indexOf("/* Studio preview finish:");
 assert.notEqual(sectionStart, -1, "studio preview finish section is missing");
 const section = globals.slice(sectionStart);

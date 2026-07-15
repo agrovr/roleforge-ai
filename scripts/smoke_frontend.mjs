@@ -390,6 +390,17 @@ async function checkPublicShell(baseUrl, signedInCookie = "") {
 
   const stylesheetPageTexts = [home.text, templates.text];
   if (signedInCookie) {
+    const studioStylesheetPage = await request(baseUrl, "/app", {
+      cookie: signedInCookie,
+      redirect: "follow",
+    });
+    const studioPath = new URL(studioStylesheetPage.response.url || `${baseUrl}/app`).pathname;
+    requireCondition(
+      studioStylesheetPage.response.ok && studioPath === "/app",
+      `signed-in studio stylesheet page ended at ${studioPath} with status ${studioStylesheetPage.response.status}`,
+    );
+    stylesheetPageTexts.push(studioStylesheetPage.text);
+
     const settingsStylesheetPage = await request(baseUrl, "/settings", {
       cookie: signedInCookie,
       redirect: "follow",
@@ -420,6 +431,7 @@ async function checkPublicShell(baseUrl, signedInCookie = "") {
     }))
   ).join("\n");
   if (!signedInCookie) {
+    stylesheetText += `\n${readFileSync(new URL("../app/app/studio.css", import.meta.url), "utf8")}`;
     stylesheetText += `\n${readFileSync(new URL("../app/settings/settings.css", import.meta.url), "utf8")}`;
   }
   const sourceStylesheetText = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");

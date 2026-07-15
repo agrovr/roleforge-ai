@@ -14,3 +14,5 @@ export const allPublicStyles = stylesFor(
   "updates/updates.css",
   "templates/templates.css",
 );
+
+export const allStudioStyles = stylesFor("app/studio.css");

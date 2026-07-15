@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { allStudioStyles } from "./style_sources.mjs";
 
 const studioPage = readFileSync("app/app/page.tsx", "utf8");
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = allStudioStyles;
 
 test("studio exposes a workflow preflight checklist from real state", () => {
   assert.match(studioPage, /preflightItems:\s*Array/);

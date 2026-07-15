@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import test from "node:test";
+import { allStudioStyles } from "./style_sources.mjs";
 
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = allStudioStyles;
 
 test("mobile studio keeps section navigation compact and horizontally available", () => {
   assert.match(

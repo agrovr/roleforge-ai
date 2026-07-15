@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { allStudioStyles } from "./style_sources.mjs";
 
 const studioPage = readFileSync("app/app/page.tsx", "utf8");
-const globals = readFileSync("app/globals.css", "utf8");
+const globals = allStudioStyles;
 
 test("protected studio gate keeps real auth states and actions", () => {
   assert.match(studioPage, /function StudioAccountGate/);

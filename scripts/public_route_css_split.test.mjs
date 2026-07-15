@@ -11,6 +11,7 @@ const routeStyles = {
   updates: readFileSync("app/updates/updates.css", "utf8"),
   templates: readFileSync("app/templates/templates.css", "utf8"),
   settings: readFileSync("app/settings/settings.css", "utf8"),
+  studio: readFileSync("app/app/studio.css", "utf8"),
   publicPages: readFileSync("app/public-pages.css", "utf8"),
 };
 
@@ -22,6 +23,7 @@ test("route styles load from their owning route instead of the root bundle", () 
     ["app/updates/layout.tsx", /import "\.\/updates\.css"/],
     ["app/templates/layout.tsx", /import "\.\/templates\.css"/],
     ["app/settings/layout.tsx", /import "\.\/settings\.css"/],
+    ["app/app/layout.tsx", /import "\.\/studio\.css"/],
   ];
 
   for (const [file, importPattern] of routeImports) {
@@ -34,7 +36,7 @@ test("route styles load from their owning route instead of the root bundle", () 
 });
 
 test("the universal stylesheet no longer carries complete page-owned rule sets", () => {
-  assert.ok(Buffer.byteLength(globalStyles) < 475_000, "universal stylesheet should stay below the route-split budget");
+  assert.ok(Buffer.byteLength(globalStyles) < 325_000, "universal stylesheet should stay below the route-split budget");
 
   const ownershipChecks = [
     [routeStyles.help, globalStyles, /\.help-action-grid\s*\{/],
@@ -43,6 +45,7 @@ test("the universal stylesheet no longer carries complete page-owned rule sets",
     [routeStyles.updates, globalStyles, /\.updates-ledger\s*\{/],
     [routeStyles.templates, globalStyles, /\.templates-decision-guide\s*\{/],
     [routeStyles.settings, globalStyles, /\.settings-grid\s*\{/],
+    [routeStyles.studio, globalStyles, /\.rf-studio-layout\s*\{/],
     [routeStyles.publicPages, globalStyles, /\.legal-card\s*\{/],
   ];
 
@@ -57,9 +60,18 @@ test("the production smoke reads route styles from every page it validates", () 
 
   assert.match(smokeSource, /\[home\.text,\s*templates\.text\]/);
   assert.match(smokeSource, /stylesheetPageTexts\.push\(settingsStylesheetPage\.text\)/);
+  assert.match(smokeSource, /stylesheetPageTexts\.push\(studioStylesheetPage\.text\)/);
   assert.match(smokeSource, /checkPublicShell\(baseUrl,\s*cookie\)/);
   assert.match(smokeSource, /new Set\(/);
   assert.match(smokeSource, /public pages did not include Next\.js stylesheets/);
+});
+
+test("studio route keeps mixed shared rules in their original cascade order", () => {
+  assert.ok(Buffer.byteLength(routeStyles.studio) < 200_000, "studio route stylesheet should stay focused");
+  assert.match(globalStyles, /\.rf-intake-card,\s*\.rf-file-drop,\s*\.rf-target-editor/);
+  assert.match(routeStyles.studio, /\.rf-intake-card,\s*\.rf-file-drop,\s*\.rf-target-editor/);
+  assert.match(routeStyles.studio, /\/\* Studio workbench polish:/);
+  assert.match(routeStyles.studio, /\/\* Studio preview finish:/);
 });
 
 test("route-owned support grids keep their narrow breakpoint after the split", () => {

@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { allStudioStyles } from "./style_sources.mjs";
 
 const studioPage = readFileSync("app/app/page.tsx", "utf8");
 const targetLabel = readFileSync("app/lib/targetLabel.ts", "utf8");
 const targetInput = readFileSync("app/lib/targetInput.ts", "utf8");
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = allStudioStyles;
 
 test("studio validates and normalizes public target URLs before declaring readiness", () => {
   assert.match(studioPage, /import \{ normalizePublicUrlInput, parseTargetUrl \}/);
