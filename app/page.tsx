@@ -8,7 +8,7 @@ import { ResumePreview } from "./components/ResumePreview";
 import { RESUME_TEMPLATES } from "./lib/resumeTemplates";
 import { RoleForgeIcon } from "./components/RoleForgeIcons";
 import { ThemeToggle } from "./components/ThemeToggle";
-import { accountAvatarUrl, accountDisplayName, accountReference } from "./lib/accountUser";
+import { accountAvatarUrl, accountDisplayName, accountIdentityFromClaims, accountReference } from "./lib/accountUser";
 import { billingReadiness } from "./lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "./lib/billing/stripe";
 import { FREE_ENTITLEMENT, loadAccountEntitlement } from "./lib/entitlements";
@@ -44,9 +44,8 @@ const PREMIUM_YEARLY_PRICE = PREMIUM_PRICE.yearly / 100;
 
 async function getLandingLinks(): Promise<LandingLinks> {
   const supabase = await createRoleForgeServerClient();
-  const {
-    data: { user },
-  } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
+  const authResult = supabase ? await supabase.auth.getClaims() : { data: { claims: null } };
+  const user = accountIdentityFromClaims(authResult.data?.claims);
   const signedIn = Boolean(user);
   const [entitlement, profile] = user && supabase
     ? await Promise.all([

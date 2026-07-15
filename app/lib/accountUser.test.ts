@@ -5,10 +5,38 @@ import {
   accountAvatarUrl,
   accountDisplayName,
   accountEmailVerificationLabel,
+  accountIdentityFromClaims,
   accountReference,
   accountSecurityDateLabel,
   accountSignInMethodLabel,
 } from "./accountUser";
+
+test("builds the public account identity from verified JWT claims", () => {
+  assert.deepEqual(
+    accountIdentityFromClaims({
+      sub: "user-123",
+      email: " person@example.com ",
+      user_metadata: { full_name: "Avery Stone", picture: "https://example.com/avatar.png" },
+      app_metadata: { provider: "google", providers: ["google"] },
+    }),
+    {
+      id: "user-123",
+      email: "person@example.com",
+      user_metadata: {
+        avatar_url: undefined,
+        full_name: "Avery Stone",
+        name: undefined,
+        picture: "https://example.com/avatar.png",
+      },
+      app_metadata: {
+        provider: "google",
+        providers: ["google"],
+      },
+    },
+  );
+  assert.equal(accountIdentityFromClaims({ email: "person@example.com" }), null);
+  assert.equal(accountIdentityFromClaims(null), null);
+});
 
 test("uses explicit account names before provider full names", () => {
   assert.equal(

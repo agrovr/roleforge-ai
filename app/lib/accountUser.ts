@@ -16,8 +16,43 @@ export type AccountIdentitySource = {
   } | null;
 };
 
+export type AccountClaimIdentity = AccountIdentitySource & {
+  id: string;
+  email: string;
+};
+
 function cleanMetadataString(value: unknown) {
   return typeof value === "string" ? value.replace(/\s+/g, " ").trim() : "";
+}
+
+function claimRecord(value: unknown) {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+export function accountIdentityFromClaims(value: unknown): AccountClaimIdentity | null {
+  const claims = claimRecord(value);
+  const id = cleanMetadataString(claims.sub);
+  if (!id) return null;
+
+  const userMetadata = claimRecord(claims.user_metadata);
+  const appMetadata = claimRecord(claims.app_metadata);
+
+  return {
+    id,
+    email: cleanMetadataString(claims.email),
+    user_metadata: {
+      avatar_url: userMetadata.avatar_url,
+      full_name: userMetadata.full_name,
+      name: userMetadata.name,
+      picture: userMetadata.picture,
+    },
+    app_metadata: {
+      provider: appMetadata.provider,
+      providers: appMetadata.providers,
+    },
+  };
 }
 
 export function accountReference(value: unknown) {

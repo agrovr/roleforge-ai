@@ -32,7 +32,11 @@ test("protected route checks preserve Supabase private response headers", () => 
   assert.match(proxy, /response\.headers\.set\(name, value\)/);
 });
 
-test("public landing and templates parallelize independent personalized reads", () => {
+test("public landing and templates use verified claims without a remote auth user lookup", () => {
+  assert.match(landingPage, /supabase\.auth\.getClaims\(\)/);
+  assert.doesNotMatch(landingPage, /supabase\.auth\.getUser\(\)/);
   assert.match(landingPage, /const \[entitlement, profile\] = user && supabase[\s\S]*?await Promise\.all\(\[/);
+  assert.match(templatesPage, /supabase\.auth\.getClaims\(\)/);
+  assert.doesNotMatch(templatesPage, /supabase\.auth\.getUser\(\)/);
   assert.match(templatesPage, /const \[authResult, cookieStore\] = await Promise\.all\(\[/);
 });

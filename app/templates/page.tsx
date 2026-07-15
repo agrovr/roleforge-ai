@@ -5,7 +5,7 @@ import { AccountAvatar } from "../components/AccountAvatar";
 import { AccountReferenceCopyButton } from "../components/AccountReferenceCopyButton";
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
-import { accountAvatarUrl, accountDisplayName, accountReference } from "../lib/accountUser";
+import { accountAvatarUrl, accountDisplayName, accountIdentityFromClaims, accountReference } from "../lib/accountUser";
 import { RESUME_TEMPLATE_COOKIE, isResumeTemplateSlug } from "../lib/resumeTemplates";
 import { supportRequestHref } from "../lib/supportRequests";
 import { ThemeToggle } from "../components/ThemeToggle";
@@ -15,12 +15,10 @@ import { TemplateLibrary } from "./TemplateLibrary";
 async function getTemplateLinks() {
   const supabase = await createRoleForgeServerClient();
   const [authResult, cookieStore] = await Promise.all([
-    supabase ? supabase.auth.getUser() : Promise.resolve({ data: { user: null } }),
+    supabase ? supabase.auth.getClaims() : Promise.resolve({ data: { claims: null } }),
     cookies(),
   ]);
-  const {
-    data: { user },
-  } = authResult;
+  const user = accountIdentityFromClaims(authResult.data?.claims);
   const signedIn = Boolean(user);
   const templateCookie = cookieStore.get(RESUME_TEMPLATE_COOKIE)?.value;
   const initialTemplateSlug = isResumeTemplateSlug(templateCookie) ? templateCookie : null;
