@@ -56,6 +56,8 @@ test("the production smoke reads route styles from every page it validates", () 
   const smokeSource = readFileSync("scripts/smoke_frontend.mjs", "utf8");
 
   assert.match(smokeSource, /\[home\.text,\s*templates\.text\]/);
+  assert.match(smokeSource, /stylesheetPageTexts\.push\(settingsStylesheetPage\.text\)/);
+  assert.match(smokeSource, /checkPublicShell\(baseUrl,\s*cookie\)/);
   assert.match(smokeSource, /new Set\(/);
   assert.match(smokeSource, /public pages did not include Next\.js stylesheets/);
 });

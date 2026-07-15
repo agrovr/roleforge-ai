@@ -355,7 +355,7 @@ export function buildSmokeSavedRunPayload(overrides = {}) {
   };
 }
 
-async function checkPublicShell(baseUrl) {
+async function checkPublicShell(baseUrl, signedInCookie = "") {
   const home = await request(baseUrl, "/", { redirect: "follow" });
   requireCondition(home.response.ok, `home returned ${home.response.status}`);
   requireCondition(home.text.includes("RoleForge AI"), "home did not include RoleForge AI brand copy");
@@ -388,9 +388,23 @@ async function checkPublicShell(baseUrl) {
   );
   pass("templates page respects the saved template direction");
 
+  const stylesheetPageTexts = [home.text, templates.text];
+  if (signedInCookie) {
+    const settingsStylesheetPage = await request(baseUrl, "/settings", {
+      cookie: signedInCookie,
+      redirect: "follow",
+    });
+    const settingsPath = new URL(settingsStylesheetPage.response.url || `${baseUrl}/settings`).pathname;
+    requireCondition(
+      settingsStylesheetPage.response.ok && settingsPath === "/settings",
+      `signed-in settings stylesheet page ended at ${settingsPath} with status ${settingsStylesheetPage.response.status}`,
+    );
+    stylesheetPageTexts.push(settingsStylesheetPage.text);
+  }
+
   const stylesheetPaths = Array.from(
     new Set(
-      [home.text, templates.text]
+      stylesheetPageTexts
         .flatMap((pageText) => Array.from(pageText.matchAll(/href="([^"]+\.css[^"]*)"/g)))
         .map((match) => match[1])
         .filter((path) => path.startsWith("/_next/static/")),
@@ -398,13 +412,16 @@ async function checkPublicShell(baseUrl) {
   );
   requireCondition(stylesheetPaths.length > 0, "public pages did not include Next.js stylesheets");
 
-  const stylesheetText = (
+  let stylesheetText = (
     await Promise.all(stylesheetPaths.map(async (path) => {
       const stylesheet = await requestAbsolute(new URL(path, baseUrl).toString(), { redirect: "follow" });
       requireCondition(stylesheet.response.ok, `stylesheet ${path} returned ${stylesheet.response.status}`);
       return stylesheet.text;
     }))
   ).join("\n");
+  if (!signedInCookie) {
+    stylesheetText += `\n${readFileSync(new URL("../app/settings/settings.css", import.meta.url), "utf8")}`;
+  }
   const sourceStylesheetText = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
 
   requireCondition(/\.templates-page-hero\s*\{(?=[^}]*min-width:\s*0)(?=[^}]*container:\s*templates-hero\s*\/\s*inline-size)(?=[^}]*overflow:\s*hidden)[^}]*\}/s.test(stylesheetText), "templates hero was missing overflow-safe container sizing");
@@ -1460,7 +1477,7 @@ async function main(argv = process.argv.slice(2)) {
   const requireBackendWorkflowSmoke = args.requireBackendWorkflowSmoke ?? readBooleanEnv("ROLEFORGE_REQUIRE_BACKEND_WORKFLOW_SMOKE");
 
   try {
-    await checkPublicShell(baseUrl);
+    await checkPublicShell(baseUrl, cookie);
     await checkAnonymousAuthStatus(baseUrl);
     await checkAnonymousGate(baseUrl);
     await checkAnonymousAccountDataGate(baseUrl);
