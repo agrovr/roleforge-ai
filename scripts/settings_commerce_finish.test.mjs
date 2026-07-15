@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = [readFileSync("app/globals.css", "utf8"), readFileSync("app/settings/settings.css", "utf8")].join("\n");
 
 test("settings commerce finish keeps billing and export surfaces polished", () => {
   assert.match(settingsPage, /settings-section-panel settings-export-list/);

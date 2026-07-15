@@ -4,7 +4,7 @@ import { test } from "node:test";
 
 const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
 const settingsNav = readFileSync("app/settings/SettingsSectionNav.tsx", "utf8");
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = [readFileSync("app/globals.css", "utf8"), readFileSync("app/settings/settings.css", "utf8")].join("\n");
 const icons = readFileSync("app/components/RoleForgeIcons.tsx", "utf8");
 
 function sectionIdsFromPage(source) {

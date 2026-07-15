@@ -6,7 +6,7 @@ const studioPage = readFileSync("app/app/page.tsx", "utf8");
 const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
 const rootLayout = readFileSync("app/layout.tsx", "utf8");
 const accountMenuBehavior = readFileSync("app/components/AccountMenuBehavior.tsx", "utf8");
-const globalsCss = readFileSync("app/globals.css", "utf8");
+const globalsCss = [readFileSync("app/globals.css", "utf8"), readFileSync("app/settings/settings.css", "utf8")].join("\n");
 
 test("studio account menu acts as a workspace command center", () => {
   assert.match(studioPage, /AccountAvatar/);

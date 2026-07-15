@@ -6,7 +6,7 @@ const actionButton = readFileSync("app/components/ActionSubmitButton.tsx", "utf8
 const nativeActionForm = readFileSync("app/components/NativeActionForm.tsx", "utf8");
 const loginPage = readFileSync("app/login/page.tsx", "utf8");
 const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = [readFileSync("app/globals.css", "utf8"), readFileSync("app/settings/settings.css", "utf8")].join("\n");
 
 test("shared action buttons expose the active submission without allowing duplicate submits", () => {
   assert.match(actionButton, /useFormStatus\(\)/);

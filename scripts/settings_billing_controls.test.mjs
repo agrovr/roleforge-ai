@@ -6,7 +6,7 @@ const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
 const billingSubmitButton = readFileSync("app/settings/BillingSubmitButton.tsx", "utf8");
 const actionSubmitButton = readFileSync("app/components/ActionSubmitButton.tsx", "utf8");
 const nativeActionForm = readFileSync("app/components/NativeActionForm.tsx", "utf8");
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = [readFileSync("app/globals.css", "utf8"), readFileSync("app/settings/settings.css", "utf8")].join("\n");
 
 test("settings billing action distinguishes active portals from inactive billing state", () => {
   assert.match(settingsPage, /portalReady\s*\?\s*\(/);

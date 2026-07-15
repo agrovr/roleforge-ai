@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const globals = readFileSync("app/globals.css", "utf8");
+const globals = [readFileSync("app/globals.css", "utf8"), readFileSync("app/settings/settings.css", "utf8")].join("\n");
 const adminStyles = readFileSync("app/admin/support/admin-support.css", "utf8");
 
 test("operational polish keeps saved work and document rows scannable", () => {

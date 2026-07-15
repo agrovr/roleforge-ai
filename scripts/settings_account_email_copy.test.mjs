@@ -5,7 +5,7 @@ import test from "node:test";
 const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
 const accountEmailCopyButton = readFileSync("app/settings/AccountEmailCopyButton.tsx", "utf8");
 const accountReferenceCopyButton = readFileSync("app/components/AccountReferenceCopyButton.tsx", "utf8");
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = [readFileSync("app/globals.css", "utf8"), readFileSync("app/settings/settings.css", "utf8")].join("\n");
 
 test("settings account panel can copy the signed-in email and safe account reference", () => {
   assert.match(settingsPage, /AccountEmailCopyButton/);

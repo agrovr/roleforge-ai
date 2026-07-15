@@ -10,16 +10,18 @@ const routeStyles = {
   support: readFileSync("app/support/support.css", "utf8"),
   updates: readFileSync("app/updates/updates.css", "utf8"),
   templates: readFileSync("app/templates/templates.css", "utf8"),
+  settings: readFileSync("app/settings/settings.css", "utf8"),
   publicPages: readFileSync("app/public-pages.css", "utf8"),
 };
 
-test("public route styles load from their owning route instead of the root bundle", () => {
+test("route styles load from their owning route instead of the root bundle", () => {
   const routeImports = [
     ["app/help/layout.tsx", /import "\.\/help\.css"/],
     ["app/status/layout.tsx", /import "\.\/status\.css"/],
     ["app/support/layout.tsx", /import "\.\/support\.css"/],
     ["app/updates/layout.tsx", /import "\.\/updates\.css"/],
     ["app/templates/layout.tsx", /import "\.\/templates\.css"/],
+    ["app/settings/layout.tsx", /import "\.\/settings\.css"/],
   ];
 
   for (const [file, importPattern] of routeImports) {
@@ -32,7 +34,7 @@ test("public route styles load from their owning route instead of the root bundl
 });
 
 test("the universal stylesheet no longer carries complete page-owned rule sets", () => {
-  assert.ok(Buffer.byteLength(globalStyles) < 600_000, "universal stylesheet should stay below the public-route split budget");
+  assert.ok(Buffer.byteLength(globalStyles) < 475_000, "universal stylesheet should stay below the route-split budget");
 
   const ownershipChecks = [
     [routeStyles.help, globalStyles, /\.help-action-grid\s*\{/],
@@ -40,6 +42,7 @@ test("the universal stylesheet no longer carries complete page-owned rule sets",
     [routeStyles.support, globalStyles, /\.support-shell\s*\{/],
     [routeStyles.updates, globalStyles, /\.updates-ledger\s*\{/],
     [routeStyles.templates, globalStyles, /\.templates-decision-guide\s*\{/],
+    [routeStyles.settings, globalStyles, /\.settings-grid\s*\{/],
     [routeStyles.publicPages, globalStyles, /\.legal-card\s*\{/],
   ];
 
@@ -61,5 +64,15 @@ test("route-owned support grids keep their narrow breakpoint after the split", (
   assert.match(
     routeStyles.support,
     /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.support-admin-entry,\s*\.support-routing-strip,\s*\.support-routing-steps\s*\{\s*grid-template-columns:\s*1fr/,
+  );
+});
+
+test("settings route keeps shared finish rules in their original cascade order", () => {
+  assert.ok(Buffer.byteLength(routeStyles.settings) < 200_000, "settings route stylesheet should stay focused");
+  assert.match(globalStyles, /\.settings-page-topbar\s*\{/);
+  assert.match(routeStyles.settings, /\.settings-page-topbar\s*\{/);
+  assert.match(
+    routeStyles.settings,
+    /\.settings-project-item,\s*\.settings-project-empty[\s\S]*?\.settings-project-item,\s*\.settings-document-item,\s*\.studio-account-recent-link/,
   );
 });

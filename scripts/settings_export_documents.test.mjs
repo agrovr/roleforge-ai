@@ -4,7 +4,7 @@ import test from "node:test";
 
 const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
 const settingsProjects = readFileSync("app/lib/settingsProjects.ts", "utf8");
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = [readFileSync("app/globals.css", "utf8"), readFileSync("app/settings/settings.css", "utf8")].join("\n");
 
 test("settings exports include a real recent document hub", () => {
   assert.match(settingsProjects, /settingsDocumentSummaries/);

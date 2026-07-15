@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const stylesheet = readFileSync("app/globals.css", "utf8");
+const stylesheet = [readFileSync("app/globals.css", "utf8"), readFileSync("app/settings/settings.css", "utf8")].join("\n");
 
 test("settings saved project workspace has a clearer visual hierarchy", () => {
   assert.match(stylesheet, /\/\*\s*Saved-project workspace finish: clearer hierarchy for dense project controls\.\s*\*\//);

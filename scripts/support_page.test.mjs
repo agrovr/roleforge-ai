@@ -21,7 +21,7 @@ const templatesPage = readFileSync("app/templates/page.tsx", "utf8");
 const legalPage = readFileSync("app/components/LegalPage.tsx", "utf8");
 const robotsRoute = readFileSync("app/robots.ts", "utf8");
 const sitemapRoute = readFileSync("app/sitemap.ts", "utf8");
-const stylesheet = stylesFor("public-pages.css", "support/support.css");
+const stylesheet = stylesFor("public-pages.css", "support/support.css", "settings/settings.css");
 const smokeFrontend = readFileSync("scripts/smoke_frontend.mjs", "utf8");
 const smokeLayout = readFileSync("scripts/smoke_layout.mjs", "utf8");
 

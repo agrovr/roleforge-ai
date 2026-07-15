@@ -6,7 +6,7 @@ import { allPublicStyles } from "./style_sources.mjs";
 
 const layout = readFileSync("app/layout.tsx", "utf8");
 const sitePolish = readFileSync("app/components/SitePolish.tsx", "utf8");
-const globals = allPublicStyles;
+const globals = `${allPublicStyles}\n${readFileSync("app/settings/settings.css", "utf8")}`;
 const adminStyles = readFileSync("app/admin/support/admin-support.css", "utf8");
 
 test("site polish layer is mounted once in the app shell", () => {
