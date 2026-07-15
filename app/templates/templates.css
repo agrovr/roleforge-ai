@@ -757,13 +757,13 @@ html[data-theme="dark"] .templates-page-card.selected {
 }
 
 .templates-guide-option {
-  padding: 12px 4px;
+  padding: 12px 10px;
   border: 0;
   border-bottom: 1px solid var(--line);
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-  transition: color 160ms ease, background 160ms ease, padding 160ms ease;
+  transition: color 160ms ease, background 160ms ease;
 }
 
 .templates-guide-option::before {
@@ -779,7 +779,6 @@ html[data-theme="dark"] .templates-page-card.selected {
 }
 
 .templates-guide-option.selected {
-  padding-inline: 10px;
   border-color: var(--line);
   border-radius: 8px;
   background: color-mix(in srgb, var(--success) 12%, transparent);

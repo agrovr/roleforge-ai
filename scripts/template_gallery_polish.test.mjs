@@ -32,8 +32,10 @@ test("template gallery removes decorative rails and flattens guidance surfaces",
 
 test("template choices keep clear selected states without nested card effects", () => {
   assert.match(section, /\.templates-guide-card\s*\{(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
-  assert.match(section, /\.templates-guide-option\s*\{(?=[^}]*border-bottom:\s*1px solid var\(--line\))(?=[^}]*border-radius:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
+  assert.match(section, /\.templates-guide-option\s*\{(?=[^}]*padding:\s*12px 10px)(?=[^}]*border-bottom:\s*1px solid var\(--line\))(?=[^}]*border-radius:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)(?=[^}]*transition:\s*color 160ms ease, background 160ms ease)[^}]*\}/s);
   assert.match(section, /\.templates-guide-option\.selected\s*\{(?=[^}]*background:\s*color-mix\(in srgb, var\(--success\) 12%, transparent\))(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
+  assert.doesNotMatch(section, /\.templates-guide-option\.selected\s*\{[^}]*padding(?:-inline)?:/s);
+  assert.doesNotMatch(section, /transition:[^;]*padding/s);
   assert.match(section, /\.templates-page-card\.selected\s*\{(?=[^}]*border-color:)(?=[^}]*box-shadow:\s*inset 0 0 0 1px)[^}]*\}/s);
 });
 
