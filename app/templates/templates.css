@@ -727,6 +727,7 @@ html[data-theme="dark"] .templates-page-card.selected {
 }
 
 .templates-guide-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0;
 }
 
