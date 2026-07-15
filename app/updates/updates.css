@@ -319,7 +319,7 @@
   }
 }
 
-@media (max-width: 620px) {
+@media (max-width: 720px) {
 
   .updates-timeline {
     grid-template-columns: 1fr;

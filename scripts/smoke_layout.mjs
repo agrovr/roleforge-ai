@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createServer } from "node:net";
 import { cookieHeaderFromSession } from "./smoke_frontend.mjs";
+import { installBrowserSession } from "./smoke_browser_session.mjs";
 
 const DEFAULT_BASE_URL = "https://roleforgeai.vercel.app";
 const VIEWPORTS = [390, 640, 768, 900, 1024, 1180, 1366, 1440, 1500, 1712];
@@ -799,8 +800,38 @@ async function openCdpPage(port, baseUrl) {
   return { send, close: () => socket.close() };
 }
 
-async function evaluateLayout(send, baseUrl, page, width, cookie, options = {}) {
-  await send("Network.setExtraHTTPHeaders", { headers: cookie ? { Cookie: cookie } : {} });
+async function verifySignedInBrowserSession(send, baseUrl) {
+  await send("Emulation.setDeviceMetricsOverride", {
+    width: 1366,
+    height: 1100,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+  await send("Page.navigate", { url: `${baseUrl}/app` });
+  await delay(3200);
+
+  const result = await send("Runtime.evaluate", {
+    expression: `(() => ({
+      pathname: window.location.pathname,
+      hasStudioShell: Boolean(document.querySelector(".rf-studio-page")),
+      hasPasswordField: Boolean(document.querySelector('input[type="password"]')),
+    }))()`,
+    returnByValue: true,
+  });
+  if (result.error) throw new Error(result.error.message);
+  if (result.result.exceptionDetails) {
+    throw new Error(result.result.exceptionDetails.text || "Signed-in browser session preflight failed");
+  }
+
+  const probe = result.result.result.value;
+  if (!probe?.hasStudioShell) {
+    throw new Error(
+      `Signed-in browser session did not open protected Studio (path=${probe?.pathname || "unknown"}, passwordField=${Boolean(probe?.hasPasswordField)})`,
+    );
+  }
+}
+
+async function evaluateLayout(send, baseUrl, page, width, options = {}) {
   const themes = page.requiresAuth ? ["account"] : PUBLIC_THEMES;
   const reports = [];
   const viewportMode = options.viewportMode || "responsive";
@@ -1070,10 +1101,7 @@ async function evaluateLayout(send, baseUrl, page, width, cookie, options = {}) 
   return reports;
 }
 
-async function evaluatePreviewTabs(send, baseUrl, cookie) {
-  if (!cookie) return [];
-
-  await send("Network.setExtraHTTPHeaders", { headers: { Cookie: cookie } });
+async function evaluatePreviewTabs(send, baseUrl) {
   await send("Emulation.setDeviceMetricsOverride", {
     width: 1366,
     height: 1100,
@@ -1161,14 +1189,11 @@ async function evaluatePreviewTabs(send, baseUrl, cookie) {
   return [JSON.parse(result.result.result.value)];
 }
 
-async function evaluateHistoryRestore(send, baseUrl, cookie) {
-  if (!cookie) return [];
-
+async function evaluateHistoryRestore(send, baseUrl) {
   const smokeRunId = `roleforge-layout-history-${Date.now()}`;
   const smokeFilename = "roleforge-layout-smoke.pdf";
   const smokeTarget = "RoleForge layout smoke restore target";
 
-  await send("Network.setExtraHTTPHeaders", { headers: { Cookie: cookie } });
   await send("Emulation.setDeviceMetricsOverride", {
     width: 1366,
     height: 1100,
@@ -1491,27 +1516,38 @@ async function main(argv = process.argv.slice(2)) {
     const page = await openCdpPage(port, baseUrl);
     try {
       const reports = [];
+      let browserSessionInstalled = false;
+      const ensureSignedInBrowserSession = async () => {
+        if (browserSessionInstalled || !signedInSession?.cookie) return;
+        const installedCookieCount = await installBrowserSession(page.send, baseUrl, signedInSession.cookie);
+        await verifySignedInBrowserSession(page.send, baseUrl);
+        browserSessionInstalled = true;
+        pass(`signed-in browser session installed with ${installedCookieCount} cookie chunk(s)`);
+      };
+
       for (const pageCheck of pageChecks) {
         if (pageCheck.requiresAuth && !signedInSession?.cookie) continue;
+        if (pageCheck.requiresAuth) await ensureSignedInBrowserSession();
         for (const width of viewportWidths) {
           console.log(`CHECK ${pageCheck.name} width=${width}`);
           reports.push(
-            ...(await evaluateLayout(page.send, baseUrl, pageCheck, width, pageCheck.requiresAuth ? signedInSession.cookie : "")),
+            ...(await evaluateLayout(page.send, baseUrl, pageCheck, width)),
           );
         }
         if (!pageCheck.requiresAuth) {
           for (const width of narrowDesktopWidths) {
             console.log(`CHECK ${pageCheck.name} narrow-desktop width=${width}`);
             reports.push(
-              ...(await evaluateLayout(page.send, baseUrl, pageCheck, width, "", { mobile: false, viewportMode: "narrow-desktop" })),
+              ...(await evaluateLayout(page.send, baseUrl, pageCheck, width, { mobile: false, viewportMode: "narrow-desktop" })),
             );
           }
         }
       }
+      if (signedInSession?.cookie) await ensureSignedInBrowserSession();
       const interactionReports = signedInSession?.cookie
         ? [
-            ...(await evaluatePreviewTabs(page.send, baseUrl, signedInSession.cookie)),
-            ...(await evaluateHistoryRestore(page.send, baseUrl, signedInSession.cookie)),
+            ...(await evaluatePreviewTabs(page.send, baseUrl)),
+            ...(await evaluateHistoryRestore(page.send, baseUrl)),
           ]
         : [];
 

@@ -32,8 +32,9 @@ test("landing studio interaction remains responsive dark-mode safe and restraine
   assert.match(globals, /\.dash-demo-tabs\s*\{(?=[^}]*display:\s*none)(?=[^}]*overflow-x:\s*auto)[^}]*\}/s);
   assert.match(globals, /\.dash-demo-tabs button\s*\{(?=[^}]*min-height:\s*44px)[^}]*\}/s);
   assert.match(globals, /\.dash-mock\.dash-demo \.dash-stats\s*\{[^}]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)[^}]*\}/s);
-  assert.match(globals, /@media\s*\(max-width:\s*1040px\)\s*\{[\s\S]*?\.dash-demo-tabs\s*\{[^}]*display:\s*flex[^}]*\}/s);
+  assert.match(globals, /@media\s*\(max-width:\s*1180px\)\s*\{[\s\S]*?\.dash-demo-tabs\s*\{[^}]*display:\s*flex[^}]*\}/s);
   assert.match(globals, /@media\s*\(max-width:\s*640px\)\s*\{[\s\S]*?\.dash-demo-tabs\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\))[^}]*\}/s);
+  assert.match(globals, /@media\s*\(max-width:\s*640px\)\s*\{[\s\S]*?\.dash-demo-reset\s*\{(?=[^}]*width:\s*44px)(?=[^}]*min-height:\s*44px)[^}]*\}/s);
   assert.match(globals, /\.dash-demo-content\s*\{(?=[^}]*min-height:\s*386px)[^}]*\}/s);
   assert.match(globals, /html\[data-theme="dark"\] \.dash-demo-tabs button\.active/);
   assert.match(globals, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.dash-demo-content,[\s\S]*?transition:\s*none/s);

@@ -21,3 +21,11 @@ test("rendered layout smoke prints progress for long browser passes", () => {
   assert.match(smokeLayout, /console\.log\(`CHECK \$\{pageCheck\.name\} narrow-desktop width=\$\{width\}`\)/);
   assert.match(smokeLayout, /rendered layout smoke passed \$\{checkedPageCount\} pages across \$\{viewportWidths\.length\} responsive widths/);
 });
+
+test("rendered layout smoke installs and preflights a real browser session", () => {
+  assert.match(smokeLayout, /installBrowserSession\(page\.send, baseUrl, signedInSession\.cookie\)/);
+  assert.match(smokeLayout, /await verifySignedInBrowserSession\(page\.send, baseUrl\)/);
+  assert.match(smokeLayout, /Signed-in browser session did not open protected Studio/);
+  assert.match(smokeLayout, /if \(pageCheck\.requiresAuth\) await ensureSignedInBrowserSession\(\)/);
+  assert.doesNotMatch(smokeLayout, /Network\.setExtraHTTPHeaders/);
+});

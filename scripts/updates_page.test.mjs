@@ -99,7 +99,7 @@ test("updates timeline has overflow-safe responsive cards", () => {
   assert.match(stylesheet, /\.updates-card-actions\s+\.btn\s*\{(?=[^}]*max-width:\s*100%)(?=[^}]*text-wrap:\s*balance)(?=[^}]*white-space:\s*normal)[^}]*\}/s);
   assert.match(stylesheet, /@container\s+updates-card\s+\(max-width:\s*520px\)/);
   assert.match(stylesheet, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.updates-overview,[\s\S]*?\.updates-ledger,[\s\S]*?\.updates-timeline\s*\{[^}]*grid-template-columns:\s*1fr/s);
-  assert.match(stylesheet, /@media\s*\(max-width:\s*620px\)\s*\{[\s\S]*?\.updates-ledger\s+ol\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s);
+  assert.match(stylesheet, /@media\s*\(max-width:\s*720px\)\s*\{[\s\S]*?\.updates-ledger\s+ol\s*\{[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/s);
   assert.match(stylesheet, /@media\s*\(max-width:\s*560px\)\s*\{[\s\S]*?\.updates-ledger\s+ol\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.updates-ledger/);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.updates-ledger\s+a/);

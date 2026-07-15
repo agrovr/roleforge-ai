@@ -2348,7 +2348,7 @@ html[data-theme="dark"] .dash-demo-history-list button {
   border-color: rgba(255, 247, 233, 0.14);
 }
 
-@media (max-width: 1040px) {
+@media (max-width: 1180px) {
   .dash-demo-tabs {
     display: flex;
   }
@@ -2360,7 +2360,8 @@ html[data-theme="dark"] .dash-demo-history-list button {
   }
 
   .dash-demo-reset {
-    width: 32px;
+    width: 44px;
+    min-height: 44px;
     padding-inline: 0;
   }
 
