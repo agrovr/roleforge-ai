@@ -872,6 +872,20 @@ async function evaluateLayout(send, baseUrl, page, width, options = {}) {
     const failures = [];
     const viewportWidth = document.documentElement.clientWidth;
     const overflow = document.documentElement.scrollWidth - viewportWidth;
+    const isInsideReachableHorizontalScroller = (element) => {
+      let ancestor = element.parentElement;
+      while (ancestor && ancestor !== document.body) {
+        const ancestorStyle = getComputedStyle(ancestor);
+        const scrollsInline = ["auto", "scroll", "overlay"].includes(ancestorStyle.overflowX);
+        const hasInlineOverflow = ancestor.scrollWidth - ancestor.clientWidth > 3;
+        if (scrollsInline && hasInlineOverflow) {
+          const ancestorRect = ancestor.getBoundingClientRect();
+          return ancestorRect.right > 0 && ancestorRect.left < window.innerWidth;
+        }
+        ancestor = ancestor.parentElement;
+      }
+      return false;
+    };
 
     for (const selector of selectors) {
       const elements = Array.from(document.querySelectorAll(selector));
@@ -887,7 +901,7 @@ async function evaluateLayout(send, baseUrl, page, width, options = {}) {
           return;
         }
 
-        if (rect.left < -1 || rect.right > window.innerWidth + 1) {
+        if ((rect.left < -1 || rect.right > window.innerWidth + 1) && !isInsideReachableHorizontalScroller(element)) {
           failures.push({
             selector,
             index,
@@ -925,7 +939,7 @@ async function evaluateLayout(send, baseUrl, page, width, options = {}) {
           });
         }
 
-        if (rect.left < -1 || rect.right > window.innerWidth + 1) {
+        if ((rect.left < -1 || rect.right > window.innerWidth + 1) && !isInsideReachableHorizontalScroller(element)) {
           failures.push({
             selector,
             index,

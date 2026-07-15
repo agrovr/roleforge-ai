@@ -29,3 +29,10 @@ test("rendered layout smoke installs and preflights a real browser session", () 
   assert.match(smokeLayout, /if \(pageCheck\.requiresAuth\) await ensureSignedInBrowserSession\(\)/);
   assert.doesNotMatch(smokeLayout, /Network\.setExtraHTTPHeaders/);
 });
+
+test("rendered layout smoke permits reachable content in intentional horizontal rails", () => {
+  assert.match(smokeLayout, /const isInsideReachableHorizontalScroller = \(element\) =>/);
+  assert.match(smokeLayout, /\["auto", "scroll", "overlay"\]\.includes\(ancestorStyle\.overflowX\)/);
+  assert.match(smokeLayout, /ancestor\.scrollWidth - ancestor\.clientWidth > 3/);
+  assert.match(smokeLayout, /!isInsideReachableHorizontalScroller\(element\)/);
+});
