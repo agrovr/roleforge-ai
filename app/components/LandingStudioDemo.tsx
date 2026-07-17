@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
-import { ResumePreview } from "./ResumePreview";
 import { RoleForgeIcon, type RoleForgeIconName } from "./RoleForgeIcons";
 
 type DemoView = "resume" | "target" | "tailor" | "history";
@@ -80,7 +79,13 @@ const HISTORY_VERSIONS: ReadonlyArray<{
   { id: "previous", label: "Program manager", date: "Earlier sample", detail: "Professional template · review notes saved" },
 ];
 
-export function LandingStudioDemo({ studioHref }: { studioHref: string }) {
+export function LandingStudioDemo({
+  studioHref,
+  resumePreview,
+}: {
+  studioHref: string;
+  resumePreview: ReactNode;
+}) {
   const [activeView, setActiveView] = useState<DemoView>("resume");
   const [targetSource, setTargetSource] = useState<TargetSource>("url");
   const [reviewedSuggestions, setReviewedSuggestions] = useState<string[]>(["impact"]);
@@ -180,7 +185,7 @@ export function LandingStudioDemo({ studioHref }: { studioHref: string }) {
                   <div className="dash-stat"><div className="dash-stat-label">Export</div><div className="dash-stat-value">PDF</div><div className="dash-stat-delta">Free format</div></div>
                 </div>
                 <div className="dash-resume-card">
-                  <div className="dash-resume-thumb" aria-hidden="true"><ResumePreview highlight={showHighlights} /></div>
+                  <div className="dash-resume-thumb" data-highlight={showHighlights} aria-hidden="true">{resumePreview}</div>
                   <div className="dash-resume-info">
                     <div>
                       <h4 className="dash-resume-title">Role-targeted resume draft</h4>

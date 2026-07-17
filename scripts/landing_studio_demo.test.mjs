@@ -8,7 +8,8 @@ const globals = readFileSync("app/globals.css", "utf8");
 
 test("landing studio is isolated as an honest client-side sample", () => {
   assert.match(demo, /^"use client";/);
-  assert.match(landingPage, /<LandingStudioDemo studioHref=\{studioHref\} \/>/);
+  assert.match(landingPage, /<LandingStudioDemo[\s\S]*?studioHref=\{studioHref\}[\s\S]*?resumePreview=\{<ResumePreview highlight \/>\}[\s\S]*?\/>/);
+  assert.doesNotMatch(demo, /from "\.\/ResumePreview"/);
   assert.match(demo, /Interactive sample: nothing is uploaded, saved, generated, or exported here\./);
   assert.match(demo, /data-demo-view=\{activeView\}/);
   assert.doesNotMatch(demo, /fetch\s*\(/);
@@ -26,7 +27,7 @@ test("landing studio exposes keyboard-operable sample views and state", () => {
   assert.match(demo, /aria-pressed=\{targetSource === "url"\}/);
   assert.match(demo, /aria-pressed=\{reviewed\}/);
   assert.match(demo, /aria-pressed=\{historyVersion === version\.id\}/);
-  assert.match(demo, /aria-hidden="true"><ResumePreview/);
+  assert.match(demo, /data-highlight=\{showHighlights\} aria-hidden="true">\{resumePreview\}<\/div>/);
   assert.match(demo, /href=\{studioHref\}/);
 });
 
@@ -39,6 +40,7 @@ test("landing studio interaction remains responsive dark-mode safe and restraine
   assert.match(globals, /@media\s*\(max-width:\s*640px\)\s*\{[\s\S]*?\.dash-demo-tabs\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\))[^}]*\}/s);
   assert.match(globals, /@media\s*\(max-width:\s*640px\)\s*\{[\s\S]*?\.dash-demo-reset\s*\{(?=[^}]*width:\s*44px)(?=[^}]*min-height:\s*44px)[^}]*\}/s);
   assert.match(globals, /\.dash-demo-content\s*\{(?=[^}]*min-height:\s*386px)[^}]*\}/s);
+  assert.match(globals, /\.dash-resume-thumb\[data-highlight="false"\] \.r-hl-good\s*\{(?=[^}]*background:\s*transparent)(?=[^}]*background-image:\s*none)[^}]*\}/s);
   assert.match(globals, /html\[data-theme="dark"\] \.dash-demo-tabs button\.active/);
   assert.match(globals, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.dash-demo-content,[\s\S]*?transition:\s*none/s);
 });

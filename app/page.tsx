@@ -378,7 +378,10 @@ function StudioPreview({ studioHref }: Pick<LandingLinks, "studioHref">) {
           </div>
           <p className="lede">A focused workspace that shows your resume, the job, and generated suggestions side-by-side. Fit signals, gaps, and export controls stay in one calm panel.</p>
         </div>
-        <LandingStudioDemo studioHref={studioHref} />
+        <LandingStudioDemo
+          studioHref={studioHref}
+          resumePreview={<ResumePreview highlight />}
+        />
       </div>
     </section>
   );

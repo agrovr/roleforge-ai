@@ -1749,6 +1749,11 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   font-size: 6px;
 }
 
+.dash-resume-thumb[data-highlight="false"] .r-hl-good {
+  background: transparent;
+  background-image: none;
+}
+
 .dash-resume-thumb .r-name {
   font-size: 13px;
 }
