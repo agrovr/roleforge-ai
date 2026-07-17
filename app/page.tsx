@@ -275,13 +275,13 @@ function Hero({ studioHref }: Pick<LandingLinks, "studioHref">) {
 
       <div className="hero-stage" aria-label="RoleForge resume preview">
         <div className="resume-card resume-card-back-l">
-          <ResumePreview variant="technical" name="Noor Vale" role="Software Engineer" />
+          <ResumePreview detail="decorative" variant="technical" name="Noor Vale" role="Software Engineer" />
         </div>
         <div className="resume-card resume-card-front">
           <ResumePreview variant="essential" highlight />
         </div>
         <div className="resume-card resume-card-back-r">
-          <ResumePreview variant="editorial" name="Mina Okafor" role="Product Designer" />
+          <ResumePreview detail="decorative" variant="editorial" name="Mina Okafor" role="Product Designer" />
         </div>
 
         <div className="hero-badge b-score">
@@ -648,7 +648,7 @@ function CTABand({ studioHref }: Pick<LandingLinks, "studioHref">) {
             </div>
           </div>
           <div className="cta-visual">
-            <div className="resume-card back"><ResumePreview variant="technical" name="Noor Vale" role="Software Engineer" /></div>
+            <div className="resume-card back"><ResumePreview detail="decorative" variant="technical" name="Noor Vale" role="Software Engineer" /></div>
             <div className="resume-card"><ResumePreview variant="essential" highlight /></div>
           </div>
         </div>

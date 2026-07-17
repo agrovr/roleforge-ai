@@ -272,25 +272,54 @@ type ResumePreviewProps = {
   name?: string;
   role?: string;
   highlight?: boolean;
+  detail?: "full" | "decorative";
 };
+
+function decorativeSectionsFor(sections: readonly PreviewSection[]): PreviewSection[] {
+  const summary = sections.find((section) => (
+    section.copy && !section.title.toLowerCase().includes("education")
+  ));
+  const experience = sections.find((section) => section.jobs?.length);
+  const skills = sections.find((section) => section.skills?.length);
+  const education = sections.find((section) => section.title.toLowerCase().includes("education"));
+  const leadJob = experience?.jobs?.[0];
+
+  return [
+    summary,
+    leadJob ? {
+      title: experience?.title ?? "Experience",
+      copy: `${leadJob.title} · ${leadJob.organization} · ${leadJob.date}`,
+    } : undefined,
+    skills ? {
+      title: skills.title,
+      copy: skills.skills?.join(" · "),
+    } : undefined,
+    education,
+  ].filter((section): section is PreviewSection => Boolean(section));
+}
 
 export const ResumePreview = memo(function ResumePreview({
   variant = "essential",
   name = "Avery Stone",
   role = "Product Operations Manager",
   highlight = false,
+  detail = "full",
 }: ResumePreviewProps) {
   const sections = [...sectionsFor(variant), ...PREVIEW_FINISHERS[variant]];
+  const visibleSections = detail === "decorative" ? decorativeSectionsFor(sections) : sections;
 
   return (
-    <div className={`r-doc ${variant}`}>
+    <div
+      aria-hidden={detail === "decorative" ? true : undefined}
+      className={`r-doc ${variant}${detail === "decorative" ? " r-doc-decorative" : ""}`}
+    >
       <header className="r-header">
         <div className="r-name">{name}</div>
         <div className="r-role">{role}</div>
         <div className="r-contact">candidate@preview.test · Austin, TX · portfolio.preview.test</div>
       </header>
       <div className="r-sections">
-        {sections.map((section) => (
+        {visibleSections.map((section) => (
           <section className="r-section" key={section.title}>
             <div className="r-section-title">{section.title}</div>
             {section.copy ? (
