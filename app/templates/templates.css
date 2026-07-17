@@ -790,6 +790,8 @@ html[data-theme="dark"] .templates-page-card.selected {
   border-color: var(--line);
   background: color-mix(in srgb, var(--surface) 96%, var(--surface-warm));
   box-shadow: none;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 680px;
   transition: border-color 180ms ease;
   transform: none;
 }
@@ -889,6 +891,7 @@ html[data-theme="dark"] .templates-page-card.selected {
   height: auto;
   aspect-ratio: 8.5 / 11;
   border-top: 0;
+  container-type: inline-size;
 }
 
 .templates-page-card .template-thumb .r-doc,
@@ -896,4 +899,130 @@ html[data-theme="dark"] .templates-page-card.selected {
   width: 100%;
   height: auto;
   aspect-ratio: 8.5 / 11;
+}
+
+/* Scale the sample document with its paper. The hero uses a smaller sheet than
+   the gallery, so fixed pixel type made it clip while the larger cards looked
+   under-filled. */
+@supports (font-size: 1cqi) {
+  .templates-page-card .r-doc,
+  .templates-hero-thumb .r-doc {
+    padding: 5.2cqi 5.7cqi;
+    font-size: 1.75cqi;
+  }
+
+  .templates-page-card .r-doc.compact,
+  .templates-hero-thumb .r-doc.compact {
+    padding: 5.2cqi 5.7cqi;
+  }
+
+  .templates-page-card .r-doc.executive,
+  .templates-hero-thumb .r-doc.executive {
+    padding: 7.2cqi 8.2cqi;
+  }
+
+  .templates-page-card .r-doc.technical,
+  .templates-hero-thumb .r-doc.technical {
+    padding: 5.4cqi 5.9cqi;
+  }
+
+  .templates-page-card .r-doc.academic,
+  .templates-hero-thumb .r-doc.academic {
+    padding: 7cqi 7.7cqi;
+  }
+
+  .templates-page-card .r-doc .r-name,
+  .templates-hero-thumb .r-doc .r-name {
+    font-size: 4cqi;
+  }
+
+  .templates-page-card .r-doc.compact .r-name,
+  .templates-hero-thumb .r-doc.compact .r-name {
+    font-size: 4.9cqi;
+  }
+
+  .templates-page-card .r-doc.executive .r-name,
+  .templates-hero-thumb .r-doc.executive .r-name,
+  .templates-page-card .r-doc.impact .r-name,
+  .templates-hero-thumb .r-doc.impact .r-name {
+    font-size: 6.2cqi;
+  }
+
+  .templates-page-card .r-doc .r-role,
+  .templates-hero-thumb .r-doc .r-role {
+    font-size: 2.1cqi;
+  }
+
+  .templates-page-card .r-doc .r-contact,
+  .templates-page-card .r-doc .r-job-org,
+  .templates-page-card .r-doc .r-job-date,
+  .templates-hero-thumb .r-doc .r-contact,
+  .templates-hero-thumb .r-doc .r-job-org,
+  .templates-hero-thumb .r-doc .r-job-date {
+    font-size: 1.5cqi;
+  }
+
+  .templates-page-card .r-doc .r-section-title,
+  .templates-hero-thumb .r-doc .r-section-title {
+    margin-bottom: 1.3cqi;
+    font-size: 1.9cqi;
+  }
+
+  .templates-page-card .r-doc .r-copy,
+  .templates-page-card .r-doc .r-bullet,
+  .templates-hero-thumb .r-doc .r-copy,
+  .templates-hero-thumb .r-doc .r-bullet {
+    font-size: 1.62cqi;
+  }
+
+  .templates-page-card .r-doc .r-bullet,
+  .templates-hero-thumb .r-doc .r-bullet {
+    margin-bottom: 0.26cqi;
+    padding-left: 2.3cqi;
+  }
+
+  .templates-page-card .r-doc .r-job-title,
+  .templates-hero-thumb .r-doc .r-job-title {
+    font-size: 1.75cqi;
+  }
+
+  .templates-page-card .r-doc .r-skill,
+  .templates-hero-thumb .r-doc .r-skill {
+    font-size: 1.5cqi;
+  }
+
+  .templates-page-card .r-doc .r-skill:not(:last-child)::after,
+  .templates-hero-thumb .r-doc .r-skill:not(:last-child)::after {
+    margin-inline-start: 2.05cqi;
+  }
+
+  .templates-page-card .r-doc .r-header,
+  .templates-hero-thumb .r-doc .r-header,
+  .templates-page-card .r-doc .r-section,
+  .templates-hero-thumb .r-doc .r-section {
+    margin-bottom: 3.1cqi;
+  }
+
+  .templates-page-card .r-doc.compact .r-header,
+  .templates-hero-thumb .r-doc.compact .r-header,
+  .templates-page-card .r-doc.compact .r-section,
+  .templates-hero-thumb .r-doc.compact .r-section {
+    margin-bottom: 1.8cqi;
+  }
+
+  .templates-page-card .r-doc .r-job,
+  .templates-hero-thumb .r-doc .r-job {
+    margin-bottom: 1.8cqi;
+  }
+
+  .templates-page-card .r-doc .r-job-org,
+  .templates-hero-thumb .r-doc .r-job-org {
+    margin-bottom: 0.78cqi;
+  }
+}
+
+@media (min-width: 901px) {
+  .templates-page-card:last-child:nth-child(3n + 1) {
+    grid-column: 2;
+  }
 }

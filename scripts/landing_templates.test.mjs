@@ -44,6 +44,11 @@ test("resume previews expose complete role-specific document structures", () => 
   assert.match(preview, /Brand Designer/);
   assert.match(preview, /Graduate Research Fellow/);
   assert.match(preview, /Lifecycle Marketing Manager/);
+  assert.match(preview, /const PREVIEW_FINISHERS: Record<ResumeTemplateVariant, readonly PreviewSection\[\]>/);
+  for (const variant of ["essential", "professional", "editorial", "compact", "executive", "technical", "student", "hybrid", "academic", "impact"]) {
+    assert.match(preview, new RegExp(`\\b${variant}: \\[`, "m"));
+  }
+  assert.match(preview, /memo\(function ResumePreview/);
   assert.match(page, /role=\{template\.previewRole\}/);
   assert.match(stylesheet, /\.template-thumb,\s*\.settings-template-thumb\s*\{(?=[^}]*aspect-ratio:\s*8\.5\s*\/\s*11)(?=[^}]*height:\s*auto)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
   assert.match(stylesheet, /\.template-thumb \.r-doc,\s*\.settings-template-thumb \.r-doc\s*\{(?=[^}]*aspect-ratio:\s*8\.5\s*\/\s*11)(?=[^}]*height:\s*auto)[^}]*\}/s);

@@ -114,6 +114,10 @@ const PAGE_CHECKS = [
       { container: "closest:.templates-guide-option", selector: ".templates-guide-option small", tolerance: 4 },
       { container: "closest:.template-thumb", selector: ".templates-page-card .template-thumb .r-doc", tolerance: 4 },
     ],
+    documentFillChecks: [
+      { selector: ".templates-hero-thumb .r-doc", minFill: 0.72, maxFill: 0.95 },
+      { selector: ".templates-page-card .r-doc", minFill: 0.72, maxFill: 0.95 },
+    ],
   },
   {
     path: "/login?next=%2Fapp&account=signin-required",
@@ -869,6 +873,7 @@ async function evaluateLayout(send, baseUrl, page, width, options = {}) {
     const containedSelectors = ${JSON.stringify(page.containedSelectors || [])};
     const anchorClearanceChecks = ${JSON.stringify(page.anchorClearanceChecks || [])};
     const maxHeightChecks = ${JSON.stringify(page.maxHeightChecks || [])};
+    const documentFillChecks = ${JSON.stringify(page.documentFillChecks || [])};
     const failures = [];
     const viewportWidth = document.documentElement.clientWidth;
     const overflow = document.documentElement.scrollWidth - viewportWidth;
@@ -1099,6 +1104,55 @@ async function evaluateLayout(send, baseUrl, page, width, options = {}) {
           viewport: window.innerWidth,
         });
       }
+    }
+
+    for (const rule of documentFillChecks) {
+      const elements = Array.from(document.querySelectorAll(rule.selector));
+      if (!elements.length) {
+        failures.push({ selector: rule.selector, reason: "document-fill-missing" });
+        continue;
+      }
+
+      elements.forEach((element, index) => {
+        const lastSection = element.querySelector(rule.lastSelector || ".r-section:last-child");
+        if (!lastSection) {
+          failures.push({ selector: rule.selector, index, reason: "document-last-section-missing" });
+          return;
+        }
+
+        const rect = element.getBoundingClientRect();
+        const lastRect = lastSection.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+
+        const blockOverflow = element.scrollHeight - element.clientHeight;
+        const fill = (lastRect.bottom - rect.top) / rect.height;
+        if (blockOverflow > 3) {
+          failures.push({
+            selector: rule.selector,
+            index,
+            reason: "document-content-clipped",
+            blockOverflow: Math.round(blockOverflow),
+          });
+        }
+        if (fill < Number(rule.minFill || 0)) {
+          failures.push({
+            selector: rule.selector,
+            index,
+            reason: "document-under-filled",
+            fill: Number(fill.toFixed(3)),
+            minFill: Number(rule.minFill || 0),
+          });
+        }
+        if (fill > Number(rule.maxFill || 1)) {
+          failures.push({
+            selector: rule.selector,
+            index,
+            reason: "document-over-filled",
+            fill: Number(fill.toFixed(3)),
+            maxFill: Number(rule.maxFill || 1),
+          });
+        }
+      });
     }
 
     return JSON.stringify({

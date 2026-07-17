@@ -42,3 +42,11 @@ test("rendered layout smoke rejects observer-polished sections that remain fully
   assert.match(smokeLayout, /opacity\s*<\s*0\.1/);
   assert.match(smokeLayout, /reason:\s*"polish-reveal-hidden"/);
 });
+
+test("rendered layout smoke catches clipped and visibly under-filled template papers", () => {
+  assert.match(smokeLayout, /documentFillChecks/);
+  assert.match(smokeLayout, /\.templates-hero-thumb \.r-doc[^\n]*minFill:\s*0\.72[^\n]*maxFill:\s*0\.95/);
+  assert.match(smokeLayout, /reason:\s*"document-content-clipped"/);
+  assert.match(smokeLayout, /reason:\s*"document-under-filled"/);
+  assert.match(smokeLayout, /reason:\s*"document-over-filled"/);
+});

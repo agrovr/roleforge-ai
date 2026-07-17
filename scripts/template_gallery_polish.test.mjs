@@ -49,6 +49,13 @@ test("template preview cards stay calm in light, dark, and reduced-motion modes"
   assert.match(section, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.templates-page-card,[\s\S]*?\.templates-guide-option\s*\{[^}]*transition:\s*none;[\s\S]*?\}/s);
 });
 
+test("template papers scale their content and defer offscreen card painting", () => {
+  assert.match(section, /\.templates-page-card\s*\{(?=[^}]*content-visibility:\s*auto)(?=[^}]*contain-intrinsic-size:\s*auto 680px)[^}]*\}/s);
+  assert.match(section, /\.templates-page-card \.template-thumb,\s*\.templates-hero-thumb\s*\{(?=[^}]*aspect-ratio:\s*8\.5\s*\/\s*11)(?=[^}]*container-type:\s*inline-size)[^}]*\}/s);
+  assert.match(section, /@supports\s*\(font-size:\s*1cqi\)\s*\{[\s\S]*?\.templates-page-card \.r-doc,[\s\S]*?padding:\s*5\.2cqi 5\.7cqi;[\s\S]*?\.templates-hero-thumb \.r-doc \.r-copy,[\s\S]*?font-size:\s*1\.62cqi;/s);
+  assert.match(section, /@media\s*\(min-width:\s*901px\)\s*\{[\s\S]*?\.templates-page-card:last-child:nth-child\(3n \+ 1\)\s*\{[^}]*grid-column:\s*2;/s);
+});
+
 test("templates hero preview stays responsive without decorative motion", () => {
   assert.match(section, /\.templates-hero-preview\s*\{(?=[^}]*border-radius:\s*18px)(?=[^}]*transition:\s*border-color 180ms ease)[^}]*\}/s);
   assert.match(section, /\.templates-hero-thumb\s*\{(?=[^}]*box-shadow:)[^}]*\}/s);

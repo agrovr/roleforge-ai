@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 import type { ResumeTemplateVariant } from "../lib/resumeTemplates";
 
 type PreviewSection = {
@@ -36,6 +38,49 @@ const SHARED_EXPERIENCE = [
     bullets: ["Built launch checklists used across product and customer teams.", "Maintained adoption reporting for quarterly planning reviews."],
   },
 ] as const;
+
+const PREVIEW_FINISHERS: Record<ResumeTemplateVariant, readonly PreviewSection[]> = {
+  essential: [
+    { title: "Selected Project", copy: "Built a launch health brief that connected customer evidence, ownership, and delivery risk." },
+    { title: "Professional Development", copy: "Product analytics and facilitation coursework" },
+  ],
+  professional: [
+    { title: "Operational Impact", copy: "Created a quarterly planning rhythm used across product, customer, and finance teams." },
+    { title: "Credentials", copy: "Certified Scrum Product Owner · Product analytics coursework" },
+  ],
+  editorial: [
+    { title: "Recognition", copy: "Selected work featured in regional design and editorial showcases." },
+    { title: "Tools", skills: ["Figma", "Adobe Creative Cloud", "Notion", "Miro"] },
+  ],
+  compact: [
+    { title: "Selected Outcomes", copy: "Improved launch clarity, customer feedback routing, and cross-team planning readiness." },
+    { title: "Tools", skills: ["Jira", "Looker", "SQL", "Miro"] },
+  ],
+  executive: [
+    { title: "Board & Advisory", copy: "Advises growth-stage product leaders on portfolio reviews and operating cadence." },
+    { title: "Credentials", copy: "M.B.A. · Executive leadership program" },
+  ],
+  technical: [
+    { title: "Open Source", copy: "Maintains small reliability utilities and contributes documentation fixes to developer tools." },
+    { title: "Certifications", copy: "Cloud architecture fundamentals · Secure software delivery" },
+  ],
+  student: [
+    { title: "Coursework", copy: "Database systems · Statistical modeling · Operations strategy" },
+    { title: "Activities", copy: "Analytics Club project lead · Peer tutor" },
+  ],
+  hybrid: [
+    { title: "Selected Project", copy: "Mapped a customer support workflow into a measurable product operations handoff." },
+    { title: "Credentials", copy: "Product management certificate · SQL foundations" },
+  ],
+  academic: [
+    { title: "Grants & Service", copy: "Graduate research award · Conference reviewer · Lab methods coordinator" },
+    { title: "Affiliations", copy: "Association for Information Science and Technology" },
+  ],
+  impact: [
+    { title: "Campaign Portfolio", copy: "Lifecycle launches, partner programs, customer research, and sales enablement systems." },
+    { title: "Platforms", skills: ["HubSpot", "Salesforce", "GA4", "Looker"] },
+  ],
+};
 
 function sectionsFor(variant: ResumeTemplateVariant): PreviewSection[] {
   if (variant === "hybrid") {
@@ -222,18 +267,20 @@ function sectionsFor(variant: ResumeTemplateVariant): PreviewSection[] {
   ];
 }
 
-export function ResumePreview({
-  variant = "essential",
-  name = "Avery Stone",
-  role = "Product Operations Manager",
-  highlight = false,
-}: {
+type ResumePreviewProps = {
   variant?: ResumeTemplateVariant;
   name?: string;
   role?: string;
   highlight?: boolean;
-}) {
-  const sections = sectionsFor(variant);
+};
+
+export const ResumePreview = memo(function ResumePreview({
+  variant = "essential",
+  name = "Avery Stone",
+  role = "Product Operations Manager",
+  highlight = false,
+}: ResumePreviewProps) {
+  const sections = [...sectionsFor(variant), ...PREVIEW_FINISHERS[variant]];
 
   return (
     <div className={`r-doc ${variant}`}>
@@ -273,4 +320,4 @@ export function ResumePreview({
       </div>
     </div>
   );
-}
+});
