@@ -233,12 +233,14 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
           return (
             <article className="admin-support-card" data-status={request.status} aria-labelledby={`support-request-${request.id}`} key={request.id}>
               <header>
-                <div>
+                <div className="admin-support-card-heading">
                   <span className="admin-support-reference">{request.referenceLabel}</span>
+                  <span className={`admin-support-status ${request.status}`}>{request.statusLabel}</span>
+                </div>
+                <div className="admin-support-card-copy">
                   <h2 id={`support-request-${request.id}`}>{request.subject}</h2>
                   <p>{request.categoryLabel} · {request.createdLabel}</p>
                 </div>
-                <span className={`admin-support-status ${request.status}`}>{request.statusLabel}</span>
               </header>
               <div className="admin-support-card-body">
                 <div className="admin-support-case">
