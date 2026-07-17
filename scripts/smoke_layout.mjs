@@ -25,6 +25,9 @@ const PAGE_CHECKS = [
       [".hero-copy", ".hero-stage .resume-card-front"],
       [".cta-band > div:first-child", ".cta-visual"],
     ],
+    disjointSelectorGroups: [
+      { first: ".steps-track span", second: ".step-icon" },
+    ],
     containedSelectors: [
       { container: ".hero-stage", selector: ".hero-stage .resume-card", tolerance: 8 },
       { container: ".hero-stage", selector: ".hero-badge", tolerance: 8 },
@@ -870,6 +873,7 @@ async function evaluateLayout(send, baseUrl, page, width, options = {}) {
     const selectors = ${JSON.stringify(page.selectors)};
     const textFitSelectors = ${JSON.stringify(page.textFitSelectors || [])};
     const noOverlapPairs = ${JSON.stringify(page.noOverlapPairs || [])};
+    const disjointSelectorGroups = ${JSON.stringify(page.disjointSelectorGroups || [])};
     const containedSelectors = ${JSON.stringify(page.containedSelectors || [])};
     const anchorClearanceChecks = ${JSON.stringify(page.anchorClearanceChecks || [])};
     const maxHeightChecks = ${JSON.stringify(page.maxHeightChecks || [])};
@@ -989,6 +993,31 @@ async function evaluateLayout(send, baseUrl, page, width, options = {}) {
           leftRight: Math.round(leftRect.right),
           rightLeft: Math.round(rightRect.left),
         });
+      }
+    }
+
+    for (const rule of disjointSelectorGroups) {
+      const firstElements = Array.from(document.querySelectorAll(rule.first));
+      const secondElements = Array.from(document.querySelectorAll(rule.second));
+      for (const [firstIndex, first] of firstElements.entries()) {
+        const firstRect = first.getBoundingClientRect();
+        if (firstRect.width <= 0 || firstRect.height <= 0) continue;
+        for (const [secondIndex, second] of secondElements.entries()) {
+          const secondRect = second.getBoundingClientRect();
+          if (secondRect.width <= 0 || secondRect.height <= 0) continue;
+          const verticalOverlap = Math.max(0, Math.min(firstRect.bottom, secondRect.bottom) - Math.max(firstRect.top, secondRect.top));
+          const horizontalOverlap = Math.max(0, Math.min(firstRect.right, secondRect.right) - Math.max(firstRect.left, secondRect.left));
+          if (verticalOverlap > 0.5 && horizontalOverlap > 0.5) {
+            failures.push({
+              selector: rule.first + " / " + rule.second,
+              reason: "selector-groups-overlap",
+              firstIndex,
+              secondIndex,
+              horizontalOverlap: Number(horizontalOverlap.toFixed(2)),
+              verticalOverlap: Number(verticalOverlap.toFixed(2)),
+            });
+          }
+        }
       }
     }
 

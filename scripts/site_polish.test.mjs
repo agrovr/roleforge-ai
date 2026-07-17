@@ -24,7 +24,7 @@ test("site polish keeps ambient depth without global line overlays", () => {
   assert.doesNotMatch(globals, /\.rf-scroll-progress/);
   assert.doesNotMatch(globals, /\.rf-page-texture/);
   assert.match(globals, /@keyframes\s+rf-section-reveal/);
-  assert.match(globals, /html\.rf-polish-ready \[data-polish-reveal="true"\]\s*\{(?=[^}]*opacity:\s*1)(?=[^}]*transform:\s*none)[^}]*\}/s);
+  assert.match(globals, /html\.rf-polish-ready \[data-polish-reveal="true"\]\s*\{(?=[^}]*animation:\s*none)(?=[^}]*opacity:\s*1)(?=[^}]*transform:\s*none)[^}]*\}/s);
   assert.match(globals, /data-polish-visible="true"\]\s*\{(?=[^}]*animation:\s*rf-section-reveal)[^}]*\}/s);
   assert.doesNotMatch(globals, /data-polish-reveal="true"\]\s*\{[^}]*opacity:\s*0/s);
   assert.match(globals, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);

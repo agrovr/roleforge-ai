@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { AccountMenuBehavior } from "./components/AccountMenuBehavior";
 import { SitePolish } from "./components/SitePolish";
@@ -58,14 +58,6 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const jetBrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  display: "swap",
-  variable: "--font-jetbrains-mono",
-});
-
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -74,7 +66,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${fraunces.variable} ${inter.variable} ${jetBrainsMono.variable}`}
+      className={`${fraunces.variable} ${inter.variable}`}
       suppressHydrationWarning
     >
       <body>

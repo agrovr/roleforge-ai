@@ -29,7 +29,7 @@ test("landing process reads as a connected workflow without restoring card divid
   assert.match(globals, /\.step \.step-icon\s*\{(?=[^}]*isolation:\s*isolate)(?=[^}]*background:\s*color-mix\(in srgb,\s*var\(--brand\) 18%,\s*var\(--surface-warm\)\))(?=[^}]*outline:\s*0)[^}]*\}/s);
   assert.match(globals, /html\[data-theme="dark"\] \.step:nth-child\(n\)\s*\{(?=[^}]*border-color:\s*transparent)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
   assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.steps,\s*\.features-grid\s*\{(?=[^}]*grid-template-columns:\s*1fr)(?=[^}]*gap:\s*28px)[^}]*\}[\s\S]*?\.step:nth-child\(n\)\s*\{(?=[^}]*grid-template-columns:\s*36px 36px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*14px 12px)(?=[^}]*border:\s*0)[^}]*\}/s);
-  assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.steps-track\s*\{[^}]*display:\s*none[^}]*\}/s);
+  assert.match(globals, /@media\s*\(max-width:\s*1180px\)\s*\{\s*\.steps-track\s*\{[^}]*display:\s*none[^}]*\}/s);
   assert.match(globals, /@media\s*\(max-width:\s*640px\)\s*\{[\s\S]*?\.step:nth-child\(n\)\s*\{(?=[^}]*grid-template-columns:\s*32px 34px minmax\(0,\s*1fr\))(?=[^}]*padding:\s*12px 8px)[^}]*\}/s);
   assert.match(globals, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.steps-track\s*\{[^}]*transition:\s*none[^}]*\}[\s\S]*?\.steps\[data-polish-reveal="true"\][\s\S]*?transform:\s*none/s);
   assert.doesNotMatch(globals, /--landing-workflow-rail|--landing-workflow-glint/);

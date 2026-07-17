@@ -39,7 +39,7 @@
   --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   --font-resume: var(--font-fraunces), Georgia, "Times New Roman", serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
 html[data-theme="dark"] {
@@ -181,6 +181,7 @@ html[data-theme="dark"] textarea {
 }
 
 html.rf-polish-ready [data-polish-reveal="true"] {
+  animation: none;
   opacity: 1;
   transform: none;
 }
@@ -12132,6 +12133,10 @@ html[data-theme="dark"] .step:nth-child(n):hover {
 }
 
 @media (max-width: 1180px) {
+  .steps-track {
+    display: none;
+  }
+
   .step:nth-child(n) {
     border: 0;
   }
