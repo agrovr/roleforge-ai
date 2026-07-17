@@ -1,4 +1,5 @@
-import Link from "next/link";
+import NextLink from "next/link";
+import type { ComponentProps } from "react";
 import { AccountAvatar } from "./components/AccountAvatar";
 import { AccountReferenceCopyButton } from "./components/AccountReferenceCopyButton";
 import { Brand } from "./components/Brand";
@@ -37,6 +38,10 @@ type LandingLinks = {
   billingHref: string;
   supportAdmin: boolean;
 };
+
+function Link({ prefetch = false, ...props }: ComponentProps<typeof NextLink>) {
+  return <NextLink {...props} prefetch={prefetch} />;
+}
 
 const FREE_RUN_ALLOWANCE = monthlyRunAllowanceLabel(FREE_ENTITLEMENT.monthlyRunLimit);
 const PREMIUM_MONTHLY_PRICE = PREMIUM_PRICE.monthly / 100;
@@ -137,7 +142,7 @@ function Nav({
       <div className="nav-inner">
         <Brand />
         <nav className="nav-links" aria-label="Primary navigation">
-          <Link className="nav-link nav-link-secondary" href="/templates">Templates</Link>
+          <Link className="nav-link nav-link-secondary" href="/templates" prefetch>Templates</Link>
           <a className="nav-link nav-link-secondary" href="#how">How it works</a>
           <a className="nav-link nav-link-secondary" href="#features">Features</a>
           <a className="nav-link nav-link-secondary" href="#pricing">Pricing</a>

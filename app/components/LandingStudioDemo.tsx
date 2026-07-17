@@ -141,7 +141,7 @@ export function LandingStudioDemo({ studioHref }: { studioHref: string }) {
           ))}
           <div className="dash-side-divider" />
           <div className="dash-side-label">Real workflow</div>
-          <Link className="dash-side-item dash-side-link" href={studioHref}>
+          <Link className="dash-side-item dash-side-link" href={studioHref} prefetch={false}>
             <RoleForgeIcon name="arrow" size={15} />
             <span>Open studio</span>
           </Link>
@@ -167,7 +167,7 @@ export function LandingStudioDemo({ studioHref }: { studioHref: string }) {
               <h3>{activeCopy.title}</h3>
               <p>{activeCopy.detail}</p>
             </div>
-            <Link className="btn btn-brand btn-sm" href={studioHref}><RoleForgeIcon name="arrow" size={14} />Open real studio</Link>
+            <Link className="btn btn-brand btn-sm" href={studioHref} prefetch={false}><RoleForgeIcon name="arrow" size={14} />Open real studio</Link>
           </div>
           <span className="sr-only" role="status" aria-live="polite">Showing {activeCopy.title} sample.</span>
 
@@ -195,7 +195,7 @@ export function LandingStudioDemo({ studioHref }: { studioHref: string }) {
                         <RoleForgeIcon name="edit" size={13} />{showHighlights ? "Hide" : "Show"} sample change
                       </button>
                       <button className="btn btn-soft btn-sm" type="button" onClick={() => selectView("tailor")}><RoleForgeIcon name="chart" size={13} />Fit signals</button>
-                      <Link className="btn btn-soft btn-sm" href={studioHref}><RoleForgeIcon name="arrow" size={13} />Use my resume</Link>
+                      <Link className="btn btn-soft btn-sm" href={studioHref} prefetch={false}><RoleForgeIcon name="arrow" size={13} />Use my resume</Link>
                     </div>
                   </div>
                 </div>
@@ -271,7 +271,7 @@ export function LandingStudioDemo({ studioHref }: { studioHref: string }) {
               <p>{detail}</p>
             </div>
           ))}
-          <Link className="btn btn-soft btn-sm dash-demo-aside-action" href={studioHref}>Open real studio <RoleForgeIcon name="arrow" size={13} /></Link>
+          <Link className="btn btn-soft btn-sm dash-demo-aside-action" href={studioHref} prefetch={false}>Open real studio <RoleForgeIcon name="arrow" size={13} /></Link>
         </aside>
       </div>
     </div>

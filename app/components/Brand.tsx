@@ -10,7 +10,7 @@ export function Brand({
   studio?: boolean;
 }) {
   return (
-    <Link className="brand" href={href} aria-label={label}>
+    <Link className="brand" href={href} aria-label={label} prefetch={false}>
       <span className="brand-mark" aria-hidden="true">
         <span className="brand-mark-sheet sheet-one" />
         <span className="brand-mark-sheet sheet-two" />
