@@ -20,7 +20,8 @@ test("landing process reads as a connected workflow without restoring card divid
   assert.match(landing, /<div className="steps-track" aria-hidden="true">\s*<span \/>\s*<span \/>\s*<span \/>\s*<\/div>/s);
   assert.match(globals, /\.steps-track\s*\{(?=[^}]*inset-inline:\s*12\.5%)(?=[^}]*top:\s*clamp\(98px,\s*7vw,\s*105px\))(?=[^}]*grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\))[^}]*\}/s);
   assert.match(globals, /\.steps-track span\s*\{(?=[^}]*height:\s*2px)(?=[^}]*margin-inline:\s*46px)[^}]*\}/s);
-  assert.match(globals, /html\.rf-polish-ready \.steps\[data-polish-reveal="true"\]\[data-polish-visible="true"\] \.steps-track\s*\{[^}]*transform:\s*scaleX\(1\)[^}]*\}/s);
+  assert.match(globals, /@keyframes\s+rf-workflow-connect\s*\{[\s\S]*?from\s*\{[^}]*transform:\s*scaleX\(0\)[^}]*\}[\s\S]*?to\s*\{[^}]*transform:\s*scaleX\(1\)[^}]*\}/s);
+  assert.match(globals, /html\.rf-polish-ready \.steps\[data-polish-reveal="true"\]\[data-polish-visible="true"\] \.steps-track\s*\{[^}]*animation:\s*rf-workflow-connect[^}]*\}/s);
   assert.match(globals, /\.step\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\) 42px minmax\(0,\s*1fr\))(?=[^}]*grid-template-rows:\s*auto 42px auto auto)(?=[^}]*padding:\s*22px 18px 24px)(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*18px)(?=[^}]*background:\s*transparent)(?=[^}]*transition:\s*transform 280ms)[^}]*\}/s);
   assert.match(globals, /\.step \+ \.step\s*\{[^}]*border-inline-start:\s*0[^}]*\}/s);
   assert.match(globals, /\.step:hover\s*\{(?=[^}]*background:)(?=[^}]*box-shadow:)(?=[^}]*transform:\s*translateY\(-4px\))[^}]*\}/s);

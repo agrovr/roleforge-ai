@@ -916,6 +916,17 @@ async function evaluateLayout(send, baseUrl, page, width, options = {}) {
       });
     }
 
+    for (const element of document.querySelectorAll('[data-polish-reveal="true"]')) {
+      const opacity = Number.parseFloat(getComputedStyle(element).opacity);
+      if (Number.isFinite(opacity) && opacity < 0.1) {
+        failures.push({
+          selector: element.className || element.tagName.toLowerCase(),
+          reason: "polish-reveal-hidden",
+          opacity,
+        });
+      }
+    }
+
     for (const selector of textFitSelectors) {
       const elements = Array.from(document.querySelectorAll(selector));
       elements.forEach((element, index) => {

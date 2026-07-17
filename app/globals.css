@@ -168,23 +168,26 @@ html[data-theme="dark"] textarea {
   background: var(--brand-soft);
 }
 
+@keyframes rf-section-reveal {
+  from {
+    opacity: 0.84;
+    transform: translateY(7px) scale(0.996);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 html.rf-polish-ready [data-polish-reveal="true"] {
-  opacity: 0;
-  transform: scale(0.992);
-  transition:
-    opacity 560ms ease,
-    transform 700ms cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 180ms ease,
-    background 180ms ease,
-    box-shadow 180ms ease;
-  transition-delay: calc(var(--rf-reveal-index, 0) * 34ms);
-  will-change: opacity, transform;
+  opacity: 1;
+  transform: none;
 }
 
 html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
-  opacity: 1;
-  transform: scale(1);
-  will-change: auto;
+  animation: rf-section-reveal 520ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: calc(var(--rf-reveal-index, 0) * 28ms);
 }
 
 /* Skip below-the-fold paint and layout work until those sections approach the viewport. */
@@ -405,6 +408,7 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
     opacity: 1;
     transform: none;
+    animation: none;
     transition: none;
   }
 
@@ -11901,12 +11905,18 @@ html[data-theme="dark"] .pricing-grid.two .price-card.featured .price-status.pau
   background: linear-gradient(90deg, color-mix(in srgb, var(--brand) 42%, var(--sky)), var(--sky));
 }
 
-html.rf-polish-ready .steps[data-polish-reveal="true"] .steps-track {
-  transform: scaleX(0);
+@keyframes rf-workflow-connect {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
 }
 
 html.rf-polish-ready .steps[data-polish-reveal="true"][data-polish-visible="true"] .steps-track {
-  transform: scaleX(1);
+  animation: rf-workflow-connect 900ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .step {
@@ -12287,6 +12297,7 @@ html[data-theme="dark"] .step:nth-child(n):hover {
   html.rf-polish-ready .steps[data-polish-reveal="true"] .steps-track,
   html.rf-polish-ready .steps[data-polish-reveal="true"][data-polish-visible="true"] .steps-track {
     transform: none;
+    animation: none;
   }
 }
 

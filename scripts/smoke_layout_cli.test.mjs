@@ -36,3 +36,9 @@ test("rendered layout smoke permits reachable content in intentional horizontal 
   assert.match(smokeLayout, /ancestor\.scrollWidth - ancestor\.clientWidth > 3/);
   assert.match(smokeLayout, /!isInsideReachableHorizontalScroller\(element\)/);
 });
+
+test("rendered layout smoke rejects observer-polished sections that remain fully transparent", () => {
+  assert.match(smokeLayout, /querySelectorAll\('\[data-polish-reveal="true"\]'\)/);
+  assert.match(smokeLayout, /opacity\s*<\s*0\.1/);
+  assert.match(smokeLayout, /reason:\s*"polish-reveal-hidden"/);
+});
