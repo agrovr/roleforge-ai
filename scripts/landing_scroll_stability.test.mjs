@@ -29,6 +29,9 @@ test("landing intrinsic sizes follow the stacked tablet and mobile layouts", () 
   assert.match(globals, /@media \(max-width: 900px\) \{[\s\S]*?\.page-shell > #templates \{ contain-intrinsic-size: auto 1330px; \}[\s\S]*?\.page-shell > #pricing \{ contain-intrinsic-size: auto 1300px; \}[\s\S]*?\.page-shell > #final-cta \{ contain-intrinsic-size: auto 520px; \}[\s\S]*?\}/);
   assert.match(globals, /@media \(max-width: 640px\) \{[\s\S]*?\.page-shell > #studio \{ contain-intrinsic-size: auto 1785px; \}[\s\S]*?\.page-shell > #templates \{ contain-intrinsic-size: auto 2430px; \}[\s\S]*?\.page-shell > #pricing \{ contain-intrinsic-size: auto 1620px; \}[\s\S]*?\}/);
   assert.match(globals, /@media \(min-width: 401px\) and \(max-width: 640px\) \{[\s\S]*?\.page-shell > #studio \{ contain-intrinsic-size: auto 1752px; \}[\s\S]*?\.page-shell > #features \{ contain-intrinsic-size: auto 1560px; \}[\s\S]*?\.page-shell > #final-cta \{ contain-intrinsic-size: auto 611px; \}[\s\S]*?\}/);
+  assert.match(globals, /@media \(min-width: 600px\) and \(max-width: 640px\) \{[\s\S]*?\.page-shell > #templates \{ contain-intrinsic-size: auto 2371px; \}[\s\S]*?\.page-shell > #final-cta \{ contain-intrinsic-size: auto 518px; \}[\s\S]*?\}/);
+  assert.match(globals, /@media \(min-width: 830px\) and \(max-width: 900px\) \{[\s\S]*?\.page-shell > #templates \{ contain-intrinsic-size: auto 1493px; \}[\s\S]*?\}/);
+  assert.match(globals, /@media \(min-width: 901px\) and \(max-width: 1100px\) \{[\s\S]*?\.page-shell > #templates \{ contain-intrinsic-size: auto 1548px; \}[\s\S]*?\.page-shell > #features \{ contain-intrinsic-size: auto 904px; \}[\s\S]*?\.page-shell > #final-cta \{ contain-intrinsic-size: auto 454px; \}[\s\S]*?\}/);
 });
 
 test("rendered layout smoke guards landing scroll-height and section-position drift", () => {

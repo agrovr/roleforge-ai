@@ -233,6 +233,26 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   .page-shell > #final-cta { contain-intrinsic-size: auto 611px; }
 }
 
+@media (min-width: 600px) and (max-width: 640px) {
+  .page-shell > #templates { contain-intrinsic-size: auto 2371px; }
+  .page-shell > #features { contain-intrinsic-size: auto 1511px; }
+  .page-shell > #pricing { contain-intrinsic-size: auto 1433px; }
+  .page-shell > #faq { contain-intrinsic-size: auto 759px; }
+  .page-shell > #final-cta { contain-intrinsic-size: auto 518px; }
+}
+
+@media (min-width: 830px) and (max-width: 900px) {
+  .page-shell > #templates { contain-intrinsic-size: auto 1493px; }
+}
+
+@media (min-width: 901px) and (max-width: 1100px) {
+  .page-shell > #templates { contain-intrinsic-size: auto 1548px; }
+  .page-shell > #features { contain-intrinsic-size: auto 904px; }
+  .page-shell > #pricing { contain-intrinsic-size: auto 751px; }
+  .page-shell > #faq { contain-intrinsic-size: auto 730px; }
+  .page-shell > #final-cta { contain-intrinsic-size: auto 454px; }
+}
+
 .page-shell,
 .shell,
 .templates-page-shell,
