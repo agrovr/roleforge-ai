@@ -16,6 +16,12 @@ const PAGE_CHECKS = [
   {
     path: "/",
     name: "landing",
+    scrollStabilityCheck: {
+      selectors: ["#studio", "#templates", "#features", "#pricing", "#faq", "#final-cta"],
+      maxDocumentHeightDrift: 120,
+      maxSectionTopDrift: 90,
+      maxSectionHeightDrift: 120,
+    },
     anchorClearanceChecks: [
       { anchor: "#final-cta", selector: ".cta-band h2", guard: ".nav", minGap: 18 },
       { anchor: ".cta-band", selector: ".cta-band h2", guard: ".nav", minGap: 18, minWidth: 981 },
@@ -868,6 +874,52 @@ async function evaluateLayout(send, baseUrl, page, width, options = {}) {
       })`,
     });
 
+    let scrollStability = null;
+    if (page.scrollStabilityCheck) {
+      const stabilityResult = await send("Runtime.evaluate", {
+        awaitPromise: true,
+        returnByValue: true,
+        expression: `(async () => {
+          const selectors = ${JSON.stringify(page.scrollStabilityCheck.selectors)};
+          const waitForFrames = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          const snapshot = () => ({
+            documentHeight: document.documentElement.scrollHeight,
+            sections: Object.fromEntries(selectors.map((selector) => {
+              const element = document.querySelector(selector);
+              if (!element) return [selector, null];
+              const rect = element.getBoundingClientRect();
+              return [selector, {
+                top: Math.round(rect.top + window.scrollY),
+                height: Math.round(rect.height),
+              }];
+            })),
+          });
+
+          document.documentElement.style.scrollBehavior = "auto";
+          window.scrollTo(0, 0);
+          await waitForFrames();
+          const initial = snapshot();
+
+          for (const selector of selectors) {
+            const element = document.querySelector(selector);
+            if (!element) continue;
+            element.scrollIntoView({ block: "center", inline: "nearest" });
+            await waitForFrames();
+          }
+
+          window.scrollTo(0, 0);
+          await waitForFrames();
+          const final = snapshot();
+          return { initial, final };
+        })()`,
+      });
+      if (stabilityResult.error) throw new Error(stabilityResult.error.message);
+      if (stabilityResult.result.exceptionDetails) {
+        throw new Error(stabilityResult.result.exceptionDetails.text || "Landing scroll stability evaluation failed");
+      }
+      scrollStability = stabilityResult.result.result.value;
+    }
+
     const expression = `(() => {
     document.documentElement.style.scrollBehavior = "auto";
     const selectors = ${JSON.stringify(page.selectors)};
@@ -879,6 +931,8 @@ async function evaluateLayout(send, baseUrl, page, width, options = {}) {
     const maxHeightChecks = ${JSON.stringify(page.maxHeightChecks || [])};
     const documentFillChecks = ${JSON.stringify(page.documentFillChecks || [])};
     const failures = [];
+    const scrollStability = ${JSON.stringify(scrollStability)};
+    const scrollStabilityCheck = ${JSON.stringify(page.scrollStabilityCheck || null)};
     const viewportWidth = document.documentElement.clientWidth;
     const overflow = document.documentElement.scrollWidth - viewportWidth;
     const isInsideReachableHorizontalScroller = (element) => {
@@ -895,6 +949,50 @@ async function evaluateLayout(send, baseUrl, page, width, options = {}) {
       }
       return false;
     };
+
+    if (scrollStability && scrollStabilityCheck) {
+      const documentHeightDrift = Math.abs(scrollStability.final.documentHeight - scrollStability.initial.documentHeight);
+      if (documentHeightDrift > Number(scrollStabilityCheck.maxDocumentHeightDrift || 0)) {
+        failures.push({
+          selector: "document",
+          reason: "scroll-height-drift",
+          initialHeight: scrollStability.initial.documentHeight,
+          finalHeight: scrollStability.final.documentHeight,
+          drift: documentHeightDrift,
+          maxDrift: Number(scrollStabilityCheck.maxDocumentHeightDrift || 0),
+        });
+      }
+
+      for (const selector of scrollStabilityCheck.selectors) {
+        const initialSection = scrollStability.initial.sections[selector];
+        const finalSection = scrollStability.final.sections[selector];
+        if (!initialSection || !finalSection) continue;
+        const topDrift = Math.abs(finalSection.top - initialSection.top);
+        const heightDrift = Math.abs(finalSection.height - initialSection.height);
+        if (topDrift > Number(scrollStabilityCheck.maxSectionTopDrift || 0)) {
+          failures.push({
+            selector,
+            reason: "section-position-drift",
+            initialTop: initialSection.top,
+            finalTop: finalSection.top,
+            initialHeight: initialSection.height,
+            finalHeight: finalSection.height,
+            drift: topDrift,
+            maxDrift: Number(scrollStabilityCheck.maxSectionTopDrift || 0),
+          });
+        }
+        if (heightDrift > Number(scrollStabilityCheck.maxSectionHeightDrift || 0)) {
+          failures.push({
+            selector,
+            reason: "section-height-drift",
+            initialHeight: initialSection.height,
+            finalHeight: finalSection.height,
+            drift: heightDrift,
+            maxDrift: Number(scrollStabilityCheck.maxSectionHeightDrift || 0),
+          });
+        }
+      }
+    }
 
     for (const selector of selectors) {
       const elements = Array.from(document.querySelectorAll(selector));

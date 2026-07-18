@@ -198,6 +198,41 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   contain-intrinsic-size: auto 900px;
 }
 
+/* Keep the landing scroll range stable while below-the-fold sections are skipped. */
+.page-shell > #studio { contain-intrinsic-size: auto 940px; }
+.page-shell > #templates { contain-intrinsic-size: auto 690px; }
+.page-shell > #features { contain-intrinsic-size: auto 920px; }
+.page-shell > #pricing { contain-intrinsic-size: auto 775px; }
+.page-shell > #faq { contain-intrinsic-size: auto 755px; }
+.page-shell > #final-cta { contain-intrinsic-size: auto 530px; }
+
+@media (max-width: 900px) {
+  .page-shell > #studio { contain-intrinsic-size: auto 920px; }
+  .page-shell > #templates { contain-intrinsic-size: auto 1330px; }
+  .page-shell > #features { contain-intrinsic-size: auto 1490px; }
+  .page-shell > #pricing { contain-intrinsic-size: auto 1300px; }
+  .page-shell > #faq { contain-intrinsic-size: auto 775px; }
+  .page-shell > #final-cta { contain-intrinsic-size: auto 520px; }
+}
+
+@media (max-width: 640px) {
+  .page-shell > #studio { contain-intrinsic-size: auto 1785px; }
+  .page-shell > #templates { contain-intrinsic-size: auto 2430px; }
+  .page-shell > #features { contain-intrinsic-size: auto 1640px; }
+  .page-shell > #pricing { contain-intrinsic-size: auto 1620px; }
+  .page-shell > #faq { contain-intrinsic-size: auto 870px; }
+  .page-shell > #final-cta { contain-intrinsic-size: auto 595px; }
+}
+
+@media (min-width: 401px) and (max-width: 640px) {
+  .page-shell > #studio { contain-intrinsic-size: auto 1752px; }
+  .page-shell > #templates { contain-intrinsic-size: auto 2399px; }
+  .page-shell > #features { contain-intrinsic-size: auto 1560px; }
+  .page-shell > #pricing { contain-intrinsic-size: auto 1508px; }
+  .page-shell > #faq { contain-intrinsic-size: auto 847px; }
+  .page-shell > #final-cta { contain-intrinsic-size: auto 611px; }
+}
+
 .page-shell,
 .shell,
 .templates-page-shell,
