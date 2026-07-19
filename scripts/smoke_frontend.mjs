@@ -388,7 +388,10 @@ async function checkPublicShell(baseUrl, signedInCookie = "") {
   );
   pass("templates page respects the saved template direction");
 
-  const stylesheetPageTexts = [home.text, templates.text];
+  const help = await request(baseUrl, "/help", { redirect: "follow" });
+  requireCondition(help.response.ok, `help returned ${help.response.status}`);
+
+  const stylesheetPageTexts = [home.text, templates.text, help.text];
   if (signedInCookie) {
     const studioStylesheetPage = await request(baseUrl, "/app", {
       cookie: signedInCookie,
