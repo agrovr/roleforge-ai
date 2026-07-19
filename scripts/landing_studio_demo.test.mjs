@@ -42,5 +42,6 @@ test("landing studio interaction remains responsive dark-mode safe and restraine
   assert.match(globals, /\.dash-demo-content\s*\{(?=[^}]*min-height:\s*386px)[^}]*\}/s);
   assert.match(globals, /\.dash-resume-thumb\[data-highlight="false"\] \.r-hl-good\s*\{(?=[^}]*background:\s*transparent)(?=[^}]*background-image:\s*none)[^}]*\}/s);
   assert.match(globals, /html\[data-theme="dark"\] \.dash-demo-tabs button\.active/);
+  assert.match(globals, /html\[data-theme="dark"\] \.dash-demo \.dash-side-item\.active \.dash-pill\s*\{(?=[^}]*background:\s*color-mix\(in srgb, currentColor 10%, transparent\))(?=[^}]*color:\s*inherit)[^}]*\}/s);
   assert.match(globals, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.dash-demo-content,[\s\S]*?transition:\s*none/s);
 });

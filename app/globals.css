@@ -4159,6 +4159,11 @@ html[data-theme="dark"] .dash-side-item.active {
   box-shadow: 0 12px 26px -18px rgba(255, 247, 233, 0.58);
 }
 
+html[data-theme="dark"] .dash-demo .dash-side-item.active .dash-pill {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  color: inherit;
+}
+
 html[data-theme="dark"] .dash-main {
   background:
     radial-gradient(circle at 82% 10%, rgba(221, 160, 74, 0.07), transparent 18rem),
