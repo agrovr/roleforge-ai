@@ -6,8 +6,10 @@ const globals = readFileSync("app/globals.css", "utf8");
 const landing = readFileSync("app/page.tsx", "utf8");
 
 test("landing nav uses a compact floating dock instead of a full-width box", () => {
-  assert.match(globals, /\.nav\s*\{(?=[^}]*padding-block:\s*12px)(?=[^}]*border-bottom:\s*0)(?=[^}]*backdrop-filter:\s*saturate\(130%\)\s+blur\(8px\))[^}]*\}/s);
-  assert.match(globals, /\.nav-inner\s*\{(?=[^}]*width:\s*min\(1120px,\s*calc\(100%\s*-\s*clamp\(32px,\s*8vw,\s*120px\)\)\))(?=[^}]*border:\s*1px solid)(?=[^}]*border-radius:\s*999px)(?=[^}]*backdrop-filter:\s*blur\(18px\)\s+saturate\(1\.08\))(?=[^}]*box-shadow:)[^}]*\}/s);
+  assert.match(globals, /\.nav\s*\{(?=[^}]*padding-block:\s*12px)(?=[^}]*border-bottom:\s*0)(?=[^}]*background:[^}]*var\(--surface-warm\))(?=[^}]*backdrop-filter:\s*none)[^}]*\}/s);
+  assert.match(globals, /\.nav-inner\s*\{(?=[^}]*width:\s*min\(1120px,\s*calc\(100%\s*-\s*clamp\(32px,\s*8vw,\s*120px\)\)\))(?=[^}]*border:\s*1px solid)(?=[^}]*border-radius:\s*999px)(?=[^}]*linear-gradient\(180deg,[^}]*var\(--surface\))(?=[^}]*backdrop-filter:\s*none)(?=[^}]*box-shadow:)[^}]*\}/s);
+  assert.doesNotMatch(globals, /\.nav\s*\{[^}]*backdrop-filter:[^;}]*blur/s);
+  assert.doesNotMatch(globals, /\.nav-inner\s*\{[^}]*backdrop-filter:[^;}]*blur/s);
   assert.match(globals, /\.nav-inner::before\s*\{[^}]*content:\s*none/s);
   assert.doesNotMatch(globals, /\.nav::after\s*\{/);
   assert.doesNotMatch(landing, /nav-divider/);

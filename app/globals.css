@@ -548,9 +548,9 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   padding-block: 12px;
   border-bottom: 0;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--bg) 92%, transparent), color-mix(in srgb, var(--bg) 62%, transparent) 78%, transparent);
-  backdrop-filter: saturate(130%) blur(8px);
-  -webkit-backdrop-filter: saturate(130%) blur(8px);
+    linear-gradient(180deg, color-mix(in srgb, var(--bg) 96%, var(--surface)), color-mix(in srgb, var(--bg) 92%, var(--surface-warm)) 78%, var(--bg));
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   isolation: isolate;
 }
 
@@ -568,14 +568,14 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   border: 1px solid color-mix(in srgb, var(--line) 76%, transparent);
   border-radius: 999px;
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 88%, transparent), color-mix(in srgb, var(--surface-warm) 74%, transparent)),
     radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--brand-soft) 28%, transparent), transparent 16rem),
-    radial-gradient(circle at 92% 14%, color-mix(in srgb, var(--accent-soft) 22%, transparent), transparent 15rem);
+    radial-gradient(circle at 92% 14%, color-mix(in srgb, var(--accent-soft) 22%, transparent), transparent 15rem),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface) 96%, var(--bg)), color-mix(in srgb, var(--surface-warm) 82%, var(--surface)));
   box-shadow:
     0 1px 0 color-mix(in srgb, #fff 76%, transparent) inset,
     0 18px 48px -38px color-mix(in srgb, var(--ink-0) 42%, transparent);
-  backdrop-filter: blur(18px) saturate(1.08);
-  -webkit-backdrop-filter: blur(18px) saturate(1.08);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .nav-inner::before {
@@ -3582,9 +3582,9 @@ html[data-theme="dark"] .nav {
 html[data-theme="dark"] .nav-inner {
   border-color: rgba(255, 247, 233, 0.13);
   background:
-    linear-gradient(180deg, rgba(25, 30, 49, 0.82), rgba(11, 16, 31, 0.72)),
     radial-gradient(circle at 0% 0%, rgba(221, 160, 74, 0.14), transparent 16rem),
-    radial-gradient(circle at 92% 14%, rgba(127, 200, 184, 0.11), transparent 15rem);
+    radial-gradient(circle at 92% 14%, rgba(127, 200, 184, 0.11), transparent 15rem),
+    linear-gradient(180deg, #191e31, #0b101f);
   box-shadow:
     0 1px 0 rgba(255, 247, 233, 0.08) inset,
     0 24px 62px -46px rgba(0, 0, 0, 0.92);
@@ -8234,7 +8234,7 @@ body {
 }
 
 .nav {
-  background: color-mix(in srgb, var(--bg) 84%, white 12%);
+  background: color-mix(in srgb, var(--bg) 88%, white 12%);
   box-shadow: 0 18px 44px -38px rgba(48, 36, 20, 0.35);
 }
 
@@ -8353,7 +8353,7 @@ html[data-theme="dark"] body {
 }
 
 html[data-theme="dark"] .nav {
-  background: rgba(10, 14, 28, 0.9);
+  background: color-mix(in srgb, var(--bg) 92%, #10182c);
   border-bottom-color: rgba(255, 247, 233, 0.13);
   box-shadow: 0 18px 46px -32px rgba(0, 0, 0, 0.9);
 }
