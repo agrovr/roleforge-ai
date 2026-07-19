@@ -1394,6 +1394,184 @@ async function evaluatePreviewTabs(send, baseUrl) {
   return [JSON.parse(result.result.result.value)];
 }
 
+async function evaluateLandingStudioDemo(send, baseUrl) {
+  await send("Emulation.setDeviceMetricsOverride", {
+    width: 1280,
+    height: 1000,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+  await send("Page.navigate", { url: `${baseUrl}/` });
+  await delay(2400);
+
+  const expression = `(async () => {
+    const failures = [];
+    const waitForUpdate = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const demo = document.querySelector(".dash-demo");
+
+    if (!demo) {
+      return JSON.stringify({
+        page: "landing studio demo",
+        theme: document.documentElement.dataset.theme || "light",
+        viewportMode: "interaction",
+        width: window.innerWidth,
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        failures: [{ selector: ".dash-demo", reason: "studio-demo-missing" }],
+      });
+    }
+
+    demo.scrollIntoView({ block: "center" });
+    await waitForUpdate();
+
+    const findButton = (selector, label) => Array.from(document.querySelectorAll(selector))
+      .find((button) => button.textContent.replace(/\\s+/g, " ").trim().includes(label));
+
+    const expectView = (view, title) => {
+      if (demo.getAttribute("data-demo-view") !== view) {
+        failures.push({ selector: ".dash-demo", reason: "studio-demo-view-mismatch", expected: view, actual: demo.getAttribute("data-demo-view") });
+      }
+
+      const currentTitle = document.querySelector(".dash-main-head h3")?.textContent.trim();
+      if (currentTitle !== title) {
+        failures.push({ selector: ".dash-main-head h3", reason: "studio-demo-title-mismatch", expected: title, actual: currentTitle });
+      }
+
+      const sidePressedCount = document.querySelectorAll('.dash-side button.dash-side-item[aria-pressed="true"]').length;
+      const tabPressedCount = document.querySelectorAll('.dash-demo-tabs button[aria-pressed="true"]').length;
+      if (sidePressedCount !== 1 || tabPressedCount !== 1) {
+        failures.push({ selector: ".dash-demo", reason: "studio-demo-active-count", sidePressedCount, tabPressedCount });
+      }
+    };
+
+    const selectView = async (label, view, title) => {
+      const button = findButton(".dash-side button.dash-side-item", label);
+      if (!button) {
+        failures.push({ selector: ".dash-side button.dash-side-item", reason: "studio-demo-button-missing", label });
+        return false;
+      }
+      button.click();
+      await waitForUpdate();
+      expectView(view, title);
+      return true;
+    };
+
+    expectView("resume", "Resume studio");
+
+    if (await selectView("Job target", "target", "Job target")) {
+      const pastedTextButton = findButton(".dash-demo-toggle button", "Pasted text");
+      if (!pastedTextButton) {
+        failures.push({ selector: ".dash-demo-toggle button", reason: "studio-demo-button-missing", label: "Pasted text" });
+      } else {
+        pastedTextButton.click();
+        await waitForUpdate();
+        if (pastedTextButton.getAttribute("aria-pressed") !== "true") {
+          failures.push({ selector: ".dash-demo-toggle button", reason: "studio-demo-target-source-mismatch" });
+        }
+        const targetCopy = document.querySelector(".dash-demo-surface > p")?.textContent.trim() || "";
+        if (!targetCopy.includes("Lead cross-functional planning")) {
+          failures.push({ selector: ".dash-demo-surface > p", reason: "studio-demo-target-copy-mismatch", actual: targetCopy });
+        }
+      }
+    }
+
+    if (await selectView("AI tailor", "tailor", "Review suggestions")) {
+      const targetSuggestion = Array.from(document.querySelectorAll(".dash-demo-review-list button"))
+        .find((button) => button.querySelector("strong")?.textContent.trim() === "Check target terms");
+      if (!targetSuggestion) {
+        failures.push({ selector: ".dash-demo-review-list button", reason: "studio-demo-button-missing", label: "Check target terms" });
+      } else {
+        targetSuggestion.click();
+        await waitForUpdate();
+        const reviewCount = document.querySelector(".dash-demo-surface-head small")?.textContent.trim();
+        if (targetSuggestion.getAttribute("aria-pressed") !== "true" || reviewCount !== "2 of 3 reviewed") {
+          failures.push({ selector: ".dash-demo-review-list", reason: "studio-demo-suggestion-state-mismatch", reviewCount });
+        }
+      }
+    }
+
+    if (await selectView("History", "history", "Saved project history")) {
+      const previousVersion = Array.from(document.querySelectorAll(".dash-demo-history-list button"))
+        .find((button) => button.querySelector("strong")?.textContent.trim() === "Program manager");
+      if (!previousVersion) {
+        failures.push({ selector: ".dash-demo-history-list button", reason: "studio-demo-button-missing", label: "Program manager" });
+      } else {
+        previousVersion.click();
+        await waitForUpdate();
+        const historyDetail = document.querySelector(".dash-demo-history-detail strong")?.textContent.trim();
+        if (previousVersion.getAttribute("aria-pressed") !== "true" || historyDetail !== "Program manager") {
+          failures.push({ selector: ".dash-demo-history-list", reason: "studio-demo-history-state-mismatch", historyDetail });
+        }
+      }
+    }
+
+    if (await selectView("Resume", "resume", "Resume studio")) {
+      const highlightButton = findButton(".dash-resume-actions button", "Hide sample change");
+      if (!highlightButton) {
+        failures.push({ selector: ".dash-resume-actions button", reason: "studio-demo-button-missing", label: "Hide sample change" });
+      } else {
+        highlightButton.click();
+        await waitForUpdate();
+        const highlightState = document.querySelector(".dash-resume-thumb")?.getAttribute("data-highlight");
+        if (highlightState !== "false" || !highlightButton.textContent.includes("Show sample change")) {
+          failures.push({ selector: ".dash-resume-thumb", reason: "studio-demo-highlight-state-mismatch", highlightState });
+        }
+      }
+    }
+
+    const resetButton = document.querySelector(".dash-demo-reset");
+    if (!resetButton) {
+      failures.push({ selector: ".dash-demo-reset", reason: "studio-demo-button-missing", label: "Reset" });
+    } else {
+      resetButton.click();
+      await waitForUpdate();
+      const resetView = demo.getAttribute("data-demo-view");
+      const resetHighlight = document.querySelector(".dash-resume-thumb")?.getAttribute("data-highlight");
+      if (resetView !== "resume" || resetHighlight !== "true") {
+        failures.push({ selector: ".dash-demo-reset", reason: "studio-demo-reset-state-mismatch", resetView, resetHighlight });
+      }
+
+      await selectView("Job target", "target", "Job target");
+      const urlButton = findButton(".dash-demo-toggle button", "Public URL");
+      if (urlButton?.getAttribute("aria-pressed") !== "true") {
+        failures.push({ selector: ".dash-demo-toggle", reason: "studio-demo-reset-state-mismatch", state: "target-source" });
+      }
+
+      await selectView("AI tailor", "tailor", "Review suggestions");
+      const resetReviewCount = document.querySelector(".dash-demo-surface-head small")?.textContent.trim();
+      if (resetReviewCount !== "1 of 3 reviewed") {
+        failures.push({ selector: ".dash-demo-review-list", reason: "studio-demo-reset-state-mismatch", state: "review-count", resetReviewCount });
+      }
+
+      await selectView("History", "history", "Saved project history");
+      const currentVersion = Array.from(document.querySelectorAll(".dash-demo-history-list button"))
+        .find((button) => button.querySelector("strong")?.textContent.trim() === "Product operations");
+      if (currentVersion?.getAttribute("aria-pressed") !== "true") {
+        failures.push({ selector: ".dash-demo-history-list", reason: "studio-demo-reset-state-mismatch", state: "history-version" });
+      }
+
+      resetButton.click();
+      await waitForUpdate();
+      expectView("resume", "Resume studio");
+    }
+
+    return JSON.stringify({
+      page: "landing studio demo",
+      theme: document.documentElement.dataset.theme || "light",
+      viewportMode: "interaction",
+      width: window.innerWidth,
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      failures,
+    });
+  })()`;
+
+  const result = await send("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true });
+  if (result.error) throw new Error(result.error.message);
+  if (result.result.exceptionDetails) {
+    throw new Error(result.result.exceptionDetails.text || "Landing Studio interaction evaluation failed");
+  }
+  return [JSON.parse(result.result.result.value)];
+}
+
 async function evaluateTemplateFilters(send, baseUrl) {
   await send("Emulation.setDeviceMetricsOverride", {
     width: 1280,
@@ -1831,6 +2009,9 @@ async function main(argv = process.argv.slice(2)) {
       }
       if (signedInSession?.cookie) await ensureSignedInBrowserSession();
       const interactionReports = [
+        ...(pageChecks.some((pageCheck) => pageCheck.name === "landing")
+          ? await evaluateLandingStudioDemo(page.send, baseUrl)
+          : []),
         ...(pageChecks.some((pageCheck) => pageCheck.name === "templates")
           ? await evaluateTemplateFilters(page.send, baseUrl)
           : []),

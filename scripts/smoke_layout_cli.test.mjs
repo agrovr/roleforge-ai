@@ -58,3 +58,13 @@ test("rendered layout smoke exercises template filters and their accessible stat
   assert.match(smokeLayout, /template-filter-label-mismatch/);
   assert.match(smokeLayout, /pageChecks\.some\(\(pageCheck\) => pageCheck\.name === "templates"\)/);
 });
+
+test("rendered layout smoke exercises the interactive landing Studio sample", () => {
+  assert.match(smokeLayout, /async function evaluateLandingStudioDemo\(send, baseUrl\)/);
+  assert.match(smokeLayout, /studio-demo-view-mismatch/);
+  assert.match(smokeLayout, /studio-demo-suggestion-state-mismatch/);
+  assert.match(smokeLayout, /studio-demo-history-state-mismatch/);
+  assert.match(smokeLayout, /studio-demo-highlight-state-mismatch/);
+  assert.match(smokeLayout, /studio-demo-reset-state-mismatch/);
+  assert.match(smokeLayout, /pageChecks\.some\(\(pageCheck\) => pageCheck\.name === "landing"\)/);
+});
