@@ -30,12 +30,15 @@ test("template gallery removes decorative rails and flattens guidance surfaces",
   assert.match(section, /\.templates-decision-guide\s*\{(?=[^}]*border-block:\s*1px solid var\(--line\))(?=[^}]*border-radius:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
 });
 
-test("template choices keep clear selected states without nested card effects", () => {
-  assert.match(section, /\.templates-guide-grid\s*\{(?=[^}]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\))(?=[^}]*gap:\s*0)[^}]*\}/s);
-  assert.match(section, /\.templates-guide-card\s*\{(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
-  assert.match(section, /\.templates-guide-option\s*\{(?=[^}]*padding:\s*12px 10px)(?=[^}]*border-bottom:\s*1px solid var\(--line\))(?=[^}]*border-radius:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)(?=[^}]*transition:\s*color 160ms ease, background 160ms ease)[^}]*\}/s);
-  assert.match(section, /\.templates-guide-option\.selected\s*\{(?=[^}]*background:\s*color-mix\(in srgb, var\(--success\) 12%, transparent\))(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
-  assert.doesNotMatch(section, /\.templates-guide-option\.selected\s*\{[^}]*padding(?:-inline)?:/s);
+test("template filters keep clear states without repeating template cards", () => {
+  assert.match(templateLibrary, /className="templates-filter-list" aria-label="Filter templates by use case"/);
+  assert.match(templateLibrary, /visibleTemplates\.map/);
+  assert.doesNotMatch(templateLibrary, /templates-guide-card/);
+  assert.doesNotMatch(templateLibrary, /templates-guide-option/);
+  assert.match(globals, /\.templates-filter-list\s*\{(?=[^}]*grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\))(?=[^}]*gap:\s*8px)[^}]*\}/s);
+  assert.match(globals, /\.templates-filter-option\s*\{(?=[^}]*border:\s*1px solid transparent)(?=[^}]*background:\s*transparent)(?=[^}]*transition:\s*border-color 160ms ease, background 160ms ease, color 160ms ease)[^}]*\}/s);
+  assert.match(globals, /\.templates-filter-option\.active\s*\{(?=[^}]*background:\s*color-mix\(in srgb, var\(--success\) 10%, transparent\))[^}]*\}/s);
+  assert.doesNotMatch(globals, /\.templates-filter-option\.active\s*\{[^}]*padding(?:-inline)?:/s);
   assert.doesNotMatch(section, /transition:[^;]*padding/s);
   assert.match(section, /\.templates-page-card\.selected\s*\{(?=[^}]*border-color:)(?=[^}]*box-shadow:\s*inset 0 0 0 1px)[^}]*\}/s);
 });
@@ -44,9 +47,9 @@ test("template preview cards stay calm in light, dark, and reduced-motion modes"
   assert.match(section, /\.template-thumb::before\s*\{[^}]*content:\s*none;[^}]*\}/s);
   assert.match(section, /\.template-thumb \.r-doc\s*\{(?=[^}]*transform:\s*none)(?=[^}]*transition:\s*none)[^}]*\}/s);
   assert.match(section, /\.templates-page-card:hover \.template-thumb \.r-doc,\s*\.templates-page-card:focus-within \.template-thumb \.r-doc\s*\{(?=[^}]*transform:\s*none)[^}]*\}/s);
-  assert.match(section, /html\[data-theme="dark"\]\s+\.templates-guide-option\.selected\s*\{(?=[^}]*background:\s*rgba\(142,\s*219,\s*166,\s*0\.09\))(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
+  assert.match(globals, /html\[data-theme="dark"\]\s+\.templates-filter-option\.active\s*\{(?=[^}]*background:\s*rgba\(142,\s*219,\s*166,\s*0\.09\))(?=[^}]*color:\s*#dfffe6)[^}]*\}/s);
   assert.match(section, /html\[data-theme="dark"\]\s+\.templates-page-card\.selected\s*\{(?=[^}]*border-color:\s*rgba\(243,\s*193,\s*109,\s*0\.56\))(?=[^}]*box-shadow:\s*inset 0 0 0 1px)[^}]*\}/s);
-  assert.match(section, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.templates-page-card,[\s\S]*?\.templates-guide-option\s*\{[^}]*transition:\s*none;[\s\S]*?\}/s);
+  assert.match(section, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.templates-page-card,[\s\S]*?\.templates-filter-option\s*\{[^}]*transition:\s*none;[\s\S]*?\}/s);
 });
 
 test("template papers scale their content and defer offscreen card painting", () => {

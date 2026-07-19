@@ -19,24 +19,29 @@ import {
 
 const TEMPLATE_DECISION_GROUPS = [
   {
+    id: "everyday",
     title: "Everyday applications",
     detail: "Reliable formats for most professional roles and industries.",
     icon: "file",
     slugs: ["classic", "modern", "impact"],
   },
   {
+    id: "focused",
     title: "Focused formats",
     detail: "Use these when density, projects, or early-career evidence should lead.",
     icon: "scan",
     slugs: ["engineer", "compact", "student", "hybrid"],
   },
   {
+    id: "specialist",
     title: "Leadership and creative",
     detail: "Give senior scope or portfolio-led work a more editorial rhythm.",
     icon: "sparkle",
     slugs: ["executive", "editorial", "academic"],
   },
 ] as const;
+
+type TemplateDecisionGroupId = "all" | (typeof TEMPLATE_DECISION_GROUPS)[number]["id"];
 
 function rememberTemplate(slug: ResumeTemplateSlug) {
   window.localStorage.setItem(RESUME_TEMPLATE_STORAGE_KEY, slug);
@@ -102,6 +107,7 @@ export function TemplateLibrary({
   settingsHref: string;
 }) {
   const [selectedSlug, setSelectedSlug] = useState<ResumeTemplateSlug>(initialTemplateSlug ?? "classic");
+  const [activeGroupId, setActiveGroupId] = useState<TemplateDecisionGroupId>("all");
 
   useEffect(() => {
     const stored = window.localStorage.getItem(RESUME_TEMPLATE_STORAGE_KEY);
@@ -113,6 +119,12 @@ export function TemplateLibrary({
   }, [initialTemplateSlug]);
 
   const selectedTemplate = getResumeTemplate(selectedSlug);
+  const activeGroup = activeGroupId === "all"
+    ? null
+    : TEMPLATE_DECISION_GROUPS.find((group) => group.id === activeGroupId) ?? null;
+  const visibleTemplates = activeGroup
+    ? RESUME_TEMPLATES.filter((template) => (activeGroup.slugs as readonly ResumeTemplateSlug[]).includes(template.slug))
+    : RESUME_TEMPLATES;
 
   return (
     <>
@@ -179,52 +191,50 @@ export function TemplateLibrary({
       <section className="templates-decision-guide" aria-labelledby="templates-decision-title">
         <div className="templates-decision-head">
           <div>
-            <span className="eyebrow">Template decision guide</span>
-            <h2 id="templates-decision-title">Choose by resume shape.</h2>
+            <span className="eyebrow">Browse by use case</span>
+            <h2 id="templates-decision-title">Find the right starting point.</h2>
           </div>
           <p>
-            These groups use the same template directions available in the studio, so the choice you make here carries into the next export.
+            Narrow the real formats available in the studio, then compare full previews before choosing what carries into your next export.
           </p>
         </div>
-        <div className="templates-guide-grid">
+        <div className="templates-filter-list" aria-label="Filter templates by use case">
+          <button
+            className={`templates-filter-option${activeGroupId === "all" ? " active" : ""}`}
+            type="button"
+            onClick={() => setActiveGroupId("all")}
+            aria-pressed={activeGroupId === "all"}
+          >
+            <span aria-hidden="true"><RoleForgeIcon name="layers" size={16} /></span>
+            <span>
+              <strong>All templates</strong>
+              <small>{RESUME_TEMPLATES.length} directions</small>
+            </span>
+          </button>
           {TEMPLATE_DECISION_GROUPS.map((group) => (
-            <article className="templates-guide-card" key={group.title}>
-              <div className="templates-guide-card-head">
-                <span aria-hidden="true"><RoleForgeIcon name={group.icon} size={16} /></span>
-                <div>
-                  <strong>{group.title}</strong>
-                  <small>{group.detail}</small>
-                </div>
-              </div>
-              <div className="templates-guide-options">
-                {group.slugs.map((slug) => {
-                  const template = getResumeTemplate(slug);
-                  const selected = template.slug === selectedSlug;
-                  return (
-                    <button
-                      className={`templates-guide-option${selected ? " selected" : ""}`}
-                      key={template.slug}
-                      type="button"
-                      onClick={() => {
-                        setSelectedSlug(template.slug);
-                        rememberTemplate(template.slug);
-                      }}
-                      aria-pressed={selected}
-                    >
-                      <span>{template.name}</span>
-                      <small>{template.tag}</small>
-                      <RoleForgeIcon name={selected ? "check" : "arrow"} size={12} />
-                    </button>
-                  );
-                })}
-              </div>
-            </article>
+            <button
+              className={`templates-filter-option${activeGroupId === group.id ? " active" : ""}`}
+              key={group.id}
+              type="button"
+              onClick={() => setActiveGroupId(group.id)}
+              aria-pressed={activeGroupId === group.id}
+            >
+              <span aria-hidden="true"><RoleForgeIcon name={group.icon} size={16} /></span>
+              <span>
+                <strong>{group.title}</strong>
+                <small>{group.slugs.length} directions</small>
+              </span>
+            </button>
           ))}
         </div>
+        <p className="templates-filter-summary" role="status" aria-live="polite">
+          <strong>{visibleTemplates.length} {visibleTemplates.length === 1 ? "template" : "templates"}</strong>
+          <span>{activeGroup?.detail ?? "Compare every export-backed direction. Essential is the recommended default for most roles."}</span>
+        </p>
       </section>
 
-      <section className="templates-page-grid" aria-label="Resume template directions">
-        {RESUME_TEMPLATES.map((template) => {
+      <section className="templates-page-grid" aria-label={`${visibleTemplates.length} resume template directions shown`}>
+        {visibleTemplates.map((template) => {
           const selected = template.slug === selectedSlug;
           return (
             <article className={`templates-page-card${selected ? " selected" : ""}`} key={template.name}>

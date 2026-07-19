@@ -50,3 +50,11 @@ test("rendered layout smoke catches clipped and visibly under-filled template pa
   assert.match(smokeLayout, /reason:\s*"document-under-filled"/);
   assert.match(smokeLayout, /reason:\s*"document-over-filled"/);
 });
+
+test("rendered layout smoke exercises template filters and their accessible state", () => {
+  assert.match(smokeLayout, /async function evaluateTemplateFilters\(send, baseUrl\)/);
+  assert.match(smokeLayout, /template-filter-results-mismatch/);
+  assert.match(smokeLayout, /template-filter-pressed-count/);
+  assert.match(smokeLayout, /template-filter-label-mismatch/);
+  assert.match(smokeLayout, /pageChecks\.some\(\(pageCheck\) => pageCheck\.name === "templates"\)/);
+});

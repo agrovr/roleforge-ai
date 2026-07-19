@@ -100,10 +100,10 @@ const PAGE_CHECKS = [
       ".templates-page-actions .ghost-button",
       ".templates-decision-head h2",
       ".templates-decision-head p",
-      ".templates-guide-card strong",
-      ".templates-guide-card small",
-      ".templates-guide-option span",
-      ".templates-guide-option small",
+      ".templates-filter-option strong",
+      ".templates-filter-option small",
+      ".templates-filter-summary strong",
+      ".templates-filter-summary span",
       ".templates-page-card-copy p",
       ".template-card-actions .btn",
     ],
@@ -117,10 +117,9 @@ const PAGE_CHECKS = [
       { container: ".templates-hero-thumb", selector: ".templates-hero-thumb .r-doc", tolerance: 4 },
       { container: ".templates-page-shell", selector: ".templates-decision-guide", tolerance: 4 },
       { container: ".templates-page-shell", selector: ".templates-page-grid", tolerance: 4 },
-      { container: "closest:.templates-guide-card", selector: ".templates-guide-card strong", tolerance: 4 },
-      { container: "closest:.templates-guide-card", selector: ".templates-guide-card small", tolerance: 4 },
-      { container: "closest:.templates-guide-option", selector: ".templates-guide-option span", tolerance: 4 },
-      { container: "closest:.templates-guide-option", selector: ".templates-guide-option small", tolerance: 4 },
+      { container: "closest:.templates-filter-option", selector: ".templates-filter-option strong", tolerance: 4 },
+      { container: "closest:.templates-filter-option", selector: ".templates-filter-option small", tolerance: 4 },
+      { container: ".templates-decision-guide", selector: ".templates-filter-summary", tolerance: 4 },
       { container: "closest:.template-thumb", selector: ".templates-page-card .template-thumb .r-doc", tolerance: 4 },
     ],
     documentFillChecks: [
@@ -1395,6 +1394,87 @@ async function evaluatePreviewTabs(send, baseUrl) {
   return [JSON.parse(result.result.result.value)];
 }
 
+async function evaluateTemplateFilters(send, baseUrl) {
+  await send("Emulation.setDeviceMetricsOverride", {
+    width: 1280,
+    height: 1100,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+  await send("Page.navigate", { url: `${baseUrl}/templates` });
+  await delay(2400);
+
+  const expression = `(async () => {
+    const checks = [
+      { label: "Everyday applications", names: ["Essential", "Professional", "Impact"] },
+      { label: "Focused formats", names: ["Compact", "Technical", "Early Career", "Career Pivot"] },
+      { label: "Leadership and creative", names: ["Studio", "Leadership", "Academic"] },
+      { label: "All templates", names: ["Essential", "Professional", "Studio", "Compact", "Leadership", "Technical", "Early Career", "Career Pivot", "Academic", "Impact"] },
+    ];
+    const failures = [];
+    const waitForUpdate = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+    for (const check of checks) {
+      const button = Array.from(document.querySelectorAll(".templates-filter-option"))
+        .find((candidate) => candidate.querySelector("strong")?.textContent.trim() === check.label);
+      if (!button) {
+        failures.push({ selector: ".templates-filter-option", reason: "template-filter-missing", label: check.label });
+        continue;
+      }
+
+      button.click();
+      await waitForUpdate();
+
+      const names = Array.from(document.querySelectorAll(".templates-page-card .template-name"))
+        .map((element) => element.textContent.trim());
+      if (JSON.stringify(names) !== JSON.stringify(check.names)) {
+        failures.push({
+          selector: ".templates-page-grid",
+          reason: "template-filter-results-mismatch",
+          label: check.label,
+          expected: check.names,
+          actual: names,
+        });
+      }
+
+      if (button.getAttribute("aria-pressed") !== "true" || !button.classList.contains("active")) {
+        failures.push({ selector: ".templates-filter-option", reason: "template-filter-not-active", label: check.label });
+      }
+
+      const pressedCount = document.querySelectorAll('.templates-filter-option[aria-pressed="true"]').length;
+      if (pressedCount !== 1) {
+        failures.push({ selector: ".templates-filter-list", reason: "template-filter-pressed-count", label: check.label, pressedCount });
+      }
+
+      const expectedCount = check.names.length;
+      const gridLabel = document.querySelector(".templates-page-grid")?.getAttribute("aria-label");
+      if (gridLabel !== expectedCount + " resume template directions shown") {
+        failures.push({ selector: ".templates-page-grid", reason: "template-filter-label-mismatch", label: check.label, gridLabel });
+      }
+      const summary = document.querySelector(".templates-filter-summary strong")?.textContent.trim();
+      if (summary !== expectedCount + " templates") {
+        failures.push({ selector: ".templates-filter-summary", reason: "template-filter-summary-mismatch", label: check.label, summary });
+      }
+    }
+
+    return JSON.stringify({
+      page: "template filters",
+      theme: document.documentElement.dataset.theme || "light",
+      viewportMode: "interaction",
+      width: window.innerWidth,
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      failures,
+    });
+  })()`;
+
+  const result = await send("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true });
+  if (result.error) throw new Error(result.error.message);
+  if (result.result.exceptionDetails) {
+    throw new Error(result.result.exceptionDetails.text || "Template filter interaction evaluation failed");
+  }
+  return [JSON.parse(result.result.result.value)];
+}
+
 async function evaluateHistoryRestore(send, baseUrl) {
   const smokeRunId = `roleforge-layout-history-${Date.now()}`;
   const smokeFilename = "roleforge-layout-smoke.pdf";
@@ -1750,12 +1830,17 @@ async function main(argv = process.argv.slice(2)) {
         }
       }
       if (signedInSession?.cookie) await ensureSignedInBrowserSession();
-      const interactionReports = signedInSession?.cookie
-        ? [
-            ...(await evaluatePreviewTabs(page.send, baseUrl)),
-            ...(await evaluateHistoryRestore(page.send, baseUrl)),
-          ]
-        : [];
+      const interactionReports = [
+        ...(pageChecks.some((pageCheck) => pageCheck.name === "templates")
+          ? await evaluateTemplateFilters(page.send, baseUrl)
+          : []),
+        ...(signedInSession?.cookie
+          ? [
+              ...(await evaluatePreviewTabs(page.send, baseUrl)),
+              ...(await evaluateHistoryRestore(page.send, baseUrl)),
+            ]
+          : []),
+      ];
 
       const failures = [...reports, ...interactionReports].flatMap((report) => {
         const pageFailures = [...report.failures];
@@ -1776,7 +1861,7 @@ async function main(argv = process.argv.slice(2)) {
       }
 
       const checkedPageCount = new Set(reports.map((report) => report.page)).size;
-      const interactionLabel = interactionReports.length ? " with preview tab interactions" : "";
+      const interactionLabel = interactionReports.length ? " with interactive checks" : "";
       pass(`rendered layout smoke passed ${checkedPageCount} pages across ${viewportWidths.length} responsive widths and ${narrowDesktopWidths.length} narrow desktop widths${interactionLabel}`);
     } finally {
       page.close();
