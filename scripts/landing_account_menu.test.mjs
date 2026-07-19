@@ -87,7 +87,7 @@ test("landing pricing presents real plan state as quiet metadata", () => {
   assert.match(landingPage, /const freeStatusTone = signedIn && !premiumActive \? "current" : "starter";/);
   assert.match(landingPage, /const premiumStatusTone = premiumActive \? "current" : premiumPaused \? "paused" : "upgrade";/);
   assert.match(landingPage, /className=\{`price-status \$\{premiumStatusTone\}`\}/);
-  assert.match(stylesheet, /\.pricing-grid\.two\s+\.price-status\s*\{(?=[^}]*min-height:\s*0)(?=[^}]*justify-content:\s*flex-end)(?=[^}]*padding:\s*2px 0)(?=[^}]*border:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)(?=[^}]*letter-spacing:\s*0\.08em)[^}]*\}/s);
+  assert.match(stylesheet, /\.pricing-grid\.two\s+\.price-status\s*\{(?=[^}]*min-height:\s*0)(?=[^}]*justify-content:\s*flex-end)(?=[^}]*padding:\s*2px 0)(?=[^}]*border:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)(?=[^}]*letter-spacing:\s*0\.035em)(?=[^}]*text-transform:\s*none)[^}]*\}/s);
   assert.match(stylesheet, /\.pricing-grid\.two\s+\.price-status::before,[\s\S]*?\.pricing-grid\.two\s+\.price-card\.featured\s+\.price-status\.current::before\s*\{[^}]*content:\s*none[^}]*\}/s);
   assert.match(stylesheet, /\.pricing-grid\.two\s+\.price-card\.featured\s+\.price-status,[\s\S]*?\.pricing-grid\.two\s+\.price-card\.featured\s+\.price-status\.paused\s*\{(?=[^}]*border:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*color:\s*#f5d69a)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.pricing-grid\.two\s+\.price-card\.featured\s+\.price-status,[\s\S]*?\.price-status\.current\s*\{(?=[^}]*border:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*color:\s*#f5d69a)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);

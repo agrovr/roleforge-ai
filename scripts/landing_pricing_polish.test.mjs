@@ -8,7 +8,9 @@ test("landing pricing keeps compact plan contrast without internal line texture"
   assert.match(globals, /\/\* Landing pricing refinement: compact plans with quiet depth and clear status\. \*\//);
   assert.match(globals, /\.pricing-grid\.two\s*\{(?=[^}]*width:\s*min\(100%,\s*1040px\))(?=[^}]*align-items:\s*stretch)(?=[^}]*gap:\s*20px)[^}]*\}/s);
   assert.match(globals, /\.pricing-grid\.two\s+\.price-card,\s*\.pricing-clarity-grid a\s*\{(?=[^}]*position:\s*relative)(?=[^}]*isolation:\s*isolate)[^}]*\}/s);
-  assert.match(globals, /\.pricing-grid\.two\s+\.price-card\s*\{(?=[^}]*height:\s*100%)(?=[^}]*min-height:\s*0)(?=[^}]*gap:\s*14px)(?=[^}]*padding:\s*26px 28px)(?=[^}]*border-radius:\s*18px)(?=[^}]*background:\s*var\(--surface\))(?=[^}]*box-shadow:)[^}]*\}/s);
+  assert.match(globals, /\.pricing-grid\.two\s+\.price-card\s*\{(?=[^}]*height:\s*100%)(?=[^}]*min-height:\s*0)(?=[^}]*gap:\s*14px)(?=[^}]*padding:\s*26px 28px)(?=[^}]*border-radius:\s*16px)(?=[^}]*background:\s*var\(--surface\))(?=[^}]*box-shadow:\s*0 12px 28px -26px)(?=[^}]*transition:\s*border-color 180ms ease)[^}]*\}/s);
+  assert.match(globals, /\.pricing-grid\.two\s+\.price-card:hover\s*\{(?=[^}]*border-color:)[^}]*\}/s);
+  assert.doesNotMatch(globals, /\.pricing-grid\.two\s+\.price-card:hover\s*\{[^}]*(?:transform|box-shadow):/s);
   assert.match(globals, /\.pricing-grid\.two\s+\.price-card::after\s*\{[^}]*content:\s*none/s);
   assert.match(globals, /\.pricing-grid\.two\s+\.price-card\.featured\s*\{(?=[^}]*background:\s*#11162f)(?=[^}]*box-shadow:)[^}]*\}/s);
   assert.match(globals, /\.pricing-grid\.two\s+\.price-card\s+\.btn\s*\{[^}]*margin-top:\s*auto[^}]*\}/s);
@@ -17,7 +19,7 @@ test("landing pricing keeps compact plan contrast without internal line texture"
 });
 
 test("landing pricing plan status reads as metadata instead of a nested badge", () => {
-  assert.match(globals, /\.pricing-grid\.two\s+\.price-status\s*\{(?=[^}]*min-height:\s*0)(?=[^}]*padding:\s*2px 0)(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
+  assert.match(globals, /\.pricing-grid\.two\s+\.price-status\s*\{(?=[^}]*min-height:\s*0)(?=[^}]*padding:\s*2px 0)(?=[^}]*border:\s*0)(?=[^}]*border-radius:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)(?=[^}]*font-size:\s*0\.72rem)(?=[^}]*letter-spacing:\s*0\.035em)(?=[^}]*text-transform:\s*none)[^}]*\}/s);
   assert.match(globals, /\.pricing-grid\.two\s+\.price-status::before,[\s\S]*?\.pricing-grid\.two\s+\.price-card\.featured\s+\.price-status\.current::before\s*\{[^}]*content:\s*none[^}]*\}/s);
   assert.match(globals, /\.pricing-grid\.two\s+\.price-card\.featured\s+\.price-status,[\s\S]*?\.pricing-grid\.two\s+\.price-card\.featured\s+\.price-status\.paused\s*\{(?=[^}]*border:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
 });
