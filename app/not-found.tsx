@@ -1,7 +1,5 @@
 import Link from "next/link";
 
-import "./public-pages.css";
-
 import { Brand } from "./components/Brand";
 import { RoleForgeIcon } from "./components/RoleForgeIcons";
 import { ThemeToggle } from "./components/ThemeToggle";
@@ -29,8 +27,8 @@ const recoveryLinks = [
 
 export default function NotFound() {
   return (
-    <main className="legal-shell not-found-shell">
-      <header className="settings-page-topbar legal-topbar">
+    <main className="not-found-shell">
+      <header className="settings-page-topbar public-page-topbar">
         <Brand href="/" label="RoleForge AI home" />
         <div className="settings-page-actions">
           <Link className="btn btn-soft btn-sm" href="/app">Studio</Link>

@@ -6766,9 +6766,15 @@ html[data-theme="dark"] input::file-selector-button {
 }
 
 .not-found-shell {
+  position: relative;
+  z-index: 2;
   display: grid;
   align-content: start;
   gap: 16px;
+  min-height: 100dvh;
+  overflow-x: clip;
+  padding: 24px clamp(18px, 4vw, 54px) 54px;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
 }
 
 .not-found-hero,

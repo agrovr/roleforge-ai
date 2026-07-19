@@ -396,7 +396,7 @@ const PAGE_CHECKS = [
   {
     path: "/missing-layout-smoke",
     name: "not-found",
-    selectors: [".not-found-shell", ".legal-topbar", ".not-found-hero", ".not-found-docket", ".not-found-recovery", ".not-found-recovery-card"],
+    selectors: [".not-found-shell", ".public-page-topbar", ".not-found-hero", ".not-found-docket", ".not-found-recovery", ".not-found-recovery-card"],
     textFitSelectors: [
       ".not-found-copy h1",
       ".not-found-copy p",

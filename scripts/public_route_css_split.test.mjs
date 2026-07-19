@@ -31,8 +31,17 @@ test("route styles load from their owning route instead of the root bundle", () 
   }
 
   assert.match(readFileSync("app/components/LegalPage.tsx", "utf8"), /import "\.\.\/public-pages\.css"/);
-  assert.match(readFileSync("app/not-found.tsx", "utf8"), /import "\.\/public-pages\.css"/);
+  assert.doesNotMatch(readFileSync("app/not-found.tsx", "utf8"), /public-pages\.css/);
   assert.doesNotMatch(rootLayout, /(help|status|support|updates|templates|public-pages)\.css/);
+});
+
+test("the root not-found fallback does not preload public-page route styles", () => {
+  const notFound = readFileSync("app/not-found.tsx", "utf8");
+
+  assert.match(notFound, /className="not-found-shell"/);
+  assert.match(notFound, /className="settings-page-topbar public-page-topbar"/);
+  assert.match(globalStyles, /\.not-found-shell\s*\{[\s\S]*?min-height:\s*100dvh;/);
+  assert.doesNotMatch(notFound, /legal-shell|legal-topbar/);
 });
 
 test("the universal stylesheet no longer carries complete page-owned rule sets", () => {

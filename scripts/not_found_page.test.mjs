@@ -9,7 +9,9 @@ const globals = stylesFor("public-pages.css");
 const smokeLayout = readFileSync("scripts/smoke_layout.mjs", "utf8");
 
 test("not found page provides branded recovery without generic framework UI", () => {
-  assert.match(notFoundPage, /className="legal-shell not-found-shell"/);
+  assert.match(notFoundPage, /className="not-found-shell"/);
+  assert.match(notFoundPage, /className="settings-page-topbar public-page-topbar"/);
+  assert.doesNotMatch(notFoundPage, /legal-shell|legal-topbar/);
   assert.match(notFoundPage, /Route not found/);
   assert.match(notFoundPage, /This page slipped out of the stack\./);
   assert.match(notFoundPage, /href="\//);
