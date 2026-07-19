@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const globals = readFileSync("app/globals.css", "utf8");
+import { stylesFor } from "./style_sources.mjs";
+
+const globals = stylesFor("login/login.css");
 const loginPage = readFileSync("app/login/page.tsx", "utf8");
 
 test("login gateway keeps real auth actions while using a polished shell", () => {

@@ -12,6 +12,7 @@ const routeStyles = {
   templates: readFileSync("app/templates/templates.css", "utf8"),
   settings: readFileSync("app/settings/settings.css", "utf8"),
   studio: readFileSync("app/app/studio.css", "utf8"),
+  login: readFileSync("app/login/login.css", "utf8"),
   publicPages: readFileSync("app/public-pages.css", "utf8"),
 };
 
@@ -24,6 +25,7 @@ test("route styles load from their owning route instead of the root bundle", () 
     ["app/templates/layout.tsx", /import "\.\/templates\.css"/],
     ["app/settings/layout.tsx", /import "\.\/settings\.css"/],
     ["app/app/layout.tsx", /import "\.\/studio\.css"/],
+    ["app/login/layout.tsx", /import "\.\/login\.css"/],
   ];
 
   for (const [file, importPattern] of routeImports) {
@@ -55,6 +57,7 @@ test("the universal stylesheet no longer carries complete page-owned rule sets",
     [routeStyles.templates, globalStyles, /\.templates-decision-guide\s*\{/],
     [routeStyles.settings, globalStyles, /\.settings-grid\s*\{/],
     [routeStyles.studio, globalStyles, /\.rf-studio-layout\s*\{/],
+    [routeStyles.login, globalStyles, /\.login-shell\s*\{[^}]*isolation:\s*isolate/],
     [routeStyles.publicPages, globalStyles, /\.legal-card\s*\{/],
   ];
 
@@ -62,6 +65,14 @@ test("the universal stylesheet no longer carries complete page-owned rule sets",
     assert.match(ownerStyles, selector);
     assert.doesNotMatch(universalStyles, selector);
   }
+});
+
+test("the protected studio auth gate loads the shared login route styles before studio overrides", () => {
+  const studioLayout = readFileSync("app/app/layout.tsx", "utf8");
+
+  assert.match(studioLayout, /import "\.\.\/login\/login\.css";\s*import "\.\/studio\.css";/);
+  assert.match(routeStyles.login, /\.login-panel\s*\{/);
+  assert.doesNotMatch(globalStyles, /\.login-panel\s*\{/);
 });
 
 test("support experience polish ships only with routes that render it", () => {
