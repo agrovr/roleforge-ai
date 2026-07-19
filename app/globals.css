@@ -37,6 +37,7 @@
   --shadow-resume: 0 2px 4px rgba(14, 20, 48, 0.04), 0 30px 60px -20px rgba(14, 20, 48, 0.2), 0 12px 24px -8px rgba(14, 20, 48, 0.08);
   --container: 1200px;
   --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --font-display-italic: Georgia, "Times New Roman", serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   --font-resume: var(--font-fraunces), Georgia, "Times New Roman", serif;
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", monospace;
@@ -517,7 +518,7 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
 
 .italic {
   font-style: italic;
-  font-family: var(--font-display);
+  font-family: var(--font-display-italic);
 }
 
 .underline-brand {
@@ -3189,6 +3190,7 @@ html[data-theme="dark"] .dash-demo-history-list button {
 
 .cta-band h2 em {
   color: var(--brand);
+  font-family: var(--font-display-italic);
   font-style: italic;
 }
 
