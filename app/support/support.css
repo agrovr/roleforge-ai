@@ -883,6 +883,218 @@ html[data-theme="dark"] .support-prefill-note {
   border-color: rgba(137, 209, 190, 0.28);
   background: rgba(137, 209, 190, 0.1);
 }
+
+/* Support experience polish: traceable request cards and operator queue depth. */
+
+.support-routing-strip,
+.support-admin-entry,
+.support-guide-card,
+.support-triage-card,
+.support-request-card,
+.support-packet-card,
+.support-response-card,
+.support-history-item,
+.settings-support-item {
+  position: relative;
+  isolation: isolate;
+}
+
+.support-routing-strip,
+.support-admin-entry,
+.support-guide-card,
+.support-triage-card,
+.support-request-card,
+.support-packet-card,
+.support-response-card,
+.support-history-item,
+.settings-support-item {
+  background:
+    radial-gradient(circle at 96% 4%, color-mix(in srgb, var(--sky-soft) 30%, transparent), transparent 12rem),
+    var(--support-experience-glass),
+    var(--surface);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 54%, transparent) inset,
+    0 22px 54px -42px color-mix(in srgb, var(--ink-0) 44%, transparent);
+}
+
+.support-routing-strip::after,
+.support-admin-entry::after,
+.support-guide-card::after,
+.support-request-card::after,
+.support-packet-card::after,
+.support-response-card::after,
+.support-history-item::after,
+.settings-support-item::after {
+  position: absolute;
+  inset-block: 12px;
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: var(--support-experience-rail);
+  content: "";
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.support-guide-card,
+.support-triage-item,
+.support-packet-item,
+.support-response-item,
+.support-history-item,
+.settings-support-item {
+  transform: translateZ(0);
+  transition:
+    border-color 170ms ease,
+    background 170ms ease,
+    box-shadow 170ms ease,
+    transform 170ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.support-guide-card:hover,
+.support-guide-card:focus-visible,
+.support-triage-item:hover,
+.support-packet-item:hover,
+.support-response-item:hover,
+.support-history-item:hover,
+.support-history-item:focus-within,
+.settings-support-item:hover,
+.settings-support-item:focus-within {
+  border-color: color-mix(in srgb, var(--sky) 38%, var(--line));
+  box-shadow:
+    0 1px 0 color-mix(in srgb, #fff 62%, transparent) inset,
+    0 26px 62px -44px color-mix(in srgb, var(--ink-0) 52%, transparent);
+  transform: translateY(-2px);
+}
+
+.support-guide-card:hover::after,
+.support-guide-card:focus-visible::after,
+.support-request-card:focus-within::after,
+.support-packet-card:focus-within::after,
+.support-response-card:hover::after,
+.support-history-item:hover::after,
+.support-history-item:focus-within::after,
+.settings-support-item:hover::after,
+.settings-support-item:focus-within::after {
+  opacity: 0.86;
+}
+
+.support-packet-item.good,
+.support-status-badge.closed {
+  box-shadow: 0 12px 24px -22px color-mix(in srgb, var(--good) 45%, transparent);
+}
+
+.support-packet-item.warn,
+.support-status-badge.reviewing {
+  box-shadow: 0 12px 24px -22px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.support-status-badge,
+.support-reference-copy {
+  letter-spacing: 0.045em;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #fff 42%, transparent),
+    0 12px 24px -22px var(--shadow);
+}
+
+@keyframes support-panel-rise {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+html[data-theme="dark"] .support-routing-strip,
+html[data-theme="dark"] .support-admin-entry,
+html[data-theme="dark"] .support-guide-card,
+html[data-theme="dark"] .support-triage-card,
+html[data-theme="dark"] .support-request-card,
+html[data-theme="dark"] .support-packet-card,
+html[data-theme="dark"] .support-response-card,
+html[data-theme="dark"] .support-history-item,
+html[data-theme="dark"] .settings-support-item {
+  border-color: rgba(255, 247, 233, 0.15);
+  background:
+    radial-gradient(circle at 96% 4%, rgba(142, 183, 240, 0.1), transparent 12rem),
+    var(--support-experience-glass),
+    rgba(16, 22, 37, 0.86);
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.08) inset,
+    0 26px 62px -42px rgba(0, 0, 0, 0.9);
+}
+
+html[data-theme="dark"] .support-guide-card:hover,
+html[data-theme="dark"] .support-guide-card:focus-visible,
+html[data-theme="dark"] .support-triage-item:hover,
+html[data-theme="dark"] .support-packet-item:hover,
+html[data-theme="dark"] .support-response-item:hover,
+html[data-theme="dark"] .support-history-item:hover,
+html[data-theme="dark"] .support-history-item:focus-within,
+html[data-theme="dark"] .settings-support-item:hover,
+html[data-theme="dark"] .settings-support-item:focus-within {
+  border-color: rgba(142, 183, 240, 0.32);
+  box-shadow:
+    0 1px 0 rgba(255, 247, 233, 0.1) inset,
+    0 30px 70px -44px rgba(0, 0, 0, 0.96);
+}
+
+html[data-theme="dark"] .support-status-badge,
+html[data-theme="dark"] .support-reference-copy {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.09),
+    0 12px 24px -22px rgba(0, 0, 0, 0.92);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .support-request-card,
+  .support-guide-card,
+  .support-triage-item,
+  .support-packet-item,
+  .support-response-item,
+  .support-history-item,
+  .settings-support-item {
+    animation: none;
+    transition: none;
+  }
+
+  .support-guide-card:hover,
+  .support-guide-card:focus-visible,
+  .support-triage-item:hover,
+  .support-packet-item:hover,
+  .support-response-item:hover,
+  .support-history-item:hover,
+  .support-history-item:focus-within,
+  .settings-support-item:hover,
+  .settings-support-item:focus-within,
+  .support-form input:focus,
+  .support-form select:focus,
+  .support-form textarea:focus {
+    transform: none;
+  }
+}
+
+/* Support portal finish: clearer request packet, form depth, and traceable history. */
+
+.support-reference-copy,
+.support-status-badge {
+  min-height: 34px;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 42%, transparent),
+    0 12px 24px -22px color-mix(in srgb, var(--ink-0) 42%, transparent);
+}
+
+html[data-theme="dark"] .support-form input,
+html[data-theme="dark"] .support-form select,
+html[data-theme="dark"] .support-form textarea,
+html[data-theme="dark"] .support-reference-copy,
+html[data-theme="dark"] .support-status-badge {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 247, 233, 0.09),
+    0 12px 24px -22px rgba(0, 0, 0, 0.92);
+}
+
 .support-shell {
   --support-experience-rail: linear-gradient(180deg, var(--sky), var(--brand), var(--accent));
   --support-experience-glass: linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 70%, transparent));

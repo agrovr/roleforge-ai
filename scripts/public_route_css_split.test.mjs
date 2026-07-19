@@ -36,7 +36,7 @@ test("route styles load from their owning route instead of the root bundle", () 
 });
 
 test("the universal stylesheet no longer carries complete page-owned rule sets", () => {
-  assert.ok(Buffer.byteLength(globalStyles) < 325_000, "universal stylesheet should stay below the route-split budget");
+  assert.ok(Buffer.byteLength(globalStyles) < 315_000, "universal stylesheet should stay below the route-split budget");
 
   const ownershipChecks = [
     [routeStyles.help, globalStyles, /\.help-action-grid\s*\{/],
@@ -53,6 +53,17 @@ test("the universal stylesheet no longer carries complete page-owned rule sets",
     assert.match(ownerStyles, selector);
     assert.doesNotMatch(universalStyles, selector);
   }
+});
+
+test("support experience polish ships only with routes that render it", () => {
+  assert.match(routeStyles.support, /\/\* Support experience polish:/);
+  assert.match(routeStyles.support, /@keyframes support-panel-rise/);
+  assert.doesNotMatch(globalStyles, /\/\* Support experience polish:/);
+  assert.doesNotMatch(globalStyles, /@keyframes support-panel-rise/);
+
+  assert.match(routeStyles.settings, /Settings keeps the shared ticket-status treatment/);
+  assert.match(routeStyles.settings, /\.support-status-badge\.closed\s*\{/);
+  assert.match(routeStyles.settings, /html\[data-theme="dark"\] \.support-status-badge\s*\{/);
 });
 
 test("the production smoke reads route styles from every page it validates", () => {
