@@ -90,7 +90,7 @@ test("the production smoke reads route styles from every page it validates", () 
   const smokeSource = readFileSync("scripts/smoke_frontend.mjs", "utf8");
 
   assert.match(smokeSource, /request\(baseUrl,\s*"\/help"/);
-  assert.match(smokeSource, /\[home\.text,\s*templates\.text,\s*help\.text\]/);
+  assert.match(smokeSource, /\[home\.text,\s*login\.text,\s*templates\.text,\s*help\.text\]/);
   assert.match(smokeSource, /stylesheetPageTexts\.push\(settingsStylesheetPage\.text\)/);
   assert.match(smokeSource, /stylesheetPageTexts\.push\(studioStylesheetPage\.text\)/);
   assert.match(smokeSource, /checkPublicShell\(baseUrl,\s*cookie\)/);
