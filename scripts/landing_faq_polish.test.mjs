@@ -15,6 +15,7 @@ test("FAQ accordion exposes polished disclosure markup", () => {
   assert.match(accordion, /aria-controls=\{answerId\}/);
   assert.match(accordion, /aria-expanded=\{isOpen\}/);
   assert.match(accordion, /aria-labelledby=\{questionId\}[\s\S]*?role="region"/);
+  assert.match(accordion, /<div className="faq-a-inner">\s*<div className="faq-a-copy">\{answer\}<\/div>\s*<\/div>/s);
 });
 
 test("FAQ uses a compact disclosure ledger with localized feedback", () => {
@@ -27,7 +28,12 @@ test("FAQ uses a compact disclosure ledger with localized feedback", () => {
   assert.match(globals, /\.faq-question-copy\s*\{(?=[^}]*display:\s*grid)(?=[^}]*min-width:\s*0)(?=[^}]*gap:\s*3px)[^}]*\}/s);
   assert.match(globals, /\.faq-topic\s*\{(?=[^}]*font-family:\s*var\(--font-mono\))(?=[^}]*font-size:\s*0\.63rem)(?=[^}]*letter-spacing:\s*0\.12em)(?=[^}]*text-transform:\s*uppercase)[^}]*\}/s);
   assert.match(globals, /\.faq-toggle\s*\{(?=[^}]*border:\s*1px solid)(?=[^}]*border-radius:\s*9px)(?=[^}]*background:)[^}]*\}/s);
+  assert.match(globals, /\.faq-a\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-rows:\s*0fr)(?=[^}]*transition:\s*grid-template-rows 260ms)[^}]*\}/s);
   assert.match(globals, /\.faq-a\s*\{(?=[^}]*opacity:\s*0)(?=[^}]*transform:\s*translateY\(-6px\))(?=[^}]*transition:[^}]*opacity 200ms ease)[^}]*\}/s);
+  assert.match(globals, /\.faq-a-inner\s*\{(?=[^}]*min-height:\s*0)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
+  assert.match(globals, /\.faq-a-copy\s*\{[^}]*padding-block-end:\s*20px[^}]*\}/s);
+  assert.doesNotMatch(globals, /\.faq-a\s*\{[^}]*transition:[^}]*max-height/s);
+  assert.doesNotMatch(globals, /\.faq-a\s*\{[^}]*transition:[^}]*margin-top/s);
   assert.match(globals, /\.faq-item\.open \.faq-a,\s*\.faq-item\[open\] \.faq-a\s*\{(?=[^}]*opacity:\s*1)(?=[^}]*transform:\s*translateY\(0\))[^}]*\}/s);
   assert.match(globals, /\.faq-toggle\s+span:nth-child\(2\)\s*\{(?=[^}]*transform:\s*rotate\(90deg\))[^}]*\}/s);
   assert.match(globals, /\.faq-item\.open\s+\.faq-toggle\s+span:nth-child\(2\),\s*\.faq-item\[open\]\s+\.faq-toggle\s+span:nth-child\(2\)\s*\{(?=[^}]*opacity:\s*0)[^}]*\}/s);

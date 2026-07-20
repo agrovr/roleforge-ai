@@ -5,11 +5,13 @@ import test from "node:test";
 const globals = [readFileSync("app/globals.css", "utf8"), readFileSync("app/settings/settings.css", "utf8")].join("\n");
 const adminStyles = readFileSync("app/admin/support/admin-support.css", "utf8");
 
-test("operational polish keeps saved work and document rows scannable", () => {
+test("operational polish keeps saved work and document rows scannable without decorative rails", () => {
   assert.match(globals, /\/\* Operational surface finish: saved work, document rows, and support triage\. \*\//);
-  assert.match(globals, /\.settings-project-list,\s*\.settings-document-list\s*\{(?=[^}]*--ops-rail:\s*linear-gradient\(180deg,\s*var\(--accent\),\s*var\(--brand\),\s*var\(--sky\)\))[^}]*\}/s);
-  assert.match(globals, /\.settings-project-item,\s*\.settings-document-item,\s*\.studio-account-recent-link\s*\{(?=[^}]*position:\s*relative)(?=[^}]*isolation:\s*isolate)[^}]*\}/s);
-  assert.match(globals, /\.settings-project-item::after,\s*\.settings-document-item::after,\s*\.studio-account-recent-link::after\s*\{(?=[^}]*width:\s*3px)(?=[^}]*background:\s*var\(--ops-rail\))[^}]*\}/s);
+  assert.match(globals, /\.settings-project-item,\s*\.settings-document-item,\s*\.studio-account-recent-link\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--surface\) 92%, var\(--surface-warm\)\)[^}]*\}/s);
+  assert.doesNotMatch(globals, /--ops-rail/);
+  assert.doesNotMatch(globals, /\.settings-project-item::after/);
+  assert.doesNotMatch(globals, /\.settings-document-item::after/);
+  assert.doesNotMatch(globals, /\.studio-account-recent-link::after/);
 });
 
 test("operational polish no longer decorates support metadata as nested cards", () => {
@@ -22,7 +24,6 @@ test("operational polish no longer decorates support metadata as nested cards", 
 });
 
 test("saved-work operational polish keeps dark mode and reduced motion covered", () => {
-  assert.match(globals, /html\[data-theme="dark"\]\s+\.settings-project-list,\s*html\[data-theme="dark"\]\s+\.settings-document-list\s*\{(?=[^}]*--ops-rail:)[^}]*\}/s);
-  assert.match(globals, /html\[data-theme="dark"\]\s+\.settings-project-item,\s*html\[data-theme="dark"\]\s+\.settings-document-item,\s*html\[data-theme="dark"\]\s+\.studio-account-recent-link\s*\{/s);
+  assert.match(globals, /html\[data-theme="dark"\]\s+\.settings-project-item,\s*html\[data-theme="dark"\]\s+\.settings-document-item,\s*html\[data-theme="dark"\]\s+\.studio-account-recent-link\s*\{[^}]*background:\s*color-mix\(in srgb, var\(--surface\) 92%, var\(--bg\)\)[^}]*\}/s);
   assert.match(globals, /prefers-reduced-motion:\s*reduce[\s\S]*\.settings-document-item,\s*[\s\S]*\.studio-account-recent-link\s*\{[\s\S]*transition:\s*none/);
 });

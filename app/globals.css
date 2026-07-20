@@ -3117,20 +3117,23 @@ html[data-theme="dark"] .dash-demo-history-list button {
 }
 
 .faq-a {
-  max-height: 0;
+  display: grid;
+  grid-template-rows: 0fr;
   margin: 0 0 0 46px;
-  overflow: hidden;
   color: var(--ink-2);
   line-height: 1.58;
   border-top: 0;
-  transition: max-height 260ms ease, margin-top 260ms ease;
+  transition: grid-template-rows 260ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.faq-a-inner {
+  min-height: 0;
+  overflow: hidden;
 }
 
 .faq-item.open .faq-a,
 .faq-item[open] .faq-a {
-  max-height: 260px;
-  margin-top: 10px;
-  padding-top: 0;
+  grid-template-rows: 1fr;
 }
 
 .cta-band {
@@ -10728,39 +10731,7 @@ html[data-theme="dark"] .nav {
 .settings-project-item,
 .settings-document-item,
 .studio-account-recent-link {
-  position: relative;
-  isolation: isolate;
-}
-
-.settings-project-item,
-.settings-document-item,
-.studio-account-recent-link {
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 76%, transparent)),
-    radial-gradient(circle at 96% 0%, color-mix(in srgb, var(--brand-soft) 32%, transparent), transparent 13rem);
-}
-
-.settings-project-item::after,
-.settings-document-item::after,
-.studio-account-recent-link::after {
-  position: absolute;
-  inset-block: 12px;
-  inset-inline-start: 0;
-  width: 3px;
-  border-radius: 0 999px 999px 0;
-  background: var(--ops-rail);
-  content: "";
-  opacity: 0.52;
-  pointer-events: none;
-}
-
-.settings-project-item:hover::after,
-.settings-project-item:focus-within::after,
-.settings-document-item:hover::after,
-.settings-document-item:focus-within::after,
-.studio-account-recent-link:hover::after,
-.studio-account-recent-link:focus-visible::after {
-  opacity: 0.86;
+  background: color-mix(in srgb, var(--surface) 92%, var(--surface-warm));
 }
 
 html[data-theme="dark"] .rf-studio-hero::after,
@@ -10802,10 +10773,7 @@ html[data-theme="dark"] .settings-plan-active-card {
 html[data-theme="dark"] .settings-project-item,
 html[data-theme="dark"] .settings-document-item,
 html[data-theme="dark"] .studio-account-recent-link {
-  background:
-    linear-gradient(135deg, rgba(255, 247, 233, 0.075), rgba(255, 247, 233, 0.028)),
-    radial-gradient(circle at 96% 0%, rgba(137, 209, 190, 0.08), transparent 13rem),
-    rgba(12, 17, 31, 0.78);
+  background: color-mix(in srgb, var(--surface) 92%, var(--bg));
 }
 
 /* Settings commerce finish: billing trust rails and export document clarity. */
@@ -11657,16 +11625,17 @@ html[data-theme="dark"] .step:nth-child(n):hover {
   opacity: 0;
   transform: translateY(-6px);
   transition:
-    max-height 260ms ease,
-    margin-top 260ms ease,
+    grid-template-rows 260ms cubic-bezier(0.2, 0.7, 0.2, 1),
     opacity 200ms ease,
     transform 260ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
+.faq-a-copy {
+  padding-block-end: 20px;
+}
+
 .faq-item.open .faq-a,
 .faq-item[open] .faq-a {
-  margin-top: -4px;
-  padding-block-end: 20px;
   opacity: 1;
   transform: translateY(0);
 }
@@ -11739,9 +11708,7 @@ html[data-theme="dark"] .faq-item[open] .faq-toggle {
     letter-spacing: 0.1em;
   }
 
-  .faq-item.open .faq-a,
-  .faq-item[open] .faq-a {
-    margin-top: -2px;
+  .faq-a-copy {
     padding-block-end: 18px;
   }
 }

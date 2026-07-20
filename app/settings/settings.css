@@ -2971,7 +2971,6 @@
   height: 188px;
   padding: 10px;
   border: 1px solid var(--line);
-  border-top: 4px solid var(--brand);
   border-radius: 10px;
   background: #f8f3ea;
   overflow: hidden;
@@ -5386,47 +5385,10 @@ body,
   transform: translateY(-1px);
 }
 
-.settings-project-list,
-.settings-document-list {
-  --ops-rail: linear-gradient(180deg, var(--accent), var(--brand), var(--sky));
-}
-
 .settings-project-item,
 .settings-document-item,
 .studio-account-recent-link {
-  position: relative;
-  isolation: isolate;
-}
-
-.settings-project-item,
-.settings-document-item,
-.studio-account-recent-link {
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface-warm) 76%, transparent)),
-    radial-gradient(circle at 96% 0%, color-mix(in srgb, var(--brand-soft) 32%, transparent), transparent 13rem);
-}
-
-.settings-project-item::after,
-.settings-document-item::after,
-.studio-account-recent-link::after {
-  position: absolute;
-  inset-block: 12px;
-  inset-inline-start: 0;
-  width: 3px;
-  border-radius: 0 999px 999px 0;
-  background: var(--ops-rail);
-  content: "";
-  opacity: 0.52;
-  pointer-events: none;
-}
-
-.settings-project-item:hover::after,
-.settings-project-item:focus-within::after,
-.settings-document-item:hover::after,
-.settings-document-item:focus-within::after,
-.studio-account-recent-link:hover::after,
-.studio-account-recent-link:focus-visible::after {
-  opacity: 0.86;
+  background: color-mix(in srgb, var(--surface) 92%, var(--surface-warm));
 }
 
 .settings-project-controls {
@@ -5509,18 +5471,10 @@ html[data-theme="dark"] .settings-plan-active-card {
     inset 0 1px 0 rgba(255, 247, 233, 0.08);
 }
 
-html[data-theme="dark"] .settings-project-list,
-html[data-theme="dark"] .settings-document-list {
-  --ops-rail: linear-gradient(180deg, #f3c16d, #89d1be, #8eb7f0);
-}
-
 html[data-theme="dark"] .settings-project-item,
 html[data-theme="dark"] .settings-document-item,
 html[data-theme="dark"] .studio-account-recent-link {
-  background:
-    linear-gradient(135deg, rgba(255, 247, 233, 0.075), rgba(255, 247, 233, 0.028)),
-    radial-gradient(circle at 96% 0%, rgba(137, 209, 190, 0.08), transparent 13rem),
-    rgba(12, 17, 31, 0.78);
+  background: color-mix(in srgb, var(--surface) 92%, var(--bg));
 }
 
 html[data-theme="dark"] .settings-project-controls {

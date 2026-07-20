@@ -34,7 +34,9 @@ export function FaqAccordion({ items }: { items: readonly FaqItem[] }) {
               </span>
             </button>
             <div aria-hidden={!isOpen} aria-labelledby={questionId} className="faq-a" id={answerId} role="region">
-              {answer}
+              <div className="faq-a-inner">
+                <div className="faq-a-copy">{answer}</div>
+              </div>
             </div>
           </article>
         );
