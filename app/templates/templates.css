@@ -399,6 +399,10 @@
   overflow-wrap: anywhere;
 }
 
+.templates-page-card .template-name {
+  font-size: 1rem;
+}
+
 .template-card-actions {
   min-width: 0;
   display: grid;

@@ -149,7 +149,7 @@ export function TemplateLibrary({
             <span>Selected now</span>
             <strong>{selectedTemplate.name}</strong>
           </div>
-          <div className="template-thumb templates-hero-thumb" key={selectedTemplate.slug}>
+          <div className="template-thumb templates-hero-thumb" key={selectedTemplate.slug} aria-hidden="true">
             <ResumePreview
               variant={selectedTemplate.variant}
               name={selectedTemplate.previewName}
@@ -237,8 +237,12 @@ export function TemplateLibrary({
         {visibleTemplates.map((template) => {
           const selected = template.slug === selectedSlug;
           return (
-            <article className={`templates-page-card${selected ? " selected" : ""}`} key={template.name}>
-              <div className="template-thumb">
+            <article
+              className={`templates-page-card${selected ? " selected" : ""}`}
+              key={template.name}
+              aria-labelledby={`template-${template.slug}-title`}
+            >
+              <div className="template-thumb" aria-hidden="true">
                 <ResumePreview
                   variant={template.variant}
                   name={template.previewName}
@@ -248,7 +252,7 @@ export function TemplateLibrary({
               </div>
               <div className="templates-page-card-copy">
                 <div className="template-title-row">
-                  <span className="template-name">{template.name}</span>
+                  <h3 className="template-name" id={`template-${template.slug}-title`}>{template.name}</h3>
                   <span className="template-tag">{template.tag}</span>
                 </div>
                 <p>{template.detail}</p>
@@ -261,10 +265,15 @@ export function TemplateLibrary({
                       rememberTemplate(template.slug);
                     }}
                     aria-pressed={selected}
+                    aria-label={selected ? `${template.name} template selected` : `Select ${template.name} template`}
                   >
                     {selected ? "Selected" : "Select"} <RoleForgeIcon name={selected ? "check" : "layers"} size={12} />
                   </button>
-                  <Link className="btn btn-ghost btn-sm" href={signedIn ? resumeTemplateStudioHref(template.slug) : resumeTemplateEntryHref(template.slug, signedIn)}>
+                  <Link
+                    className="btn btn-ghost btn-sm"
+                    href={signedIn ? resumeTemplateStudioHref(template.slug) : resumeTemplateEntryHref(template.slug, signedIn)}
+                    aria-label={`Open ${template.name} in Studio`}
+                  >
                     Studio
                   </Link>
                 </div>
