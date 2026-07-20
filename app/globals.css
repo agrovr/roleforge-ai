@@ -2549,6 +2549,7 @@ html[data-theme="dark"] .dash-demo-history-list button {
 .template-name {
   min-width: 0;
   max-width: 100%;
+  margin: 0;
   font-weight: 800;
   line-height: 1.12;
   overflow-wrap: anywhere;
@@ -2624,7 +2625,9 @@ html[data-theme="dark"] .dash-demo-history-list button {
 }
 
 .price-name {
+  margin: 0;
   color: var(--brand-dark);
+  font-size: inherit;
   font-weight: 850;
 }
 

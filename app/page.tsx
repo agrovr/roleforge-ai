@@ -275,7 +275,11 @@ function Hero({ studioHref }: Pick<LandingLinks, "studioHref">) {
         </div>
       </div>
 
-      <div className="hero-stage" aria-label="RoleForge resume preview">
+      <div
+        className="hero-stage"
+        role="img"
+        aria-label="Layered resume previews showing structure, keyword, and export guidance"
+      >
         <div className="resume-card resume-card-back-l">
           <ResumePreview detail="decorative" variant="technical" name="Noor Vale" role="Software Engineer" />
         </div>
@@ -359,7 +363,7 @@ function HowItWorks() {
             <article className="step" key={title}>
               <div className="step-num">{String(index + 1).padStart(2, "0")}</div>
               <div className="step-icon"><RoleForgeIcon name={icon} size={18} /></div>
-              <h4 className="step-title">{title}</h4>
+              <h3 className="step-title">{title}</h3>
               <p>{text}</p>
             </article>
           ))}
@@ -405,14 +409,14 @@ function Templates() {
       </div>
       <div className="templates-row" aria-label="Featured resume templates">
         {templates.map((template) => (
-          <article className="template-card" key={template.slug}>
-            <div className="template-thumb">
+          <article className="template-card" aria-labelledby={`landing-template-${template.slug}`} key={template.slug}>
+            <div className="template-thumb" aria-hidden="true">
               <ResumePreview variant={template.variant} name={template.previewName} role={template.previewRole} />
             </div>
             <div className="template-info">
               <div>
                 {template.recommended ? <small>Recommended default</small> : null}
-                <span className="template-name">{template.name}</span>
+                <h3 className="template-name" id={`landing-template-${template.slug}`}>{template.name}</h3>
               </div>
               <span className="template-tag">{template.tag}</span>
             </div>
@@ -546,9 +550,9 @@ function Pricing({
           </p>
         </div>
         <div className="pricing-grid two">
-          <article className="price-card">
+          <article className="price-card" aria-labelledby="studio-plan-title">
             <div className="price-card-top">
-              <div className="price-name">Studio</div>
+              <h3 className="price-name" id="studio-plan-title">Studio</h3>
               <span className={`price-status ${freeStatusTone}`}>{freeStatus}</span>
             </div>
             <div className="price-amount"><span className="v">$0</span></div>
@@ -562,9 +566,9 @@ function Pricing({
             </ul>
             <Link className="btn btn-soft btn-lg" href={studioHref}>Open studio</Link>
           </article>
-          <article className="price-card featured">
+          <article className="price-card featured" aria-labelledby="premium-plan-title">
             <div className="price-card-top">
-              <div className="price-name">Premium</div>
+              <h3 className="price-name" id="premium-plan-title">Premium</h3>
               <span className={`price-status ${premiumStatusTone}`}>{premiumStatus}</span>
             </div>
             <div className="price-amount"><span className="v">${PREMIUM_MONTHLY_PRICE}</span><span className="m">/mo</span></div>
@@ -649,7 +653,7 @@ function CTABand({ studioHref }: Pick<LandingLinks, "studioHref">) {
               <Link className="btn btn-ghost btn-lg" href="/templates">Browse templates</Link>
             </div>
           </div>
-          <div className="cta-visual">
+          <div className="cta-visual" aria-hidden="true">
             <div className="resume-card back"><ResumePreview detail="decorative" variant="technical" name="Noor Vale" role="Software Engineer" /></div>
             <div className="resume-card"><ResumePreview variant="essential" highlight /></div>
           </div>
