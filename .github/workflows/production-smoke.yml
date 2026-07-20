@@ -5,6 +5,10 @@ on:
   schedule:
     - cron: "23 11 * * *"
 
+concurrency:
+  group: production-smoke
+  cancel-in-progress: true
+
 jobs:
   smoke:
     name: Live frontend smoke

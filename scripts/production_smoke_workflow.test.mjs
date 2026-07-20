@@ -4,6 +4,13 @@ import test from "node:test";
 
 const workflow = readFileSync(".github/workflows/production-smoke.yml", "utf8");
 
+test("production smoke cancels superseded overlapping runs", () => {
+  assert.match(
+    workflow,
+    /concurrency:\s*\n\s*group:\s*production-smoke\s*\n\s*cancel-in-progress:\s*true/,
+  );
+});
+
 test("production smoke workflow installs dependencies before running live checks", () => {
   assert.match(workflow, /uses:\s*actions\/checkout@v6/);
   assert.match(workflow, /uses:\s*actions\/setup-node@v6[\s\S]*node-version:\s*22[\s\S]*cache:\s*npm/);
