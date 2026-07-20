@@ -5,6 +5,8 @@ import { AccountMenuBehavior } from "./components/AccountMenuBehavior";
 import { SitePolish } from "./components/SitePolish";
 import "./globals.css";
 
+const deploymentCommit = process.env.VERCEL_GIT_COMMIT_SHA?.trim();
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://roleforgeai.vercel.app"),
   applicationName: "RoleForge AI",
@@ -40,6 +42,9 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  other: deploymentCommit
+    ? { "roleforge-deployment-commit": deploymentCommit }
+    : undefined,
 };
 
 const fraunces = Fraunces({

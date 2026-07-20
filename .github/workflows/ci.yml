@@ -46,6 +46,7 @@ jobs:
         run: npm run wait:vercel
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          ROLEFORGE_SITE_URL: https://roleforgeai.vercel.app
 
       - name: Smoke production shell
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
