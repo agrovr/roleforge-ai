@@ -25,13 +25,6 @@ test("landing sections retain offscreen rendering with calibrated desktop space"
   }
 });
 
-test("landing hash targets resolve against rendered section heights", () => {
-  assert.match(
-    globals,
-    /html:has\(\.page-shell > section:target\) \.page-shell > section:not\(\.hero\)\s*\{[^}]*content-visibility:\s*visible[^}]*\}/s,
-  );
-});
-
 test("landing intrinsic sizes follow the stacked tablet and mobile layouts", () => {
   assert.match(globals, /@media \(max-width: 900px\) \{[\s\S]*?\.page-shell > #templates \{ contain-intrinsic-size: auto 1330px; \}[\s\S]*?\.page-shell > #pricing \{ contain-intrinsic-size: auto 1300px; \}[\s\S]*?\.page-shell > #final-cta \{ contain-intrinsic-size: auto 520px; \}[\s\S]*?\}/);
   assert.match(globals, /@media \(max-width: 640px\) \{[\s\S]*?\.page-shell > #studio \{ contain-intrinsic-size: auto 1785px; \}[\s\S]*?\.page-shell > #templates \{ contain-intrinsic-size: auto 2430px; \}[\s\S]*?\.page-shell > #pricing \{ contain-intrinsic-size: auto 1620px; \}[\s\S]*?\}/);

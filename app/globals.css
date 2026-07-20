@@ -204,11 +204,6 @@ html.rf-polish-ready :is(.steps, .faq-grid, .cta-band)[data-polish-reveal="true"
   contain-intrinsic-size: auto 900px;
 }
 
-/* Resolve landing hash targets against real section heights before the browser positions them. */
-html:has(.page-shell > section:target) .page-shell > section:not(.hero) {
-  content-visibility: visible;
-}
-
 /* Keep the landing scroll range stable while below-the-fold sections are skipped. */
 .page-shell > #studio { contain-intrinsic-size: auto 940px; }
 .page-shell > #templates { contain-intrinsic-size: auto 690px; }

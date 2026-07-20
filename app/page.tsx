@@ -4,6 +4,8 @@ import { AccountAvatar } from "./components/AccountAvatar";
 import { AccountReferenceCopyButton } from "./components/AccountReferenceCopyButton";
 import { Brand } from "./components/Brand";
 import { FaqAccordion } from "./components/FaqAccordion";
+import { LandingAnchorBootstrap } from "./components/LandingAnchorBootstrap";
+import { LandingAnchorSync } from "./components/LandingAnchorSync";
 import { LandingStudioDemo } from "./components/LandingStudioDemo";
 import { ResumePreview } from "./components/ResumePreview";
 import { RESUME_TEMPLATES } from "./lib/resumeTemplates";
@@ -719,6 +721,7 @@ export default async function Landing() {
 
   return (
     <main className="page-shell">
+      <LandingAnchorSync />
       <Nav
         signedIn={links.signedIn}
         studioHref={links.studioHref}
@@ -753,6 +756,7 @@ export default async function Landing() {
       <FAQ checkoutReady={links.checkoutReady} />
       <CTABand studioHref={links.studioHref} />
       <Footer />
+      <LandingAnchorBootstrap />
     </main>
   );
 }
