@@ -14,11 +14,11 @@ test("site polish layer is mounted once in the app shell", () => {
   assert.match(layout, /<SitePolish \/>/);
 });
 
-test("site polish keeps ambient depth without global line overlays", () => {
+test("site polish keeps motion focused without global overlays", () => {
   assert.match(sitePolish, /prefers-reduced-motion: reduce/);
   assert.match(sitePolish, /IntersectionObserver/);
   assert.match(sitePolish, /rf-reveal-disabled/);
-  assert.match(sitePolish, /rf-ambient-field/);
+  assert.doesNotMatch(sitePolish, /rf-ambient-field/);
   assert.doesNotMatch(sitePolish, /rf-scroll-progress/);
   assert.doesNotMatch(sitePolish, /rf-page-texture/);
   assert.doesNotMatch(globals, /\.rf-scroll-progress/);
@@ -26,6 +26,7 @@ test("site polish keeps ambient depth without global line overlays", () => {
   assert.match(globals, /@keyframes\s+rf-section-reveal/);
   assert.match(globals, /html\.rf-polish-ready \[data-polish-reveal="true"\]\s*\{(?=[^}]*animation:\s*none)(?=[^}]*opacity:\s*1)(?=[^}]*transform:\s*none)[^}]*\}/s);
   assert.match(globals, /data-polish-visible="true"\]\s*\{(?=[^}]*animation:\s*rf-section-reveal)[^}]*\}/s);
+  assert.match(globals, /:is\(\.steps, \.faq-grid, \.cta-band\)\[data-polish-reveal="true"\]\[data-polish-visible="true"\]\s*\{[^}]*animation:\s*none/s);
   assert.doesNotMatch(globals, /data-polish-reveal="true"\]\s*\{[^}]*opacity:\s*0/s);
   assert.match(globals, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
 });

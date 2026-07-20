@@ -79,11 +79,5 @@ export function SitePolish() {
     };
   }, []);
 
-  return (
-    <div className="rf-ambient-field" aria-hidden="true">
-      <span />
-      <span />
-      <span />
-    </div>
-  );
+  return null;
 }

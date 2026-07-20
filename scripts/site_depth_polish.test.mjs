@@ -5,12 +5,9 @@ import test from "node:test";
 const sitePolish = readFileSync("app/components/SitePolish.tsx", "utf8");
 const globals = readFileSync("app/globals.css", "utf8");
 
-test("ambient polish field is mounted behind the shared page texture", () => {
-  assert.match(sitePolish, /className="rf-ambient-field"/);
-  assert.match(globals, /\.rf-ambient-field\s*\{/);
-  assert.match(globals, /\.rf-ambient-field span:nth-child\(1\)/);
-  assert.match(globals, /\.rf-ambient-field span:nth-child\(2\)/);
-  assert.match(globals, /\.rf-ambient-field span:nth-child\(3\)/);
+test("shared polish avoids a fixed full-viewport paint layer", () => {
+  assert.doesNotMatch(sitePolish, /className="rf-ambient-field"/);
+  assert.doesNotMatch(globals, /\.rf-ambient-field/);
 });
 
 test("site depth polish avoids global landing rails while keeping product surfaces consistent", () => {
@@ -25,9 +22,7 @@ test("site depth polish avoids global landing rails while keeping product surfac
   assert.doesNotMatch(finishPass, /admin-support-(?:hero|card)/);
 });
 
-test("progress polish keeps ambient depth static and inexpensive", () => {
+test("progress polish stays interaction-driven and inexpensive", () => {
   assert.match(globals, /\.dash-progress-track,[\s\S]*?\.dash-resume-progress[\s\S]*?\)::after\s*\{/);
-  assert.match(globals, /\.rf-ambient-field span\s*\{[^}]*filter:\s*none/s);
   assert.doesNotMatch(globals, /@keyframes\s+rf-ambient-drift-/);
-  assert.doesNotMatch(globals, /\.rf-ambient-field span:nth-child\([^)]*\)\s*\{[^}]*animation:/s);
 });

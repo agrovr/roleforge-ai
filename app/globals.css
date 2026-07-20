@@ -192,6 +192,11 @@ html.rf-polish-ready [data-polish-reveal="true"][data-polish-visible="true"] {
   animation-delay: calc(var(--rf-reveal-index, 0) * 28ms);
 }
 
+/* Keep large landing groups out of compositor-sized reveal animations. */
+html.rf-polish-ready :is(.steps, .faq-grid, .cta-band)[data-polish-reveal="true"][data-polish-visible="true"] {
+  animation: none;
+}
+
 /* Skip below-the-fold paint and layout work until those sections approach the viewport. */
 .page-shell > section:not(.hero),
 .templates-page-shell > section:not(.templates-page-hero) {
@@ -12281,43 +12286,6 @@ html[data-theme="dark"] .brand::after {
 }
 
 /* Full-site finish pass: quiet depth and restrained motion. */
-.rf-ambient-field {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  overflow: hidden;
-  pointer-events: none;
-  opacity: 0.62;
-  contain: paint;
-}
-
-.rf-ambient-field span {
-  position: absolute;
-  width: clamp(18rem, 30vw, 36rem);
-  aspect-ratio: 1;
-  border-radius: 999px;
-  filter: none;
-  opacity: 0.22;
-}
-
-.rf-ambient-field span:nth-child(1) {
-  inset-inline-start: -10rem;
-  inset-block-start: 8rem;
-  background: radial-gradient(circle, color-mix(in srgb, var(--brand) 42%, transparent), transparent 64%);
-}
-
-.rf-ambient-field span:nth-child(2) {
-  inset-inline-end: -12rem;
-  inset-block-start: 24rem;
-  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 34%, transparent), transparent 66%);
-}
-
-.rf-ambient-field span:nth-child(3) {
-  inset-inline-start: 36%;
-  inset-block-end: -18rem;
-  background: radial-gradient(circle, color-mix(in srgb, var(--sky) 24%, transparent), transparent 68%);
-}
-
 .nav {
   position: sticky;
   isolation: isolate;
@@ -12485,21 +12453,11 @@ html[data-theme="dark"] .brand::after {
   background-blend-mode: normal, normal, multiply;
 }
 
-html[data-theme="dark"] .rf-ambient-field {
-  opacity: 0.74;
-}
-
-html[data-theme="dark"] .rf-ambient-field span {
-  opacity: 0.2;
-  filter: none;
-}
-
 html[data-theme="dark"] :where(.eyebrow, .price-kicker, .settings-price-kicker, .dash-side-label, .updates-card-meta, .status-pill) {
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.42);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rf-ambient-field span,
   :where(
     .step,
     .feature-card,
