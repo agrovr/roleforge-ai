@@ -9,8 +9,8 @@ const studioDemo = readFileSync("app/components/LandingStudioDemo.tsx", "utf8");
 test("landing links avoid background route churn while scrolling", () => {
   assert.match(landing, /function Link\(\{ prefetch = false, \.\.\.props \}: ComponentProps<typeof NextLink>\)/);
   assert.match(landing, /return <NextLink \{\.\.\.props\} prefetch=\{prefetch\} \/>/);
-  assert.match(landing, /href="\/templates" prefetch>Templates<\/Link>/);
-  assert.equal((landing.match(/\sprefetch>/g) || []).length, 1, "only the visible Templates navigation should prefetch eagerly");
+  assert.match(landing, /href="\/templates">Templates<\/Link>/);
+  assert.equal((landing.match(/\sprefetch>/g) || []).length, 0, "landing navigation should not preload route-owned CSS");
 });
 
 test("shared landing artwork and demo actions do not prefetch hidden or protected routes", () => {

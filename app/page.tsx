@@ -144,7 +144,7 @@ function Nav({
       <div className="nav-inner">
         <Brand />
         <nav className="nav-links" aria-label="Primary navigation">
-          <Link className="nav-link nav-link-secondary" href="/templates" prefetch>Templates</Link>
+          <Link className="nav-link nav-link-secondary" href="/templates">Templates</Link>
           <a className="nav-link nav-link-secondary" href="#how">How it works</a>
           <a className="nav-link nav-link-secondary" href="#features">Features</a>
           <a className="nav-link nav-link-secondary" href="#pricing">Pricing</a>
