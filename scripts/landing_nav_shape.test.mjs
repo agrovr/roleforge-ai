@@ -23,8 +23,9 @@ test("landing nav dock has dark-mode and responsive shape polish", () => {
   assert.match(globals, /@media\s*\(max-width:\s*355px\)\s*\{[\s\S]*?\.nav-inner\s*\{(?=[^}]*width:\s*calc\(100%\s*-\s*12px\))(?=[^}]*border-radius:\s*18px)[^}]*\}/s);
 });
 
-test("mobile landing dock stays opaque and clears anchored sections", () => {
+test("landing dock stays opaque and clears anchored sections", () => {
   assert.match(globals, /#how,\s*#studio,\s*#features,\s*#pricing,\s*#faq\s*\{[^}]*scroll-margin-top:\s*0[^}]*\}/s);
+  assert.match(globals, /html:root\s*\{[^}]*scroll-padding-top:\s*104px[^}]*\}/s);
   assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?html:root\s*\{[^}]*scroll-padding-top:\s*84px[^}]*\}/s);
   assert.doesNotMatch(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?#how,[\s\S]*?scroll-margin-top:\s*112px/s);
   assert.match(globals, /@media\s*\(max-width:\s*900px\)\s*\{[\s\S]*?\.nav\s*\{(?=[^}]*background:\s*color-mix\(in srgb, var\(--bg\) 97%, var\(--surface\)\))(?=[^}]*backdrop-filter:\s*none)[^}]*\}/s);
