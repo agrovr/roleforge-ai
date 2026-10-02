@@ -16,21 +16,20 @@ Use this when production looks wrong, a deploy fails, or a core workflow breaks.
 Frontend shell, auth gate, crawler metadata, and security headers:
 
 ```bash
-cd C:\Users\ashmi\Downloads\Project_v1\resume-tailor-ui-github
-node scripts\smoke_frontend.mjs
+node scripts/smoke_frontend.mjs
 ```
 
 Backend health, readiness, capabilities, production frontend CORS preflight, and anonymous auth gates:
 
 ```bash
-cd C:\Users\ashmi\Downloads\Project_v1\resume-tailor-backend
-.\.codex-backend-venv\Scripts\python.exe scripts\smoke_backend.py --base-url https://roleforge-api-224015900616.us-central1.run.app --require-auth
+# from a checkout of the backend repository
+python scripts/smoke_backend.py --base-url https://roleforge-api-224015900616.us-central1.run.app --require-auth
 ```
 
 Backend health with exact deployed revision:
 
 ```bash
-.\.codex-backend-venv\Scripts\python.exe scripts\smoke_backend.py --base-url https://roleforge-api-224015900616.us-central1.run.app --expect-revision <commit-sha> --require-auth
+python scripts/smoke_backend.py --base-url https://roleforge-api-224015900616.us-central1.run.app --expect-revision <commit-sha> --require-auth
 ```
 
 ## GitHub Actions
@@ -58,7 +57,6 @@ Backend:
 Smoke readiness across both GitHub repos:
 
 ```bash
-cd C:\Users\ashmi\Downloads\Project_v1\resume-tailor-ui-github
 npm run smoke:readiness
 ```
 
@@ -143,7 +141,6 @@ Check these when checkout, portal, or plan state breaks:
 Before switching Premium back on with live Stripe values:
 
 ```bash
-cd C:\Users\ashmi\Downloads\Project_v1\resume-tailor-ui-github
 npm run check:billing -- --strict
 ```
 

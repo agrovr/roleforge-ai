@@ -12,8 +12,8 @@ test("production smoke cancels superseded overlapping runs", () => {
 });
 
 test("production smoke workflow installs dependencies before running live checks", () => {
-  assert.match(workflow, /uses:\s*actions\/checkout@v6/);
-  assert.match(workflow, /uses:\s*actions\/setup-node@v6[\s\S]*node-version:\s*22[\s\S]*cache:\s*npm/);
+  assert.match(workflow, /uses:\s*actions\/checkout@[0-9a-f]{40}\s*#\s*v\d+/);
+  assert.match(workflow, /uses:\s*actions\/setup-node@[0-9a-f]{40}\s*#\s*v\d+[\s\S]*node-version:\s*22[\s\S]*cache:\s*npm/);
   assert.match(workflow, /- name:\s*Install dependencies\s*\n\s*run:\s*npm ci/);
   assert.match(workflow, /Install dependencies[\s\S]*Smoke live frontend/);
   assert.match(workflow, /Install dependencies[\s\S]*Smoke rendered live layout/);

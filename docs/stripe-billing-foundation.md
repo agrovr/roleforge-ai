@@ -41,7 +41,6 @@ Premium is ready to be re-enabled when the production Vercel environment uses li
 7. Run the launch check:
 
 ```bash
-cd C:\Users\ashmi\Downloads\Project_v1\resume-tailor-ui-github
 npm run check:billing -- --strict
 ```
 

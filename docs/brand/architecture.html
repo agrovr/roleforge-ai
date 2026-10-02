@@ -1,0 +1,89 @@
+<!doctype html>
+<!--
+  Source for docs/brand/architecture-{light,dark}.jpg in the README.
+  Open with ?theme=light or ?theme=dark and screenshot #card at 2x (1280 x 560).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RoleForge architecture</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --bg: #f7f1e8; --bg-alt: #efe7d7; --surface: #fffaf2; --ink-0: #0e1430; --ink-2: #4a5176; --ink-3: #6f7593;
+    --line: #e2d6bd; --brand: #e89538; --brand-dark: #c0731f; --brand-soft: #fbe8c9; --accent: #28695f; --accent-soft: #d8ece6;
+    --sky: #4a7fb8; --sky-soft: #dde8f5; --coral: #d65a45; --coral-soft: #fbe0da; --wire: #c9b998;
+  }
+  .dark {
+    --bg: #0b0f1f; --bg-alt: #121729; --surface: #191f34; --ink-0: #fff7e9; --ink-2: #c7ccdf; --ink-3: #9da3bb;
+    --line: rgba(255, 247, 233, 0.14); --brand: #dda04a; --brand-dark: #f0b65f; --brand-soft: rgba(221, 160, 74, 0.18);
+    --accent: #7fc8b8; --accent-soft: rgba(127, 200, 184, 0.16); --sky: #8eb7f0; --sky-soft: rgba(142, 183, 240, 0.16);
+    --coral: #ff9a86; --coral-soft: rgba(255, 154, 134, 0.16); --wire: rgba(255, 247, 233, 0.28);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #777; }
+  #card {
+    position: relative; width: 1280px; height: 560px; overflow: hidden; color: var(--ink-0);
+    background: radial-gradient(600px 300px at 50% 0%, var(--brand-soft), transparent 70%), linear-gradient(170deg, var(--bg), var(--bg-alt));
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  .eyebrow { position: absolute; left: 56px; top: 40px; display: flex; align-items: center; gap: 12px; font: 600 12px/1 'Inter', sans-serif; letter-spacing: 0.2em; text-transform: uppercase; color: var(--brand-dark); }
+  .eyebrow::before { content: ""; width: 28px; height: 2px; border-radius: 2px; background: var(--brand); }
+  h2 { position: absolute; left: 56px; top: 64px; font: 500 34px/1.1 'Fraunces', Georgia, serif; font-variation-settings: "opsz" 72; letter-spacing: -0.01em; }
+  h2 em { font-style: italic; font-weight: 400; }
+  svg.wires { position: absolute; inset: 0; }
+  .wires path { fill: none; stroke: var(--wire); stroke-width: 2; stroke-dasharray: 5 6; }
+  .wires .hot { stroke: var(--brand); stroke-dasharray: none; stroke-width: 2.5; }
+  .node {
+    position: absolute; padding: 16px 18px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line);
+    box-shadow: 0 18px 40px -24px rgba(14, 20, 48, 0.4);
+  }
+  .node h3 { display: flex; align-items: center; gap: 10px; font: 600 16px/1.2 'Inter', sans-serif; }
+  .node h3 i { width: 10px; height: 10px; border-radius: 3px; background: var(--c, var(--brand)); flex: none; }
+  .node p { margin-top: 6px; font: 500 12.5px/1.35 'Inter', sans-serif; color: var(--ink-3); }
+  .node ul { margin-top: 10px; padding: 0; list-style: none; display: grid; gap: 5px; }
+  .node li { font: 500 13px/1.3 'Inter', sans-serif; color: var(--ink-2); display: flex; gap: 8px; }
+  .node li::before { content: "·"; color: var(--c, var(--brand)); font-weight: 700; }
+  .tag { position: absolute; padding: 5px 10px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); font: 600 11px/1 'Inter', sans-serif; letter-spacing: 0.04em; color: var(--ink-3); }
+  .browser { left: 56px; top: 210px; width: 216px; --c: var(--ink-2); }
+  .next { left: 340px; top: 150px; width: 270px; --c: var(--brand); border-color: var(--brand); }
+  .api { left: 340px; top: 370px; width: 270px; --c: var(--accent); border-color: var(--accent); }
+  .supa { left: 720px; top: 112px; width: 230px; --c: var(--accent); }
+  .stripe { left: 720px; top: 262px; width: 230px; --c: var(--sky); }
+  .gemini { left: 1000px; top: 340px; width: 224px; --c: var(--coral); }
+  .gcs { left: 720px; top: 420px; width: 230px; --c: var(--sky); }
+</style>
+</head>
+<body>
+  <div id="card">
+    <p class="eyebrow">How it fits together</p>
+    <h2>One studio, <em>two services.</em></h2>
+    <svg class="wires" viewBox="0 0 1280 560" aria-hidden="true">
+      <path class="hot" d="M272 262 C 310 262, 300 220, 340 220" />
+      <path class="hot" d="M272 300 C 310 300, 300 440, 340 440" />
+      <path d="M610 200 C 665 200, 665 160, 720 160" />
+      <path d="M610 240 C 665 240, 665 310, 720 310" />
+      <path d="M610 440 C 665 440, 665 470, 720 470" />
+      <path class="hot" d="M610 410 C 800 410, 900 390, 1000 390" />
+      <path d="M475 370 L 475 330" />
+    </svg>
+    <span class="tag" style="left:488px;top:340px">Supabase JWT</span>
+    <div class="node browser"><h3><i></i>Browser</h3><p>Loads pages from Vercel, then sends upload, tailor and export calls straight to the API with a Supabase token</p></div>
+    <div class="node next">
+      <h3><i></i>Next.js 16 on Vercel</h3><p>roleforge-ai · this repository</p>
+      <ul><li>Studio UI, landing and public pages</li><li>Auth callbacks and session refresh</li><li>Saved projects and account APIs</li><li>Stripe checkout, portal and webhook</li></ul>
+    </div>
+    <div class="node api">
+      <h3><i></i>FastAPI on Cloud Run</h3><p>Private backend service</p>
+      <ul><li>DOCX, PDF and TXT parsing</li><li>Tailoring, fit and ATS-style checks</li><li>Ten templates · PDF, DOCX, TXT</li></ul>
+    </div>
+    <div class="node supa"><h3><i></i>Supabase</h3><p>Google and magic-link auth, saved projects, entitlements, all behind RLS</p></div>
+    <div class="node stripe"><h3><i></i>Stripe</h3><p>Premium subscription checkout, billing portal and signed webhooks</p></div>
+    <div class="node gcs"><h3><i></i>Cloud Storage</h3><p>Uploaded sources and generated exports</p></div>
+    <div class="node gemini"><h3><i></i>Gemini on Vertex AI</h3><p>Role-targeted rewrites, cover letters and interview prep</p></div>
+  </div>
+  <script>
+    if (new URLSearchParams(location.search).get('theme') === 'dark') document.body.classList.add('dark');
+  </script>
+</body>
+</html>
