@@ -28,8 +28,7 @@ $OneTimeStripeSecretCachePath = Join-Path $RepoRoot ".codex-qa\roleforge-stripe-
 $OneTimeSupabaseCredentialCachePath = Join-Path $RepoRoot ".codex-qa\roleforge-supabase-admin.dpapi"
 $LiveBillingProofEvidencePath = Join-Path $RepoRoot ".codex-qa\live-billing-proof.json"
 if (-not $NodePath) {
-  $BundledNode = "C:\Users\ashmi\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe"
-  $NodePath = if (Test-Path $BundledNode) { $BundledNode } else { "node" }
+  $NodePath = "node"
 }
 
 function Import-LocalProofEnv {

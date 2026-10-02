@@ -1,165 +1,213 @@
-# RoleForge AI Frontend
+<a href="https://roleforgeai.vercel.app">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/banner-dark.jpg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/brand/banner-light.jpg">
+    <img src="docs/brand/banner-light.jpg" alt="RoleForge AI: the resume that actually fits the role. Fanned resume pages with Structure review, Keyword guidance and Export workflow cards" width="100%">
+  </picture>
+</a>
 
-Production frontend for RoleForge AI, an AI-assisted resume workflow for uploading a resume, targeting a role, reviewing generated guidance, and exporting a cleaner draft.
+<p align="center">
+  <a href="https://roleforgeai.vercel.app"><b>Open RoleForge</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://roleforgeai.vercel.app/templates">Template library</a>
+  &nbsp;·&nbsp;
+  <a href="https://roleforgeai.vercel.app/status">Live status</a>
+  &nbsp;·&nbsp;
+  <a href="docs/development.md">Developer guide</a>
+</p>
 
-- Live app: https://roleforgeai.vercel.app/
-- Frontend repo: https://github.com/agrovr/roleforge-ai
-- Production backend: `https://roleforge-api-224015900616.us-central1.run.app`
-- Private backend repo: `agrovr/roleforge-ai-backend`
+<p align="center">
+  <a href="https://github.com/agrovr/roleforge-ai/actions/workflows/ci.yml"><img alt="Frontend CI" src="https://github.com/agrovr/roleforge-ai/actions/workflows/ci.yml/badge.svg?branch=main"></a>
+  <a href="https://github.com/agrovr/roleforge-ai/actions/workflows/production-smoke.yml"><img alt="Production smoke" src="https://github.com/agrovr/roleforge-ai/actions/workflows/production-smoke.yml/badge.svg?branch=main"></a>
+  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-0e1430?logo=nextdotjs&logoColor=white">
+  <img alt="React 19" src="https://img.shields.io/badge/React-19-0e1430?logo=react&logoColor=7fc8b8">
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-0e1430?logo=typescript&logoColor=8eb7f0">
+</p>
 
-The public-facing copy intentionally avoids unsupported customer proof, performance statistics, third-party logos, vendor-specific ATS claims, and human-review claims until those are legally approved and backed by real product behavior.
+---
 
-## Features
+**RoleForge AI** is a resume-tailoring studio. Upload the resume you already have, point it at a
+job posting, and RoleForge drafts a version aimed at that role, shows you which terms match and
+which are missing, flags formatting that parsers tend to trip on, and lets you review every change
+before you export a clean PDF, DOCX or TXT.
 
-- RoleForge AI landing page and resume studio UI
-- DOCX, PDF, and TXT resume upload support through the backend
-- Job description text or public URL targeting
-- Optional company URL context
-- Fit, gap, formatting, generated resume, cover letter, interview prep, change log, warning, and local history views when returned by the backend
-- PDF export for the free workflow, with DOCX and TXT export access gated by premium entitlement
-- Supabase Google OAuth and email magic-link sign-in for protected studio access
-- Saved project sync, restore, rename, delete, and account/local history states
-- Stripe checkout, customer portal, webhook, and entitlement-backed premium plan state
-- Light and dark visual themes
+It won't invent employers, titles, dates or metrics: when the evidence isn't in your resume, it
+becomes a suggestion instead of a line on the page. It doesn't promise an ATS score either. The
+source resume stays visible next to every change, so you decide what ships.
 
-## Tech Stack
+## How it works
 
-- Next.js 16
-- React 19
-- TypeScript
-- CSS / global styling
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screens/how-dark.jpg">
+  <img src="docs/screens/how-light.jpg" alt="Four steps: upload your resume, paste the job, review and tailor, export and apply" width="100%">
+</picture>
 
-## Project Structure
+1. **Upload** a DOCX, PDF or TXT resume. RoleForge reads its structure, headings and content.
+2. **Target** a role by pasting the job description or a public posting URL, with optional company
+   context.
+3. **Review** fit signals, matched and missing terms, formatting notes and the generated rewrite in
+   one side-by-side flow.
+4. **Export** in the template you picked, then reopen the run later from your saved projects.
+
+## The studio
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screens/studio-dark.jpg">
+  <img src="docs/screens/studio-light.jpg" alt="The interactive studio sample: a workspace sidebar, resume, target and export status cards, and a role-targeted resume draft with fit signals" width="100%">
+</picture>
+
+| | |
+| :-- | :-- |
+| **AI tailoring** | Role-targeted suggestions in conservative, balanced or stronger modes, each reviewed before export. |
+| **Fit signals** | How the posting reads against your resume: matched terms, missing terms and summary notes. |
+| **ATS-friendly review** | Heading, section, bullet, table, column and contact-format checks, without claiming a guaranteed pass. |
+| **Cover letters and interview prep** | Drafted from the same resume and role, so the story stays consistent. |
+| **Saved projects** | Signed-in runs sync to your account, with rename, restore and saved export links. |
+| **Light and dark** | Both themes, chosen per device and remembered. |
+
+## Templates
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screens/templates-dark.jpg">
+  <img src="docs/screens/templates-light.jpg" alt="Four resume templates side by side: Essential, Professional, Technical and Early Career" width="100%">
+</picture>
+
+Ten export templates, from **Essential** (the single-column default) and **Professional** to
+**Technical**, **Early Career**, **Career Pivot**, **Academic** and **Impact**. The
+[template library](https://roleforgeai.vercel.app/templates) previews each one in full and lets you
+filter by use case before you open the studio.
+
+<details>
+<summary><b>More screens</b></summary>
+<br>
+
+<table>
+  <tr>
+    <td width="50%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/screens/hero-dark.jpg">
+        <img src="docs/screens/hero-light.jpg" alt="Landing page hero: 'The resume that actually fits the role.'">
+      </picture>
+      <p align="center"><sub>Landing page</sub></p>
+    </td>
+    <td width="50%">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/screens/template-library-dark.jpg">
+        <img src="docs/screens/template-library-light.jpg" alt="Template library page with the selected Essential template preview">
+      </picture>
+      <p align="center"><sub>Template library</sub></p>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="docs/screens/features-dark.jpg">
+        <img src="docs/screens/features-light.jpg" alt="Feature grid: AI tailoring, ATS-friendly review, fit signals, cover letters, interview prep and saved projects">
+      </picture>
+      <p align="center"><sub>Feature overview</sub></p>
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="docs/screens/mobile-light.jpg" alt="Landing page on a phone, light theme" width="260">
+  &nbsp;&nbsp;
+  <img src="docs/screens/mobile-dark.jpg" alt="Landing page on a phone, dark theme" width="260">
+</p>
+
+</details>
+
+## Plans
+
+| | Studio (free) | Premium |
+| :-- | :-- | :-- |
+| Tailoring runs | 5 per month | Unlimited |
+| Upload | DOCX, PDF, TXT | DOCX, PDF, TXT |
+| Export | PDF | PDF, DOCX, TXT |
+| Saved projects | Yes | Yes |
+
+Billing runs through Stripe, and plans are managed from Settings. See
+[plan rules](docs/plan-rules.md) for the exact entitlement logic.
+
+## Architecture
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/brand/architecture-dark.jpg">
+  <img src="docs/brand/architecture-light.jpg" alt="The browser loads pages from the Next.js app on Vercel, which talks to Supabase and Stripe, and calls a FastAPI service on Cloud Run with a Supabase token. The API uses Gemini on Vertex AI and Cloud Storage." width="100%">
+</picture>
+
+This repository is the **web app**: the landing and public pages, the studio UI, auth callbacks,
+saved-project and account APIs, and Stripe billing. Document parsing, AI tailoring and file
+rendering live in a separate FastAPI service on Google Cloud Run, which checks every request
+against the user's Supabase session.
+
+| Layer | Built with |
+| :-- | :-- |
+| Web app | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4 with hand-written CSS |
+| Accounts | Supabase Auth (Google OAuth and email magic links), Postgres with row-level security |
+| Billing | Stripe Checkout, Customer Portal and signed webhooks |
+| AI and documents | FastAPI, Gemini on Vertex AI, Cloud Storage, DOCX/PDF/TXT parsers and renderers |
+| Hosting | Vercel (web), Cloud Run (API), Vercel Analytics |
 
 ```text
 app/
-  api/auth/status/route.ts        # Safe account readiness endpoint
-  app/page.tsx                    # Studio workflow UI
-  components/Brand.tsx            # RoleForge brand component
-  components/ResumePreview.tsx    # Safe generic resume preview mockups
-  components/RoleForgeIcons.tsx   # Inline UI icon set
-  lib/supabase/                   # Supabase-ready browser config
-  page.tsx                        # Landing page
-  globals.css                     # Global styles and responsive layout
-  layout.tsx                      # Root layout and metadata
-docs/
-  operations-checklist.md        # Production checks and break/fix runbook
-  supabase-account-foundation.sql # Draft RLS schema for saved projects
-  plan-rules.md                   # Current free and premium entitlement rules
-  stripe-billing-foundation.md    # Stripe checkout, portal, webhook, and entitlement behavior
+  page.tsx            landing page
+  app/                the resume studio (protected)
+  templates/          template library
+  api/                saved runs, account export and delete, billing, auth status, downloads
+  auth/               OAuth start, magic link, callback, sign-out
+  settings/ support/ status/ help/ updates/ privacy/ terms/
+  components/         brand, icons, resume previews, studio demo, theme toggle
+  lib/                typed helpers with unit tests beside them
+proxy.ts              refreshes Supabase session cookies
+supabase/migrations/  schema, RLS policies and grants
+scripts/              smoke tests, readiness audits and support tooling
+docs/                 developer guide, runbook, billing and plan rules, README art
 ```
 
-## Local Development
+## Quality and operations
+
+- **CI** runs unit tests, ESLint, a strict typecheck and a production build on every push and pull
+  request.
+- **After each deploy** to `main`, CI waits for Vercel, then smoke-tests production as a signed-in
+  test user: the studio shell, a saved-project round trip, export and download through the API,
+  and rendered layouts in headless Chrome.
+- **Every day**, a scheduled workflow repeats the production smoke.
+- **The public [status page](https://roleforgeai.vercel.app/status)** checks the API's readiness
+  each time it renders.
+
+## Run it locally
 
 ```bash
-npm install
-npm run dev
+npm ci
+cp .env.example .env.local
+npm run dev        # http://localhost:3000
 ```
 
-Open `http://localhost:3000` in your browser.
+The landing page and template library work without any services. The studio needs Supabase and the
+API; the [developer guide](docs/development.md) covers environment variables, auth setup, the API
+contract and every check script.
 
-## Backend Connection
+| Script | What it does |
+| :-- | :-- |
+| `npm run dev` | Development server |
+| `npm test` | Unit tests |
+| `npm run lint` / `npm run typecheck` | ESLint and `tsc --noEmit` |
+| `npm run build` | Production build |
+| `npm run smoke:frontend` | Smoke-test a deployment (production by default) |
 
-Configure the public backend URL in local and deployed environments:
+## Documentation
 
-```env
-NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
-```
+| Doc | For |
+| :-- | :-- |
+| [Developer guide](docs/development.md) | Local setup, environment variables, auth, API contract, checks |
+| [Operations checklist](docs/operations-checklist.md) | Production health checks and break/fix steps |
+| [Plan rules](docs/plan-rules.md) | Free and Premium entitlements |
+| [Stripe billing](docs/stripe-billing-foundation.md) | Checkout, portal, webhooks and entitlement sync |
 
-For production, Vercel should point to:
+---
 
-```env
-NEXT_PUBLIC_BACKEND_URL=https://roleforge-api-224015900616.us-central1.run.app
-```
-
-The studio expects the backend to provide:
-
-- `GET /health`
-- `GET /ready`
-- `GET /capabilities`
-- `POST /upload`
-- `POST /tailor`
-- `POST /export`
-- `GET /download/{filename}`
-- `HEAD /download/{filename}`
-
-## Auth, Account, and Billing
-
-The studio is protected behind Supabase Auth. Email magic-link sign-in and Google OAuth are wired through Supabase Auth, and completed runs can sync into account-backed saved projects when the user is signed in. Saved runs can restore the studio state when they include a snapshot.
-
-Plan rules live in `docs/plan-rules.md`, and Stripe billing behavior lives in `docs/stripe-billing-foundation.md`. The app uses `account_entitlements` as the account-level source of truth so signed-in users can read their current plan while client-side writes remain blocked.
-
-Billing routes fail closed when account entitlement reads or customer writes are unavailable, returning users to Settings instead of continuing with paid state that cannot be reconciled to their Supabase account.
-
-The Supabase-ready frontend foundation is in place:
-
-- `GET /api/auth/status` reports whether public Supabase environment variables are configured and whether a user session exists.
-- `GET /auth/oauth?provider=google` starts Google OAuth when the Google provider is configured in Supabase.
-- `POST /auth/signin` sends an email magic-link sign-in request.
-- `GET /auth/callback` exchanges the Supabase callback code for a session.
-- `POST /auth/signout` clears the current session.
-- `proxy.ts` refreshes the Supabase SSR session cookies for app routes.
-- `app/lib/supabase/client.ts` creates a browser client only when config exists.
-- `docs/supabase-account-foundation.sql` defines the RLS-backed profile, entitlement, project, and run-history schema applied to the `roleforge-ai` Supabase project.
-
-Add these public environment variables in Vercel:
-
-```env
-NEXT_PUBLIC_SITE_URL=https://roleforgeai.vercel.app
-NEXT_PUBLIC_SUPABASE_URL=https://ijdspodwpkuhwszmvqip.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
-```
-
-Do not add a Supabase `service_role` key or secret key to any `NEXT_PUBLIC_*` variable.
-
-In the Supabase dashboard, configure Auth URLs before testing production email links:
-
-- Site URL: `https://roleforgeai.vercel.app`
-- Redirect URL: `https://roleforgeai.vercel.app/auth/callback`
-- Local redirect URL: `http://localhost:3000/auth/callback`
-
-For email magic links, confirm the email template uses Supabase's confirmation link token that respects the request `redirectTo` value. Old links can expire or keep pointing at an older Site URL, so generate a fresh link after changing Auth URL settings.
-
-For Google OAuth, enable the Google provider in Supabase and use this provider callback URL in the Google Cloud OAuth client:
-
-```text
-https://ijdspodwpkuhwszmvqip.supabase.co/auth/v1/callback
-```
-
-Server-only production variables required for billing and account writes:
-
-```env
-SUPABASE_SERVICE_ROLE_KEY=
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
-STRIPE_PREMIUM_MONTHLY_PRICE_ID=
-STRIPE_PREMIUM_YEARLY_PRICE_ID=
-```
-
-Do not expose these values through `NEXT_PUBLIC_*` variables.
-
-## Production Checks
-
-```bash
-npm run lint
-npm run typecheck
-npm run build
-npm run smoke:frontend
-npm run smoke:readiness
-```
-
-`npm run smoke:frontend` checks the live RoleForge shell, login copy, anonymous `/app`, settings, saved-project, download, billing auth gates, unsigned Stripe webhook rejection, crawler metadata, auth status, and backend `/capabilities` contract against `https://roleforgeai.vercel.app` and the production Cloud Run backend by default. Set `ROLEFORGE_SITE_URL` / `ROLEFORGE_BACKEND_URL`, or pass `--base-url` / `--backend-url`, to target another deployment. For local builds that still emit the production canonical sitemap, pass `--canonical-url`.
-
-```bash
-npm run smoke:frontend -- --base-url http://127.0.0.1:3036 --canonical-url https://roleforgeai.vercel.app --backend-url https://roleforge-api-224015900616.us-central1.run.app
-```
-
-Signed-in smoke is mandatory for the `main` production workflows. Keep GitHub repository variables `ROLEFORGE_SUPABASE_URL` and `ROLEFORGE_SUPABASE_PUBLISHABLE_KEY`, plus repository secrets `ROLEFORGE_SMOKE_EMAIL` and `ROLEFORGE_SMOKE_PASSWORD`, configured for a dedicated non-personal test user. The smoke script signs in through Supabase Auth, builds the same SSR cookie shape used by the app, and verifies signed-in account status, the studio shell, saved-project API access, a saved-project create/rename/delete cleanup round trip, backend workflow export/download bridging, and settings plan details. `ROLEFORGE_SMOKE_COOKIE` remains supported as a fallback for one-off local checks only. Keep `ROLEFORGE_REQUIRE_SIGNED_IN_SMOKE=true` so manual and local readiness checks report the same required contract as CI. If the smoke account should have Premium access, set `ROLEFORGE_EXPECT_PREMIUM_ACCESS=true` so the smoke fails when Premium or DOCX/TXT export access is missing.
-
-`npm run smoke:readiness` checks both GitHub repos for the public variables, private smoke credentials, and "require signed-in smoke" gate variables that keep mandatory signed-in smoke healthy. When something is missing, it prints exact `gh secret set` / `gh variable set` commands with placeholders. It reports secret names only, never secret values.
-
-On GitHub Actions, the frontend CI waits for the Vercel status on the pushed commit before running the production smoke check.
-
-Before changing billing behavior, confirm the Stripe products, price IDs, webhook events, redirect URLs, backend endpoints, and entitlement rules match the current production setup.
-
-Use `docs/operations-checklist.md` for the cross-system production runbook covering frontend smoke, backend smoke, auth, billing, saved projects, exports, and AI tailoring failure checks.
+<p align="center">
+  <img src="docs/brand/mark.svg" width="28" alt=""><br>
+  <sub>Built by <a href="https://agrover7.com">Ashmit Grover</a> · © 2026 Ashmit Grover. All rights reserved.</sub>
+</p>
