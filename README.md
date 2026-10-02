@@ -121,6 +121,7 @@ filter by use case before you open the studio.
 
 | | Studio (free) | Premium |
 | :-- | :-- | :-- |
+| Price | $0 | $9/month or $72/year |
 | Tailoring runs | 5 per month | Unlimited |
 | Upload | DOCX, PDF, TXT | DOCX, PDF, TXT |
 | Export | PDF | PDF, DOCX, TXT |
