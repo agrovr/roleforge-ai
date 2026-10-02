@@ -154,7 +154,7 @@ app/
   page.tsx            landing page
   app/                the resume studio (protected)
   templates/          template library
-  api/                saved runs, account export and delete, billing, auth status, downloads
+  api/                saved runs, account, billing, auth status, downloads
   auth/               OAuth start, magic link, callback, sign-out
   settings/ support/ status/ help/ updates/ privacy/ terms/
   components/         brand, icons, resume previews, studio demo, theme toggle
