@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ResumePreview } from "../components/ResumePreview";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
@@ -108,6 +108,40 @@ export function TemplateLibrary({
 }) {
   const [selectedSlug, setSelectedSlug] = useState<ResumeTemplateSlug>(initialTemplateSlug ?? "classic");
   const [activeGroupId, setActiveGroupId] = useState<TemplateDecisionGroupId>("all");
+  const [previewSize, setPreviewSize] = useState<"small" | "medium" | "large">("medium");
+  const [compareSlugs, setCompareSlugs] = useState<ResumeTemplateSlug[]>([]);
+  const [compareNotice, setCompareNotice] = useState("");
+  const [comparisonLimitSlug, setComparisonLimitSlug] = useState<ResumeTemplateSlug | null>(null);
+  const comparison = useRef<HTMLElement>(null);
+  const browseHeading = useRef<HTMLHeadingElement>(null);
+
+  function selectTemplate(slug: ResumeTemplateSlug) {
+    setSelectedSlug(slug);
+    rememberTemplate(slug);
+  }
+
+  function toggleComparison(slug: ResumeTemplateSlug) {
+    const pinned = compareSlugs.includes(slug);
+    if (!pinned && compareSlugs.length === 3) {
+      setComparisonLimitSlug(slug);
+      setCompareNotice("You can compare up to three templates. Remove one before adding another.");
+      return;
+    }
+    setComparisonLimitSlug(null);
+    setCompareSlugs(pinned ? compareSlugs.filter((item) => item !== slug) : [...compareSlugs, slug]);
+    setCompareNotice(`${getResumeTemplate(slug).name} ${pinned ? "removed from" : "added to"} comparison.`);
+  }
+
+  function removeComparison(slug?: ResumeTemplateSlug) {
+    setComparisonLimitSlug(null);
+    setCompareSlugs(slug ? compareSlugs.filter((item) => item !== slug) : []);
+    setCompareNotice(slug ? `${getResumeTemplate(slug).name} removed from comparison.` : "Comparison cleared.");
+    // The clicked control disappears; keep keyboard focus at a useful destination.
+    requestAnimationFrame(() => {
+      if (slug && compareSlugs.length > 1) comparison.current?.focus();
+      else browseHeading.current?.focus();
+    });
+  }
 
   useEffect(() => {
     const stored = window.localStorage.getItem(RESUME_TEMPLATE_STORAGE_KEY);
@@ -192,7 +226,7 @@ export function TemplateLibrary({
         <div className="templates-decision-head">
           <div>
             <span className="eyebrow">Browse by use case</span>
-            <h2 id="templates-decision-title">Find the right starting point.</h2>
+            <h2 id="templates-decision-title" ref={browseHeading} tabIndex={-1}>Find the right starting point.</h2>
           </div>
           <p>
             Narrow the real formats available in the studio, then compare full previews before choosing what carries into your next export.
@@ -227,13 +261,50 @@ export function TemplateLibrary({
             </button>
           ))}
         </div>
+        <div className="templates-browse-controls">
         <p className="templates-filter-summary" role="status" aria-live="polite">
           <strong>{visibleTemplates.length} {visibleTemplates.length === 1 ? "template" : "templates"}</strong>
           <span>{activeGroup?.detail ?? "Compare every export-backed direction. Essential is the recommended default for most roles."}</span>
         </p>
+        <div className="templates-preview-size" role="group" aria-label="Preview size">
+          {(["small", "medium", "large"] as const).map((size) => (
+            <button key={size} type="button" aria-pressed={previewSize === size} onClick={() => setPreviewSize(size)}>
+              {size[0].toUpperCase() + size.slice(1)}
+            </button>
+          ))}
+        </div>
+        {compareSlugs.length > 0 && <a className="templates-compare-jump" href="#template-comparison">View comparison ({compareSlugs.length}/3)</a>}
+        </div>
       </section>
 
-      <section className="templates-page-grid" aria-label={`${visibleTemplates.length} resume template directions shown`}>
+      <p className="templates-comparison-notice" role="status">{compareNotice}</p>
+      {compareSlugs.length > 0 && (
+        <section className="templates-comparison" id="template-comparison" aria-labelledby="comparison-title" ref={comparison} tabIndex={-1}>
+          <div className="templates-comparison-head">
+            <div><span className="eyebrow">Side by side</span><h2 id="comparison-title">{compareSlugs.length === 1 ? "1 template pinned — add another to compare" : `${compareSlugs.length} templates side by side`}</h2></div>
+            <button className="btn btn-soft" type="button" onClick={() => removeComparison()}>Clear comparison</button>
+          </div>
+          <div className="templates-comparison-grid">
+            {compareSlugs.map((slug) => {
+              const template = getResumeTemplate(slug);
+              const selected = selectedSlug === slug;
+              return <article className="templates-page-card" key={slug} aria-label={`${template.name} comparison`}>
+                <div className="template-thumb" aria-hidden="true"><ResumePreview variant={template.variant} name={template.previewName} role={template.previewRole} highlight={selected} /></div>
+                <div className="templates-page-card-copy">
+                  <h3 className="template-name">{template.name}</h3>
+                  <p>{layoutLabel(template.variant)} — {layoutDetail(template.variant)}</p>
+                  <div className="template-card-actions">
+                    <button className={`btn btn-soft template-select-button${selected ? " selected" : ""}`} type="button" aria-pressed={selected} aria-label={`Select ${template.name} from comparison`} onClick={() => selectTemplate(slug)}>{selected ? "Selected" : "Select"}</button>
+                    <button className="btn btn-ghost" type="button" aria-label={`Remove ${template.name} from comparison`} onClick={() => removeComparison(slug)}>Remove</button>
+                  </div>
+                </div>
+              </article>;
+            })}
+          </div>
+        </section>
+      )}
+
+      <section className="templates-page-grid" id="templates" tabIndex={-1} data-preview-size={previewSize} aria-label={`${visibleTemplates.length} resume template directions shown`}>
         {visibleTemplates.map((template) => {
           const selected = template.slug === selectedSlug;
           return (
@@ -260,14 +331,14 @@ export function TemplateLibrary({
                   <button
                     className={`btn btn-soft btn-sm template-select-button${selected ? " selected" : ""}`}
                     type="button"
-                    onClick={() => {
-                      setSelectedSlug(template.slug);
-                      rememberTemplate(template.slug);
-                    }}
+                    onClick={() => selectTemplate(template.slug)}
                     aria-pressed={selected}
                     aria-label={selected ? `${template.name} template selected` : `Select ${template.name} template`}
                   >
                     {selected ? "Selected" : "Select"} <RoleForgeIcon name={selected ? "check" : "layers"} size={12} />
+                  </button>
+                  <button className="btn btn-soft template-compare-button" type="button" aria-pressed={compareSlugs.includes(template.slug)} aria-describedby={comparisonLimitSlug === template.slug ? `comparison-limit-${template.slug}` : undefined} aria-label={`${compareSlugs.includes(template.slug) ? "Unpin" : "Compare"} ${template.name}`} onClick={() => toggleComparison(template.slug)}>
+                    {compareSlugs.includes(template.slug) ? "Pinned" : "Compare"}
                   </button>
                   <Link
                     className="btn btn-ghost btn-sm"
@@ -277,6 +348,7 @@ export function TemplateLibrary({
                     Studio
                   </Link>
                 </div>
+                {comparisonLimitSlug === template.slug && <p className="template-comparison-limit" id={`comparison-limit-${template.slug}`}>Three templates are pinned. Unpin one to compare {template.name}.</p>}
               </div>
             </article>
           );

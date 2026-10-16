@@ -1,0 +1,12 @@
+.public-info-page { min-height: 100vh; background: var(--bg); color: var(--ink-0); }
+.public-info-page .site-header { padding: 12px clamp(18px, 4vw, 54px); border-bottom: 1px solid var(--line); background: var(--surface); }
+.public-info-tabs { display: flex; justify-content: center; gap: 8px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+.public-info-tabs a { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 18px; border-radius: 10px; color: var(--ink-2); text-decoration: none; }
+.public-info-tabs a[aria-current="page"] { background: var(--ink-0); color: var(--bg); }
+.public-info-page .legal-shell, .public-info-page .not-found-shell, html[data-theme="dark"] .public-info-page .legal-shell, html[data-theme="dark"] .public-info-page .not-found-shell { background: transparent; }
+.public-info-page :focus-visible { outline: 2px solid var(--brand-dark); outline-offset: 3px; }
+.public-info-page .not-found-actions .primary-button,
+html[data-theme="dark"] .public-info-page .not-found-actions .primary-button { color: var(--on-brand); background: var(--brand); border-color: var(--brand); }
+.public-info-page .not-found-actions .primary-button:hover,
+.public-info-page .not-found-actions .primary-button:focus-visible { color: var(--on-brand); background: var(--brand-hover); }
+@media(max-width:600px) { .public-info-page .public-account-signin, .public-info-page .public-account-loading { display: none; } }

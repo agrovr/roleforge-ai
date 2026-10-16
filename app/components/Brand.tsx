@@ -1,7 +1,9 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export function Brand({
   href = "/",
+  label = "RoleForge AI home",
   studio = false,
 }: {
   href?: string;
@@ -9,11 +11,10 @@ export function Brand({
   studio?: boolean;
 }) {
   return (
-    <Link className="brand" href={href} prefetch={false}>
-      <span className="brand-mark" aria-hidden="true">
-        <span className="brand-mark-sheet sheet-one" />
-        <span className="brand-mark-sheet sheet-two" />
-        <span className="brand-mark-letter">R</span>
+    <Link className="brand" href={href} prefetch={false} aria-label={label}>
+      <span className="brand-mark brand-fit-mark" aria-hidden="true">
+        <Image className="brand-light-mark" src="/brand/logo-mark.svg" alt="" width={44} height={44} unoptimized />
+        <Image className="brand-dark-mark" src="/brand/logo-mark-dark.svg" alt="" width={44} height={44} unoptimized />
       </span>
       <span>
         <span className="brand-name">

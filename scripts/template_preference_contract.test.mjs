@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const studioPage = readFileSync("app/app/page.tsx", "utf8");
-const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
+const settingsActions = readFileSync("app/settings/actions.ts", "utf8");
 const templatesPage = readFileSync("app/templates/page.tsx", "utf8");
 const templateLibrary = readFileSync("app/templates/TemplateLibrary.tsx", "utf8");
 
@@ -24,7 +24,7 @@ test("generic Studio entry resolves query then cookie then storage and synchroni
 });
 
 test("Settings writes the same cookie consumed by Templates and Studio", () => {
-  assert.match(settingsPage, /cookieStore\.set\(RESUME_TEMPLATE_COOKIE,\s*template/);
+  assert.match(settingsActions, /set\(RESUME_TEMPLATE_COOKIE, String\(value\)/);
   assert.match(templatesPage, /cookies\(\)/);
   assert.match(templatesPage, /cookieStore\.get\(RESUME_TEMPLATE_COOKIE\)/);
   assert.match(studioPage, /readResumeTemplateCookie\(document\.cookie\)/);

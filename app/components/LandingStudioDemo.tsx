@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { memo, useCallback, useState, type ReactNode } from "react";
 
 import { RoleForgeIcon, type RoleForgeIconName } from "./RoleForgeIcons";
 
@@ -79,6 +79,50 @@ const HISTORY_VERSIONS: ReadonlyArray<{
   { id: "previous", label: "Program manager", date: "Earlier sample", detail: "Professional template · review notes saved" },
 ];
 
+const ResumeDemoContent = memo(function ResumeDemoContent({
+  onOpenFitSignals,
+  onToggleHighlights,
+  resumePreview,
+  showHighlights,
+  studioHref,
+}: {
+  onOpenFitSignals: () => void;
+  onToggleHighlights: () => void;
+  resumePreview: ReactNode;
+  showHighlights: boolean;
+  studioHref: string;
+}) {
+  return (
+    <>
+      <div className="dash-stats" aria-label="Sample workflow readiness">
+        <div className="dash-stat"><div className="dash-stat-label">Resume</div><div className="dash-stat-value">Ready</div><div className="dash-stat-delta">Complete sample</div></div>
+        <div className="dash-stat"><div className="dash-stat-label">Target</div><div className="dash-stat-value">Added</div><div className="dash-stat-delta">Text or URL</div></div>
+        <div className="dash-stat"><div className="dash-stat-label">Export</div><div className="dash-stat-value">PDF</div><div className="dash-stat-delta">Free format</div></div>
+      </div>
+      <div className="dash-resume-card">
+        <div className="dash-resume-thumb" data-highlight={showHighlights} aria-hidden="true">{resumePreview}</div>
+        <div className="dash-resume-info">
+          <div>
+            <h4 className="dash-resume-title">Role-targeted resume draft</h4>
+            <div className="dash-resume-meta"><span>Sample preview</span><span>PDF export</span><span>Review before sending</span></div>
+            <div className="dash-progress">
+              <div className="dash-progress-row"><span>Workflow status</span><span>Ready</span></div>
+              <div className="dash-progress-track"><span /></div>
+            </div>
+          </div>
+          <div className="dash-resume-actions">
+            <button className={`btn btn-soft btn-sm${showHighlights ? " active" : ""}`} type="button" onClick={onToggleHighlights} aria-pressed={showHighlights}>
+              <RoleForgeIcon name="edit" size={13} />{showHighlights ? "Hide" : "Show"} sample change
+            </button>
+            <button className="btn btn-soft btn-sm" type="button" onClick={onOpenFitSignals}><RoleForgeIcon name="chart" size={13} />Fit signals</button>
+            <Link className="btn btn-soft btn-sm" href={studioHref} prefetch={false}><RoleForgeIcon name="arrow" size={13} />Use my resume</Link>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+});
+
 export function LandingStudioDemo({
   studioHref,
   resumePreview,
@@ -94,6 +138,8 @@ export function LandingStudioDemo({
 
   const activeCopy = VIEW_COPY[activeView];
   const selectedHistory = HISTORY_VERSIONS.find((version) => version.id === historyVersion) ?? HISTORY_VERSIONS[0];
+  const openFitSignals = useCallback(() => setActiveView("tailor"), []);
+  const toggleHighlights = useCallback(() => setShowHighlights((current) => !current), []);
 
   function selectView(view: DemoView) {
     setActiveView(view);
@@ -176,36 +222,21 @@ export function LandingStudioDemo({
           </div>
           <span className="sr-only" role="status" aria-live="polite">Showing {activeCopy.title} sample.</span>
 
-          <div className="dash-demo-content" key={activeView}>
-            {activeView === "resume" ? (
-              <>
-                <div className="dash-stats" aria-label="Sample workflow readiness">
-                  <div className="dash-stat"><div className="dash-stat-label">Resume</div><div className="dash-stat-value">Ready</div><div className="dash-stat-delta">Complete sample</div></div>
-                  <div className="dash-stat"><div className="dash-stat-label">Target</div><div className="dash-stat-value">Added</div><div className="dash-stat-delta">Text or URL</div></div>
-                  <div className="dash-stat"><div className="dash-stat-label">Export</div><div className="dash-stat-value">PDF</div><div className="dash-stat-delta">Free format</div></div>
-                </div>
-                <div className="dash-resume-card">
-                  <div className="dash-resume-thumb" data-highlight={showHighlights} aria-hidden="true">{resumePreview}</div>
-                  <div className="dash-resume-info">
-                    <div>
-                      <h4 className="dash-resume-title">Role-targeted resume draft</h4>
-                      <div className="dash-resume-meta"><span>Sample preview</span><span>PDF export</span><span>Review before sending</span></div>
-                      <div className="dash-progress">
-                        <div className="dash-progress-row"><span>Workflow status</span><span>Ready</span></div>
-                        <div className="dash-progress-track"><span /></div>
-                      </div>
-                    </div>
-                    <div className="dash-resume-actions">
-                      <button className={`btn btn-soft btn-sm${showHighlights ? " active" : ""}`} type="button" onClick={() => setShowHighlights((current) => !current)} aria-pressed={showHighlights}>
-                        <RoleForgeIcon name="edit" size={13} />{showHighlights ? "Hide" : "Show"} sample change
-                      </button>
-                      <button className="btn btn-soft btn-sm" type="button" onClick={() => selectView("tailor")}><RoleForgeIcon name="chart" size={13} />Fit signals</button>
-                      <Link className="btn btn-soft btn-sm" href={studioHref} prefetch={false}><RoleForgeIcon name="arrow" size={13} />Use my resume</Link>
-                    </div>
-                  </div>
-                </div>
-              </>
-            ) : null}
+          <div className="dash-demo-content">
+            <div
+              className="dash-demo-resume-panel"
+              data-hidden={activeView !== "resume"}
+              aria-hidden={activeView !== "resume"}
+              inert={activeView === "resume" ? undefined : true}
+            >
+              <ResumeDemoContent
+                onOpenFitSignals={openFitSignals}
+                onToggleHighlights={toggleHighlights}
+                resumePreview={resumePreview}
+                showHighlights={showHighlights}
+                studioHref={studioHref}
+              />
+            </div>
 
             {activeView === "target" ? (
               <section className="dash-demo-surface" aria-labelledby="dash-demo-target-title">

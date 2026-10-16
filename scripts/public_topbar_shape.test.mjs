@@ -31,8 +31,8 @@ test("public legal topbar keeps dark mode and mobile actions shaped safely", () 
   assert.match(globals, /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.legal-topbar\s+\.brand,[\s\S]*?\.public-page-topbar\s+\.brand\s*\{[\s\S]*?transition:\s*none;[\s\S]*?\}/s);
 });
 
-test("templates page uses the polished public topbar shell", () => {
-  assert.match(templatesPage, /className="settings-page-topbar public-page-topbar templates-topbar"/);
+test("templates page uses shared navigation with real account context", () => {
+  assert.match(templatesPage, /<SiteHeader active="templates" studioHref=\{studioHref\} signedIn=\{signedIn\}>/);
 });
 
 test("public topbar has a contained rounded shape with grouped actions", () => {

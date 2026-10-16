@@ -15,7 +15,7 @@ async function readSavedProjectError(response: Response, fallback: string) {
   }
 }
 
-export async function loadSavedRuns(): Promise<SavedHistoryItem[]> {
+export async function loadSavedRuns(requestedRunId?: string): Promise<SavedHistoryItem[]> {
   const response = await fetch("/api/saved-runs", {
     cache: "no-store",
     credentials: "same-origin",
@@ -26,7 +26,14 @@ export async function loadSavedRuns(): Promise<SavedHistoryItem[]> {
   }
 
   const payload = (await response.json()) as { runs?: SavedHistoryItem[] };
-  return payload.runs ?? [];
+  const runs = payload.runs ?? [];
+  if (requestedRunId && /^[0-9a-f-]{36}$/i.test(requestedRunId) && !runs.some((run) => run.accountRunId === requestedRunId)) {
+    const requested = await fetch(`/api/saved-runs?runId=${encodeURIComponent(requestedRunId)}`, { cache: "no-store", credentials: "same-origin" });
+    if (!requested.ok) throw new Error(await readSavedProjectError(requested, "This saved project could not be loaded."));
+    const page = await requested.json() as { runs?: SavedHistoryItem[] };
+    return [...runs, ...(page.runs ?? [])];
+  }
+  return runs;
 }
 
 export async function saveCompletedRun(input: CompletedRunSaveInput): Promise<SavedRunResponse> {

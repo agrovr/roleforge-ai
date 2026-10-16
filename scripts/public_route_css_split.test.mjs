@@ -49,7 +49,7 @@ test("the root not-found fallback does not preload public-page route styles", ()
   const notFound = readFileSync("app/not-found.tsx", "utf8");
 
   assert.match(notFound, /className="not-found-shell"/);
-  assert.match(notFound, /className="settings-page-topbar public-page-topbar"/);
+  assert.match(notFound, /<PublicInfoHeader active="not-found"/);
   assert.match(globalStyles, /\.not-found-shell\s*\{[\s\S]*?min-height:\s*100dvh;/);
   assert.doesNotMatch(notFound, /legal-shell|legal-topbar/);
 });

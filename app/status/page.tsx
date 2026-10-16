@@ -1,10 +1,9 @@
+import { HelpHubHeader } from "../components/HelpHubHeader";
+import { SiteFooter } from "../components/SiteFooter";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Brand } from "../components/Brand";
-import { PublicAccountMenu } from "../components/PublicAccountMenu";
 import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
-import { ThemeToggle } from "../components/ThemeToggle";
 import { billingReadiness } from "../lib/billing/readiness";
 import { getStripeBillingConfig } from "../lib/billing/stripe";
 import { supportRequestHref } from "../lib/supportRequests";
@@ -120,15 +119,15 @@ export default async function StatusPage() {
   const backendUrl = backendBaseUrl();
 
   const freeExports = backend.capabilities?.export_formats.filter((format) => format.enabled && format.plan !== "premium").map((format) => format.label) ?? [];
-  const premiumExports = backend.capabilities?.export_formats.filter((format) => format.enabled && format.plan === "premium").map((format) => format.label) ?? [];
+  const premiumExports = backend.capabilities?.export_formats.filter((format) => format.plan === "premium").map((format) => format.label) ?? [];
   const templateCount = backend.capabilities?.export_templates.length ?? 0;
 
   const items: StatusItem[] = [
     {
       title: "Account access",
-      value: supabaseConfig.configured ? "Operational" : "Unavailable",
+      value: supabaseConfig.configured ? "Configured" : "Unavailable",
       detail: supabaseConfig.configured
-        ? "Google and email sign-in can sync saved projects to Supabase accounts."
+        ? "Account sign-in configuration is present. This check does not perform a sign-in."
         : "Account sign-in is not configured for this deployment.",
       tone: supabaseConfig.configured ? "good" : "warn",
       icon: "lock",
@@ -146,7 +145,7 @@ export default async function StatusPage() {
       title: "Exports",
       value: backend.ok ? "Available" : "Check needed",
       detail: backend.ok
-        ? `Free: ${formatList(freeExports)}. Premium: ${formatList(premiumExports)}. ${templateCount} template directions are advertised.`
+        ? `Free: ${formatList(freeExports)}. Premium formats: ${formatList(premiumExports)}; availability depends on your account access. ${templateCount} template directions are advertised.`
         : "Export availability depends on the resume workflow service.",
       tone: backend.ok ? "good" : "warn",
       icon: "download",
@@ -243,22 +242,9 @@ export default async function StatusPage() {
   ];
 
   return (
-    <main className="legal-shell status-shell">
-      <header className="settings-page-topbar legal-topbar">
-        <Brand href="/" label="RoleForge AI home" />
-        <div className="settings-page-actions">
-          <Link className="btn btn-soft btn-sm" href="/app">Studio</Link>
-          <Link className="btn btn-soft btn-sm" href="/help">Help</Link>
-          <ThemeToggle />
-          <PublicAccountMenu
-            supportHref={supportRequestHref({
-              category: "workflow",
-              subject: "Status page question",
-              contextUrl: "/status",
-            })}
-          />
-        </div>
-      </header>
+    <div className="help-hub-page">
+      <HelpHubHeader active="status" />
+      <main className="legal-shell status-shell" id="help-hub-main">
 
       <section className="legal-hero status-hero" aria-labelledby="status-title">
         <div>
@@ -334,6 +320,8 @@ export default async function StatusPage() {
           <Link className="btn btn-soft btn-sm" href="/help">Help</Link>
         </div>
       </section>
-    </main>
+      </main>
+      <SiteFooter active="/status" variant="compact" />
+    </div>
   );
 }

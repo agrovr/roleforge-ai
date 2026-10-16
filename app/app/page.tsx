@@ -7,10 +7,12 @@ import { AccountReferenceCopyButton } from "../components/AccountReferenceCopyBu
 import { Brand } from "../components/Brand";
 import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
 import { ThemeToggle } from "../components/ThemeToggle";
+import { PasteResumeInput, StudioFirstRunGuide } from "../components/StudioFirstRun";
+import { StudioGatewayFooter, StudioGatewayHeader } from "../components/StudioGatewayChrome";
 import { loadAccountStatus } from "../lib/accountStatusClient";
 import { writeClipboardText } from "../lib/clipboard";
 import { APPLICATION_STATUS_OPTIONS, applicationStatusCopy, type ApplicationStatus } from "../lib/applicationStatus";
-import { downloadStatusFromHead } from "../lib/downloadStatus";
+import { downloadStatusFromHead, readyDownloadStatus } from "../lib/downloadStatus";
 import { normalizeWorkflowDownloadUrl, workflowDownloadUrl } from "../lib/downloadUrls";
 import { FREE_ENTITLEMENT, type AccountEntitlement } from "../lib/entitlements";
 import {
@@ -178,6 +180,7 @@ type InputMode = TargetInputMode;
 type HistoryFilter = "all" | "account" | "local";
 type PreviewUploadState = "idle" | "reading" | "ready" | "error";
 type DownloadState = "idle" | "checking" | "ready" | "expired";
+type DownloadVerification = "fresh" | "verify";
 type ReviewTab = "score" | "gap" | "ats" | "resume" | "cover" | "interview" | "changes" | "history";
 type SavedRunSnapshot = {
   result: TailorResult;
@@ -903,15 +906,9 @@ function StudioAccountGate({ state }: { state: "loading" | "required" }) {
 
   return (
     <main className="login-shell studio-auth-shell">
-      <header className="login-nav studio-auth-nav">
-        <Brand href="/" label="RoleForge AI home" />
-        <div className="login-nav-actions">
-          <ThemeToggle />
-          <Link className="btn btn-soft btn-sm" href="/">Home</Link>
-        </div>
-      </header>
+      <StudioGatewayHeader />
 
-      <section className="login-panel studio-auth-panel" aria-labelledby="studio-auth-title">
+      <section id="top" className="login-panel studio-auth-panel" aria-labelledby="studio-auth-title">
         <div className="login-copy studio-auth-copy">
           <div className="eyebrow">Protected studio</div>
           <h1 id="studio-auth-title" className="display">
@@ -923,15 +920,15 @@ function StudioAccountGate({ state }: { state: "loading" | "required" }) {
               : "The studio stays behind your account so saved projects, exports, and usage stay connected."}
           </p>
           <div className="login-benefits" aria-label="Protected workspace benefits">
-            <span><RoleForgeIcon name="lock" size={14} /> Studio tools stay account protected</span>
-            <span><RoleForgeIcon name="chart" size={14} /> Saved projects reopen cleanly</span>
-            <span><RoleForgeIcon name="download" size={14} /> Exports stay tied to completed runs</span>
+            <span><RoleForgeIcon name="lock" size={14} /><span className="login-benefit-copy">Studio tools stay account protected</span></span>
+            <span><RoleForgeIcon name="chart" size={14} /><span className="login-benefit-copy">Saved projects reopen cleanly</span></span>
+            <span><RoleForgeIcon name="download" size={14} /><span className="login-benefit-copy">Exports stay tied to completed runs</span></span>
           </div>
         </div>
 
         <div className="login-card studio-auth-card">
           <div className="login-card-head">
-            <span className={`login-status ${isLoading ? "neutral" : "info"}`}>
+            <span role="status" className={`login-status ${isLoading ? "neutral" : "info"}`}>
               {isLoading ? "Checking session" : "Account required"}
             </span>
             <h2>{isLoading ? "Almost there" : "Continue to the studio"}</h2>
@@ -955,7 +952,7 @@ function StudioAccountGate({ state }: { state: "loading" | "required" }) {
           ) : (
             <div className="studio-auth-actions">
               <Link className="primary-button studio-account-submit" href="/login?next=%2Fapp&account=signin-required">
-                Sign in
+                Sign in <RoleForgeIcon name="arrow" size={16} />
               </Link>
               <Link className="ghost-button" href="/">
                 Back home
@@ -964,6 +961,7 @@ function StudioAccountGate({ state }: { state: "loading" | "required" }) {
           )}
         </div>
       </section>
+      <StudioGatewayFooter />
     </main>
   );
 }
@@ -1009,6 +1007,7 @@ export default function Page() {
   const [selectedTemplateSlug, setSelectedTemplateSlug] = useState<ResumeTemplateSlug>("classic");
   const [downloadState, setDownloadState] = useState<DownloadState>("idle");
   const [downloadMessage, setDownloadMessage] = useState("");
+  const [downloadVerification, setDownloadVerification] = useState<DownloadVerification>("verify");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [historySyncState, setHistorySyncState] = useState<"local" | "loading" | "synced" | "saving" | "error">("local");
   const [historySyncMessage, setHistorySyncMessage] = useState("Local browser history");
@@ -1178,7 +1177,8 @@ export default function Page() {
     if (!options.quiet) setHistorySyncMessage("Loading saved projects...");
 
     try {
-      const savedRuns = await loadSavedRuns();
+      const requestedRunId = new URLSearchParams(window.location.search).get("historyRun") ?? undefined;
+      const savedRuns = await loadSavedRuns(requestedRunId);
       const savedHistory = savedRuns.map((run) => ({
         ...run,
         source: "account" as const,
@@ -1186,7 +1186,7 @@ export default function Page() {
       }));
 
       setHistory((current) => {
-        const merged = mergeHistory(current.length ? current : loadHistory(), savedHistory);
+        const merged = mergeHistory(current.length ? current : loadHistory(), savedHistory, requestedRunId);
         saveHistory(merged);
         return merged;
       });
@@ -1293,6 +1293,7 @@ export default function Page() {
     setSelectedExportFormat("pdf");
     setDownloadState("idle");
     setDownloadMessage("");
+    setDownloadVerification("verify");
     setJdUrl("");
     setJdText("");
     setCompanyUrl("");
@@ -1451,6 +1452,25 @@ export default function Page() {
 
     return () => window.removeEventListener("hashchange", openHashTarget);
   }, [openGeneratedAsset, openHistoryPanel, openPreviewMode]);
+
+  useEffect(() => {
+    let frame = 0;
+    function focusJobTarget() {
+      if (window.location.hash !== "#target") return;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const editor = document.getElementById("target");
+        if (!editor) return;
+        const input = editor.querySelector<HTMLTextAreaElement | HTMLInputElement>("textarea, input");
+        if (!input) return;
+        input.scrollIntoView({ behavior: "instant", block: "center" });
+        input.focus({ preventScroll: true });
+      });
+    }
+    focusJobTarget();
+    window.addEventListener("hashchange", focusJobTarget);
+    return () => { cancelAnimationFrame(frame); window.removeEventListener("hashchange", focusJobTarget); };
+  }, [accountStatus]);
 
   function clearHistoryHash() {
     if (!["#history", "#cover-letter", "#interview-prep", "#preview-tailored", "#preview-original", "#preview-changes"].includes(window.location.hash)) return;
@@ -1629,6 +1649,7 @@ export default function Page() {
       setSelectedExportFormat("pdf");
       setDownloadState("idle");
       setDownloadMessage("");
+      setDownloadVerification("verify");
       return;
     }
 
@@ -1644,6 +1665,7 @@ export default function Page() {
     setDownloadUrl(null);
     setDownloadFormat("pdf");
     setSelectedExportFormat("pdf");
+    setDownloadVerification("verify");
     setStage("idle");
     setError("");
     setWorkflowError(null);
@@ -1717,6 +1739,13 @@ export default function Page() {
       return;
     }
 
+    if (downloadVerification === "fresh") {
+      const status = readyDownloadStatus(downloadFormat);
+      setDownloadState(status.state);
+      setDownloadMessage(status.message);
+      return;
+    }
+
     const controller = new AbortController();
     setDownloadState("checking");
     setDownloadMessage(`Checking ${downloadFormat.toUpperCase()} download...`);
@@ -1738,7 +1767,7 @@ export default function Page() {
       });
 
     return () => controller.abort();
-  }, [accountStatus?.entitlement, downloadFormat, downloadUrl]);
+  }, [accountStatus?.entitlement, downloadFormat, downloadUrl, downloadVerification]);
 
   const normalizedJobUrl = normalizePublicUrlInput(jdUrl);
   const normalizedCompanyUrl = normalizePublicUrlInput(companyUrl);
@@ -1865,8 +1894,10 @@ export default function Page() {
     if (options.updateActiveDownload ?? true) {
       setDownloadUrl(url);
       setDownloadFormat(format);
-      setDownloadState("checking");
-      setDownloadMessage(`Checking ${format.toUpperCase()} download...`);
+      setDownloadVerification("fresh");
+      const status = readyDownloadStatus(format);
+      setDownloadState(status.state);
+      setDownloadMessage(status.message);
     }
     return url;
   }
@@ -2165,6 +2196,7 @@ export default function Page() {
     setSourcePreviewText(snapshot.sourcePreviewText ?? "");
     setResult(snapshot.result);
     const restoredDownload = restoredHistoryDownloadSelection(entry, accountStatus?.entitlement);
+    setDownloadVerification("verify");
     setDownloadUrl(restoredDownload.url ? normalizeWorkflowDownloadUrl(restoredDownload.url) : null);
     setDownloadFormat(restoredDownload.format);
     setSelectedExportFormat(restoredDownload.format);
@@ -2415,6 +2447,7 @@ export default function Page() {
     setDownloadUrl(null);
     setDownloadFormat("pdf");
     setSelectedExportFormat("pdf");
+    setDownloadVerification("verify");
     setCopyState("");
 
     let tailoredOutput: TailorResult | null = null;
@@ -2546,6 +2579,7 @@ export default function Page() {
 
     const normalizedDownloadUrl = normalizeWorkflowDownloadUrl(restoredDownloadUrl);
     if (normalizedDownloadUrl !== downloadUrl || downloadFormat !== format.format) {
+      setDownloadVerification("verify");
       setDownloadUrl(normalizedDownloadUrl);
       setDownloadFormat(format.format);
       setDownloadState("checking");
@@ -3457,6 +3491,316 @@ export default function Page() {
     ? `${reviewedSuggestionCount}/${suggestionCards.length} reviewed${editSuggestionCount ? ` · ${editSuggestionCount} to edit` : ""}`
     : "Ready after a completed run";
 
+  const intakePanel = (
+<section className="studio-card rf-workflow-card">
+              <div className="studio-card-head">
+                <div>
+                  <div className="eyebrow">New run</div>
+                  <h2 className="panel-title">Resume intake · role target</h2>
+                </div>
+              </div>
+              <div className="rf-workflow-panel rf-intake-grid" aria-label="Workflow controls">
+                <article className="rf-intake-card rf-intake-resume">
+                  <h3 className="rf-intake-card-header">Select Resume</h3>
+                  <div className="rf-intake-card-body">
+                    <label
+                      id="input"
+                      className={file || dragActive ? "rf-file-drop active" : "rf-file-drop"}
+                      onDragEnter={() => setDragActive(true)}
+                      onDragOver={(event) => event.preventDefault()}
+                      onDragLeave={() => setDragActive(false)}
+                      onDrop={onDrop}
+                    >
+                      <input
+                        key={fileInputVersion}
+                        className="rf-file-input"
+                        type="file"
+                        accept={uploadAccept}
+                        onChange={(event) => {
+                          selectResumeFile(event.currentTarget.files?.[0] ?? null);
+                          event.currentTarget.value = "";
+                        }}
+                        aria-label="Upload resume file"
+                        aria-invalid={uploadFailed}
+                        aria-describedby="resumeUploadHint"
+                      />
+                      <span className="rf-file-icon"><RoleForgeIcon name="file" size={24} /></span>
+                      <span className="rf-file-copy">
+                        <strong>{file ? file.name : "Choose a resume file"}</strong>
+                        <small id="resumeUploadHint" aria-live="polite">{uploadStatusCopy}</small>
+                      </span>
+                      <span className="rf-file-action">{file ? "Replace file" : "Choose File"}</span>
+                    </label>
+                    {allowedUploadFormats.includes("txt") && <PasteResumeInput key={fileInputVersion} maxBytes={maxUploadBytes} onUse={selectResumeFile} />}
+                  </div>
+                </article>
+
+                <article className="rf-intake-card rf-intake-target-card">
+                  <h3 className="rf-intake-card-header">
+                    Job Target
+                    {showTargetNext ? <span className="rf-intake-next">Next</span> : null}
+                  </h3>
+                  <div className="rf-intake-card-body">
+                    <div className="rf-target-editor" id="target">
+                      <div className="segment rf-target-segment" role="group" aria-label="Job description input mode">
+                        <button className={inputMode === "text" ? "active" : ""} type="button" aria-pressed={inputMode === "text"} onClick={() => setInputMode("text")}>Paste text</button>
+                        <button className={inputMode === "url" ? "active" : ""} type="button" aria-pressed={inputMode === "url"} onClick={() => setInputMode("url")}>Job URL</button>
+                      </div>
+                      {inputMode === "text" ? (
+                        <>
+                          <textarea
+                            id="jdText"
+                            value={jdText}
+                            onChange={(event) => setJdText(event.target.value)}
+                            placeholder={targetTextPlaceholder}
+                            aria-label="Job description"
+                            aria-invalid={targetInput.descriptionTooLong}
+                            aria-describedby="jdTextHint"
+                          />
+                          <small
+                            className={`rf-target-text-hint${targetInput.descriptionTooLong ? " invalid" : targetInput.nearDescriptionLimit ? " near" : ""}`}
+                            id="jdTextHint"
+                            aria-live="polite"
+                          >
+                            <span>{targetInput.descriptionTooLong ? targetInput.disabledReason : "Paste the full role description; your text stays editable."}</span>
+                            <strong>{targetInput.countLabel}</strong>
+                          </small>
+                        </>
+                      ) : (
+                        <>
+                          <input
+                            id="jdUrl"
+                            type="url"
+                            inputMode="url"
+                            autoCapitalize="none"
+                            spellCheck={false}
+                            value={jdUrl}
+                            onChange={(event) => setJdUrl(event.target.value)}
+                            onBlur={() => {
+                              if (normalizedJobUrl && normalizedJobUrl !== jdUrl.trim()) setJdUrl(normalizedJobUrl);
+                            }}
+                            placeholder={targetUrlPlaceholder}
+                            aria-label="Job posting URL"
+                            aria-invalid={jobUrlInvalid}
+                            aria-describedby="jdUrlHint"
+                          />
+                          <small className={`rf-url-hint${jobUrlInvalid ? " invalid" : normalizedJobUrl ? " ready" : ""}`} id="jdUrlHint">
+                            {jobUrlHint}
+                          </small>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </article>
+
+                <article className="rf-intake-card rf-intake-config">
+                  <h3 className="rf-intake-card-header">Tailor settings</h3>
+                  <div className="rf-intake-card-body">
+                    <div className="rf-run-controls">
+                      <div className="rf-config-label">Tailoring mode</div>
+                      <div className="segment mode-segment" role="group" aria-label="Tailoring mode">
+                        <button className={tailoringMode === "conservative" ? "active" : ""} type="button" aria-pressed={tailoringMode === "conservative"} onClick={() => setTailoringMode("conservative")}>Conservative</button>
+                        <button className={tailoringMode === "balanced" ? "active" : ""} type="button" aria-pressed={tailoringMode === "balanced"} onClick={() => setTailoringMode("balanced")}>Balanced</button>
+                        <button className={tailoringMode === "aggressive" ? "active" : ""} type="button" aria-pressed={tailoringMode === "aggressive"} onClick={() => setTailoringMode("aggressive")}>Aggressive</button>
+                      </div>
+                      <label className="rf-company-field">
+                        <span>Company context</span>
+                        <input
+                          type="url"
+                          inputMode="url"
+                          autoCapitalize="none"
+                          spellCheck={false}
+                          value={companyUrl}
+                          onChange={(event) => setCompanyUrl(event.target.value)}
+                          onBlur={() => {
+                            if (normalizedCompanyUrl && normalizedCompanyUrl !== companyUrl.trim()) setCompanyUrl(normalizedCompanyUrl);
+                          }}
+                          placeholder="Optional company URL"
+                          aria-label="Company URL"
+                          aria-invalid={companyUrlInvalid}
+                          aria-describedby="companyUrlHint"
+                        />
+                        <small className={`rf-url-hint${companyUrlInvalid ? " invalid" : normalizedCompanyUrl ? " ready" : ""}`} id="companyUrlHint">
+                          {companyUrlHint}
+                        </small>
+                      </label>
+                      <span className="sr-only" aria-live="polite">Workflow status: {stage}</span>
+                      <button className="primary-button" type="button" onClick={onRun} disabled={!canRun} title={runDisabledReason || undefined}>{runLabel} <RoleForgeIcon name="sparkle" size={14} /></button>
+                      {runNextAction ? (
+                        <Link
+                          className="studio-run-next-action compact"
+                          href={runNextAction.href}
+                          onClick={runNextAction.recheckWorkflow ? () => void checkWorkflowReadiness() : undefined}
+                        >
+                          <RoleForgeIcon name="arrow" size={13} />
+                          <span>
+                            <strong>{runNextAction.label}</strong>
+                            <small>{runNextAction.detail}</small>
+                          </span>
+                        </Link>
+                      ) : null}
+                      {copyState ? <span className="copy-state">{copyState}</span> : null}
+                    </div>
+                  </div>
+                </article>
+                <section className="rf-preflight-panel" id="preflight" aria-label="Workflow preflight">
+                  <div className="rf-preflight-head">
+                    <div>
+                      <div className="eyebrow">Preflight</div>
+                      <h3>{preflightStatusLabel}</h3>
+                      <p>{preflightStatusDetail}</p>
+                    </div>
+                    <span className={`rf-preflight-score ${canRun ? "ready" : ""}`}>
+                      {preflightReadyCount}/{preflightItems.length}
+                    </span>
+                  </div>
+                  <div className="rf-preflight-list">
+                    {preflightItems.map((item) => (
+                      <a
+                        className={`rf-preflight-item ${item.tone}`}
+                        href={
+                          item.label === "Account"
+                            ? "#account"
+                            : item.label === "Resume"
+                              ? "#input"
+                              : item.label === "Target"
+                                ? "#target"
+                                : item.label === "Usage"
+                                  ? "#account"
+                                  : "#assets"
+                        }
+                        key={item.label}
+                      >
+                        <span className="rf-preflight-icon" aria-hidden="true">
+                          <RoleForgeIcon name={item.icon} size={15} />
+                        </span>
+                        <span className="rf-preflight-copy">
+                          <span>{item.label}</span>
+                          <strong>{item.value}</strong>
+                          <small>{item.detail}</small>
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                </section>
+                {premiumExportRequested ? (
+                  <div className="rf-callout upgrade">
+                    <strong>
+                      {premiumExportSyncing
+                        ? `${premiumExportRequested.label} export is still syncing with your Premium plan`
+                        : `${premiumExportRequested.label} export is included with Premium`}
+                    </strong>
+                    <p>
+                      {premiumExportSyncing
+                        ? "Try again in a moment, or open Settings to refresh your plan state. PDF remains available while your export access catches up."
+                        : premiumBillingReady
+                          ? "Upgrade to export DOCX and TXT files, or keep using PDF on the free plan."
+                          : "Premium checkout is unavailable right now. Keep using PDF export on the free plan."}
+                    </p>
+                    <div className="rf-callout-actions">
+                      <Link className="primary-button" href="/settings#billing">
+                        {premiumExportSyncing || !premiumBillingReady ? "Open settings" : "View plans"} <RoleForgeIcon name="sparkle" size={14} />
+                      </Link>
+                      <Link className="ghost-button" href={premiumExportSupportHref}>
+                        Contact support
+                      </Link>
+                      <button
+                        className="ghost-button"
+                        type="button"
+                        onClick={() => {
+                          setSelectedExportFormat("pdf");
+                          setExportNotice(null);
+                          setWorkflowError(null);
+                          setError("");
+                          setStage(result ? "ready" : "idle");
+                        }}
+                      >
+                        Use PDF
+                      </button>
+                    </div>
+                  </div>
+                ) : limitReached ? (
+                  <div className="rf-callout upgrade">
+                    <strong>Free monthly limit reached</strong>
+                    <p>
+                      {monthlyRunAllowanceSentence(typeof monthlyRunLimit === "number" ? monthlyRunLimit : FREE_ENTITLEMENT.monthlyRunLimit)}
+                    </p>
+                    <div className="rf-callout-meta">
+                      <span>{usageLabel}</span>
+                      {resetLabel ? <span>Resets {resetLabel}</span> : null}
+                    </div>
+                    <div className="rf-callout-actions">
+                      <Link className="primary-button" href="/settings#billing">Upgrade plan <RoleForgeIcon name="sparkle" size={14} /></Link>
+                      <Link className="ghost-button" href="/settings#usage">View usage</Link>
+                    </div>
+                  </div>
+                ) : error && workflowError ? (
+                  <div className="rf-callout danger rf-recovery-card" role="alert" aria-label="Workflow recovery">
+                    <div className="rf-recovery-head">
+                      <span className="rf-recovery-icon" aria-hidden="true">
+                        <RoleForgeIcon name="settings" size={16} />
+                      </span>
+                      <div>
+                        <span className="eyebrow">Recovery checklist</span>
+                        <strong>{workflowRecoveryTitle}</strong>
+                        <p>{error}</p>
+                      </div>
+                    </div>
+                    <div className="rf-recovery-detail">
+                      <p>{workflowRecoveryDetail}</p>
+                      {workflowError.requestId ? <span>Request {workflowError.requestId}</span> : null}
+                    </div>
+                    <div className="rf-recovery-steps" aria-label="Recovery steps">
+                      {workflowRecoverySteps.map((step, index) => (
+                        <span key={step}>
+                          <strong>{index + 1}</strong>
+                          {step}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="rf-callout-actions rf-recovery-actions">
+                      <button
+                        className="primary-button"
+                        type="button"
+                        onClick={
+                          workflowError.code === "entitlement_verification_failed"
+                            ? () => void onExportSelectedFormat()
+                            : workflowError.code === "ai_not_configured"
+                              ? () => void checkWorkflowReadiness()
+                              : onRun
+                        }
+                        disabled={
+                          workflowError.code === "entitlement_verification_failed"
+                            ? !result?.tailored_text?.trim() || busy
+                            : workflowError.code === "ai_not_configured"
+                              ? workflowAvailability === "checking" || busy
+                              : !canRun || busy
+                        }
+                      >
+                        {workflowError.code === "entitlement_verification_failed"
+                          ? `Retry ${selectedFormatLabel} export`
+                          : workflowError.code === "ai_not_configured"
+                            ? workflowAvailability === "checking"
+                              ? "Checking workflow..."
+                              : "Check workflow"
+                            : "Retry workflow"}{" "}
+                        <RoleForgeIcon name="arrow" size={14} />
+                      </button>
+                      <Link className="ghost-button" href="/status">Check status</Link>
+                      <Link className="ghost-button" href="/help#try-first">Help guide</Link>
+                      <Link className="ghost-button" href={workflowSupportHref}>Contact support</Link>
+                    </div>
+                  </div>
+                ) : error ? (
+                  <div className="rf-callout danger">
+                    <strong>Workflow stopped</strong>
+                    <p>{error}</p>
+                  </div>
+                ) : null}
+              </div>
+            </section>
+  );
+
   if (accountStatus === null) {
     return <StudioAccountGate state="loading" />;
   }
@@ -3466,7 +3810,7 @@ export default function Page() {
   }
 
   return (
-    <main className="page-shell rf-studio-page">
+    <main className={`page-shell rf-studio-page${hasActiveWorkspace ? "" : " rf-first-run"}`}>
       <div className="rf-studio-shell">
         <header className="rf-studio-topbar" aria-label="Studio controls">
           <div className="rf-studio-breadcrumb">
@@ -3742,12 +4086,20 @@ export default function Page() {
             <div className="rail-section-title">Build</div>
             <a className={`rail-item ${editorRailActive ? "active" : ""}`} href="#editor" onClick={() => setActiveTab("score")}><RoleForgeIcon name="doc" size={15} /> Editor</a>
             <a className={`rail-item ${targetRailActive ? "active" : ""}`} href="#target" onClick={() => setActiveTab("gap")}><RoleForgeIcon name="target" size={15} /> Job target</a>
+            {hasActiveWorkspace ? <>
             <a className={`rail-item ${suggestionsRailActive ? "active" : ""}`} href="#suggestions" onClick={() => setActiveTab("changes")}><RoleForgeIcon name="sparkle" size={15} /> AI tailor <span className="rail-pill">{suggestionCards.length || 0}</span></a>
             <a className={`rail-item ${atsRailActive ? "active" : ""}`} href="#ats" onClick={() => setActiveTab("ats")}><RoleForgeIcon name="scan" size={15} /> ATS check</a>
             <a className={`rail-item ${coverRailActive ? "active" : ""}`} href="#cover-letter" onClick={(event) => { event.preventDefault(); openGeneratedAsset("cover"); }}><RoleForgeIcon name="mail" size={15} /> Cover letter</a>
             <a className={`rail-item ${interviewRailActive ? "active" : ""}`} href="#interview-prep" onClick={(event) => { event.preventDefault(); openGeneratedAsset("interview"); }}><RoleForgeIcon name="briefcase" size={15} /> Interview prep</a>
+            </> : <>
+              <span className="rail-item studio-rail-unavailable" aria-disabled="true"><RoleForgeIcon name="sparkle" size={15} /> AI tailor <span className="rail-pill">Next</span></span>
+              <span className="rail-item studio-rail-unavailable" aria-disabled="true"><RoleForgeIcon name="scan" size={15} /> ATS check</span>
+              <span className="rail-item studio-rail-unavailable" aria-disabled="true"><RoleForgeIcon name="mail" size={15} /> Cover letter</span>
+              <span className="rail-item studio-rail-unavailable" aria-disabled="true"><RoleForgeIcon name="briefcase" size={15} /> Interview prep</span>
+            </>}
             <div className="rail-divider" />
             <div className="rail-section-title">Workspace</div>
+            <Link className="rail-item" href="/home"><RoleForgeIcon name="doc" size={15} /> Projects</Link>
             <Link className="rail-item" href="/templates"><RoleForgeIcon name="layers" size={15} /> Templates</Link>
             <button className={`rail-item ${activeTab === "history" ? "active" : ""}`} type="button" aria-pressed={activeTab === "history"} onClick={openHistoryPanel}><RoleForgeIcon name="chart" size={15} /> History</button>
             <Link className="rail-item" href="/settings"><RoleForgeIcon name="settings" size={15} /> Settings</Link>
@@ -3759,6 +4111,17 @@ export default function Page() {
           </aside>
 
           <section className="rf-studio-main" id="editor" ref={editorSectionRef} tabIndex={-1}>
+            {!hasActiveWorkspace && <div className="studio-first-welcome"><div className="eyebrow">{hasActiveWorkspace ? "Prepare your next run" : "First run"}</div><h1>Start with your resume.</h1><p>Upload your resume, then add the role you are targeting. Review the generated draft before you export.</p></div>}
+            <div className="studio-run-summary"><span>{accountUsageValue} · {accountUsageCaption}</span><Link href="/home">Your projects →</Link></div>
+            <ol className="studio-run-progress" aria-label="Resume workflow progress">{[
+              { label: "Upload", done: previewUploadState === "ready" && Boolean(uploadMeta), href: "#input" },
+              { label: "Target", done: hasTarget && !targetInvalid, href: "#target" },
+              { label: "Tailor", done: hasTailoredDraft, href: "#preflight" },
+              { label: "Export", done: selectedDownloadReady, href: hasActiveWorkspace ? "#preview" : "#preflight" },
+            ].map((step, index, steps) => <li key={step.label} className={step.done ? "complete" : ""}><a href={step.href} aria-current={!step.done && steps.slice(0, index).every((previous) => previous.done) ? "step" : undefined}><span aria-hidden="true">{step.done ? "✓" : index + 1}</span><strong>{step.label}</strong><small>{step.done ? "Ready" : steps.slice(0, index).every((previous) => previous.done) ? "Next" : "Waiting"}</small></a></li>)}</ol>
+            {!hasTailoredDraft ? intakePanel : null}
+            {!hasActiveWorkspace && <StudioFirstRunGuide selected={selectedTemplateSlug} onSelect={(slug) => { setSelectedTemplateSlug(slug); saveResumeTemplatePreference(slug); }} />}
+            {hasActiveWorkspace && <>
             <div className="rf-studio-hero">
               <div>
                 <div className="eyebrow">Active resume</div>
@@ -4063,7 +4426,12 @@ export default function Page() {
                       <div className="ats-dot"><RoleForgeIcon name={issue.severity?.toLowerCase().includes("high") ? "sparkle" : "check"} size={11} /></div>
                       <div><strong>{issue.issue}</strong><p>{issue.fix}</p></div>
                     </article>
-                  )) : (
+                  )) : result ? (
+                    <article className={`ats-item ${result.ats_after ? "good" : "warn"}`}>
+                      <div className="ats-dot"><RoleForgeIcon name={result.ats_after ? "check" : "sparkle"} size={11} /></div>
+                      <div><strong>{result.ats_after ? "No parser issues returned" : "Parser report unavailable"}</strong><p>Review the exported document for formatting and accuracy before applying.</p></div>
+                    </article>
+                  ) : (
                     <>
                       <article className="ats-item good"><div className="ats-dot"><RoleForgeIcon name="check" size={11} /></div><div><strong>Headings ready for review</strong><p>Run the workflow to surface parser notes.</p></div></article>
                       <article className="ats-item good"><div className="ats-dot"><RoleForgeIcon name="check" size={11} /></div><div><strong>Single-column check</strong><p>Formatting notes will appear when the run completes.</p></div></article>
@@ -4135,312 +4503,8 @@ export default function Page() {
               </div>
             </section>
 
-            <section className="studio-card rf-workflow-card">
-              <div className="studio-card-head">
-                <div>
-                  <div className="eyebrow">New run</div>
-                  <h2 className="panel-title">Resume intake · role target</h2>
-                </div>
-              </div>
-              <div className="rf-workflow-panel rf-intake-grid" aria-label="Workflow controls">
-                <article className="rf-intake-card rf-intake-resume">
-                  <h3 className="rf-intake-card-header">Select Resume</h3>
-                  <div className="rf-intake-card-body">
-                    <label
-                      id="input"
-                      className={file || dragActive ? "rf-file-drop active" : "rf-file-drop"}
-                      onDragEnter={() => setDragActive(true)}
-                      onDragOver={(event) => event.preventDefault()}
-                      onDragLeave={() => setDragActive(false)}
-                      onDrop={onDrop}
-                    >
-                      <input
-                        key={fileInputVersion}
-                        className="rf-file-input"
-                        type="file"
-                        accept={uploadAccept}
-                        onChange={(event) => {
-                          selectResumeFile(event.currentTarget.files?.[0] ?? null);
-                          event.currentTarget.value = "";
-                        }}
-                        aria-label="Upload resume file"
-                        aria-invalid={uploadFailed}
-                        aria-describedby="resumeUploadHint"
-                      />
-                      <span className="rf-file-icon"><RoleForgeIcon name="file" size={24} /></span>
-                      <span className="rf-file-copy">
-                        <strong>{file ? file.name : "Choose a resume file"}</strong>
-                        <small id="resumeUploadHint" aria-live="polite">{uploadStatusCopy}</small>
-                      </span>
-                      <span className="rf-file-action">{file ? "Replace file" : "Choose File"}</span>
-                    </label>
-                  </div>
-                </article>
-
-                <article className="rf-intake-card rf-intake-target-card">
-                  <h3 className="rf-intake-card-header">
-                    Job Target
-                    {showTargetNext ? <span className="rf-intake-next">Next</span> : null}
-                  </h3>
-                  <div className="rf-intake-card-body">
-                    <div className="rf-target-editor" id="target">
-                      <div className="segment rf-target-segment" role="group" aria-label="Job description input mode">
-                        <button className={inputMode === "text" ? "active" : ""} type="button" aria-pressed={inputMode === "text"} onClick={() => setInputMode("text")}>Paste text</button>
-                        <button className={inputMode === "url" ? "active" : ""} type="button" aria-pressed={inputMode === "url"} onClick={() => setInputMode("url")}>Job URL</button>
-                      </div>
-                      {inputMode === "text" ? (
-                        <>
-                          <textarea
-                            id="jdText"
-                            value={jdText}
-                            onChange={(event) => setJdText(event.target.value)}
-                            placeholder={targetTextPlaceholder}
-                            aria-label="Job description"
-                            aria-invalid={targetInput.descriptionTooLong}
-                            aria-describedby="jdTextHint"
-                          />
-                          <small
-                            className={`rf-target-text-hint${targetInput.descriptionTooLong ? " invalid" : targetInput.nearDescriptionLimit ? " near" : ""}`}
-                            id="jdTextHint"
-                            aria-live="polite"
-                          >
-                            <span>{targetInput.descriptionTooLong ? targetInput.disabledReason : "Paste the full role description; your text stays editable."}</span>
-                            <strong>{targetInput.countLabel}</strong>
-                          </small>
-                        </>
-                      ) : (
-                        <>
-                          <input
-                            id="jdUrl"
-                            type="url"
-                            inputMode="url"
-                            autoCapitalize="none"
-                            spellCheck={false}
-                            value={jdUrl}
-                            onChange={(event) => setJdUrl(event.target.value)}
-                            onBlur={() => {
-                              if (normalizedJobUrl && normalizedJobUrl !== jdUrl.trim()) setJdUrl(normalizedJobUrl);
-                            }}
-                            placeholder={targetUrlPlaceholder}
-                            aria-label="Job posting URL"
-                            aria-invalid={jobUrlInvalid}
-                            aria-describedby="jdUrlHint"
-                          />
-                          <small className={`rf-url-hint${jobUrlInvalid ? " invalid" : normalizedJobUrl ? " ready" : ""}`} id="jdUrlHint">
-                            {jobUrlHint}
-                          </small>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </article>
-
-                <article className="rf-intake-card rf-intake-config">
-                  <h3 className="rf-intake-card-header">Tailor settings</h3>
-                  <div className="rf-intake-card-body">
-                    <div className="rf-run-controls">
-                      <div className="rf-config-label">Tailoring mode</div>
-                      <div className="segment mode-segment" role="group" aria-label="Tailoring mode">
-                        <button className={tailoringMode === "conservative" ? "active" : ""} type="button" aria-pressed={tailoringMode === "conservative"} onClick={() => setTailoringMode("conservative")}>Conservative</button>
-                        <button className={tailoringMode === "balanced" ? "active" : ""} type="button" aria-pressed={tailoringMode === "balanced"} onClick={() => setTailoringMode("balanced")}>Balanced</button>
-                        <button className={tailoringMode === "aggressive" ? "active" : ""} type="button" aria-pressed={tailoringMode === "aggressive"} onClick={() => setTailoringMode("aggressive")}>Aggressive</button>
-                      </div>
-                      <label className="rf-company-field">
-                        <span>Company context</span>
-                        <input
-                          type="url"
-                          inputMode="url"
-                          autoCapitalize="none"
-                          spellCheck={false}
-                          value={companyUrl}
-                          onChange={(event) => setCompanyUrl(event.target.value)}
-                          onBlur={() => {
-                            if (normalizedCompanyUrl && normalizedCompanyUrl !== companyUrl.trim()) setCompanyUrl(normalizedCompanyUrl);
-                          }}
-                          placeholder="Optional company URL"
-                          aria-label="Company URL"
-                          aria-invalid={companyUrlInvalid}
-                          aria-describedby="companyUrlHint"
-                        />
-                        <small className={`rf-url-hint${companyUrlInvalid ? " invalid" : normalizedCompanyUrl ? " ready" : ""}`} id="companyUrlHint">
-                          {companyUrlHint}
-                        </small>
-                      </label>
-                      <span className="sr-only" aria-live="polite">Workflow status: {stage}</span>
-                      <button className="primary-button" type="button" onClick={onRun} disabled={!canRun} title={runDisabledReason || undefined}>{runLabel} <RoleForgeIcon name="sparkle" size={14} /></button>
-                      {runNextAction ? (
-                        <Link
-                          className="studio-run-next-action compact"
-                          href={runNextAction.href}
-                          onClick={runNextAction.recheckWorkflow ? () => void checkWorkflowReadiness() : undefined}
-                        >
-                          <RoleForgeIcon name="arrow" size={13} />
-                          <span>
-                            <strong>{runNextAction.label}</strong>
-                            <small>{runNextAction.detail}</small>
-                          </span>
-                        </Link>
-                      ) : null}
-                      {copyState ? <span className="copy-state">{copyState}</span> : null}
-                    </div>
-                  </div>
-                </article>
-                <section className="rf-preflight-panel" id="preflight" aria-label="Workflow preflight">
-                  <div className="rf-preflight-head">
-                    <div>
-                      <div className="eyebrow">Preflight</div>
-                      <h3>{preflightStatusLabel}</h3>
-                      <p>{preflightStatusDetail}</p>
-                    </div>
-                    <span className={`rf-preflight-score ${canRun ? "ready" : ""}`}>
-                      {preflightReadyCount}/{preflightItems.length}
-                    </span>
-                  </div>
-                  <div className="rf-preflight-list">
-                    {preflightItems.map((item) => (
-                      <a
-                        className={`rf-preflight-item ${item.tone}`}
-                        href={
-                          item.label === "Account"
-                            ? "#account"
-                            : item.label === "Resume"
-                              ? "#input"
-                              : item.label === "Target"
-                                ? "#target"
-                                : item.label === "Usage"
-                                  ? "#account"
-                                  : "#assets"
-                        }
-                        key={item.label}
-                      >
-                        <span className="rf-preflight-icon" aria-hidden="true">
-                          <RoleForgeIcon name={item.icon} size={15} />
-                        </span>
-                        <span className="rf-preflight-copy">
-                          <span>{item.label}</span>
-                          <strong>{item.value}</strong>
-                          <small>{item.detail}</small>
-                        </span>
-                      </a>
-                    ))}
-                  </div>
-                </section>
-                {premiumExportRequested ? (
-                  <div className="rf-callout upgrade">
-                    <strong>
-                      {premiumExportSyncing
-                        ? `${premiumExportRequested.label} export is still syncing with your Premium plan`
-                        : `${premiumExportRequested.label} export is included with Premium`}
-                    </strong>
-                    <p>
-                      {premiumExportSyncing
-                        ? "Try again in a moment, or open Settings to refresh your plan state. PDF remains available while your export access catches up."
-                        : premiumBillingReady
-                          ? "Upgrade to export DOCX and TXT files, or keep using PDF on the free plan."
-                          : "Premium checkout is unavailable right now. Keep using PDF export on the free plan."}
-                    </p>
-                    <div className="rf-callout-actions">
-                      <Link className="primary-button" href="/settings#billing">
-                        {premiumExportSyncing || !premiumBillingReady ? "Open settings" : "View plans"} <RoleForgeIcon name="sparkle" size={14} />
-                      </Link>
-                      <Link className="ghost-button" href={premiumExportSupportHref}>
-                        Contact support
-                      </Link>
-                      <button
-                        className="ghost-button"
-                        type="button"
-                        onClick={() => {
-                          setSelectedExportFormat("pdf");
-                          setExportNotice(null);
-                          setWorkflowError(null);
-                          setError("");
-                          setStage(result ? "ready" : "idle");
-                        }}
-                      >
-                        Use PDF
-                      </button>
-                    </div>
-                  </div>
-                ) : limitReached ? (
-                  <div className="rf-callout upgrade">
-                    <strong>Free monthly limit reached</strong>
-                    <p>
-                      {monthlyRunAllowanceSentence(typeof monthlyRunLimit === "number" ? monthlyRunLimit : FREE_ENTITLEMENT.monthlyRunLimit)}
-                    </p>
-                    <div className="rf-callout-meta">
-                      <span>{usageLabel}</span>
-                      {resetLabel ? <span>Resets {resetLabel}</span> : null}
-                    </div>
-                    <div className="rf-callout-actions">
-                      <Link className="primary-button" href="/settings#billing">Upgrade plan <RoleForgeIcon name="sparkle" size={14} /></Link>
-                      <Link className="ghost-button" href="/settings#usage">View usage</Link>
-                    </div>
-                  </div>
-                ) : error && workflowError ? (
-                  <div className="rf-callout danger rf-recovery-card" role="alert" aria-label="Workflow recovery">
-                    <div className="rf-recovery-head">
-                      <span className="rf-recovery-icon" aria-hidden="true">
-                        <RoleForgeIcon name="settings" size={16} />
-                      </span>
-                      <div>
-                        <span className="eyebrow">Recovery checklist</span>
-                        <strong>{workflowRecoveryTitle}</strong>
-                        <p>{error}</p>
-                      </div>
-                    </div>
-                    <div className="rf-recovery-detail">
-                      <p>{workflowRecoveryDetail}</p>
-                      {workflowError.requestId ? <span>Request {workflowError.requestId}</span> : null}
-                    </div>
-                    <div className="rf-recovery-steps" aria-label="Recovery steps">
-                      {workflowRecoverySteps.map((step, index) => (
-                        <span key={step}>
-                          <strong>{index + 1}</strong>
-                          {step}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="rf-callout-actions rf-recovery-actions">
-                      <button
-                        className="primary-button"
-                        type="button"
-                        onClick={
-                          workflowError.code === "entitlement_verification_failed"
-                            ? () => void onExportSelectedFormat()
-                            : workflowError.code === "ai_not_configured"
-                              ? () => void checkWorkflowReadiness()
-                              : onRun
-                        }
-                        disabled={
-                          workflowError.code === "entitlement_verification_failed"
-                            ? !result?.tailored_text?.trim() || busy
-                            : workflowError.code === "ai_not_configured"
-                              ? workflowAvailability === "checking" || busy
-                              : !canRun || busy
-                        }
-                      >
-                        {workflowError.code === "entitlement_verification_failed"
-                          ? `Retry ${selectedFormatLabel} export`
-                          : workflowError.code === "ai_not_configured"
-                            ? workflowAvailability === "checking"
-                              ? "Checking workflow..."
-                              : "Check workflow"
-                            : "Retry workflow"}{" "}
-                        <RoleForgeIcon name="arrow" size={14} />
-                      </button>
-                      <Link className="ghost-button" href="/status">Check status</Link>
-                      <Link className="ghost-button" href="/help#try-first">Help guide</Link>
-                      <Link className="ghost-button" href={workflowSupportHref}>Contact support</Link>
-                    </div>
-                  </div>
-                ) : error ? (
-                  <div className="rf-callout danger">
-                    <strong>Workflow stopped</strong>
-                    <p>{error}</p>
-                  </div>
-                ) : null}
-              </div>
-            </section>
+            </>}
+            {hasTailoredDraft ? intakePanel : null}
 
             {activeTab === "history" ? (
               <section className="studio-card studio-history-panel" id="history" ref={historySectionRef}>

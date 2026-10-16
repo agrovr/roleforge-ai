@@ -32,5 +32,5 @@ test("landing emits an early anchor bootstrap after the target sections", () => 
   assert.match(bootstrap, /addEventListener\("load", align, \{ once: true \}\)/);
   assert.match(bootstrap, /root\.style\.scrollBehavior = "auto";[\s\S]*?scrollIntoView\(\{ behavior: "auto", block: "start", inline: "nearest" \}\);[\s\S]*?root\.style\.scrollBehavior = previousScrollBehavior;/);
   assert.match(landing, /import \{ LandingAnchorBootstrap \} from "\.\/components\/LandingAnchorBootstrap";/);
-  assert.match(landing, /<Footer \/>[\s\S]*?<LandingAnchorBootstrap \/>/);
+  assert.match(landing, /<SiteFooter \/>[\s\S]*?<LandingAnchorBootstrap \/>/);
 });

@@ -1,0 +1,26 @@
+.rf-admin-page { background: var(--bg); color: var(--ink-0); }
+.rf-admin-page .site-header { padding: 12px clamp(18px, 4vw, 54px); background: var(--surface); border-bottom: 1px solid var(--line); }
+.rf-admin-page :is(.admin-queue-search, .admin-bulk-bar, .admin-queue-range) { width: min(1120px, 100%); margin-inline: auto; }
+.rf-admin-page .site-header-context { color: var(--ink-3); font-size: .75rem; white-space: nowrap; }
+@media(max-width:1120px) { .rf-admin-page .site-header-context { display: none; } }
+@media(max-width:600px) { .rf-admin-page .public-account-signin, .rf-admin-page .public-account-loading { display: none; } }
+.rf-admin-page .admin-support-shell, html[data-theme="dark"] .rf-admin-page .admin-support-shell { background: transparent; }
+.rf-admin-page .admin-support-filter button { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); color: var(--ink-0); font: inherit; cursor: pointer; }
+.rf-admin-page .admin-support-filter button.active { background: var(--ink-0); color: var(--bg); }
+.rf-admin-page .admin-queue-search { display: grid; gap: 8px; margin: 24px auto 16px; }
+.rf-admin-page .admin-queue-search label { font-weight: 700; }
+.rf-admin-page .admin-queue-search input { width: 100%; min-height: 48px; padding: 12px 16px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); color: var(--ink-0); font: inherit; }
+.rf-admin-page .admin-queue-search > span, .rf-admin-page .admin-queue-range { color: var(--ink-3); font-size: .85rem; }
+.rf-admin-page .admin-bulk-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+.rf-admin-page .admin-bulk-bar button, .rf-admin-page .admin-reply-snippets button, .rf-admin-page .admin-queue-pagination button { min-height: 44px; padding: 9px 12px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--surface-2); color: var(--ink-0); font: inherit; font-size: .82rem; cursor: pointer; }
+.rf-admin-page .admin-select-all { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 6px; }
+.rf-admin-page .admin-select-all input, .rf-admin-page .admin-case-select input { width: 22px; height: 22px; accent-color: var(--brand-dark); cursor: pointer; }
+.rf-admin-page .admin-case-select { display: flex; align-items: center; justify-content: center; flex: 0 0 44px; width: 44px; height: 44px; cursor: pointer; }
+.rf-admin-page .admin-reply-snippets { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.rf-admin-page .admin-reply-snippets button.recommended { border-color: var(--brand); background: var(--brand-soft); }
+.rf-admin-page .admin-queue-pagination { display: flex; justify-content: center; gap: 16px; align-items: center; margin: 24px 0; }
+.rf-admin-page .admin-support-action.primary, html[data-theme="dark"] .rf-admin-page .admin-support-action.primary { color: var(--on-brand); background: var(--brand); border-color: var(--brand); }
+.rf-admin-page button:disabled { opacity: .5; cursor: default; }
+.rf-admin-page :focus-visible { outline: 2px solid var(--brand-dark); outline-offset: 3px; }
+.rf-admin-page .admin-support-notice:empty { display: none; }
+@media(max-width:600px) { .rf-admin-page .admin-bulk-bar { gap: 8px; } .rf-admin-page .admin-support-card-heading { flex-wrap: wrap; } }

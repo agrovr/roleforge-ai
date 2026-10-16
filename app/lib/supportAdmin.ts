@@ -172,6 +172,25 @@ export async function loadAdminSupportRequests(client: SupabaseClient, options: 
   return (data ?? []).map((row) => normalizeAdminSupportRequest(row as Record<string, unknown>));
 }
 
+// Read every page before exposing query counts, including references derived from IDs.
+// A failed page rejects the load rather than presenting an incomplete queue as complete.
+export async function loadAdminSupportQueue(client: SupabaseClient) {
+  const requests = new Map<string, AdminSupportRequest>();
+  const pageSize = 200;
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await client.from("support_requests")
+      .select("id, user_id, email, category, subject, message, context_url, status, created_at, updated_at")
+      .order("created_at", { ascending: false }).order("id", { ascending: false })
+      .range(offset, offset + pageSize - 1);
+    if (error) throw error;
+    for (const row of data ?? []) {
+      const request = normalizeAdminSupportRequest(row as Record<string, unknown>);
+      requests.set(request.id, request);
+    }
+    if (!data || data.length < pageSize) return [...requests.values()];
+  }
+}
+
 async function countAdminSupportRequests(client: SupabaseClient, status?: SupportRequestStatus) {
   let query = client
     .from("support_requests")

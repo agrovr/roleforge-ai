@@ -10,7 +10,7 @@ const smokeLayout = readFileSync("scripts/smoke_layout.mjs", "utf8");
 
 test("not found page provides branded recovery without generic framework UI", () => {
   assert.match(notFoundPage, /className="not-found-shell"/);
-  assert.match(notFoundPage, /className="settings-page-topbar public-page-topbar"/);
+  assert.match(notFoundPage, /<PublicInfoHeader active="not-found"/);
   assert.doesNotMatch(notFoundPage, /legal-shell|legal-topbar/);
   assert.match(notFoundPage, /Route not found/);
   assert.match(notFoundPage, /This page slipped out of the stack\./);
@@ -19,7 +19,7 @@ test("not found page provides branded recovery without generic framework UI", ()
   assert.match(notFoundPage, /href:\s*"\/templates"/);
   assert.match(notFoundPage, /href:\s*"\/status"/);
   assert.match(notFoundPage, /href:\s*"\/support"/);
-  assert.match(notFoundPage, /<ThemeToggle \/>/);
+  assert.match(readFileSync("app/components/SiteHeader.tsx", "utf8"), /<ThemeToggle \/>/);
 });
 
 test("not found surface has detailed responsive visual treatment", () => {

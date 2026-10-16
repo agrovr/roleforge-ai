@@ -3888,6 +3888,71 @@ html[data-theme="dark"] .rf-rail-upgrade p {
 }
 
 @media (max-width: 1180px) {
+  .rf-studio-rail,
+  .rf-rail-upgrade,
+  .rail-item {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .rf-studio-rail {
+    min-height: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: inline proximity;
+    scrollbar-width: thin;
+  }
+
+  .rf-studio-rail .rail-section-title,
+  .rf-studio-rail .rail-divider {
+    display: none;
+  }
+
+  .rf-studio-rail .rail-item {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding-inline: 12px;
+    scroll-snap-align: start;
+  }
+
+  .rf-studio-rail .rail-pill {
+    margin-left: 2px;
+  }
+
+  .rf-studio-rail .rf-rail-upgrade {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    margin-top: 0;
+    padding: 8px 10px;
+    border-radius: 12px;
+    box-shadow: none;
+    scroll-snap-align: end;
+  }
+
+  .rf-studio-rail .rf-rail-upgrade strong,
+  .rf-studio-rail .rf-rail-upgrade .primary-button {
+    white-space: nowrap;
+  }
+
+  .rf-studio-rail .rf-rail-upgrade p {
+    display: none;
+  }
+
+  .rf-studio-rail .rf-rail-upgrade .primary-button {
+    width: auto;
+    min-height: 36px;
+    padding-inline: 12px;
+  }
+
+
   .rf-studio-topbar,
   .rf-studio-layout,
   .rf-workflow-panel,
@@ -3952,70 +4017,6 @@ html[data-theme="dark"] .rf-rail-upgrade p {
 
   .studio-account-menu {
     justify-self: start;
-  }
-
-  .rf-studio-rail,
-  .rf-rail-upgrade,
-  .rail-item {
-    max-width: 100%;
-    overflow: hidden;
-  }
-
-  .rf-studio-rail {
-    min-height: auto;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-    padding: 10px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    overscroll-behavior-inline: contain;
-    scroll-snap-type: inline proximity;
-    scrollbar-width: thin;
-  }
-
-  .rf-studio-rail .rail-section-title,
-  .rf-studio-rail .rail-divider {
-    display: none;
-  }
-
-  .rf-studio-rail .rail-item {
-    flex: 0 0 auto;
-    min-height: 44px;
-    padding-inline: 12px;
-    scroll-snap-align: start;
-  }
-
-  .rf-studio-rail .rail-pill {
-    margin-left: 2px;
-  }
-
-  .rf-studio-rail .rf-rail-upgrade {
-    flex: 0 0 auto;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 8px;
-    margin-top: 0;
-    padding: 8px 10px;
-    border-radius: 12px;
-    box-shadow: none;
-    scroll-snap-align: end;
-  }
-
-  .rf-studio-rail .rf-rail-upgrade strong,
-  .rf-studio-rail .rf-rail-upgrade .primary-button {
-    white-space: nowrap;
-  }
-
-  .rf-studio-rail .rf-rail-upgrade p {
-    display: none;
-  }
-
-  .rf-studio-rail .rf-rail-upgrade .primary-button {
-    width: auto;
-    min-height: 36px;
-    padding-inline: 12px;
   }
 
   .rf-studio-top-actions,

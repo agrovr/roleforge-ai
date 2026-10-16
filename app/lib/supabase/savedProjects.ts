@@ -159,13 +159,31 @@ function hasSavedProjectSurface(run: TailorRunRow) {
 }
 
 export async function loadSavedRuns(client: SupabaseClient, userId: string): Promise<SavedHistoryItem[]> {
-  const selectSavedRuns = (select: string) =>
-    client
+  return (await loadSavedRunsPage(client, userId)).runs;
+}
+
+export type SavedRunsPage = { runs: SavedHistoryItem[]; nextOffset: number | null };
+
+export async function loadSavedRunsPage(
+  client: SupabaseClient,
+  userId: string,
+  options?: { offset: number; runId?: string },
+): Promise<SavedRunsPage> {
+  const offset = options?.offset ?? 0;
+  if (!Number.isSafeInteger(offset) || offset < 0) throw new Error("Invalid saved runs offset");
+  const pageSize = 12;
+  const selectSavedRuns = (select: string) => {
+    let query = client
       .from("tailor_runs")
       .select(select)
       .eq("user_id", userId)
-      .order("created_at", { ascending: false })
-      .limit(12);
+      .order("created_at", { ascending: false });
+    if (options?.runId) return query.eq("id", options.runId).limit(1);
+    if (!options) return query.limit(pageSize);
+    query = query.order("id", { ascending: false });
+    // One extra raw row determines continuation even when usage-only rows are hidden.
+    return query.range(offset, offset + pageSize);
+  };
 
   let { data, error } = await selectSavedRuns(
     "id, client_history_id, project_id, created_at, source_resume_name, job_target, mode, fit_score, download_format, download_url, export_template, payload",
@@ -180,7 +198,8 @@ export async function loadSavedRuns(client: SupabaseClient, userId: string): Pro
   if (error) throw error;
 
   const runs = (data ?? []) as unknown as TailorRunRow[];
-  const visibleRuns = runs.filter(hasSavedProjectSurface);
+  const nextOffset = options && !options.runId && runs.length > pageSize ? offset + pageSize : null;
+  const visibleRuns = runs.slice(0, pageSize).filter(hasSavedProjectSurface);
   const projectIds = Array.from(new Set(visibleRuns.map((run) => run.project_id).filter(Boolean)));
   const projectTitles = new Map<string, string>();
   const projectStatuses = new Map<string, ApplicationStatus>();
@@ -200,7 +219,7 @@ export async function loadSavedRuns(client: SupabaseClient, userId: string): Pro
     });
   }
 
-  return visibleRuns.map((run) => {
+  const savedRuns: SavedHistoryItem[] = visibleRuns.map((run) => {
     const rawSnapshot = (run.payload?.studioSnapshot as Record<string, unknown> | undefined) ?? undefined;
     const templateSnapshot = snapshotWithTemplate(rawSnapshot, run.export_template);
     const downloadFormat = run.download_format || "pdf";
@@ -228,6 +247,7 @@ export async function loadSavedRuns(client: SupabaseClient, userId: string): Pro
       snapshot,
     };
   });
+  return { runs: savedRuns, nextOffset };
 }
 
 export async function updateSavedProjectStatus(
@@ -236,16 +256,19 @@ export async function updateSavedProjectStatus(
   status: ApplicationStatus,
   userId: string,
 ) {
-  const { error } = await client
+  const { data, error } = await client
     .from("resume_projects")
     .update({
       status,
       updated_at: new Date().toISOString(),
     })
     .eq("id", projectId)
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .select("id")
+    .maybeSingle();
 
   if (error) throw error;
+  if (!data) throw new Error("Project is no longer available. Refresh your projects and try again.");
   return status;
 }
 

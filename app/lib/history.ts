@@ -410,6 +410,7 @@ export function groupHistoryItems<TSnapshot extends HistorySnapshot>(
 export function mergeHistory<TSnapshot extends HistorySnapshot>(
   localItems: HistoryItem<TSnapshot>[],
   savedItems: HistoryItem<TSnapshot>[],
+  requestedRunId?: string,
 ) {
   const merged = new Map<string, HistoryItem<TSnapshot>>();
 
@@ -435,7 +436,9 @@ export function mergeHistory<TSnapshot extends HistorySnapshot>(
     );
   });
 
-  return [...merged.values()]
-    .sort((a, b) => historySortValue(b) - historySortValue(a))
-    .slice(0, 12);
+  const sorted = [...merged.values()].sort((a, b) => historySortValue(b) - historySortValue(a));
+  const recent = sorted.slice(0, 12);
+  const requested = requestedRunId ? sorted.find((item) => item.accountRunId === requestedRunId) : undefined;
+  if (requested && !recent.includes(requested)) return [...recent.slice(0, 11), requested];
+  return recent;
 }

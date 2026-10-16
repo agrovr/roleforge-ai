@@ -1,12 +1,12 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import { Brand } from "@/app/components/Brand";
+import { SiteHeader } from "@/app/components/SiteHeader";
+import { SiteFooter } from "@/app/components/SiteFooter";
+import { PublicAccountMenu } from "@/app/components/PublicAccountMenu";
 import { RoleForgeIcon } from "@/app/components/RoleForgeIcons";
 import {
   isSupportAdminUser,
-  loadAdminSupportRequests,
-  loadAdminSupportSummary,
+  loadAdminSupportQueue,
   parseAdminSupportStatus,
   supportOperatorReadiness,
   type AdminSupportRequest,
@@ -14,7 +14,9 @@ import {
 import { createRoleForgeRouteClient } from "@/app/lib/supabase/routeClient";
 import { createRoleForgeServiceClient } from "@/app/lib/supabase/service";
 
-import { SupportSubmitButton } from "./SupportSubmitButton";
+import { SupportQueue } from "./SupportQueue";
+import { updateSupportSelection } from "./bulk";
+import { supportQueueCounts } from "@/app/lib/supportQueue";
 
 type AdminSupportPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -47,19 +49,6 @@ function statusNotice(value: string | undefined) {
   }
 }
 
-function SupportStatusForm({ request, status, label, icon, returnStatus }: { request: AdminSupportRequest; status: "open" | "reviewing" | "closed"; label: string; icon: "check" | "mail" | "undo"; returnStatus: "open" | "reviewing" | "closed" | "all" }) {
-  const disabled = request.status === status;
-  return (
-    <form action="/admin/support/actions" method="post">
-      <input type="hidden" name="id" value={request.id} />
-      <input type="hidden" name="status" value={status} />
-      <input type="hidden" name="version" value={request.updatedAt} />
-      <input type="hidden" name="returnStatus" value={returnStatus} />
-      <SupportSubmitButton disabled={disabled} icon={icon} label={label} pendingLabel="Updating…" />
-    </form>
-  );
-}
-
 function readinessTone(ready: boolean) {
   return ready ? "ready" : "needs-setup";
 }
@@ -86,10 +75,8 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
 
   if (serviceClient) {
     try {
-      [requests, summary] = await Promise.all([
-        loadAdminSupportRequests(serviceClient, { status, limit: 40 }),
-        loadAdminSupportSummary(serviceClient),
-      ]);
+      requests = await loadAdminSupportQueue(serviceClient);
+      summary = supportQueueCounts(requests);
     } catch (error) {
       loadError = true;
       console.error("Admin support inbox load failed", error);
@@ -148,23 +135,13 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
     },
   ] as const;
   const requiredSetupCount = readinessCards.filter((item) => item.required && !item.ready).length;
-  const filterCounts = {
-    open: summary.open,
-    reviewing: summary.reviewing,
-    closed: summary.closed,
-    all: summary.all,
-  } as const;
-
   return (
-    <main className="admin-support-shell">
-      <header className="admin-support-commandbar" aria-label="Support operator navigation">
-        <Brand href="/" label="RoleForge AI home" />
-        <nav aria-label="Operator shortcuts">
-          <Link href="/app"><RoleForgeIcon name="file" size={14} /> Studio</Link>
-          <Link href="/support"><RoleForgeIcon name="mail" size={14} /> Support page</Link>
-          <Link href="/settings"><RoleForgeIcon name="settings" size={14} /> Settings</Link>
-        </nav>
-      </header>
+    <>
+      <a className="site-skip-link" href="#admin-support-main">Skip to support inbox</a>
+      <SiteHeader signedIn studioHref="/app" context="Operator inbox" navigationLinks={[["Projects", "/home", "projects"], ["Studio", "/app", "studio"], ["Support page", "/support", "support"], ["Settings", "/settings", "settings"]]}>
+        <PublicAccountMenu supportHref="/support" />
+      </SiteHeader>
+    <main className="admin-support-shell" id="admin-support-main">
 
       <section className="admin-support-hero" aria-label="Support inbox overview">
         <div>
@@ -173,7 +150,7 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
           <p>Review customer requests, reply by email, and update the status from any browser.</p>
         </div>
         <div className="admin-support-stats" aria-label="Support inbox counts">
-          <span><strong>{requests.length}</strong> shown</span>
+          <span><strong>{requests.length}</strong> requests</span>
           <span><strong>{summary.open}</strong> open</span>
           <span><strong>{summary.reviewing}</strong> reviewing</span>
         </div>
@@ -219,122 +196,9 @@ export default async function AdminSupportPage({ searchParams }: AdminSupportPag
         </div>
       </details>
 
-      <nav className="admin-support-filter" aria-label="Support request filters">
-        {(["open", "reviewing", "closed", "all"] as const).map((item) => (
-          <Link className={status === item ? "active" : ""} href={`/admin/support?status=${item}`} key={item} aria-current={status === item ? "page" : undefined}>
-            <span>{item === "all" ? "All" : item[0].toUpperCase() + item.slice(1)}</span>
-            <strong>{filterCounts[item]}</strong>
-          </Link>
-        ))}
-      </nav>
-
-      <section className="admin-support-list" aria-label="Support request list">
-        {requests.length ? requests.map((request) => {
-          return (
-            <article className="admin-support-card" data-status={request.status} aria-labelledby={`support-request-${request.id}`} key={request.id}>
-              <header>
-                <div className="admin-support-card-heading">
-                  <span className="admin-support-reference">{request.referenceLabel}</span>
-                  <span className={`admin-support-status ${request.status}`}>{request.statusLabel}</span>
-                </div>
-                <div className="admin-support-card-copy">
-                  <h2 id={`support-request-${request.id}`}>{request.subject}</h2>
-                  <p>{request.categoryLabel} · {request.createdLabel}</p>
-                </div>
-              </header>
-              <div className="admin-support-card-body">
-                <div className="admin-support-case">
-                  <span className="admin-support-panel-label">Customer request</span>
-                  <p className="admin-support-message">{request.message}</p>
-                  <dl className="admin-support-meta">
-                    <div>
-                      <dt>Customer</dt>
-                      <dd>{request.email}</dd>
-                    </div>
-                    {request.contextUrl ? (
-                      <div>
-                        <dt>Context</dt>
-                        <dd>{request.contextUrl}</dd>
-                      </div>
-                    ) : null}
-                  </dl>
-                  <div className="admin-support-next-step" aria-label="Recommended support workflow">
-                    <RoleForgeIcon name={request.status === "closed" ? "check" : "sparkle"} size={15} />
-                    <span>
-                      {request.status === "closed"
-                        ? "Resolved. Reopen only if the customer needs another pass."
-                        : "Recommended: send a customer-safe reply, mark reviewing while you investigate, then close after the customer has an answer."}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="admin-support-workbench">
-                  <span className="admin-support-panel-label">Response workspace</span>
-                  <form className="admin-support-reply-form" action="/admin/support/reply" method="post">
-                    <input type="hidden" name="id" value={request.id} />
-                    <input type="hidden" name="version" value={request.updatedAt} />
-                    <input type="hidden" name="returnStatus" value={status} />
-                    <label htmlFor={`reply-${request.id}`}>Customer-safe reply</label>
-                    <textarea
-                      id={`reply-${request.id}`}
-                      name="message"
-                      rows={5}
-                      minLength={12}
-                      maxLength={2000}
-                      placeholder={`Hi,\n\nThanks for reaching out. I checked ${request.referenceLabel} and...`}
-                      disabled={!readiness.customerReplyReady || request.email === "No email"}
-                    />
-                    <div className="admin-support-reply-footer">
-                      <span>
-                        {readiness.customerReplyReady
-                          ? "Sent from the configured support sender, not your private Gmail."
-                          : "Customer replies are paused until a verified support sender is configured. Your private Gmail stays hidden."}
-                      </span>
-                      <div>
-                        <SupportSubmitButton
-                          className="admin-support-action primary"
-                          name="nextStatus"
-                          value="reviewing"
-                          disabled={!readiness.customerReplyReady || request.email === "No email"}
-                          icon="mail"
-                          label="Send reply"
-                          pendingLabel="Sending…"
-                        />
-                        <SupportSubmitButton
-                          name="nextStatus"
-                          value="closed"
-                          disabled={!readiness.customerReplyReady || request.email === "No email"}
-                          icon="check"
-                          label="Send and close"
-                          pendingLabel="Sending and closing…"
-                        />
-                      </div>
-                    </div>
-                  </form>
-                  <div className="admin-support-actions">
-                    <span className="admin-support-actions-label">Queue status</span>
-                    <SupportStatusForm request={request} status="reviewing" label="Reviewing" icon="mail" returnStatus={status} />
-                    <SupportStatusForm request={request} status="closed" label="Close" icon="check" returnStatus={status} />
-                    {request.status === "closed" ? <SupportStatusForm request={request} status="open" label="Reopen" icon="undo" returnStatus={status} /> : null}
-                  </div>
-                </div>
-              </div>
-            </article>
-          );
-        }) : loadError ? (
-          <article className="admin-support-empty is-error">
-            <RoleForgeIcon name="settings" size={18} />
-            <strong>Could not load this queue</strong>
-            <p>Refresh the page or check the support database connection. Existing requests remain unchanged.</p>
-          </article>
-        ) : (
-          <article className="admin-support-empty">
-            <RoleForgeIcon name="check" size={18} />
-            <strong>No support requests in this view</strong>
-            <p>New requests will appear here after customers send them from the Support page.</p>
-          </article>
-        )}
-      </section>
+      <SupportQueue initialRequests={requests} initialStatus={status} readiness={readiness} loadError={loadError || !serviceClient} updateAction={updateSupportSelection} />
     </main>
+    <SiteFooter variant="compact" />
+    </>
   );
 }

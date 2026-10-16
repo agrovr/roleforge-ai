@@ -124,10 +124,10 @@ test("updates saved project application status", async () => {
               assert.equal(column, "id");
               assert.equal(value, "project-1");
               return {
-                async eq(nextColumn: string, nextValue: string) {
+                eq(nextColumn: string, nextValue: string) {
                   assert.equal(nextColumn, "user_id");
                   assert.equal(nextValue, "user-123");
-                  return { error: null };
+                  return { select(column: string) { assert.equal(column, "id"); return { async maybeSingle() { return { data: { id: "project-1" }, error: null }; } }; } };
                 },
               };
             },

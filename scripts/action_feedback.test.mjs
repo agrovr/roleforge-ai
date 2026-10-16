@@ -6,6 +6,7 @@ const actionButton = readFileSync("app/components/ActionSubmitButton.tsx", "utf8
 const nativeActionForm = readFileSync("app/components/NativeActionForm.tsx", "utf8");
 const loginPage = readFileSync("app/login/page.tsx", "utf8");
 const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
+const drafts = readFileSync("app/settings/SettingsDrafts.tsx", "utf8");
 const stylesheet = [readFileSync("app/globals.css", "utf8"), readFileSync("app/settings/settings.css", "utf8")].join("\n");
 
 test("shared action buttons expose the active submission without allowing duplicate submits", () => {
@@ -34,19 +35,14 @@ test("email sign-in reports that the secure link request is in progress", () => 
   assert.match(loginPage, /action="\/auth\/signin"/);
 });
 
-test("settings account and preference forms report pending work", () => {
-  assert.match(settingsPage, /pendingLabel="Saving name…"/);
-  assert.match(settingsPage, /pendingLabel="Sending confirmation…"/);
-  assert.match(settingsPage, /pendingLabel="Saving direction…"/);
-  assert.match(settingsPage, /pendingLabel="Saving preferences…"/);
-  assert.match(settingsPage, /pendingLabel="Deleting account…"/);
-});
-
-test("saved project controls identify only the submitted operation as pending", () => {
-  assert.match(settingsPage, /name="status"[\s\S]*?pendingLabel="Updating…"[\s\S]*?value=\{option\.status\}/);
-  assert.match(settingsPage, /<ActionSubmitButton label="Save" pendingLabel="Saving…" \/>/);
-  assert.match(settingsPage, /<ActionSubmitButton label="Remove" pendingLabel="Removing…" \/>/);
-  assert.match(stylesheet, /\.settings-project-stage-controls button:disabled:not\(\.active\):not\(\.is-pending\)/);
+test("settings draft saves announce pending work and prevent duplicate requests", () => {
+  assert.match(drafts, /if \(saving.current\) return/);
+  assert.match(drafts, /aria-busy=\{busy\}/);
+  assert.match(drafts, /Saving changes/);
+  assert.match(drafts, /disabled=\{busy \|\| !changed\}/);
+  assert.match(settingsPage, /pendingLabel="Sending confirmation/);
+  assert.match(settingsPage, /pendingLabel="Deleting account/);
+  assert.match(settingsPage, /pendingLabel="Removing/);
 });
 
 test("settings results are placed beside the anchor-targeted section", () => {

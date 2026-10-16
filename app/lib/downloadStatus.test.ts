@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { downloadStatusFromHead } from "./downloadStatus";
+import { downloadStatusFromHead, readyDownloadStatus } from "./downloadStatus";
+
+test("marks a newly persisted export as ready without another network check", () => {
+  assert.deepEqual(readyDownloadStatus("pdf"), {
+    state: "ready",
+    message: "PDF download is ready",
+  });
+});
 
 test("marks successful download checks as ready", () => {
   assert.deepEqual(downloadStatusFromHead("pdf", 200), {

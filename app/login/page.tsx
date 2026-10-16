@@ -1,11 +1,10 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { Brand } from "../components/Brand";
+import { SiteHeader } from "../components/SiteHeader";
+import { SiteFooter } from "../components/SiteFooter";
 import { ActionSubmitButton } from "../components/ActionSubmitButton";
 import { NativeActionForm } from "../components/NativeActionForm";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
-import { ThemeToggle } from "../components/ThemeToggle";
 import { loginNoticeCopy, loginNoticeTone, shouldShowLoginStatus } from "../lib/loginNotice";
 import { safeRedirectPath } from "../lib/safeRedirect";
 import { getSupabaseConfig } from "../lib/supabase/config";
@@ -40,14 +39,9 @@ export default async function LoginPage({ searchParams }: { searchParams: LoginS
   }
 
   return (
-    <main className="login-shell">
-      <header className="login-nav">
-        <Brand href="/" label="RoleForge AI home" />
-        <div className="login-nav-actions">
-          <ThemeToggle />
-          <Link className="btn btn-soft btn-sm" href="/">Home</Link>
-        </div>
-      </header>
+    <main className="login-shell login-page">
+      <a className="site-skip-link" href="#signin">Skip to sign-in</a>
+      <SiteHeader />
 
       <section className="login-panel" aria-labelledby="login-title">
         <div className="login-copy">
@@ -56,7 +50,7 @@ export default async function LoginPage({ searchParams }: { searchParams: LoginS
           <p>{introNotice}</p>
         </div>
 
-        <div className="login-card">
+        <div className="login-card" id="signin" tabIndex={-1}>
           {config.configured ? (
             <>
               <div className="login-card-head">
@@ -81,11 +75,16 @@ export default async function LoginPage({ searchParams }: { searchParams: LoginS
                 Continue with Google
               </a>
               <div className="studio-account-divider"><span>Email sign-in</span></div>
+              {account === "check-email" && <div className="login-email-sent">
+                <strong>Check your inbox</strong>
+                <p>Use the secure link to continue. Check your spam folder if it has not arrived. You can enter your email below to request another link.</p>
+              </div>}
               <NativeActionForm className="studio-account-form" action="/auth/signin">
                 <input type="hidden" name="next" value={next} />
                 <input type="hidden" name="statusNext" value={statusNext} />
                 <label htmlFor="login-email">Email address</label>
-                <input id="login-email" name="email" type="email" autoComplete="email" required placeholder="you@example.com" />
+                <input id="login-email" name="email" type="email" autoComplete="email" required placeholder="you@example.com" aria-describedby="login-email-hint" />
+                <small id="login-email-hint">We’ll email you a secure sign-in link. No password needed.</small>
                 <ActionSubmitButton
                   className="primary-button studio-account-submit"
                   label="Send sign-in link"
@@ -129,6 +128,7 @@ export default async function LoginPage({ searchParams }: { searchParams: LoginS
           </div>
         </div>
       </section>
+      <SiteFooter />
     </main>
   );
 }

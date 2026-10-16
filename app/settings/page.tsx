@@ -4,18 +4,15 @@ import { redirect } from "next/navigation";
 
 import { AccountAvatar } from "../components/AccountAvatar";
 import { ActionSubmitButton } from "../components/ActionSubmitButton";
-import { Brand } from "../components/Brand";
+import { SiteHeader } from "../components/SiteHeader";
+import { SiteFooter } from "../components/SiteFooter";
 import { NativeActionForm } from "../components/NativeActionForm";
-import { ResumePreview } from "../components/ResumePreview";
 import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
 import { SupportReferenceCopyButton } from "../components/SupportReferenceCopyButton";
-import { ThemeToggle } from "../components/ThemeToggle";
 import { validateAccountEmail } from "../lib/accountEmail";
 import {
   DEFAULT_COMMUNICATION_PREFERENCES,
   loadAccountProfile,
-  saveAccountProfile,
-  saveCommunicationPreferences,
 } from "../lib/accountProfile";
 import {
   accountAvatarUrl,
@@ -25,7 +22,6 @@ import {
   accountSecurityDateLabel,
   accountSignInMethodLabel,
 } from "../lib/accountUser";
-import { APPLICATION_STATUS_OPTIONS, isApplicationStatus } from "../lib/applicationStatus";
 import { billingStateDetail, billingStateLabel, billingStatusTone } from "../lib/billing/display";
 import { reconcileUserSubscriptionEntitlement, syncCheckoutSessionEntitlement } from "../lib/billing/entitlements";
 import { billingNotice } from "../lib/billing/notices";
@@ -34,9 +30,7 @@ import { getStripeBillingConfig, PREMIUM_PRICE } from "../lib/billing/stripe";
 import { loadAccountEntitlement } from "../lib/entitlements";
 import {
   RESUME_TEMPLATE_COOKIE,
-  RESUME_TEMPLATES,
   getResumeTemplate,
-  isResumeTemplateSlug,
   resumeTemplateStudioHref,
 } from "../lib/resumeTemplates";
 import { settingsDocumentCounts, settingsDocumentSummaries, settingsProjectStageSummaries, settingsProjectSummaries } from "../lib/settingsProjects";
@@ -44,7 +38,7 @@ import { getConfiguredSiteOrigin } from "../lib/siteUrl";
 import { isSupportAdminUser } from "../lib/supportAdmin";
 import { loadSupportRequests, supportRequestHref } from "../lib/supportRequests";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
-import { deleteSavedProject, loadSavedRuns, renameSavedProject, updateSavedProjectStatus } from "../lib/supabase/savedProjects";
+import { deleteSavedProject, loadSavedRuns } from "../lib/supabase/savedProjects";
 import {
   loadAccountUsage,
   monthlyRunAllowanceLabel,
@@ -56,6 +50,8 @@ import { BillingSubmitButton } from "./BillingSubmitButton";
 import { AccountEmailCopyButton } from "./AccountEmailCopyButton";
 import { AccountReferenceCopyButton } from "../components/AccountReferenceCopyButton";
 import { SettingsSectionNav } from "./SettingsSectionNav";
+import { SettingsDraftProvider, SettingsDraftField, SettingsDraftProject, SettingsDraftTemplates } from "./SettingsDrafts";
+import { saveSettingsDraft } from "./actions";
 
 type CountResult = { count: number | null; error: unknown };
 type ExportRow = {
@@ -163,34 +159,6 @@ async function countRows(
   return error ? 0 : count ?? 0;
 }
 
-async function updateAccountProfileAction(formData: FormData) {
-  "use server";
-
-  const supabase = await createRoleForgeServerClient();
-  if (!supabase) {
-    redirect("/login?next=/settings&account=signin-required");
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login?next=/settings&account=signin-required");
-  }
-
-  try {
-    await saveAccountProfile(supabase, user, {
-      displayName: formData.get("displayName"),
-    });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "";
-    redirect(`/settings?account=${message.includes("80 characters") ? "profile-invalid" : "profile-unavailable"}#account`);
-  }
-
-  redirect("/settings?account=profile-saved#account");
-}
-
 async function updateAccountEmailAction(formData: FormData) {
   "use server";
 
@@ -223,126 +191,6 @@ async function updateAccountEmailAction(formData: FormData) {
   }
 
   redirect("/settings?account=email-change-sent#account-email");
-}
-
-async function updateTemplatePreferenceAction(formData: FormData) {
-  "use server";
-
-  const supabase = await createRoleForgeServerClient();
-  if (!supabase) {
-    redirect("/login?next=/settings&account=signin-required");
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login?next=/settings&account=signin-required");
-  }
-
-  const template = formData.get("template");
-  if (typeof template !== "string" || !isResumeTemplateSlug(template)) {
-    redirect("/settings?account=template-invalid#preferences");
-  }
-
-  const cookieStore = await cookies();
-  cookieStore.set(RESUME_TEMPLATE_COOKIE, template, {
-    maxAge: 60 * 60 * 24 * 365,
-    path: "/",
-    sameSite: "lax",
-  });
-
-  redirect("/settings?account=template-saved#preferences");
-}
-
-async function updateCommunicationPreferenceAction(formData: FormData) {
-  "use server";
-
-  const supabase = await createRoleForgeServerClient();
-  if (!supabase) {
-    redirect("/login?next=/settings&account=signin-required");
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login?next=/settings&account=signin-required");
-  }
-
-  try {
-    await saveCommunicationPreferences(supabase, user, {
-      productUpdates: formData.get("productUpdates") === "on",
-    });
-  } catch {
-    redirect("/settings?account=communication-unavailable#communication-preferences");
-  }
-
-  redirect("/settings?account=communication-saved#communication-preferences");
-}
-
-async function updateSettingsProjectStatusAction(formData: FormData) {
-  "use server";
-
-  const supabase = await createRoleForgeServerClient();
-  if (!supabase) {
-    redirect("/login?next=/settings&account=signin-required");
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login?next=/settings&account=signin-required");
-  }
-
-  const projectId = typeof formData.get("projectId") === "string" ? String(formData.get("projectId")).trim() : "";
-  const status = formData.get("status");
-  if (!projectId || projectId.length > 120 || !isApplicationStatus(status)) {
-    redirect("/settings?account=project-stage-invalid#projects");
-  }
-
-  try {
-    await updateSavedProjectStatus(supabase, projectId, status, user.id);
-  } catch {
-    redirect("/settings?account=project-stage-unavailable#projects");
-  }
-
-  redirect("/settings?account=project-stage-saved#projects");
-}
-
-async function renameSettingsProjectAction(formData: FormData) {
-  "use server";
-
-  const supabase = await createRoleForgeServerClient();
-  if (!supabase) {
-    redirect("/login?next=/settings&account=signin-required");
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login?next=/settings&account=signin-required");
-  }
-
-  const projectId = typeof formData.get("projectId") === "string" ? String(formData.get("projectId")).trim() : "";
-  const title = typeof formData.get("title") === "string" ? String(formData.get("title")).replace(/\s+/g, " ").trim() : "";
-  if (!projectId || projectId.length > 120 || !title || title.length > 120) {
-    redirect("/settings?account=project-rename-invalid#projects");
-  }
-
-  try {
-    await renameSavedProject(supabase, projectId, title, user.id);
-  } catch {
-    redirect("/settings?account=project-rename-unavailable#projects");
-  }
-
-  redirect("/settings?account=project-renamed#projects");
 }
 
 async function deleteSettingsProjectAction(formData: FormData) {
@@ -710,7 +558,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
       tone: portalReady || showCheckoutHeaderAction ? "good" : premiumActive ? "warn" : "ready",
     },
   ];
-  const hasDisplayName = Boolean(accountProfile?.displayName?.trim());
+  const hasDisplayName = Boolean(displayName.trim());
   const accountHealthItems: Array<{
     icon: RoleForgeIconName;
     label: string;
@@ -927,12 +775,18 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   ];
 
   return (
-    <main className="settings-page-shell">
-      <header className="settings-page-topbar">
-        <Brand href="/" label="RoleForge AI home" />
+    <SettingsDraftProvider saveAction={saveSettingsDraft} fields={[
+      { key: "displayName", label: "Display name", value: displayName },
+      { key: "template", label: "Resume direction", value: selectedTemplate.slug },
+      { key: "productUpdates", label: "Product updates", value: communicationPreferences.productUpdates },
+      ...recentProjectSummaries.filter((project) => project.projectId).flatMap((project) => [
+        { key: `project:${project.projectId}:title`, label: `${project.title} name`, value: project.title },
+        { key: `project:${project.projectId}:status`, label: `${project.title} stage`, value: project.stageStatus },
+      ]),
+    ]}>
+    <SiteHeader signedIn studioHref="/app">
         <div className="settings-page-actions">
           <Link className="btn btn-soft btn-sm" href="/app">Studio</Link>
-          <ThemeToggle />
           <details className="settings-account-menu" data-account-menu="true">
             <summary className="studio-account-button settings-topbar-avatar" aria-expanded="false" aria-haspopup="menu" aria-label="Open account menu">
               <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
@@ -1091,8 +945,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
             </div>
           </details>
         </div>
-      </header>
-
+    </SiteHeader>
+    <main className="settings-page-shell" id="settings-main">
       <div className="settings-page-layout">
         <SettingsSectionNav />
 
@@ -1268,22 +1122,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   </span>
                 </div>
               </div>
-              <form className="settings-profile-form" action={updateAccountProfileAction}>
-                <label htmlFor="settings-display-name">Display name</label>
-                <div className="settings-profile-edit-row">
-                  <input
-                    id="settings-display-name"
-                    name="displayName"
-                    type="text"
-                    autoComplete="name"
-                    maxLength={80}
-                    defaultValue={displayName}
-                    placeholder="Add a display name"
-                  />
-                  <ActionSubmitButton className="primary-button" label="Save name" pendingLabel="Saving name…" />
-                </div>
-                <small>Shown in your account menu and saved-project profile.</small>
-              </form>
+              <SettingsDraftField fieldKey="displayName" label="Display name" saveLabel="Save name" maxLength={80} hint="Shown in your account menu and saved-project profile." />
               <form className="settings-profile-form" id="account-email" action={updateAccountEmailAction}>
                 <label htmlFor="settings-account-email">Email address</label>
                 <div className="settings-profile-edit-row">
@@ -1455,72 +1294,13 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   <span>{profileNotice.text}</span>
                 </div>
               ) : null}
-              <div className="settings-template-grid" aria-label="Default resume direction">
-                {RESUME_TEMPLATES.map((template) => {
-                  const selected = template.slug === selectedTemplate.slug;
-                  return (
-                    <article className={`settings-template-card${selected ? " selected" : ""}`} key={template.slug}>
-                      <div className="settings-template-thumb">
-                        <ResumePreview
-                          variant={template.variant}
-                          name={template.previewName}
-                          role={template.previewRole}
-                          highlight={selected}
-                        />
-                      </div>
-                      <div className="settings-template-card-copy">
-                        <div className="template-title-row">
-                          <span className="template-name">{template.name}</span>
-                          <span className="template-tag">{template.tag}</span>
-                        </div>
-                        <p>{template.detail}</p>
-                        <form className="settings-template-form" action={updateTemplatePreferenceAction}>
-                          <input type="hidden" name="template" value={template.slug} />
-                          <ActionSubmitButton
-                            ariaPressed={selected}
-                            className={`btn btn-soft btn-sm settings-template-button${selected ? " selected" : ""}`}
-                            icon={selected ? "check" : "layers"}
-                            label={selected ? "Selected" : "Set default"}
-                            pendingLabel="Saving direction…"
-                          />
-                        </form>
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-              <div className="settings-export-actions">
-                <span>{selectedTemplate.name} is selected for new exports and studio runs.</span>
-                <Link className="btn btn-soft btn-sm settings-inline-link" href={resumeTemplateStudioHref(selectedTemplate.slug)}>Open in studio</Link>
-              </div>
+              <SettingsDraftTemplates />
               <div className="settings-communication-card" id="communication-preferences">
                 <div>
                   <h3>Communication preferences</h3>
                   <p>Choose optional RoleForge product email. Account, billing, security, and support messages stay available because they keep the service working.</p>
                 </div>
-                <form className="settings-communication-form" action={updateCommunicationPreferenceAction}>
-                  <label className="settings-toggle-row">
-                    <input
-                      type="checkbox"
-                      name="productUpdates"
-                      defaultChecked={communicationPreferences.productUpdates}
-                    />
-                    <span>
-                      <strong>Product updates</strong>
-                      <small>Occasional RoleForge release notes, workflow improvements, and template updates.</small>
-                    </span>
-                  </label>
-                  <div className="settings-required-notices" aria-label="Required account communications">
-                    <span><RoleForgeIcon name="lock" size={13} /> Account and security notices</span>
-                    <span><RoleForgeIcon name="settings" size={13} /> Billing and subscription notices</span>
-                    <span><RoleForgeIcon name="mail" size={13} /> Support request follow-up</span>
-                  </div>
-                  <ActionSubmitButton
-                    className="primary-button"
-                    label="Save communication preferences"
-                    pendingLabel="Saving preferences…"
-                  />
-                </form>
+                <SettingsDraftField fieldKey="productUpdates" label="Product updates" kind="checkbox" saveLabel="Save communication preferences" hint="Optional release notes and template updates. Account, billing, security, and support notices are unaffected." />
               </div>
             </div>
           </section>
@@ -1560,10 +1340,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   </div>
                   <div className="settings-project-list" aria-label="Recent saved projects">
                     {recentProjectSummaries.map((project) => (
-                      <article
-                        className="settings-project-item"
-                        key={project.key}
-                      >
+                      <SettingsDraftProject projectId={project.projectId} key={project.key}>
                         <div className="settings-project-summary">
                           <div className="settings-project-title-block">
                             <Link href={project.href} aria-label={`Open ${project.title} in History`}>
@@ -1594,47 +1371,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                           </div>
                         </div>
                         <div className="settings-project-controls">
-                          {project.projectId ? (
-                            <form className="settings-project-stage-form" action={updateSettingsProjectStatusAction}>
-                              <input type="hidden" name="projectId" value={project.projectId} />
-                              <div className="settings-project-stage-controls" role="group" aria-label={`Set project stage for ${project.title}`}>
-                                {APPLICATION_STATUS_OPTIONS.map((option) => {
-                                  const selected = project.stageStatus === option.status;
-                                  return (
-                                    <ActionSubmitButton
-                                      ariaPressed={selected}
-                                      className={selected ? "active" : ""}
-                                      disabled={selected}
-                                      key={`${project.projectId}-${option.status}`}
-                                      label={settingsStageLabel(option.status, option.label)}
-                                      name="status"
-                                      pendingLabel="Updating…"
-                                      value={option.status}
-                                      title={option.detail}
-                                    />
-                                  );
-                                })}
-                              </div>
-                            </form>
-                          ) : null}
-                          {project.projectId ? (
-                            <form className="settings-project-rename" action={renameSettingsProjectAction}>
-                              <input type="hidden" name="projectId" value={project.projectId} />
-                              <label>
-                                <span>Project name</span>
-                                <div className="settings-project-rename-row">
-                                  <input
-                                    name="title"
-                                    defaultValue={project.title}
-                                    maxLength={120}
-                                    aria-label={`Rename ${project.title}`}
-                                    autoComplete="off"
-                                  />
-                                  <ActionSubmitButton label="Save" pendingLabel="Saving…" />
-                                </div>
-                              </label>
-                            </form>
-                          ) : null}
+                          {project.projectId ? <>
+                            <SettingsDraftField fieldKey={`project:${project.projectId}:status`} label={`Stage for ${project.title}`} kind="status" saveLabel="Save stage" />
+                            <SettingsDraftField fieldKey={`project:${project.projectId}:title`} label="Project name" saveLabel="Save name" maxLength={120} />
+                          </> : null}
                           {project.downloads.length ? (
                             <div className="settings-project-downloads" aria-label={`Downloads for ${project.title}`}>
                               {project.downloads.map((download) => (
@@ -1684,7 +1424,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                             </details>
                           ) : null}
                         </div>
-                      </article>
+                      </SettingsDraftProject>
                     ))}
                   </div>
                 </>
@@ -2020,5 +1760,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
         </section>
       </div>
     </main>
+    <SiteFooter active="/settings" variant="compact" />
+    </SettingsDraftProvider>
   );
 }

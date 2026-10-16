@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const page = readFileSync("app/admin/support/page.tsx", "utf8");
+const serverPage = readFileSync("app/admin/support/page.tsx", "utf8");
+const queue = readFileSync("app/admin/support/SupportQueue.tsx", "utf8");
+const page = serverPage + queue;
 const routeLayout = readFileSync("app/admin/support/layout.tsx", "utf8");
 const loadingPage = readFileSync("app/admin/support/loading.tsx", "utf8");
 const submitButton = readFileSync("app/admin/support/SupportSubmitButton.tsx", "utf8");
@@ -25,8 +27,8 @@ test("admin support inbox is protected and reads real queue data", () => {
   assert.match(page, /isSupportAdminUser\(user\)/);
   assert.match(page, /notFound\(\)/);
   assert.match(page, /createRoleForgeServiceClient/);
-  assert.match(page, /loadAdminSupportRequests/);
-  assert.match(page, /loadAdminSupportSummary/);
+  assert.match(page, /loadAdminSupportQueue/);
+  assert.match(page, /supportQueueCounts\(requests\)/);
   assert.match(supportAdmin, /select\("id", \{ count: "exact", head: true \}\)/);
   assert.match(supportAdmin, /Promise\.all\(\[[\s\S]*countAdminSupportRequests\(client, "open"\)[\s\S]*countAdminSupportRequests\(client, "reviewing"\)[\s\S]*countAdminSupportRequests\(client, "closed"\)/s);
 });
@@ -44,7 +46,9 @@ test("admin support setup stays available without burying the queue", () => {
 });
 
 test("admin command bar and request cards use restrained operator surfaces", () => {
-  assert.match(page, /className="admin-support-commandbar"/);
+  assert.match(serverPage, /<SiteHeader signedIn studioHref="\/app" context="Operator inbox" navigationLinks=/);
+  assert.match(serverPage, /<PublicAccountMenu supportHref="\/support"/);
+  assert.match(serverPage, /<SiteFooter variant="compact"/);
   assert.match(stylesheet, /\.admin-support-commandbar\s*\{(?=[^}]*padding:\s*7px 8px)(?=[^}]*border-radius:\s*22px)(?=[^}]*backdrop-filter:\s*blur\(16px\) saturate\(1\.04\))[^}]*\}/s);
   assert.match(stylesheet, /\.admin-support-commandbar::before\s*\{[^}]*content:\s*none/s);
   assert.match(stylesheet, /\.admin-support-commandbar \.brand,\s*\.admin-support-commandbar nav\s*\{(?=[^}]*border:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
@@ -97,9 +101,9 @@ test("admin support exposes honest loading and database failure states", () => {
 });
 
 test("admin queue filters show aggregate counts and preserve the current view", () => {
-  assert.match(page, /const filterCounts =/);
-  assert.match(page, /aria-current=\{status === item \? "page" : undefined\}/);
-  assert.match(page, /<strong>\{filterCounts\[item\]\}<\/strong>/);
+  assert.match(page, /const counts = supportQueueCounts\(matching\)/);
+  assert.match(page, /aria-pressed=\{status === item\}/);
+  assert.match(page, /<strong>\{counts\[item\]\}<\/strong>/);
   assert.match(page, /name="returnStatus" value=\{status\}/);
   assert.match(actionRoute, /normalizedReturnStatus/);
   assert.match(replyRoute, /normalizedReturnStatus/);

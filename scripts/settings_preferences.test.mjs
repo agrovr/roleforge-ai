@@ -3,42 +3,24 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
+const actions = readFileSync("app/settings/actions.ts", "utf8");
+const drafts = readFileSync("app/settings/SettingsDrafts.tsx", "utf8");
+const validation = readFileSync("app/lib/settingsDrafts.ts", "utf8");
 const stylesheet = [readFileSync("app/globals.css", "utf8"), readFileSync("app/settings/settings.css", "utf8")].join("\n");
 
-test("settings preferences save the default resume direction through the shared template cookie", () => {
-  assert.match(settingsPage, /updateTemplatePreferenceAction/);
-  assert.match(settingsPage, /isResumeTemplateSlug\(template\)/);
-  assert.match(settingsPage, /cookieStore\.set\(RESUME_TEMPLATE_COOKIE,\s*template/);
-  assert.match(settingsPage, /account=template-saved#preferences/);
-  assert.match(settingsPage, /account=template-invalid#preferences/);
+test("settings draft preferences keep shared cookie and authenticated profile persistence", () => {
+  assert.match(actions, /supabase.auth.getUser/);
+  assert.match(actions, /set\(RESUME_TEMPLATE_COOKIE, String\(value\)/);
+  assert.match(validation, /isResumeTemplateSlug\(value\)/);
+  assert.match(actions, /saveCommunicationPreferences\(supabase, user/);
+  assert.match(settingsPage, /fieldKey="productUpdates"/);
 });
 
-test("settings preferences save communication preferences through the profile record", () => {
-  assert.match(settingsPage, /updateCommunicationPreferenceAction/);
-  assert.match(settingsPage, /saveCommunicationPreferences\(supabase,\s*user/);
-  assert.match(settingsPage, /formData\.get\("productUpdates"\)\s*===\s*"on"/);
-  assert.match(settingsPage, /account=communication-saved#communication-preferences/);
-  assert.match(settingsPage, /account=communication-unavailable#communication-preferences/);
-});
-
-test("settings preferences expose all resume templates as account controls", () => {
-  assert.match(settingsPage, /id="preferences"/);
-  assert.match(settingsPage, /RESUME_TEMPLATES\.map/);
-  assert.match(settingsPage, /settings-template-grid/);
-  assert.match(settingsPage, /settings-template-card/);
-  assert.match(settingsPage, /name="template"/);
-  assert.match(settingsPage, /Set default/);
-  assert.match(settingsPage, /Open in studio/);
-});
-
-test("settings preferences expose communication controls without hiding required notices", () => {
-  assert.match(settingsPage, /id="communication-preferences"/);
-  assert.match(settingsPage, /name="productUpdates"/);
-  assert.match(settingsPage, /Product updates/);
-  assert.match(settingsPage, /Account and security notices/);
-  assert.match(settingsPage, /Billing and subscription notices/);
-  assert.match(settingsPage, /Support request follow-up/);
-  assert.match(settingsPage, /Save communication preferences/);
+test("settings directions use the catalog with explicit per-field saves", () => {
+  assert.match(drafts, /RESUME_TEMPLATES.map/);
+  assert.match(drafts, /save\(\["template"\]\)/);
+  assert.match(drafts, /saved for this browser/);
+  assert.match(settingsPage, /Account, billing, security, and support notices are unaffected/);
 });
 
 test("settings preference cards are overflow-safe", () => {
