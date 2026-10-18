@@ -1,4 +1,4 @@
-# Design upgrade completion audit — updated October 16, 2026
+# Design upgrade completion audit — updated October 17, 2026
 
 Status: active. Local implementation and verification are substantial; complete delivery is not yet proven. This audit supplements the slice evidence, not a declaration that synthetic accounts prove live persistence or email/payment behavior.
 
@@ -20,13 +20,21 @@ Status: active. Local implementation and verification are substantial; complete 
 | Privacy/Terms/Updates/404 | 24 actual route cases; independent review identified 404 contrast, corrected and browser-verified in both themes | Local verification passed |
 | Final regression and build | tests-live-final.log 687/687 in 41735.52ms; build-live-fixes.log exit0; focused ESLint exit0 | Passed current implementation |
 | Temporary fixture cleanup / backend preservation | No app/*preview/page routes found; backend git status empty; diff --check clean | Verified October4 |
-| Publication | No commit/push/deploy performed | Not authorized; local work only |
+| Publication | Approved release branch published as PR #9; Vercel preview deployed application commit 10f0ee7; GitHub CI passes 688 tests, lint, typecheck, build | Preview published; production merge is not authorized |
 
 ## Remaining proof
 
 - Live signed-in routing, account display, TXT intake, tailoring, all three export downloads, project persistence, and restore are now verified below. This does not establish PDF/DOCX source intake or every template's export layout.
 - Profile save persistence is verified. Preference saves, actual support delivery/admin mutation, and live Stripe checkout/portal behavior remain unverified. No payment, email, or destructive action is authorized by the QA-run approval.
-- Frontend publication and deployed verification remain pending; no commit/push/frontend-deploy authorization has been given.
+- Approved preview publication is complete. Chrome verified the landing, Pricing navigation/layout, and signed-out Studio gateway. Signed-in preview behavior and production release verification remain pending; production merge requires separate approval.
+
+## October 17 preview release
+
+- [PR #9](https://github.com/agrovr/roleforge-ai/pull/9) is open on `codex/roleforge-design-upgrade`. Application commit `10f0ee7` passes all 688 tests and CI lint/typecheck/build. Vercel reports successful deployment.
+- Fixed the review finding: malformed requested run IDs no longer trigger a rejected targeted request that discards valid recent projects. Three focused client tests pass, including the new malformed-ID regression and retained valid-ID/error handling cases.
+- Connected Chrome rendered the public landing, Pricing, and signed-out Studio gateway. Reloaded the gateway after the latest deployment. Screenshot evidence: `output/playwright/final-integration/preview-gateway.png`. These desktop checks do not claim deployed mobile coverage or signed-in preview persistence.
+- Preview Pricing reports checkout unavailable. Do not infer production billing status from the preview configuration. No payment, email, live admin mutation, or production merge was performed.
+- Earlier continuation entries below describe historical state and are superseded by this section for publication status.
 
 ## October 16 continuation
 

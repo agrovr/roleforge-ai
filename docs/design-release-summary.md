@@ -4,7 +4,7 @@ The staged design upgrade is implemented locally across shared branding/navigati
 
 ## Verified
 
-- Current full test suite: 687 passed, zero failed.
+- Full CI suite at application commit `10f0ee7`: 688 passed, zero failed; GitHub lint, typecheck, and production build also passed.
 - Current production build and focused ESLint pass; diff whitespace check passes.
 - Real Google sign-in to localhost, signed-in Projects root, public landing escape, and account Settings.
 - One explicitly approved fictional QA run: TXT intake, tailoring, generated materials, PDF/DOCX/TXT downloads, saved project persistence and restore. PDF rendered and visually inspected.
@@ -19,6 +19,10 @@ The staged design upgrade is implemented locally across shared branding/navigati
 - The single labeled fictional QA project remains in the user's account.
 - Explicitly authorized hosted setup changes: Supabase localhost callback allowlist and Cloud Run CORS for localhost:3100. Cloud Run revision roleforge-api-00073-pbr changed configuration only; backend source is clean.
 
-## Next release step
+## Preview release and next step
 
-Publish `codex/roleforge-design-upgrade` as a PR against `main` and verify its Git-connected preview. The release branch incorporates the newer README, CI, and social-preview commits from main. Do not equate a successful preview with a production release; production requires separate approval.
+Published `codex/roleforge-design-upgrade` as [PR #9](https://github.com/agrovr/roleforge-ai/pull/9) against `main`. The release branch incorporates the newer README, CI, and social-preview commits from main. Vercel deployed application commit `10f0ee7` successfully. Chrome checks confirmed the public landing, Pricing navigation/layout, and signed-out Studio gateway; the gateway was reloaded after the latest deployment. The PR review's malformed run-ID finding is fixed with a regression test that preserves recent projects while skipping invalid targeted lookups.
+
+Preview: https://roleforge-ai-git-codex-roleforge-4f2bf3-ashs-projects-e04a172f.vercel.app
+
+Preview Pricing reports checkout unavailable. Signed-in preview behavior is not verified; prior live account checks used localhost. Remaining release decision: user review and separate production merge approval. A successful preview is not a production release.
