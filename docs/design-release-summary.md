@@ -13,7 +13,7 @@ The staged design upgrade is implemented locally across shared branding/navigati
 
 ## Release boundaries
 
-- No frontend commit, push, or deployment has been authorized or performed.
+- The user approved committing to a release branch, pushing it, and opening a PR for preview review. Production merge/deployment is not authorized.
 - Proposed release includes app/source, regression scripts, public brand assets, next.config.ts and design docs, including the preserved export/demo fixes. Exclude output/, env files, caches, input ZIPs, and downloaded QA files.
 - No payment or support email was sent. Local billing/support/admin secrets are intentionally absent; public production reports checkout configuration ready. Actual production billing and support interactions remain separate verification gates.
 - The single labeled fictional QA project remains in the user's account.
@@ -21,4 +21,4 @@ The staged design upgrade is implemented locally across shared branding/navigati
 
 ## Next release step
 
-Obtain explicit approval for the chosen GitHub/Vercel publication path, inspect the exact staged file set before committing, publish, and verify the resulting deployment and live signed-in routes. Do not equate local success with a deployed upgrade.
+Publish `codex/roleforge-design-upgrade` as a PR against `main` and verify its Git-connected preview. The release branch incorporates the newer README, CI, and social-preview commits from main. Do not equate a successful preview with a production release; production requires separate approval.
