@@ -27,7 +27,7 @@ export async function loadSavedRuns(requestedRunId?: string): Promise<SavedHisto
 
   const payload = (await response.json()) as { runs?: SavedHistoryItem[] };
   const runs = payload.runs ?? [];
-  if (requestedRunId && /^[0-9a-f-]{36}$/i.test(requestedRunId) && !runs.some((run) => run.accountRunId === requestedRunId)) {
+  if (requestedRunId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(requestedRunId) && !runs.some((run) => run.accountRunId === requestedRunId)) {
     const requested = await fetch(`/api/saved-runs?runId=${encodeURIComponent(requestedRunId)}`, { cache: "no-store", credentials: "same-origin" });
     if (!requested.ok) throw new Error(await readSavedProjectError(requested, "This saved project could not be loaded."));
     const page = await requested.json() as { runs?: SavedHistoryItem[] };
