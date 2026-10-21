@@ -15,6 +15,13 @@ import {
 
 const freeEntitlement: AccountEntitlement = FREE_ENTITLEMENT;
 
+test("strict usage loading does not turn database failures into zero usage", async () => {
+  const failure = new Error("Database unavailable");
+  const query = { select() { return this; }, eq() { return this; }, gte() { return this; }, async lt() { return { count: null, error: failure }; } };
+  const client = { from() { return query; } } as unknown as SupabaseClient;
+  await assert.rejects(loadAccountUsage(client, "owner", freeEntitlement, { throwOnError: true }), failure);
+});
+
 const premiumEntitlement: AccountEntitlement = {
   ...FREE_ENTITLEMENT,
   plan: "premium",

@@ -168,28 +168,31 @@ export async function loadSupportRequests(
   });
 }
 
-export function parseSupportRequestInput(payload: {
+type SupportRequestPayload = {
   category?: unknown;
   subject?: unknown;
   message?: unknown;
   contextUrl?: unknown;
-}): { ok: true; input: SupportRequestInput } | { ok: false; error: string } {
+};
+
+export function supportRequestFieldErrors(payload: SupportRequestPayload) {
+  const errors: Partial<Record<"category" | "subject" | "message", string>> = {};
+  if (!supportCategorySet.has(compactSingleLine(payload.category))) errors.category = "Choose a support topic.";
+  const subject = compactSingleLine(payload.subject);
+  if (subject.length < 4 || subject.length > 120) errors.subject = "Use a subject between 4 and 120 characters.";
+  const message = compactMessage(payload.message);
+  if (message.length < 20 || message.length > 2000) errors.message = "Use a message between 20 and 2000 characters.";
+  return errors;
+}
+
+export function parseSupportRequestInput(payload: SupportRequestPayload): { ok: true; input: SupportRequestInput } | { ok: false; error: string } {
   const category = compactSingleLine(payload.category);
   const subject = compactSingleLine(payload.subject);
   const message = compactMessage(payload.message);
   const contextUrl = normalizeSupportRequestContextUrl(payload.contextUrl);
 
-  if (!supportCategorySet.has(category)) {
-    return { ok: false, error: "Choose a support topic." };
-  }
-
-  if (subject.length < 4 || subject.length > 120) {
-    return { ok: false, error: "Use a subject between 4 and 120 characters." };
-  }
-
-  if (message.length < 20 || message.length > 2000) {
-    return { ok: false, error: "Use a message between 20 and 2000 characters." };
-  }
+  const error = Object.values(supportRequestFieldErrors(payload))[0];
+  if (error) return { ok: false, error };
 
   return {
     ok: true,

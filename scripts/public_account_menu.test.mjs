@@ -100,15 +100,18 @@ test("auth status exposes safe account counts for public menus", () => {
   assert.doesNotMatch(authStatusRoute, /ROLEFORGE_ADMIN_EMAILS[^;]*json/i);
 });
 
-test("help status support and updates mount the public account menu", () => {
-  for (const source of [helpPage, statusPage, supportPage, updatesPage]) {
-    assert.match(source, /PublicAccountMenu/);
-    assert.match(source, /supportHref=\{supportRequestHref\(/);
-  }
-  assert.match(helpPage, /subject:\s*"Help center question"/);
-  assert.match(statusPage, /subject:\s*"Status page question"/);
-  assert.match(supportPage, /subject:\s*"Support page question"/);
-  assert.match(updatesPage, /subject:\s*"Product updates question"/);
+test("help hub and updates mount the real public account menu with page context", () => {
+  const hub = readFileSync("app/components/HelpHubHeader.tsx", "utf8");
+  for (const source of [helpPage, statusPage, supportPage]) assert.match(source, /HelpHubHeader/);
+  assert.match(hub, /PublicAccountMenu supportHref=\{supportHref\}/);
+  assert.match(hub, /supportRequestHref/);
+  assert.match(hub, /Help center question/);
+  assert.match(hub, /Status page question/);
+  assert.match(hub, /Support page question/);
+  assert.match(updatesPage, /PublicInfoHeader active="updates"/);
+  const info = readFileSync("app/components/PublicInfoHeader.tsx", "utf8");
+  assert.match(info, /PublicAccountMenu supportHref=\{supportRequestHref/);
+  assert.match(info, /active === "updates" \? "Product updates question"/);
 });
 
 test("public account menu topbar layout is overflow safe", () => {

@@ -1,11 +1,10 @@
+import { PublicInfoHeader } from "../components/PublicInfoHeader";
+import { SiteFooter } from "../components/SiteFooter";
+import "../public-info.css";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Brand } from "../components/Brand";
-import { PublicAccountMenu } from "../components/PublicAccountMenu";
 import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
-import { ThemeToggle } from "../components/ThemeToggle";
-import { supportRequestHref } from "../lib/supportRequests";
 
 export const metadata: Metadata = {
   title: "Product Updates",
@@ -117,22 +116,10 @@ export default function UpdatesPage() {
   const releaseAreas = updates.map((item) => item.eyebrow).join(" / ");
 
   return (
-    <main className="legal-shell updates-shell">
-      <header className="settings-page-topbar legal-topbar">
-        <Brand href="/" label="RoleForge AI home" />
-        <div className="settings-page-actions">
-          <Link className="btn btn-soft btn-sm" href="/app">Studio</Link>
-          <Link className="btn btn-soft btn-sm" href="/status">Status</Link>
-          <ThemeToggle />
-          <PublicAccountMenu
-            supportHref={supportRequestHref({
-              category: "workflow",
-              subject: "Product updates question",
-              contextUrl: "/updates",
-            })}
-          />
-        </div>
-      </header>
+    <div className="public-info-page">
+<PublicInfoHeader active="updates" />
+<main className="legal-shell updates-shell" id="public-info-main">
+
 
       <section className="legal-hero updates-hero" aria-labelledby="updates-title">
         <div>
@@ -233,5 +220,7 @@ export default function UpdatesPage() {
         </div>
       </section>
     </main>
+<SiteFooter active="/updates" />
+</div>
   );
 }

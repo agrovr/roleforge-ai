@@ -1,5 +1,6 @@
 /* Landing-only presentation. Keep shared tokens, controls, account chrome,
    resume-preview primitives, and template-library foundations in globals.css. */
+@import "./landing-upgrade.css";
 /* Keep large landing groups out of compositor-sized reveal animations. */
 html.rf-polish-ready :where(.landing-page) :is(.steps, .faq-grid, .cta-band)[data-polish-reveal="true"][data-polish-visible="true"] {
   animation: none;
@@ -1475,6 +1476,20 @@ html.rf-polish-ready :where(.landing-page) :is(.steps, .faq-grid, .cta-band)[dat
   gap: 18px;
   min-width: 0;
   min-height: 386px;
+}
+
+:where(.landing-page) .dash-demo-resume-panel {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+:where(.landing-page) .dash-demo-resume-panel[data-hidden="true"] {
+  height: 0;
+  overflow: hidden;
+  content-visibility: hidden;
+  contain-intrinsic-size: 0 0;
+  pointer-events: none;
 }
 
 :where(.landing-page) .dash-demo-surface {

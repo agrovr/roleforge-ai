@@ -1,8 +1,9 @@
 import Link from "next/link";
 
-import { Brand } from "./Brand";
+import { PublicInfoHeader } from "./PublicInfoHeader";
+import { SiteFooter } from "./SiteFooter";
 import { RoleForgeIcon } from "./RoleForgeIcons";
-import { ThemeToggle } from "./ThemeToggle";
+import "../public-info.css";
 import "../public-pages.css";
 
 type LegalSection = {
@@ -36,14 +37,10 @@ export function LegalPage({
   }));
 
   return (
-    <main className="legal-shell">
-      <header className="settings-page-topbar legal-topbar">
-        <Brand href="/" label="RoleForge AI home" />
-        <div className="settings-page-actions">
-          <Link className="btn btn-soft btn-sm" href="/app">Studio</Link>
-          <ThemeToggle />
-        </div>
-      </header>
+    <div className="public-info-page">
+      <PublicInfoHeader active={title === "Terms of Use" ? "terms" : "privacy"} />
+    <main className="legal-shell" id="public-info-main">
+
 
       <section className="legal-hero" aria-labelledby="legal-title">
         <div>
@@ -119,5 +116,7 @@ export function LegalPage({
         </div>
       </section>
     </main>
+    <SiteFooter active={title === "Terms of Use" ? "/terms" : "/privacy"} />
+    </div>
   );
 }

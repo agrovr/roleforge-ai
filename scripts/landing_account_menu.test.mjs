@@ -94,27 +94,10 @@ test("landing pricing presents real plan state as quiet metadata", () => {
   assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.pricing-grid\.two\s+\.price-card\.featured\s+\.price-status,[\s\S]*?\.price-status\.current\s*\{(?=[^}]*border:\s*0)(?=[^}]*background:\s*transparent)(?=[^}]*color:\s*#f5d69a)(?=[^}]*box-shadow:\s*none)[^}]*\}/s);
 });
 
-test("landing footer reads as a complete product footer", () => {
-  assert.match(landingPage, /const currentYear = new Date\(\)\.getFullYear\(\);/);
-  assert.match(landingPage, /className="footer-brand-block"/);
-  assert.match(landingPage, /A focused resume tailoring workspace/);
-  assert.match(landingPage, /Stripe-backed Premium billing/);
-  assert.match(landingPage, /Protected studio/);
-  assert.match(landingPage, /Premium DOCX\/TXT/);
-  assert.match(landingPage, /Account exports/);
-  assert.match(landingPage, /Payments by Stripe/);
-  assert.match(landingPage, /Google sign-in supported/);
-  assert.match(landingPage, /className="footer-meta-links"/);
-  assert.match(landingPage, /<h3>Account<\/h3>/);
-  assert.match(landingPage, /<h3>Legal<\/h3>/);
-  assert.match(landingPage, /href="\/settings#billing"/);
-  assert.match(landingPage, /&copy; \{currentYear\} RoleForge AI\. All rights reserved\./);
-  assert.match(stylesheet, /\.footer-inner\s*\{(?=[^}]*grid-template-columns:\s*minmax\(300px,\s*1\.35fr\)\s+repeat\(4,\s*minmax\(122px,\s*0\.56fr\)\))(?=[^}]*align-items:\s*start)[^}]*\}/s);
-  assert.match(stylesheet, /\.footer-brand-block\s*\{(?=[^}]*display:\s*grid)(?=[^}]*gap:\s*16px)(?=[^}]*max-width:\s*560px)[^}]*\}/s);
-  assert.match(stylesheet, /\.footer-product-note\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*gap:\s*9px)[^}]*\}/s);
-  assert.match(stylesheet, /\.footer-product-note\s+span,\s*\.footer-trust-row\s+span\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*font-weight:\s*760)[^}]*\}/s);
-  assert.match(stylesheet, /\.footer-col\s+a,\s*\.footer-col\s+span\s*\{(?=[^}]*min-height:\s*30px)(?=[^}]*font-size:\s*0\.96rem)[^}]*\}/s);
-  assert.match(stylesheet, /\.footer-meta-links\s*\{(?=[^}]*display:\s*inline-flex)(?=[^}]*flex-wrap:\s*wrap)[^}]*\}/s);
-  assert.match(stylesheet, /\.footer-meta\s*\{(?=[^}]*justify-content:\s*space-between)(?=[^}]*align-items:\s*center)(?=[^}]*border-top:\s*1px solid var\(--line\))[^}]*\}/s);
-  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.footer-product-note span/);
+test("landing uses the shared footer with real account and support destinations", () => {
+  const footer = readFileSync("app/components/SiteFooter.tsx", "utf8");
+  assert.match(landingPage, /<SiteFooter \/>/);
+  for (const href of ["/app", "/templates", "/settings#projects", "/settings#billing", "/help", "/support", "/status", "/privacy", "/terms"]) assert.ok(footer.includes(href), href);
+  assert.match(footer, /new Date\(\)\.getFullYear\(\)/);
+  assert.match(footer, /aria-label="Footer legal links"/);
 });

@@ -1,0 +1,27 @@
+/* Login-only reference migration; the shared /app gateway keeps its own layout. */
+.login-shell.login-page { padding: 28px clamp(18px,4vw,54px) 48px; color: var(--ink-0); background: radial-gradient(circle at 86% 8%,color-mix(in srgb,var(--accent-soft) 45%,transparent),transparent 24rem),radial-gradient(circle at 12% 82%,color-mix(in srgb,var(--brand-soft) 45%,transparent),transparent 24rem),linear-gradient(180deg,var(--bg),var(--bg-alt)); }
+.login-shell.login-page::before, .login-shell.login-page::after { content: none; }
+.login-page .site-header { width: min(1180px,100%); position: relative; z-index: 60; margin-inline: auto; padding: 10px 14px; border: 1px solid var(--line); border-radius: 24px; background: var(--surface); }
+.login-page .site-header .brand { flex: 0 0 auto; padding: 0; }
+.login-page .site-header .brand-name { max-width: none; white-space: nowrap; overflow: visible; }
+.login-page .login-copy h1 { font-weight: 650; }
+.login-page .login-card { border-color: var(--line); background: linear-gradient(145deg,var(--surface),var(--surface-warm)); }
+.login-page .login-card-head h2 { font-weight: 650; }
+.login-page .login-card .primary-button { color: var(--on-brand); background: var(--brand); text-shadow: none; min-height: 52px; }
+.login-page .login-card .primary-button:hover:not(:disabled) { color: var(--on-brand); background: var(--brand-hover); }
+.login-page .login-oauth { background: var(--surface); color: var(--ink-0); border-color: var(--line); min-height: 48px; }
+.login-page .studio-account-form input[type="email"] { background: var(--surface); color: var(--ink-0); border-color: var(--line); min-height: 48px; font-size: 16px; }
+.login-page #login-email-hint { color: var(--ink-3); font-size: .8rem; line-height: 1.45; }
+.login-page .login-email-sent { padding: 16px; border: 1px solid color-mix(in srgb,var(--good) 35%,var(--line)); border-radius: 14px; background: var(--good-soft); }
+.login-page .login-email-sent strong { color: var(--ink-0); }
+.login-page .login-email-sent p { margin: 8px 0 0; color: var(--ink-2); font-size: .9rem; line-height: 1.5; }
+.login-page .login-session-strip { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+.login-page .login-session-strip span { color: var(--ink-1); background: color-mix(in srgb,var(--good-soft) 45%,var(--surface)); border-color: var(--line); }
+.login-page .site-footer { margin-inline: calc(-1 * clamp(18px,4vw,54px)); margin-bottom: -48px; }
+.login-page :focus-visible { outline: 2px solid var(--brand-dark); outline-offset: 3px; }
+@media (max-width: 760px) {
+  .login-shell.login-page { padding: 18px 14px 34px; }
+  .login-page .site-header { padding: 10px; }
+  .login-page .site-footer { margin-inline: -14px; margin-bottom: -34px; }
+  .login-page .login-panel { overflow: visible; }
+}

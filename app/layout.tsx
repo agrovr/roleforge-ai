@@ -4,6 +4,8 @@ import { Analytics } from "@vercel/analytics/next";
 import { AccountMenuBehavior } from "./components/AccountMenuBehavior";
 import { SitePolish } from "./components/SitePolish";
 import "./globals.css";
+import "./design-tokens.css";
+import "./site-chrome.css";
 
 const deploymentCommit = process.env.VERCEL_GIT_COMMIT_SHA?.trim();
 

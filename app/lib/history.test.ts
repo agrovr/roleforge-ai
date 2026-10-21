@@ -436,3 +436,13 @@ test("labels history versions from newest to oldest", () => {
   assert.equal(historyVersionLabel(4, 0), "Version 4 · Latest");
   assert.equal(historyVersionLabel(4, 2), "Version 2");
 });
+
+test("keeps an explicitly opened older run within the bounded Studio history", () => {
+  const recent = Array.from({ length: 12 }, (_, i) => historyItem({ id: `recent-${i}`, createdAt: `2026-09-${String(30-i).padStart(2, "0")}T12:00:00Z` }));
+  const older = historyItem({ id: "older", accountRunId: "older-account-run", createdAt: "2026-08-01T12:00:00Z" });
+  assert.equal(mergeHistory([], [...recent, older]).some((item) => item.id === "older"), false);
+  const opened = mergeHistory([], [...recent, older], "older-account-run");
+  assert.equal(opened.length, 12);
+  assert.equal(opened.at(-1)?.id, "older");
+  assert.equal(opened[0].id, "recent-0");
+});

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const page = readFileSync("app/admin/support/page.tsx", "utf8");
+const page = readFileSync("app/admin/support/SupportQueue.tsx", "utf8");
 const stylesheet = readFileSync("app/admin/support/admin-support.css", "utf8");
 
 test("admin request identity and queue status share one scan row", () => {

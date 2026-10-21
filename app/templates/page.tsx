@@ -3,12 +3,12 @@ import { cookies } from "next/headers";
 
 import { AccountAvatar } from "../components/AccountAvatar";
 import { AccountReferenceCopyButton } from "../components/AccountReferenceCopyButton";
-import { Brand } from "../components/Brand";
+import { SiteHeader } from "../components/SiteHeader";
+import { SiteFooter } from "../components/SiteFooter";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { accountAvatarUrl, accountDisplayName, accountIdentityFromClaims, accountReference } from "../lib/accountUser";
 import { RESUME_TEMPLATE_COOKIE, isResumeTemplateSlug } from "../lib/resumeTemplates";
 import { supportRequestHref } from "../lib/supportRequests";
-import { ThemeToggle } from "../components/ThemeToggle";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 import { TemplateLibrary } from "./TemplateLibrary";
 
@@ -49,11 +49,9 @@ export default async function TemplatesPage() {
 
   return (
     <main className="templates-page-shell">
-      <header className="settings-page-topbar public-page-topbar templates-topbar">
-        <Brand href="/" label="RoleForge AI home" />
-        <div className="settings-page-actions">
-          <Link className="btn btn-soft btn-sm" href={studioHref}>Studio</Link>
-          <ThemeToggle />
+      <a className="site-skip-link" href="#templates">Skip to templates</a>
+      <SiteHeader active="templates" studioHref={studioHref} signedIn={signedIn}>
+          <Link className="btn btn-soft btn-sm templates-studio-link" href={studioHref} prefetch={false}>Studio</Link>
           {signedIn ? (
             <details className="settings-account-menu templates-account-menu" data-account-menu="true">
               <summary className="studio-account-button templates-topbar-avatar" aria-expanded="false" aria-haspopup="menu" aria-label="Open account menu">
@@ -138,10 +136,10 @@ export default async function TemplatesPage() {
               </div>
             </details>
           ) : null}
-        </div>
-      </header>
+      </SiteHeader>
 
       <TemplateLibrary signedIn={signedIn} initialTemplateSlug={initialTemplateSlug} settingsHref={settingsHref} />
+      <SiteFooter active="/templates" variant="compact" />
     </main>
   );
 }

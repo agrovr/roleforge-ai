@@ -1,10 +1,9 @@
+import { HelpHubHeader } from "../components/HelpHubHeader";
+import { SiteFooter } from "../components/SiteFooter";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Brand } from "../components/Brand";
-import { PublicAccountMenu } from "../components/PublicAccountMenu";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
-import { ThemeToggle } from "../components/ThemeToggle";
 import { supportRequestHref } from "../lib/supportRequests";
 import { HelpSearch } from "./HelpSearch";
 
@@ -191,21 +190,9 @@ const helpActionRoutes: readonly HelpActionRoute[] = [
 
 export default function HelpPage() {
   return (
-    <main className="legal-shell help-shell">
-      <header className="settings-page-topbar legal-topbar">
-        <Brand href="/" label="RoleForge AI home" />
-        <div className="settings-page-actions">
-          <Link className="btn btn-soft btn-sm" href="/app">Studio</Link>
-          <ThemeToggle />
-          <PublicAccountMenu
-            supportHref={supportRequestHref({
-              category: "workflow",
-              subject: "Help center question",
-              contextUrl: "/help",
-            })}
-          />
-        </div>
-      </header>
+    <div className="help-hub-page">
+      <HelpHubHeader active="help" />
+      <main className="legal-shell help-shell" id="help-hub-main">
 
       <section className="legal-hero help-hero" aria-labelledby="help-title">
         <div>
@@ -278,6 +265,8 @@ export default function HelpPage() {
           <Link className="btn btn-soft btn-sm" href="/privacy">Privacy</Link>
         </div>
       </section>
-    </main>
+      </main>
+      <SiteFooter active="/help" variant="compact" />
+    </div>
   );
 }

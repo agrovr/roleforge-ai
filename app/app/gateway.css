@@ -1,0 +1,79 @@
+/* Claude Studio Gateway reference, scoped to the actual account gate. */
+.studio-auth-shell {
+  --bg: #f6eee1;
+  --bg-alt: #e9e0cc;
+  --surface: #fffefc;
+  --surface-2: #f8f1e6;
+  --surface-warm: #fdf9f1;
+  --ink-0: #14182f;
+  --ink-1: #262b48;
+  --ink-2: #4a5170;
+  --ink-3: #5c6276;
+  --line: #e4d8c2;
+  --line-2: #cdba96;
+  --brand: #c26f2b;
+  --brand-dark: #a04a10;
+  --brand-soft: #f8e3c6;
+  --on-brand: #10142d;
+  --brand-hover: #cf7b33;
+  --accent: #1e6d71;
+  --accent-soft: #d5eaed;
+  --sky: #2f7fda;
+  --sky-dark: #1f5fa8;
+  --good: #137232;
+  --gateway-gutter: clamp(18px, 4vw, 54px);
+  padding: 28px var(--gateway-gutter) 0;
+}
+html[data-theme="dark"] .studio-auth-shell {
+  --bg: #0a0e1c;
+  --bg-alt: #131828;
+  --surface: #1a2034;
+  --surface-2: #151b2c;
+  --surface-warm: #22283b;
+  --ink-0: #fdf6ea;
+  --ink-1: #efe8db;
+  --ink-2: #ccd2e0;
+  --ink-3: #a6adc0;
+  --line: rgba(253,246,234,.16);
+  --line-2: rgba(253,246,234,.28);
+  --brand: #dfa155;
+  --brand-dark: #f2bd72;
+  --brand-soft: rgba(223,161,85,.22);
+  --brand-hover: #f0bb69;
+  --accent: #7ccbd3;
+  --accent-soft: rgba(124,203,211,.2);
+  --sky: #86b4ef;
+  --sky-dark: #a5c8f5;
+  --good: #7fd394;
+}
+.studio-auth-shell::before, .studio-auth-shell::after { content: none; }
+.studio-auth-shell .studio-auth-panel {
+  grid-template-areas: "copy card";
+  grid-template-rows: auto;
+  min-height: calc(100dvh - 150px);
+  padding-top: clamp(34px, 5vw, 60px);
+}
+.studio-auth-shell .studio-auth-copy { align-self: center; gap: 16px; }
+.studio-auth-shell .studio-auth-copy h1 { font-size: clamp(2.7rem, 6vw, 5.1rem); font-weight: 650; overflow-wrap: anywhere; }
+.studio-auth-shell .login-benefits { margin-top: 8px; }
+.studio-auth-shell .login-benefit-copy { display: block; }
+.studio-auth-shell .studio-auth-card { width: 100%; padding: 24px; border-radius: 18px; }
+.studio-auth-shell .login-status.info {
+  border-color: color-mix(in srgb, var(--sky) 32%, var(--line));
+  background: color-mix(in srgb, var(--sky) 12%, var(--surface));
+  color: color-mix(in srgb, var(--sky-dark) 82%, var(--ink-1));
+}
+.studio-auth-shell .studio-auth-actions .primary-button {
+  gap: 9px; color: var(--on-brand); background: var(--brand); border-color: transparent;
+}
+.studio-auth-shell .studio-auth-actions .primary-button:hover { background: var(--brand-hover); }
+.studio-auth-shell .studio-auth-actions .ghost-button { color: var(--ink-1); background: color-mix(in srgb, var(--surface) 82%, transparent); }
+.studio-auth-shell :focus-visible { outline: 2px solid var(--brand-dark); outline-offset: 3px; }
+.studio-auth-shell .studio-auth-nav { width: min(1180px, 100%); position: relative; z-index: 5; }
+@media (max-width: 1040px) {
+  .studio-auth-shell .studio-auth-panel { grid-template-columns: 1fr; grid-template-areas: "copy" "card"; min-height: auto; }
+}
+@media (max-width: 760px) {
+  .studio-auth-shell .studio-auth-panel { padding-top: 32px; }
+  .studio-auth-shell .studio-auth-copy p { font-size: 1.08rem; line-height: 1.65; }
+}

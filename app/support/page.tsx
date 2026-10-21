@@ -1,14 +1,13 @@
+import { SupportForm } from "./SupportForm";
+import { HelpHubHeader } from "../components/HelpHubHeader";
+import { SiteFooter } from "../components/SiteFooter";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Brand } from "../components/Brand";
-import { PublicAccountMenu } from "../components/PublicAccountMenu";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
 import { SupportReferenceCopyButton } from "../components/SupportReferenceCopyButton";
-import { ThemeToggle } from "../components/ThemeToggle";
 import { isSupportAdminUser } from "../lib/supportAdmin";
 import {
-  SUPPORT_REQUEST_CATEGORIES,
   loadSupportRequests,
   parseSupportRequestPrefill,
   supportCategoryLabel,
@@ -259,22 +258,9 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
   ];
 
   return (
-    <main className="legal-shell support-shell">
-      <header className="settings-page-topbar legal-topbar">
-        <Brand href="/" label="RoleForge AI home" />
-        <div className="settings-page-actions">
-          <Link className="btn btn-soft btn-sm" href="/help">Help</Link>
-          <Link className="btn btn-soft btn-sm" href="/status">Status</Link>
-          <ThemeToggle />
-          <PublicAccountMenu
-            supportHref={supportRequestHref({
-              category: "workflow",
-              subject: "Support page question",
-              contextUrl: "/support",
-            })}
-          />
-        </div>
-      </header>
+    <div className="help-hub-page">
+      <HelpHubHeader active="support" signedIn={signedIn} />
+      <main className="legal-shell support-shell" id="help-hub-main">
 
       <section className="legal-hero support-hero" aria-labelledby="support-title">
         <div>
@@ -428,50 +414,7 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
           </section>
 
           {signedIn ? (
-            <form className="support-form" action="/api/support-requests" method="post">
-              <label>
-                <span>Topic</span>
-                <select name="category" required defaultValue={prefill.category}>
-                  {SUPPORT_REQUEST_CATEGORIES.map((category) => (
-                    <option key={category} value={category}>{supportCategoryLabel(category)}</option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                <span>Subject</span>
-                <input
-                  name="subject"
-                  maxLength={120}
-                  minLength={4}
-                  required
-                  defaultValue={prefill.subject}
-                  placeholder="Export download is not updating"
-                />
-              </label>
-              <label>
-                <span>Related page or request id</span>
-                <input
-                  name="contextUrl"
-                  maxLength={300}
-                  defaultValue={prefill.contextUrl ?? ""}
-                  placeholder="/settings#billing or req_..."
-                />
-              </label>
-              <label>
-                <span>Message</span>
-                <textarea
-                  name="message"
-                  minLength={20}
-                  maxLength={2000}
-                  required
-                  rows={7}
-                  placeholder="What happened, what you expected, and the last step you tried."
-                />
-              </label>
-              <button className="primary-button support-submit" type="submit">
-                Send request <RoleForgeIcon name="mail" size={14} />
-              </button>
-            </form>
+            <SupportForm prefill={prefill} />
           ) : (
             <div className="support-signin-card">
               <strong>Use your account session</strong>
@@ -527,6 +470,8 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
           <Link className="btn btn-soft btn-sm" href="/settings">Settings</Link>
         </div>
       </section>
-    </main>
+      </main>
+      <SiteFooter active="/support" variant="compact" />
+    </div>
   );
 }

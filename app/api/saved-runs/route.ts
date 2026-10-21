@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { withAccountDatabase } from "@/app/lib/supabase/accountDatabase";
 import { createRoleForgeRouteClient, withSupabaseCookies } from "@/app/lib/supabase/routeClient";
 import { parseCompletedRunSaveInput } from "@/app/lib/supabase/savedProjectInput";
-import { loadSavedRuns, saveCompletedRun } from "@/app/lib/supabase/savedProjects";
+import { loadSavedRuns, loadSavedRunsPage, saveCompletedRun } from "@/app/lib/supabase/savedProjects";
 
 async function requireAccount() {
   const routeClient = await createRoleForgeRouteClient();
@@ -31,11 +31,25 @@ async function requireAccount() {
   return { routeClient, user };
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const account = await requireAccount();
   if ("error" in account) return account.error;
 
+  const params = new URL(request.url).searchParams;
+  const offset = params.get("offset");
+  const runId = params.get("runId");
+  if ((offset !== null && (!/^\d+$/.test(offset) || !Number.isSafeInteger(Number(offset)))) ||
+      (runId !== null && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(runId))) {
+    return withSupabaseCookies(NextResponse.json({ error: "Invalid saved projects request." }, { status: 400 }), account.routeClient.cookiesToSet);
+  }
+
   try {
+    if (offset !== null || runId !== null) {
+      const page = await withAccountDatabase(account.routeClient.supabase,
+        (dbClient) => loadSavedRunsPage(dbClient, account.user.id, { offset: Number(offset ?? 0), runId: runId ?? undefined }),
+        { label: "Saved projects page database operation" });
+      return withSupabaseCookies(NextResponse.json(page), account.routeClient.cookiesToSet);
+    }
     const runs = await withAccountDatabase(
       account.routeClient.supabase,
       (dbClient) => loadSavedRuns(dbClient, account.user.id),

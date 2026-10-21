@@ -2,14 +2,18 @@ import type { ExportFormat } from "./exportFormats";
 
 export type CheckedDownloadState = "ready" | "expired";
 
+export function readyDownloadStatus(format: ExportFormat) {
+  return {
+    state: "ready" as CheckedDownloadState,
+    message: `${format.toUpperCase()} download is ready`,
+  };
+}
+
 export function downloadStatusFromHead(format: ExportFormat, status: number) {
   const label = format.toUpperCase();
 
   if (status >= 200 && status < 300) {
-    return {
-      state: "ready" as CheckedDownloadState,
-      message: `${label} download is ready`,
-    };
+    return readyDownloadStatus(format);
   }
 
   if (status === 402) {

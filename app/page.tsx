@@ -1,10 +1,12 @@
 import "./landing.css";
+import HomePage from "./home/page";
 
 import NextLink from "next/link";
 import type { ComponentProps } from "react";
 import { AccountAvatar } from "./components/AccountAvatar";
 import { AccountReferenceCopyButton } from "./components/AccountReferenceCopyButton";
-import { Brand } from "./components/Brand";
+import { SiteHeader } from "./components/SiteHeader";
+import { SiteFooter } from "./components/SiteFooter";
 import { DeferredLandingStudioDemo } from "./components/DeferredLandingStudioDemo";
 import { FaqAccordion } from "./components/FaqAccordion";
 import { LandingAnchorBootstrap } from "./components/LandingAnchorBootstrap";
@@ -12,7 +14,6 @@ import { LandingAnchorSync } from "./components/LandingAnchorSync";
 import { ResumePreview } from "./components/ResumePreview";
 import { RESUME_TEMPLATES } from "./lib/resumeTemplates";
 import { RoleForgeIcon } from "./components/RoleForgeIcons";
-import { ThemeToggle } from "./components/ThemeToggle";
 import { accountAvatarUrl, accountDisplayName, accountIdentityFromClaims, accountReference } from "./lib/accountUser";
 import { billingReadiness } from "./lib/billing/readiness";
 import { getStripeBillingConfig, PREMIUM_PRICE } from "./lib/billing/stripe";
@@ -142,15 +143,7 @@ function Nav({
   const landingBillingHref = premiumActive || checkoutReady ? billingHref : "/status";
 
   return (
-    <header className="nav">
-      <div className="nav-inner">
-        <Brand />
-        <nav className="nav-links" aria-label="Primary navigation">
-          <Link className="nav-link nav-link-secondary" href="/templates">Templates</Link>
-          <a className="nav-link nav-link-secondary" href="#how">How it works</a>
-          <a className="nav-link nav-link-secondary" href="#features">Features</a>
-          <a className="nav-link nav-link-secondary" href="#pricing">Pricing</a>
-          <ThemeToggle />
+    <SiteHeader landing studioHref={studioHref} signedIn={signedIn}>
           {signedIn ? (
             <details className="landing-account-menu" data-account-menu="true">
               <summary className="studio-account-button landing-account-button" aria-expanded="false" aria-haspopup="menu" aria-label="Open account menu">
@@ -242,15 +235,13 @@ function Nav({
             <span className="nav-cta-short">Build</span>
             <RoleForgeIcon name="arrow" size={14} />
           </Link>
-        </nav>
-      </div>
-    </header>
+    </SiteHeader>
   );
 }
 
 function Hero({ studioHref }: Pick<LandingLinks, "studioHref">) {
   return (
-    <section className="hero">
+    <section className="hero" id="top" tabIndex={-1}>
       <div className="hero-copy">
         <div className="hero-trust">
           <span className="badge">New</span>
@@ -262,7 +253,7 @@ function Hero({ studioHref }: Pick<LandingLinks, "studioHref">) {
           <span className="hero-line">the role.</span>
         </h1>
         <p className="hero-sub">
-          Upload your resume, add a job target, review structure and keyword signals, then export a cleaner draft from the same guided workspace.
+          Upload your resume, point at the role, and read the structure and keyword signals side by side. You review every change before a cleaner draft leaves the workspace.
         </p>
         <div className="hero-ctas">
           <Link className="btn btn-brand btn-lg" href={studioHref}>
@@ -270,11 +261,17 @@ function Hero({ studioHref }: Pick<LandingLinks, "studioHref">) {
           </Link>
           <a className="btn btn-ghost btn-lg" href="#how">See how it works</a>
         </div>
-        <div className="hero-meta safe-meta" aria-label="Product capabilities">
-          <div className="hero-meta-item"><span className="v">Upload</span><span className="l">Start from DOCX, PDF, or TXT.</span></div>
-          <div className="hero-meta-item"><span className="v">Target</span><span className="l">Use text or URL.</span></div>
-          <div className="hero-meta-item"><span className="v">Review</span><span className="l">Check before export.</span></div>
-        </div>
+        <p className="hero-free-note">Free to start · No credit card · PDF export on the free plan</p>
+        <ol className="hero-workflow" aria-label="The RoleForge workflow">
+          {[
+            ["Upload", "DOCX, PDF, or TXT"],
+            ["Target", "Job text or public URL"],
+            ["Review", "Fit, gaps, formatting"],
+            ["Export", "Clean PDF draft"],
+          ].map(([label, detail], index) => (
+            <li key={label}><span className="hero-workflow-step">Step 0{index + 1}</span><strong>{label}</strong><span>{detail}</span></li>
+          ))}
+        </ol>
       </div>
 
       <div
@@ -665,68 +662,14 @@ function CTABand({ studioHref }: Pick<LandingLinks, "studioHref">) {
   );
 }
 
-function Footer() {
-  const currentYear = new Date().getFullYear();
-
-  return (
-    <footer className="footer">
-      <div className="footer-inner">
-        <div className="footer-brand-block">
-          <Brand />
-          <p className="footer-tag">A focused resume tailoring workspace with protected studio access, saved project history, and Stripe-backed Premium billing.</p>
-          <div className="footer-product-note" aria-label="RoleForge product safeguards">
-            <span><RoleForgeIcon name="lock" size={13} /> Protected studio</span>
-            <span><RoleForgeIcon name="download" size={13} /> Account exports</span>
-            <span><RoleForgeIcon name="layers" size={13} /> Premium DOCX/TXT</span>
-          </div>
-        </div>
-        <nav className="footer-col" aria-label="Product links">
-          <h3>Product</h3>
-          <Link href="/app">Resume studio</Link>
-          <Link href="/templates">Templates</Link>
-          <a href="#features">Features</a>
-          <a href="#pricing">Pricing</a>
-        </nav>
-        <nav className="footer-col" aria-label="Account links">
-          <h3>Account</h3>
-          <Link href="/login?next=/app">Sign in</Link>
-          <Link href="/settings">Settings</Link>
-          <Link href="/settings#projects">Saved projects</Link>
-          <Link href="/settings#billing">Billing</Link>
-        </nav>
-        <nav className="footer-col" aria-label="Support links">
-          <h3>Support</h3>
-          <Link href="/help">Help</Link>
-          <Link href="/support">Support</Link>
-          <Link href="/status">Status</Link>
-          <Link href="/updates">Updates</Link>
-        </nav>
-        <nav className="footer-col" aria-label="Legal links">
-          <h3>Legal</h3>
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/terms">Terms</Link>
-          <span>Payments by Stripe</span>
-          <span>Google sign-in supported</span>
-        </nav>
-      </div>
-      <div className="footer-meta">
-        <span>&copy; {currentYear} RoleForge AI. All rights reserved.</span>
-        <div className="footer-meta-links" aria-label="Footer legal links">
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/terms">Terms</Link>
-          <Link href="/status">Status</Link>
-        </div>
-        <span>Focused resume tailoring for real applications.</span>
-      </div>
-    </footer>
-  );
-}
-
-export default async function Landing() {
+export default async function Landing({ searchParams }: { searchParams?: Promise<Record<string, string | string[] | undefined>> }) {
+  const params = await searchParams;
   const links = await getLandingLinks();
+  if (links.signedIn && params?.view !== "site") return <HomePage />;
 
   return (
     <main className="page-shell landing-page">
+      <a className="site-skip-link" href="#top">Skip to content</a>
       <LandingAnchorSync />
       <Nav
         signedIn={links.signedIn}
@@ -761,7 +704,7 @@ export default async function Landing() {
       />
       <FAQ checkoutReady={links.checkoutReady} />
       <CTABand studioHref={links.studioHref} />
-      <Footer />
+      <SiteFooter />
       <LandingAnchorBootstrap />
     </main>
   );

@@ -90,6 +90,7 @@ export async function loadAccountUsage(
   client: SupabaseClient,
   userId: string,
   entitlement: AccountEntitlement,
+  options: { throwOnError?: boolean } = {},
 ): Promise<AccountUsage> {
   const period = currentUsagePeriod();
   const { count, error } = await client
@@ -98,6 +99,7 @@ export async function loadAccountUsage(
     .eq("user_id", userId)
     .gte("created_at", period.startIso)
     .lt("created_at", period.endIso) as CountResult;
+  if (error && options.throwOnError) throw error;
   const monthlyRuns = error ? 0 : count ?? 0;
   const monthlyRunLimit = entitlement.monthlyRunLimit;
   const remainingRuns = typeof monthlyRunLimit === "number" ? Math.max(0, monthlyRunLimit - monthlyRuns) : null;

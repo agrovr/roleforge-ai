@@ -1,0 +1,36 @@
+/* Final Claude public-surface slice. Higher scope specificity isolates legacy rules. */
+.landing-page .hero-workflow {
+  list-style: none; margin: 36px 0 0; padding: 20px 0 0; border-top: 1px solid var(--line);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 132px), 1fr)); gap: 14px clamp(10px, 1.6vw, 18px);
+}
+.landing-page .hero-workflow li { display: grid; gap: 7px; min-width: 0; }
+.landing-page .hero-workflow-step { display: flex; align-items: center; gap: 8px; color: var(--brand-dark); font: 800 .64rem var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+.landing-page .hero-workflow-step::before { content: ""; width: 6px; height: 6px; flex: 0 0 6px; background: var(--brand); border-radius: 50%; }
+.landing-page .hero-workflow li:nth-child(3) .hero-workflow-step::before { background: var(--accent); }
+.landing-page .hero-workflow li:nth-child(4) .hero-workflow-step::before { background: var(--sky); }
+.landing-page .hero-workflow strong { color: var(--ink-0); font: 500 clamp(19px, 2.2vw, 23px)/1.1 var(--font-display); letter-spacing: -.02em; }
+.landing-page .hero-workflow li > span:last-child { color: var(--ink-3); font-size: 12.5px; line-height: 1.4; }
+.landing-page .hero-free-note { margin: 16px 0 0; color: var(--ink-3); font-size: 13.5px; }
+.landing-page .hero .h1 { font-size: clamp(46px, 6.4vw, 84px); font-weight: 500; letter-spacing: -.02em; line-height: 1.04; }
+.landing-page .hero-sub { max-width: 52ch; font-size: clamp(1.02rem, 2.4vw, 1.18rem); line-height: 1.55; }
+.landing-page .btn.btn-brand {
+  color: var(--on-brand); background: var(--brand); border-color: transparent; text-shadow: none;
+}
+.landing-page .btn.btn-brand:hover { color: var(--on-brand); background: var(--brand-hover); }
+.landing-page .site-header.nav, html[data-theme="dark"] .landing-page .site-header.nav { width: 100%; padding: 12px 16px; margin: 0; background: transparent; box-shadow: none; border: 0; }
+.landing-page .site-header .nav-inner { width: 100%; max-width: 1200px; margin-inline: auto; padding: 8px 12px; gap: 16px; min-height: 64px; border-radius: 30px; background: var(--surface); }
+.landing-page .hero { width: 100%; inline-size: min(100%, 1200px); max-width: 1200px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 430px), 1fr)); gap: clamp(28px, 5vw, 64px); padding-inline: clamp(20px, 4vw, 28px); }
+.landing-page .site-header .nav-links { gap: 4px; }
+.landing-page .site-header .nav-links > .btn { min-height: 48px; padding-inline: 18px; }
+.landing-page .site-header .brand-name { white-space: nowrap; }
+.landing-page .site-header .brand { padding: 0; }
+@media (max-width: 940px) {
+  .landing-page .site-header.nav { width: 100%; }
+  .landing-page .site-header .site-header-desktop { display: none; }
+}
+@media (max-width: 640px) {
+  .landing-page .site-header .nav-links > .btn { display: none; }
+  .landing-page .site-header .nav-inner { gap: 8px; }
+  .landing-page .hero .h1 { font-size: clamp(40px, 10.6vw, 60px); }
+  .landing-page .hero-badge { display: none; }
+}

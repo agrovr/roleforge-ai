@@ -115,11 +115,8 @@ test("settings status pills keep readable contrast in dark mode", () => {
 });
 
 test("settings account panel includes an editable profile display name", () => {
-  assert.match(settingsPage, /updateAccountProfileAction/);
-  assert.match(settingsPage, /saveAccountProfile\(supabase,\s*user/);
-  assert.match(settingsPage, /name="displayName"/);
+  assert.match(settingsPage, /SettingsDraftField fieldKey="displayName"/);
   assert.match(settingsPage, /maxLength=\{80\}/);
-  assert.match(settingsPage, /defaultValue=\{displayName\}/);
   assert.match(settingsPage, /Save name/);
   assert.match(settingsPage, /href="\/api\/account\/export"/);
   assert.match(settingsPage, /Export account record/);

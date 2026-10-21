@@ -13,11 +13,10 @@ assert.notEqual(mobileGuardStart, -1, "final mobile landing guardrail is missing
 assert.notEqual(mobileGuardEnd, -1, "final mobile landing guardrail boundary is missing");
 const mobileGuard = stylesheet.slice(mobileGuardStart, mobileGuardEnd);
 
-test("landing hero keeps the three real workflow capabilities visible", () => {
-  assert.match(landingPage, /aria-label="Product capabilities"/);
-  assert.match(landingPage, />Upload<\/span><span className="l">Start from DOCX, PDF, or TXT\.<\/span>/);
-  assert.match(landingPage, />Target<\/span><span className="l">Use text or URL\.<\/span>/);
-  assert.match(landingPage, />Review<\/span><span className="l">Check before export\.<\/span>/);
+test("landing hero explains the four real workflow steps without outcome claims", () => {
+  assert.match(landingPage, /aria-label="The RoleForge workflow"/);
+  for (const copy of ["DOCX, PDF, or TXT", "Job text or public URL", "Fit, gaps, formatting", "Clean PDF draft"]) assert.ok(landingPage.includes(copy));
+  assert.match(landingPage, /You review every change/);
 });
 
 test("landing hero capability rhythm is deterministic across desktop and phones", () => {

@@ -1,0 +1,22 @@
+.help-hub-page { background: var(--bg); color: var(--ink-0); min-height: 100vh; }
+.help-hub-page .site-header { padding: 12px clamp(18px, 4vw, 54px); background: var(--surface); border-bottom: 1px solid var(--line); }
+.help-hub-page .legal-shell, html[data-theme="dark"] .help-hub-page .legal-shell { background: transparent; min-height: auto; max-width: 1360px; margin: 0 auto; }
+.help-hub-page .legal-shell::before, .help-hub-page .legal-shell::after { content: none; }
+.help-hub-tabs { display: flex; gap: 8px; padding: 18px clamp(18px, 4vw, 54px) 0; max-width: 1360px; margin: 0 auto; overflow-x: auto; }
+.help-hub-tabs a { padding: 11px 16px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); color: var(--ink-2); font-size: .85rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.help-hub-tabs a[aria-current="page"] { background: var(--ink-0); color: var(--bg); border-color: var(--ink-0); }
+.help-hub-page .primary-button, html[data-theme="dark"] .help-hub-page .primary-button { background: var(--brand); color: var(--on-brand); border-color: var(--brand); }
+.help-hub-page .primary-button:hover, html[data-theme="dark"] .help-hub-page .primary-button:hover { background: var(--brand-hover); }
+.help-hub-page .support-form { gap: 10px; }
+.help-hub-page .support-form > label { margin-top: 8px; font-weight: 700; }
+.help-hub-page .support-form input, .help-hub-page .support-form textarea, .help-hub-page .support-form select { width: 100%; min-width: 0; padding: 12px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink-0); font: inherit; }
+.help-hub-page .support-form [aria-invalid="true"] { border-color: var(--danger); }
+.help-hub-page .support-form small { color: var(--ink-3); }
+.help-hub-page .support-form .support-field-error { margin: 0; color: var(--danger); font-size: .85rem; }
+.help-hub-page .support-form button:disabled { opacity: .65; cursor: wait; }
+.help-hub-page :focus-visible { outline: 2px solid var(--brand-dark); outline-offset: 3px; }
+@media(max-width:600px) { .help-hub-tabs { gap: 6px; } .help-hub-tabs a { padding: 10px 12px; font-size: .78rem; } }
+@media(max-width:600px) {
+  .help-hub-page .site-header .public-account-signin,
+  .help-hub-page .site-header .public-account-loading { display: none; }
+}

@@ -1,8 +1,9 @@
+import { PublicInfoHeader } from "./components/PublicInfoHeader";
+import { SiteFooter } from "./components/SiteFooter";
+import "./public-info.css";
 import Link from "next/link";
 
-import { Brand } from "./components/Brand";
 import { RoleForgeIcon } from "./components/RoleForgeIcons";
-import { ThemeToggle } from "./components/ThemeToggle";
 
 const recoveryLinks = [
   {
@@ -27,15 +28,10 @@ const recoveryLinks = [
 
 export default function NotFound() {
   return (
-    <main className="not-found-shell">
-      <header className="settings-page-topbar public-page-topbar">
-        <Brand href="/" label="RoleForge AI home" />
-        <div className="settings-page-actions">
-          <Link className="btn btn-soft btn-sm" href="/app">Studio</Link>
-          <Link className="btn btn-soft btn-sm" href="/help">Help</Link>
-          <ThemeToggle />
-        </div>
-      </header>
+    <div className="public-info-page">
+<PublicInfoHeader active="not-found" />
+<main className="not-found-shell" id="public-info-main">
+
 
       <section className="not-found-hero" aria-labelledby="not-found-title">
         <div className="not-found-copy">
@@ -84,5 +80,7 @@ export default function NotFound() {
         ))}
       </section>
     </main>
+<SiteFooter active="/not-found" />
+</div>
   );
 }

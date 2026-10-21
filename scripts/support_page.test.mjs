@@ -5,6 +5,7 @@ import test from "node:test";
 import { stylesFor } from "./style_sources.mjs";
 
 const supportPage = readFileSync("app/support/page.tsx", "utf8");
+const supportForm = readFileSync("app/support/SupportForm.tsx", "utf8");
 const supportRoute = readFileSync("app/api/support-requests/route.ts", "utf8");
 const supportLib = readFileSync("app/lib/supportRequests.ts", "utf8");
 const supportNotifications = readFileSync("app/lib/supportNotifications.ts", "utf8");
@@ -26,6 +27,10 @@ const smokeFrontend = readFileSync("scripts/smoke_frontend.mjs", "utf8");
 const smokeLayout = readFileSync("scripts/smoke_layout.mjs", "utf8");
 
 test("support page provides signed-in account-linked request flow", () => {
+  assert.match(supportPage, /<SupportForm prefill=\{prefill\}/);
+  assert.match(supportForm, /supportRequestFieldErrors\(values\)/);
+  assert.match(supportForm, /aria-invalid=/);
+  assert.match(supportForm, /role="alert"/);
   assert.match(supportPage, /title: "Support"/);
   assert.match(supportPage, /canonical: "\/support"/);
   assert.match(supportPage, /account, billing, privacy, export/);
@@ -64,12 +69,9 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /status:\s*"open"/);
   assert.match(supportPage, /status:\s*"reviewing"/);
   assert.match(supportPage, /status:\s*"closed"/);
-  assert.match(supportPage, /action="\/api\/support-requests"/);
+  assert.match(supportForm, /action="\/api\/support-requests"/);
   assert.match(supportPage, /loadSupportRequests\(supabase,\s*user\.id,\s*\{ limit: 5 \}\)/);
   assert.match(supportPage, /parseSupportRequestPrefill/);
-  assert.match(supportPage, /defaultValue=\{prefill\.category\}/);
-  assert.match(supportPage, /defaultValue=\{prefill\.subject\}/);
-  assert.match(supportPage, /defaultValue=\{prefill\.contextUrl \?\? ""\}/);
   assert.match(supportPage, /support-prefill-note/);
   assert.match(supportPage, /supportRequestReference\(reference\)/);
   assert.match(supportPage, /Recent requests/);
@@ -86,10 +88,10 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /Support history appears on this page and in Settings/);
   assert.match(supportPage, /If the support channel is configured, RoleForge sends the request details for operator review/);
   assert.match(supportPage, /When notification routing is configured/);
-  assert.match(supportPage, /name="category"/);
-  assert.match(supportPage, /name="subject"/);
-  assert.match(supportPage, /name="message"/);
-  assert.match(supportPage, /name="contextUrl"/);
+  assert.match(supportForm, /name="category"/);
+  assert.match(supportForm, /name="subject"/);
+  assert.match(supportForm, /name="message"/);
+  assert.match(supportForm, /name="contextUrl"/);
   assert.match(supportPage, /Sign in for support/);
   assert.match(supportPage, /Never paste full payment card details or private credentials/);
 });

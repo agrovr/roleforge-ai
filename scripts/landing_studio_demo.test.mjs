@@ -48,6 +48,16 @@ test("landing studio exposes keyboard-operable sample views and state", () => {
   assert.match(demo, /href=\{studioHref\}/);
 });
 
+test("landing studio preserves the heavy resume preview across sample view switches", () => {
+  assert.match(demo, /const ResumeDemoContent = memo\(function ResumeDemoContent/);
+  assert.match(demo, /className="dash-demo-resume-panel"[\s\S]*?data-hidden=\{activeView !== "resume"\}[\s\S]*?aria-hidden=\{activeView !== "resume"\}[\s\S]*?inert=\{activeView === "resume" \? undefined : true\}/);
+  assert.match(demo, /<ResumeDemoContent[\s\S]*?resumePreview=\{resumePreview\}[\s\S]*?\/>/);
+  assert.doesNotMatch(demo, /className="dash-demo-content" key=\{activeView\}/);
+  assert.doesNotMatch(demo, /\{activeView === "resume" \? \(/);
+  assert.match(globals, /\.dash-demo-resume-panel\s*\{(?=[^}]*display:\s*grid)(?=[^}]*gap:\s*18px)[^}]*\}/s);
+  assert.match(globals, /\.dash-demo-resume-panel\[data-hidden="true"\]\s*\{(?=[^}]*height:\s*0)(?=[^}]*content-visibility:\s*hidden)(?=[^}]*contain-intrinsic-size:\s*0 0)(?=[^}]*pointer-events:\s*none)[^}]*\}/s);
+});
+
 test("landing studio interaction remains responsive dark-mode safe and restrained", () => {
   assert.match(globals, /\.dash-demo \.dash-side-item\s*\{(?=[^}]*min-height:\s*44px)(?=[^}]*cursor:\s*pointer)[^}]*\}/s);
   assert.match(globals, /\.dash-demo-tabs\s*\{(?=[^}]*display:\s*none)(?=[^}]*overflow-x:\s*auto)[^}]*\}/s);

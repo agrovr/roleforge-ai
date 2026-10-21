@@ -9,15 +9,10 @@ const sectionStart = globals.indexOf("/* Landing footer finish:");
 assert.notEqual(sectionStart, -1, "landing footer polish section is missing");
 const section = globals.slice(sectionStart);
 
-test("landing footer keeps factual product links and legal metadata", () => {
-  assert.match(landingPage, /function Footer/);
-  assert.match(landingPage, /className="footer-brand-block"/);
-  assert.match(landingPage, /Protected studio/);
-  assert.match(landingPage, /Account exports/);
-  assert.match(landingPage, /Premium DOCX\/TXT/);
-  assert.match(landingPage, /Payments by Stripe/);
-  assert.match(landingPage, /Google sign-in supported/);
-  assert.match(landingPage, /&copy; \{currentYear\} RoleForge AI\. All rights reserved\./);
+test("shared footer keeps factual product and legal content", () => {
+  const footer = readFileSync("app/components/SiteFooter.tsx", "utf8");
+  assert.match(landingPage, /<SiteFooter \/>/);
+  for (const copy of ["Protected studio", "Account exports", "Premium DOCX/TXT", "Payments by Stripe", "Google sign-in supported", "All rights reserved."]) assert.ok(footer.includes(copy), copy);
 });
 
 test("landing footer has a grounded surface and brand trust block without a line-field overlay", () => {
