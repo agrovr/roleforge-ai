@@ -12,8 +12,8 @@ const DEFAULT_BASE_URL = "https://roleforgeai.vercel.app";
 const VIEWPORTS = [390, 640, 768, 900, 1024, 1180, 1366, 1440, 1500, 1712];
 const NARROW_DESKTOP_VIEWPORTS = [390, 430];
 const PUBLIC_THEMES = ["light", "dark"];
-const LEGAL_TOPBAR_PSEUDO_CHECKS = [
-  { selector: ".legal-topbar", pseudo: "::after", expectedContent: "none" },
+const SHARED_HEADER_PSEUDO_CHECKS = [
+  { selector: ".site-header", pseudo: "::after", expectedContent: "none" },
 ];
 const PAGE_CHECKS = [
   {
@@ -35,10 +35,13 @@ const PAGE_CHECKS = [
       [".cta-band > div:first-child", ".cta-visual"],
     ],
     disjointSelectorGroups: [
+      { first: ".hero-copy", second: ".hero-stage .resume-card" },
       { first: ".steps-track span", second: ".step-icon" },
     ],
     containedSelectors: [
-      { container: ".hero-stage", selector: ".hero-stage .resume-card", tolerance: 8 },
+      // The rotated cards intentionally extend beyond the stage's grid cell.
+      // Keep them inside the hero and clear of its copy instead.
+      { container: ".hero", selector: ".hero-stage .resume-card", tolerance: 8 },
       { container: ".hero-stage", selector: ".hero-badge", tolerance: 8 },
       { container: ".dash-mock", selector: ".dash-mock .btn", tolerance: 4 },
       { container: "closest:.dash-stat", selector: ".dash-mock .dash-stat-label", tolerance: 4 },
@@ -69,7 +72,7 @@ const PAGE_CHECKS = [
       ".cta-band",
       ".cta-band h2",
       ".cta-band .cta-cluster",
-      ".footer-inner",
+      ".site-footer-inner",
     ],
     textFitSelectors: [
       ".hero .h1",
@@ -95,10 +98,10 @@ const PAGE_CHECKS = [
   {
     path: "/templates",
     name: "templates",
-    selectors: [".public-page-topbar", ".templates-page-hero", ".templates-hero-preview", ".templates-page-actions", ".templates-decision-guide", ".templates-page-grid"],
+    selectors: [".site-header", ".templates-page-hero", ".templates-hero-preview", ".templates-page-actions", ".templates-decision-guide", ".templates-page-grid"],
     textFitSelectors: [
-      ".public-page-topbar .brand-name",
-      ".public-page-topbar .btn",
+      ".site-header .brand-name",
+      ".site-header .btn",
       ".templates-page-hero h1",
       ".templates-page-hero p",
       ".templates-hero-preview-head span",
@@ -115,9 +118,9 @@ const PAGE_CHECKS = [
       ".template-card-actions .btn",
     ],
     containedSelectors: [
-      { container: ".templates-page-shell", selector: ".public-page-topbar", tolerance: 4 },
-      { container: ".public-page-topbar", selector: ".public-page-topbar .brand", tolerance: 4 },
-      { container: ".public-page-topbar", selector: ".public-page-topbar .settings-page-actions", tolerance: 4 },
+      { container: ".templates-page-shell", selector: ".site-header", tolerance: 4 },
+      { container: ".site-header", selector: ".site-header .brand", tolerance: 4 },
+      { container: ".site-header", selector: ".site-header-navigation", tolerance: 4 },
       { container: ".templates-page-shell", selector: ".templates-page-hero", tolerance: 4 },
       { container: ".templates-page-hero", selector: ".templates-hero-preview", tolerance: 4 },
       { container: ".templates-hero-preview", selector: ".templates-hero-thumb", tolerance: 4 },
@@ -162,8 +165,8 @@ const PAGE_CHECKS = [
   {
     path: "/help",
     name: "help",
-    pseudoContentChecks: LEGAL_TOPBAR_PSEUDO_CHECKS,
-    selectors: [".legal-shell", ".legal-topbar", ".legal-hero", ".help-signal-strip", ".help-action-routes", ".help-quick-grid", ".legal-grid", ".legal-card", ".legal-footer-card"],
+    pseudoContentChecks: SHARED_HEADER_PSEUDO_CHECKS,
+    selectors: [".legal-shell", ".site-header", ".legal-hero", ".help-signal-strip", ".help-action-routes", ".help-quick-grid", ".legal-grid", ".legal-card", ".legal-footer-card"],
     textFitSelectors: [
       ".legal-hero h1",
       ".legal-hero p",
@@ -210,10 +213,10 @@ const PAGE_CHECKS = [
   {
     path: "/support",
     name: "support",
-    pseudoContentChecks: LEGAL_TOPBAR_PSEUDO_CHECKS,
+    pseudoContentChecks: SHARED_HEADER_PSEUDO_CHECKS,
     selectors: [
       ".legal-shell",
-      ".legal-topbar",
+      ".site-header",
       ".legal-hero",
       ".support-routing-strip",
       ".support-routing-step",
@@ -285,8 +288,8 @@ const PAGE_CHECKS = [
   {
     path: "/status",
     name: "status",
-    pseudoContentChecks: LEGAL_TOPBAR_PSEUDO_CHECKS,
-    selectors: [".legal-shell", ".legal-topbar", ".legal-hero", ".status-grid", ".status-card", ".status-diagnostics", ".status-incident-card", ".status-diagnostic-card", ".legal-footer-card"],
+    pseudoContentChecks: SHARED_HEADER_PSEUDO_CHECKS,
+    selectors: [".legal-shell", ".site-header", ".legal-hero", ".status-grid", ".status-card", ".status-diagnostics", ".status-incident-card", ".status-diagnostic-card", ".legal-footer-card"],
     textFitSelectors: [
       ".legal-hero h1",
       ".legal-hero p",
@@ -318,8 +321,8 @@ const PAGE_CHECKS = [
   {
     path: "/updates",
     name: "updates",
-    pseudoContentChecks: LEGAL_TOPBAR_PSEUDO_CHECKS,
-    selectors: [".legal-shell", ".legal-topbar", ".legal-hero", ".updates-signal-grid", ".updates-signal-card", ".updates-ledger", ".updates-timeline", ".updates-card", ".legal-footer-card"],
+    pseudoContentChecks: SHARED_HEADER_PSEUDO_CHECKS,
+    selectors: [".legal-shell", ".site-header", ".legal-hero", ".updates-signal-grid", ".updates-signal-card", ".updates-ledger", ".updates-timeline", ".updates-card", ".legal-footer-card"],
     textFitSelectors: [
       ".legal-hero h1",
       ".legal-hero p",
@@ -353,8 +356,8 @@ const PAGE_CHECKS = [
   {
     path: "/privacy",
     name: "privacy",
-    pseudoContentChecks: LEGAL_TOPBAR_PSEUDO_CHECKS,
-    selectors: [".legal-shell", ".legal-topbar", ".legal-hero", ".legal-hero-meta", ".legal-index", ".legal-grid", ".legal-card", ".legal-footer-card"],
+    pseudoContentChecks: SHARED_HEADER_PSEUDO_CHECKS,
+    selectors: [".legal-shell", ".site-header", ".legal-hero", ".legal-hero-meta", ".legal-index", ".legal-grid", ".legal-card", ".legal-footer-card"],
     textFitSelectors: [
       ".legal-hero h1",
       ".legal-hero p",
@@ -381,8 +384,8 @@ const PAGE_CHECKS = [
   {
     path: "/terms",
     name: "terms",
-    pseudoContentChecks: LEGAL_TOPBAR_PSEUDO_CHECKS,
-    selectors: [".legal-shell", ".legal-topbar", ".legal-hero", ".legal-hero-meta", ".legal-index", ".legal-grid", ".legal-card", ".legal-footer-card"],
+    pseudoContentChecks: SHARED_HEADER_PSEUDO_CHECKS,
+    selectors: [".legal-shell", ".site-header", ".legal-hero", ".legal-hero-meta", ".legal-index", ".legal-grid", ".legal-card", ".legal-footer-card"],
     textFitSelectors: [
       ".legal-hero h1",
       ".legal-hero p",
@@ -409,7 +412,7 @@ const PAGE_CHECKS = [
   {
     path: "/missing-layout-smoke",
     name: "not-found",
-    selectors: [".not-found-shell", ".public-page-topbar", ".not-found-hero", ".not-found-docket", ".not-found-recovery", ".not-found-recovery-card"],
+    selectors: [".not-found-shell", ".site-header", ".not-found-hero", ".not-found-docket", ".not-found-recovery", ".not-found-recovery-card"],
     textFitSelectors: [
       ".not-found-copy h1",
       ".not-found-copy p",
@@ -497,7 +500,7 @@ const PAGE_CHECKS = [
     ],
     selectors: [
       ".settings-page-shell",
-      ".settings-page-topbar",
+      ".site-header",
       ".settings-page-layout",
       ".settings-page-nav",
       ".settings-page-main",
@@ -901,7 +904,8 @@ async function evaluateLayout(send, baseUrl, page, width, options = {}) {
     const url = new URL(`${baseUrl}${page.path}`);
     if (theme !== "account") url.searchParams.set("theme", theme);
     const settleMs = page.requiresAuth ? 3200 : 1800;
-    await navigateAndWaitForDocument(send, url.toString(), settleMs);
+    if (!options.preserveDocument) await navigateAndWaitForDocument(send, url.toString(), settleMs);
+    else await delay(250);
 
     const authenticatedShell = page.requiresAuth ? page.selectors?.[0] : null;
     if (authenticatedShell && !(await documentHasSelector(send, authenticatedShell))) {
@@ -1369,15 +1373,17 @@ async function evaluateLayout(send, baseUrl, page, width, options = {}) {
   return reports;
 }
 
-async function evaluatePreviewTabs(send, baseUrl) {
+async function evaluatePreviewTabs(send, baseUrl, { preserveDocument = false } = {}) {
   await send("Emulation.setDeviceMetricsOverride", {
     width: 1366,
     height: 1100,
     deviceScaleFactor: 1,
     mobile: false,
   });
-  await send("Page.navigate", { url: `${baseUrl}/app` });
-  await delay(3200);
+  if (!preserveDocument) {
+    await send("Page.navigate", { url: `${baseUrl}/app` });
+    await delay(3200);
+  }
 
   const expression = `(async () => {
     const checks = [
@@ -1465,7 +1471,8 @@ async function evaluateLandingStudioDemo(send, baseUrl, width = 1280) {
     deviceScaleFactor: 1,
     mobile,
   });
-  await send("Page.navigate", { url: `${baseUrl}/` });
+  // Interaction checks run after sign-in, when / opens Projects.
+  await send("Page.navigate", { url: `${baseUrl}/?view=site` });
   await delay(2400);
 
   const expression = `(async () => {
@@ -2022,13 +2029,22 @@ async function evaluateHistoryRestore(send, baseUrl) {
           failures.push({ selector: "button", reason: "new-resume-button-missing" });
         } else {
           newResumeButton.click();
-          await waitForText("Suggestions are waiting", 6000);
+          await waitFor(".studio-first-welcome", 6000);
           if (document.querySelector("#suggestions .suggestion.reviewed, #suggestions .suggestion.edit")) {
             failures.push({ selector: "#suggestions .suggestion", reason: "review-state-carried-into-new-resume" });
           }
-          if (!document.querySelector("#suggestions .empty-state")) {
-            failures.push({ selector: "#suggestions .empty-state", reason: "new-resume-suggestions-empty-state-missing" });
+          if (!document.querySelector(".rf-first-run .studio-first-welcome") || document.querySelector(".rf-studio-hero")) {
+            failures.push({ selector: ".studio-first-welcome", reason: "new-resume-first-run-state-missing" });
           }
+          // Restore again so responsive result and preview-tab checks inspect a real restored draft.
+          const historyButton = Array.from(document.querySelectorAll("button.rail-item"))
+            .find((button) => button.textContent.trim() === "History");
+          if (!historyButton) failures.push({ selector: "button.rail-item", reason: "history-navigation-missing" });
+          else { historyButton.click(); await waitFor(".history-action-restore", 6000); }
+          const restoreAgain = Array.from(document.querySelectorAll(".history-action-restore"))
+            .find((button) => button.getAttribute("aria-label")?.includes(smokeFilename));
+          if (!restoreAgain) failures.push({ selector: ".history-action-restore", reason: "restore-after-reset-missing" });
+          else { restoreAgain.click(); await waitFor(".rf-studio-hero", 6000); }
         }
       }
     }
@@ -2107,10 +2123,15 @@ async function main(argv = process.argv.slice(2)) {
       for (const pageCheck of pageChecks) {
         if (pageCheck.requiresAuth && !signedInSession?.cookie) continue;
         if (pageCheck.requiresAuth) await ensureSignedInBrowserSession();
+        const initialPageCheck = pageCheck.name === "signed-in studio" ? {
+          ...pageCheck,
+          name: "signed-in studio first run",
+          selectors: [".rf-studio-page", ".rf-studio-topbar", ".rf-studio-layout", ".rf-studio-rail", ".rf-studio-main", ".studio-first-welcome", ".studio-run-progress", ".rf-workflow-panel", ".rf-intake-grid"],
+        } : pageCheck;
         for (const width of viewportWidths) {
           console.log(`CHECK ${pageCheck.name} width=${width}`);
           reports.push(
-            ...(await evaluateLayout(page.send, baseUrl, pageCheck, width)),
+            ...(await evaluateLayout(page.send, baseUrl, initialPageCheck, width)),
           );
         }
         if (!pageCheck.requiresAuth) {
@@ -2135,11 +2156,19 @@ async function main(argv = process.argv.slice(2)) {
           : []),
         ...(signedInSession?.cookie
           ? [
-              ...(await evaluatePreviewTabs(page.send, baseUrl)),
               ...(await evaluateHistoryRestore(page.send, baseUrl)),
+              ...(await evaluatePreviewTabs(page.send, baseUrl, { preserveDocument: true })),
             ]
           : []),
       ];
+
+      if (signedInSession?.cookie) {
+        const resultPage = PAGE_CHECKS.find((check) => check.name === "signed-in studio");
+        for (const width of viewportWidths) {
+          console.log(`CHECK restored studio width=${width}`);
+          reports.push(...await evaluateLayout(page.send, baseUrl, resultPage, width, { preserveDocument: true }));
+        }
+      }
 
       const failures = [...reports, ...interactionReports].flatMap((report) => {
         const pageFailures = [...report.failures];
@@ -2156,6 +2185,17 @@ async function main(argv = process.argv.slice(2)) {
       });
 
       if (failures.length) {
+        const failureGroups = new Map();
+        for (const failure of failures) {
+          const { theme, viewportMode, viewportWidth, ...detail } = failure;
+          const key = JSON.stringify(detail);
+          const group = failureGroups.get(key) ?? { detail, cases: [] };
+          group.cases.push({ theme, viewportMode, viewportWidth });
+          failureGroups.set(key, group);
+        }
+        for (const group of failureGroups.values()) {
+          console.error(`LAYOUT_FAILURE ${JSON.stringify(group)}`);
+        }
         throw new Error(`Rendered layout smoke found ${failures.length} issue(s): ${JSON.stringify(failures.slice(0, 8))}`);
       }
 
