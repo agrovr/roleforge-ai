@@ -2033,6 +2033,10 @@ async function evaluateHistoryRestore(send, baseUrl) {
             failures.push({ selector: ".studio-first-welcome", reason: "new-resume-first-run-state-missing" });
           }
           // Restore again so responsive result and preview-tab checks inspect a real restored draft.
+          const historyButton = Array.from(document.querySelectorAll("button.rail-item"))
+            .find((button) => button.textContent.trim() === "History");
+          if (!historyButton) failures.push({ selector: "button.rail-item", reason: "history-navigation-missing" });
+          else { historyButton.click(); await waitFor(".history-action-restore", 6000); }
           const restoreAgain = Array.from(document.querySelectorAll(".history-action-restore"))
             .find((button) => button.getAttribute("aria-label")?.includes(smokeFilename));
           if (!restoreAgain) failures.push({ selector: ".history-action-restore", reason: "restore-after-reset-missing" });
