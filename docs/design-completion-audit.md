@@ -1,6 +1,10 @@
-# Design upgrade completion audit — updated October 17, 2026
+# Design upgrade completion audit — updated October 28, 2026
 
-Status: active. Local implementation and verification are substantial; complete delivery is not yet proven. This audit supplements the slice evidence, not a declaration that synthetic accounts prove live persistence or email/payment behavior.
+## Current production status
+
+PR #9 was merged and deployed with explicit user approval. Production commit `c3888742ba5e99e89ad32fc87d93912e674763ce` was confirmed in the browser; 688 tests, lint, typecheck, build, and authenticated backend smoke passed. Rendered layout verification exposed stale test contracts. PR #10 updates shared chrome selectors, distinguishes first-run from restored Studio, fixes signed-in landing-demo navigation, and checks decorative card containment against the hero with separate copy-collision assertions. The corrected full layout workflow [40780411050](https://github.com/agrovr/roleforge-ai/actions/runs/40780411050) passed at test commit `007477e`: 13 pages, 10 responsive widths, two narrow desktop widths, both public themes, and interaction checks. Production publication and this verification pass are complete; merging the test/CI/documentation follow-up PR #10 remains a separate decision. Historical entries below describe the evidence available on their stated dates.
+
+Status: production design release verified within the scope below; PR #10 merge decision remains pending. This audit supplements the slice evidence, not a declaration that synthetic accounts prove live persistence or email/payment behavior.
 
 | Requirement | Current implementation / authoritative evidence | Assessment |
 | --- | --- | --- |
@@ -20,13 +24,13 @@ Status: active. Local implementation and verification are substantial; complete 
 | Privacy/Terms/Updates/404 | 24 actual route cases; independent review identified 404 contrast, corrected and browser-verified in both themes | Local verification passed |
 | Final regression and build | tests-live-final.log 687/687 in 41735.52ms; build-live-fixes.log exit0; focused ESLint exit0 | Passed current implementation |
 | Temporary fixture cleanup / backend preservation | No app/*preview/page routes found; backend git status empty; diff --check clean | Verified October4 |
-| Publication | Approved release branch published as PR #9; Vercel preview deployed application commit 10f0ee7; GitHub CI passes 688 tests, lint, typecheck, build | Preview published; production merge is not authorized |
+| Publication | PR #9 merged with approval; production commit c388874 verified in browser; 688 tests, lint, typecheck, build and authenticated backend smoke passed | Production published; corrected layout gate passed in PR #10 |
 
 ## Remaining proof
 
 - Live signed-in routing, account display, TXT intake, tailoring, all three export downloads, project persistence, and restore are now verified below. This does not establish PDF/DOCX source intake or every template's export layout.
 - Profile save persistence is verified. Preference saves, actual support delivery/admin mutation, and live Stripe checkout/portal behavior remain unverified. No payment, email, or destructive action is authorized by the QA-run approval.
-- Approved preview publication is complete. Chrome verified the landing, Pricing navigation/layout, and signed-out Studio gateway. Signed-in preview behavior and production release verification remain pending; production merge requires separate approval.
+- Approved preview and PR #9 production publication are complete. Signed-in preview behavior remains unverified; corrected production layout verification passed in PR #10. Payment, email delivery, and live admin mutation remain separate unverified flows.
 
 ## October 17 preview release
 
