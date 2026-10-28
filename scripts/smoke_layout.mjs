@@ -35,10 +35,13 @@ const PAGE_CHECKS = [
       [".cta-band > div:first-child", ".cta-visual"],
     ],
     disjointSelectorGroups: [
+      { first: ".hero-copy", second: ".hero-stage .resume-card" },
       { first: ".steps-track span", second: ".step-icon" },
     ],
     containedSelectors: [
-      { container: ".hero-stage", selector: ".hero-stage .resume-card", tolerance: 8 },
+      // The rotated cards intentionally extend beyond the stage's grid cell.
+      // Keep them inside the hero and clear of its copy instead.
+      { container: ".hero", selector: ".hero-stage .resume-card", tolerance: 8 },
       { container: ".hero-stage", selector: ".hero-badge", tolerance: 8 },
       { container: ".dash-mock", selector: ".dash-mock .btn", tolerance: 4 },
       { container: "closest:.dash-stat", selector: ".dash-mock .dash-stat-label", tolerance: 4 },
@@ -1468,7 +1471,8 @@ async function evaluateLandingStudioDemo(send, baseUrl, width = 1280) {
     deviceScaleFactor: 1,
     mobile,
   });
-  await send("Page.navigate", { url: `${baseUrl}/` });
+  // Interaction checks run after sign-in, when / opens Projects.
+  await send("Page.navigate", { url: `${baseUrl}/?view=site` });
   await delay(2400);
 
   const expression = `(async () => {
