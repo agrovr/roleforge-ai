@@ -43,9 +43,9 @@ test("rendered layout smoke rejects observer-polished sections that remain fully
   assert.match(smokeLayout, /reason:\s*"polish-reveal-hidden"/);
 });
 
-test("rendered layout smoke rejects generated overlays on legal topbars", () => {
-  assert.match(smokeLayout, /const LEGAL_TOPBAR_PSEUDO_CHECKS = \[/);
-  assert.match(smokeLayout, /selector:\s*"\.legal-topbar"[^\n]*pseudo:\s*"::after"[^\n]*expectedContent:\s*"none"/);
+test("rendered layout smoke rejects generated overlays on shared headers", () => {
+  assert.match(smokeLayout, /const SHARED_HEADER_PSEUDO_CHECKS = \[/);
+  assert.match(smokeLayout, /selector:\s*"\.site-header"[^\n]*pseudo:\s*"::after"[^\n]*expectedContent:\s*"none"/);
   assert.match(smokeLayout, /window\.getComputedStyle\(element,\s*pseudo\)\.content/);
   assert.match(smokeLayout, /reason:\s*"unexpected-pseudo-content"/);
 });

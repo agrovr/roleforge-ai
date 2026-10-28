@@ -1,0 +1,35 @@
+name: Production layout verification
+
+on:
+  pull_request:
+    paths:
+      - scripts/smoke_layout.mjs
+      - scripts/smoke_browser_session.mjs
+      - .github/workflows/layout-verification.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  layout:
+    # Only trusted repository branches can use the existing smoke account.
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Verify deployed layouts with proposed assertions
+        run: npm run smoke:layout -- --require-chrome --require-signed-in-layout
+        env:
+          ROLEFORGE_SITE_URL: https://roleforgeai.vercel.app
+          ROLEFORGE_SMOKE_COOKIE: ${{ secrets.ROLEFORGE_SMOKE_COOKIE }}
+          ROLEFORGE_SUPABASE_URL: ${{ vars.ROLEFORGE_SUPABASE_URL }}
+          ROLEFORGE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.ROLEFORGE_SUPABASE_PUBLISHABLE_KEY }}
+          ROLEFORGE_SMOKE_EMAIL: ${{ secrets.ROLEFORGE_SMOKE_EMAIL }}
+          ROLEFORGE_SMOKE_PASSWORD: ${{ secrets.ROLEFORGE_SMOKE_PASSWORD }}
