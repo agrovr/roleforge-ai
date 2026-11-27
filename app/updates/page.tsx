@@ -182,27 +182,27 @@ export default function UpdatesPage() {
       <section className="updates-timeline" aria-label="Recent product updates">
         {updates.map((item) => (
           <article className="updates-card" id={item.slug} key={item.title}>
-            <div className="updates-card-icon">
-              <RoleForgeIcon name={item.icon} size={18} />
-            </div>
             <div className="updates-card-copy">
               <div className="updates-card-meta">
-                <time>{item.date}</time>
+                <div className="updates-card-icon" aria-hidden="true">
+                  <RoleForgeIcon name={item.icon} size={18} />
+                </div>
                 <span>{item.eyebrow}</span>
+                <time>{item.date}</time>
               </div>
               <h2>{item.title}</h2>
               <p>{item.summary}</p>
-              <ul>
-                {item.details.map((detail) => (
-                  <li key={detail}><RoleForgeIcon name="check" size={13} />{detail}</li>
-                ))}
-              </ul>
               <div className="updates-card-actions">
                 <Link className="btn btn-soft btn-sm" href={item.actionHref}>
                   {item.actionLabel} <RoleForgeIcon name="arrow" size={13} />
                 </Link>
               </div>
             </div>
+            <ul>
+              {item.details.map((detail) => (
+                <li key={detail}><RoleForgeIcon name="check" size={13} />{detail}</li>
+              ))}
+            </ul>
           </article>
         ))}
       </section>

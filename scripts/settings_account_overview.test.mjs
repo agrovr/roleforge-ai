@@ -5,19 +5,10 @@ import test from "node:test";
 const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
 const stylesheet = [readFileSync("app/globals.css", "utf8"), readFileSync("app/settings/settings.css", "utf8")].join("\n");
 
-test("settings page exposes an account overview strip", () => {
-  assert.match(settingsPage, /settings-account-overview/);
-  assert.match(settingsPage, /aria-label="Account overview"/);
-  assert.match(settingsPage, /settings-overview-identity/);
-  assert.match(settingsPage, /settings-overview-status/);
-  assert.match(settingsPage, /settings-overview-actions/);
-  assert.match(settingsPage, /displayName \|\| "RoleForge user"/);
-  assert.match(settingsPage, /settingsAccountExportValue/);
-  assert.match(settingsPage, /settingsAccountUsageCaption/);
-  assert.match(settingsPage, /href="#account"/);
-  assert.match(settingsPage, /href="#billing"/);
-  assert.match(settingsPage, /href="#projects"/);
-  assert.match(settingsPage, /href=\{resumeTemplateStudioHref\(selectedTemplate\.slug\)\}/);
+test("workspace health leads into editable account settings", () => {
+  const main = settingsPage.slice(settingsPage.indexOf('className="settings-page-main"'));
+  assert.match(main, /<section className="settings-account-health"[\s\S]*?id="account"/);
+  assert.doesNotMatch(main, /className="settings-account-overview"/);
 });
 
 test("settings page summarizes workspace health from real account state", () => {
@@ -38,24 +29,9 @@ test("settings page summarizes workspace health from real account state", () => 
   assert.match(settingsPage, /className=\{`settings-account-health-card \$\{item\.tone\}`\}/);
 });
 
-test("settings page exposes recent account activity from real records", () => {
-  assert.match(settingsPage, /latestProjectSummary = recentProjectSummaries\[0\] \?\? null/);
-  assert.match(settingsPage, /latestDocumentSummary = recentDocumentSummaries\[0\] \?\? null/);
-  assert.match(settingsPage, /settingsActivityItems/);
-  assert.match(settingsPage, /aria-label="Recent account activity"/);
-  assert.match(settingsPage, /What changed lately/);
-  assert.match(settingsPage, /Projects, documents, usage, billing, and support are summarized from your current account records\./);
-  assert.match(settingsPage, /label:\s*"Latest project"/);
-  assert.match(settingsPage, /value:\s*latestProjectSummary\?\.title \?\? "No saved project yet"/);
-  assert.match(settingsPage, /href:\s*latestProjectSummary\?\.href \?\? "\/app"/);
-  assert.match(settingsPage, /label:\s*"Latest document"/);
-  assert.match(settingsPage, /value:\s*latestDocumentSummary\?\.title \?\? documentReadyLabel/);
-  assert.match(settingsPage, /href:\s*latestDocumentSummary\?\.url \?\? "#exports"/);
-  assert.match(settingsPage, /documentCounts\.locked \? "warn" : "ready"/);
-  assert.match(settingsPage, /Window resets \$\{usageResetLabel \|\| "at the next monthly reset"\}/);
-  assert.match(settingsPage, /Stripe checkout is available from this account\./);
-  assert.match(settingsPage, /latestSupportRequest\?\.referenceLabel \?\? "No recent request"/);
-  assert.match(settingsPage, /className=\{`settings-activity-item \$\{item\.tone\}`\}/);
+test("projects and exports render their saved records in dedicated sections", () => {
+  assert.match(settingsPage, /id="projects"[\s\S]*?recentProjectSummaries\.map/);
+  assert.match(settingsPage, /id="exports"[\s\S]*?recentDocumentSummaries\.map/);
 });
 
 test("settings account overview is compact and overflow-safe", () => {

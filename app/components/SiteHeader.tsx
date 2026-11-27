@@ -13,10 +13,11 @@ const links = [
   ["Help", "/help", "help"],
 ] as const;
 
-export function SiteHeader({ landing = false, active = "", studioHref, signedIn = false, children, navigationLinks: customLinks, context }: {
+export function SiteHeader({ landing = false, active = "", studioHref, signedIn = false, children, navigationLinks: customLinks, context, className = "" }: {
   landing?: boolean; active?: string; studioHref?: string; signedIn?: boolean; children?: ReactNode;
   navigationLinks?: readonly (readonly [label: string, href: string, key: string])[];
   context?: string;
+  className?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [section, setSection] = useState("");
@@ -79,7 +80,7 @@ export function SiteHeader({ landing = false, active = "", studioHref, signedIn 
   }
 
   return (
-    <header className={`site-header ${landing ? "nav" : "login-nav studio-auth-nav"}`}>
+    <header className={`site-header ${landing ? "nav" : "login-nav studio-auth-nav"} ${className}`}>
       <div className={`site-header-inner${landing ? " nav-inner" : ""}`}>
         <Brand href="/" label="RoleForge AI home" />
         {context && <span className="site-header-context">{context}</span>}

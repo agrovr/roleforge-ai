@@ -65,47 +65,12 @@ test("settings billing panel surfaces plan renewal and status information", () =
   assert.match(stylesheet, /\.settings-plan-info-item span,\s*\.settings-plan-info-item strong,\s*\.settings-plan-info-item small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
 });
 
-test("settings billing panel shows a clear subscription timeline", () => {
-  assert.match(settingsPage, /billingTimelineItems/);
-  assert.match(settingsPage, /aria-label="Billing timeline"/);
-  assert.match(settingsPage, /settings-billing-timeline/);
-  assert.match(settingsPage, /label:\s*"Today"/);
-  assert.match(settingsPage, /value:\s*premiumEnding \? "Premium ending" : premiumActive \? "Premium active" : checkoutReady \? "Free plan" : "Free studio"/);
-  assert.match(settingsPage, /label:\s*premiumEnding \? "Access end" : premiumActive \? "Renewal" : "Upgrade"/);
-  assert.match(settingsPage, /Stripe shows the next charge date, receipts, and payment method details\./);
-  assert.match(settingsPage, /Manage billing opens Stripe for cancellation, invoices, and payment methods\./);
-  assert.match(settingsPage, /Support requests from this panel include account context and safe references\./);
-  assert.match(settingsPage, /className=\{`settings-billing-timeline-item \$\{item\.tone\}`\}/);
-  assert.match(stylesheet, /\.settings-billing-timeline\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*178px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
-  assert.match(stylesheet, /\.settings-billing-timeline-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*34px minmax\(0,\s*1fr\))(?=[^}]*min-height:\s*132px)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
-  assert.match(stylesheet, /\.settings-billing-timeline-item > div,\s*\.settings-billing-timeline-item span:not\(\.settings-billing-timeline-icon\),\s*\.settings-billing-timeline-item strong,\s*\.settings-billing-timeline-item small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
-  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-billing-timeline-item/);
-  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-billing-timeline-item\.good/);
-  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-billing-timeline-item\.warn/);
+test("ending subscriptions show the access deadline beside the plan", () => {
+  assert.match(settingsPage, /Premium access remains available until \$\{premiumEndLabel\}/);
 });
 
-test("settings billing panel audits current plan access", () => {
-  assert.match(settingsPage, /premiumDocumentExportsActive\s*=\s*entitlement\.exportFormats\.docx\s*&&\s*entitlement\.exportFormats\.txt/);
-  assert.match(settingsPage, /planAccessItems/);
-  assert.match(settingsPage, /aria-label="Plan access checklist"/);
-  assert.match(settingsPage, /Access checklist/);
-  assert.match(settingsPage, /What is active right now/);
-  assert.match(settingsPage, /label:\s*"Tailoring runs"/);
-  assert.match(settingsPage, /label:\s*"PDF export"/);
-  assert.match(settingsPage, /label:\s*"DOCX and TXT"/);
-  assert.match(settingsPage, /label:\s*"Billing path"/);
-  assert.match(settingsPage, /value:\s*usage\.monthlyRunLimit === null \? "Unlimited"/);
-  assert.match(settingsPage, /Completed runs can export PDF from Studio, History, and Settings\./);
-  assert.match(settingsPage, /Upgrade to unlock DOCX and TXT exports for completed runs\./);
-  assert.match(settingsPage, /Stripe billing management can open from this panel\./);
-  assert.match(settingsPage, /className=\{`settings-plan-access-item \$\{item\.tone\}`\}/);
-  assert.match(stylesheet, /\.settings-plan-access\s*\{(?=[^}]*display:\s*grid)(?=[^}]*border:\s*1px solid color-mix\(in srgb,\s*var\(--brand\) 22%,\s*var\(--line\)\))[^}]*\}/s);
-  assert.match(stylesheet, /\.settings-plan-access-grid\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*178px\),\s*1fr\)\))(?=[^}]*min-width:\s*0)[^}]*\}/s);
-  assert.match(stylesheet, /\.settings-plan-access-item\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*34px minmax\(0,\s*1fr\))(?=[^}]*min-height:\s*128px)(?=[^}]*min-width:\s*0)[^}]*\}/s);
-  assert.match(stylesheet, /\.settings-plan-access-item > div,\s*\.settings-plan-access-item span:not\(\.settings-plan-access-icon\),\s*\.settings-plan-access-item strong,\s*\.settings-plan-access-item small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)[^}]*\}/s);
-  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-plan-access/);
-  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-plan-access-item\.good/);
-  assert.match(stylesheet, /html\[data-theme="dark"\]\s+\.settings-plan-access-item\.warn/);
+test("billing groups plan information and controls under the billing section", () => {
+  assert.match(settingsPage, /id="billing"[\s\S]*?planInformationItems\.map[\s\S]*?billingControlItems\.map/);
 });
 
 test("settings status pills keep readable contrast in dark mode", () => {
@@ -120,7 +85,7 @@ test("settings account panel includes an editable profile display name", () => {
   assert.match(settingsPage, /Save name/);
   assert.match(settingsPage, /href="\/api\/account\/export"/);
   assert.match(settingsPage, /Export account record/);
-  assert.match(settingsPage, /Download account, project, run, and support-reference details\./);
+  assert.match(settingsPage, /className="settings-profile-actions"[\s\S]*?Export account record/);
   assert.match(stylesheet, /\.settings-profile-form\s*\{[^}]*max-width:\s*min\(100%,\s*560px\)[^}]*\}/s);
   assert.match(stylesheet, /\.settings-profile-edit-row\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*minmax\(min\(100%,\s*138px\),\s*auto\)[^}]*\}/s);
 });

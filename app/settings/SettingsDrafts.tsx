@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { ResumePreview } from "../components/ResumePreview";
 import { APPLICATION_STATUS_OPTIONS } from "../lib/applicationStatus";
 import { RESUME_TEMPLATES, getResumeTemplate, resumeTemplateStudioHref } from "../lib/resumeTemplates";
 import { settingsChanges, type SettingsField, type SettingsValue, type SettingsChange, type SettingsSaveResult } from "../lib/settingsDrafts";
@@ -125,13 +124,16 @@ export function SettingsDraftTemplates() {
   const { baseline, draft, busy, change, save } = useDraft();
   const selectedTemplate = getResumeTemplate(String(draft.template));
   return <>
-    <div className="settings-template-grid" aria-label="Default resume direction">{RESUME_TEMPLATES.map((template) => {
-      const selected = template.slug === draft.template;
-      return <article className={`settings-template-card${selected ? " selected" : ""}`} key={template.slug}>
-        <div className="settings-template-thumb"><ResumePreview variant={template.variant} name={template.previewName} role={template.previewRole} highlight={selected} /></div>
-        <div className="settings-template-card-copy"><div className="template-title-row"><span className="template-name">{template.name}</span><span className="template-tag">{template.tag}</span></div><p>{template.detail}</p><button type="button" disabled={busy} aria-pressed={selected} className="btn btn-soft btn-sm settings-template-button" onClick={() => change("template", template.slug)}>{selected ? "Selected" : "Choose direction"}</button></div>
-      </article>;
-    })}</div>
+    <div className="settings-direction-list" role="group" aria-label="Default resume direction">
+      {RESUME_TEMPLATES.map((template) => (
+        <button key={template.slug} type="button" disabled={busy}
+          aria-pressed={template.slug === draft.template}
+          onClick={() => change("template", template.slug)}>
+          <strong>{template.name}</strong>
+          <small>{template.tag}</small>
+        </button>
+      ))}
+    </div>
     <div className="settings-export-actions"><span>{selectedTemplate.name}{baseline.template !== draft.template ? " selected — unsaved." : " saved for this browser."}</span><button className="primary-button" disabled={busy || baseline.template === draft.template} onClick={() => save(["template"])}>Save direction</button><a className="ghost-button" href={resumeTemplateStudioHref(String(baseline.template))}>Open saved direction in studio</a></div>
   </>;
 }

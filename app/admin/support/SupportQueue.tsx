@@ -75,14 +75,25 @@ export function SupportQueue({ initialRequests, initialStatus, readiness, loadEr
     document.getElementById(`reply-${request.id}`)?.focus();
   }
   return <>
-    <div className="admin-queue-search"><label htmlFor="admin-support-search">Search requests</label><input id="admin-support-search" type="search" value={query} disabled={busy} placeholder="Reference, subject, email, message, or category" onChange={(event) => { setQuery(event.target.value); setPage(0); }} /><span role="status">{counts.all} matching {counts.all === 1 ? "request" : "requests"}</span></div>
-    <nav className="admin-support-filter" aria-label="Support request filters">{(["open", "reviewing", "closed", "all"] as const).map((item) => <button type="button" disabled={busy} className={status === item ? "active" : ""} key={item} aria-pressed={status === item} onClick={() => { setStatus(item); setPage(0); }}><span>{item === "all" ? "All" : supportStatusLabel(item)}</span><strong>{counts[item]}</strong></button>)}</nav>
-    <div className="admin-bulk-bar" aria-busy={busy}>
-      <label className="admin-select-all"><input type="checkbox" checked={allSelected} disabled={busy || !visible.length} onChange={() => setSelected(allSelected ? [] : visible.map((request) => request.id))} />Select all visible</label>
+    <div className="admin-queue-search">
+      <label htmlFor="admin-support-search">Search the queue
+        <input id="admin-support-search" type="search" value={query} disabled={busy} placeholder="Reference, subject, email, message, or category" onChange={(event) => { setQuery(event.target.value); setPage(0); }} />
+      </label>
+      <div className="admin-queue-tools">
+        <span role="status">{filtered.length} {filtered.length === 1 ? "request" : "requests"} in view</span>
+        {query && <button type="button" disabled={busy} onClick={() => { setQuery(""); setPage(0); }}>Clear search</button>}
+        <button type="button" disabled={busy} onClick={() => router.refresh()}>Refresh queue</button>
+      </div>
+    </div>
+    {visibleSelected.length > 0 && <div className="admin-bulk-bar" role="region" aria-label="Bulk actions" aria-busy={busy}>
       <span>{visibleSelected.length} selected</span>
       {([['reviewing', 'Mark reviewing'], ['closed', 'Close'], ['open', 'Reopen']] as const).map(([value, label]) => <button type="button" key={value} disabled={busy || !selectedRequests.some((request) => request.status !== value)} onClick={() => void update(value)}>{busy ? "Updating…" : label}</button>)}
-      <button type="button" disabled={busy} onClick={() => router.refresh()}>Refresh queue</button>
-    </div>
+      <button type="button" disabled={busy} onClick={() => setSelected([])}>Clear selection</button>
+    </div>}
+    <nav className="admin-support-filter" aria-label="Support request filters">
+      <button type="button" aria-pressed={allSelected} disabled={busy || !visible.length} onClick={() => setSelected(allSelected ? [] : visible.map((request) => request.id))}>Select all visible</button>
+      {(["open", "reviewing", "closed", "all"] as const).map((item) => <button type="button" disabled={busy} className={status === item ? "active" : ""} key={item} aria-pressed={status === item} onClick={() => { setStatus(item); setPage(0); }}><span>{item === "all" ? "All" : supportStatusLabel(item)}</span><strong>{counts[item]}</strong></button>)}
+    </nav>
     <p className="admin-support-notice" role="status">{notice}</p>
     {failures.length > 0 && <div className="admin-support-notice" role="alert">{failures.map((error) => <p key={error}>{error}</p>)}</div>}
     <p className="admin-queue-range">{filtered.length ? `${currentPage * 40 + 1}–${currentPage * 40 + visible.length} of ${filtered.length}` : "No matching requests in this view"}</p>

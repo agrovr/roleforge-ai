@@ -1414,3 +1414,12 @@ html[data-theme="dark"] .support-form textarea:hover {
     transition: none;
   }
 }
+
+.support-layout { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); align-items: start; }
+.support-context { display: grid; gap: 16px; }
+@media (max-width: 760px) {
+  .support-layout { grid-template-columns: minmax(0, 1fr); }
+}
+
+.support-shell .support-hero,
+.support-shell .support-layout { max-width: 1120px; margin-inline: auto; }

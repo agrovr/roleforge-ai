@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { SupportForm } from "../app/support/SupportForm.tsx";
+import { parseSupportRequestPrefill, SUPPORT_REQUEST_CATEGORIES } from "../app/lib/supportRequests.ts";
 
 import { stylesFor } from "./style_sources.mjs";
 
@@ -34,29 +38,14 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /title: "Support"/);
   assert.match(supportPage, /canonical: "\/support"/);
   assert.match(supportPage, /account, billing, privacy, export/);
-  assert.match(supportPage, /Get help with your workflow/);
+  assert.match(supportPage, /Send a request with real context/);
   assert.match(supportPage, /Signed-in requests are saved to your account/);
-  assert.match(supportPage, /Operator review uses the account-safe request packet/);
-  assert.match(supportPage, /supportGuides\.map/);
-  assert.match(supportPage, /href=\{guide\.href\}/);
-  assert.match(supportPage, /Prefill request/);
-  assert.match(supportPage, /supportTriageItems/);
-  assert.match(supportPage, /Support triage guide/);
-  assert.match(supportPage, /Send the details that make the issue traceable/);
-  assert.match(supportPage, /supportCategoryLabel\(item\.category\)/);
-  assert.match(supportPage, /supportLifecycle/);
-  assert.match(supportPage, /supportAfterSubmit/);
-  assert.match(supportPage, /Support request lifecycle/);
-  assert.match(supportPage, /supportStatusLabel\(item\.status\)/);
-  assert.match(supportPage, /supportRoutingSteps/);
+  assert.match(supportPage, /Each request gets an RF reference/);
+  assert.doesNotMatch(supportPage, /support-category-row|Prefill request/);
   assert.match(supportPage, /isSupportAdminUser\(user\)/);
   assert.match(supportPage, /supportAdmin \?/);
   assert.match(supportPage, /Operator inbox is available for this account/);
   assert.match(supportPage, /href="\/admin\/support"/);
-  assert.match(supportPage, /Where a support request goes after submit/);
-  assert.match(supportPage, /webhook or Resend email env vars/);
-  assert.match(supportPage, /Every signed-in request is written to Supabase support history/);
-  assert.match(supportPage, /support-routing-strip/);
   assert.match(supportPage, /latestSupportRequest/);
   assert.match(supportPage, /supportRequestPacket/);
   assert.match(supportPage, /Support request packet/);
@@ -66,9 +55,7 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /Page context/);
   assert.match(supportPage, /Private data/);
   assert.match(supportPage, /Do not paste card numbers, passwords, or secret keys/);
-  assert.match(supportPage, /status:\s*"open"/);
-  assert.match(supportPage, /status:\s*"reviewing"/);
-  assert.match(supportPage, /status:\s*"closed"/);
+  assert.match(supportPage, /request\.statusLabel/);
   assert.match(supportForm, /action="\/api\/support-requests"/);
   assert.match(supportPage, /loadSupportRequests\(supabase,\s*user\.id,\s*\{ limit: 5 \}\)/);
   assert.match(supportPage, /parseSupportRequestPrefill/);
@@ -83,11 +70,7 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /SupportReferenceCopyButton referenceLabel=\{notice\.referenceLabel\}/);
   assert.match(supportPage, /support-notice-content/);
   assert.match(supportPage, /support-status-badge/);
-  assert.match(supportPage, /support-after-submit-list/);
-  assert.match(supportPage, /The request is saved to your signed-in account with an RF reference/);
-  assert.match(supportPage, /Support history appears on this page and in Settings/);
-  assert.match(supportPage, /If the support channel is configured, RoleForge sends the request details for operator review/);
-  assert.match(supportPage, /When notification routing is configured/);
+  assert.match(supportPage, /<SupportForm prefill=\{prefill\}[\s\S]*?<aside className="support-context"/);
   assert.match(supportForm, /name="category"/);
   assert.match(supportForm, /name="subject"/);
   assert.match(supportForm, /name="message"/);
@@ -96,24 +79,20 @@ test("support page provides signed-in account-linked request flow", () => {
   assert.match(supportPage, /Never paste full payment card details or private credentials/);
 });
 
-test("support topic cards prefill the right request category", () => {
-  assert.match(supportPage, /title: "Workflow or export problem"/);
-  assert.match(supportPage, /category:\s*"workflow"/);
-  assert.match(supportPage, /subject:\s*"Workflow or export issue"/);
-  assert.match(supportPage, /title: "Billing or Premium issue"/);
-  assert.match(supportPage, /category:\s*"billing"/);
-  assert.match(supportPage, /subject:\s*"Billing or Premium access"/);
-  assert.match(supportPage, /contextUrl:\s*"\/settings#billing"/);
-  assert.match(supportPage, /title: "Saved project issue"/);
-  assert.match(supportPage, /category:\s*"saved-projects"/);
-  assert.match(supportPage, /contextUrl:\s*"\/settings#projects"/);
-  assert.match(supportPage, /title: "Privacy or data request"/);
-  assert.match(supportPage, /category:\s*"privacy"/);
-  assert.match(supportPage, /subject:\s*"Privacy or data request"/);
-  assert.match(supportPage, /contextUrl:\s*"\/settings#data-privacy"/);
-  assert.match(supportPage, /title: "Sign-in or profile access"/);
-  assert.match(supportPage, /category:\s*"account"/);
-  assert.match(supportPage, /contextUrl:\s*"\/settings#account"/);
+test("each prefilled topic has its own guidance and preserves the incoming request details", () => {
+  const hints = new Set();
+  for (const category of SUPPORT_REQUEST_CATEGORIES) {
+    const prefill = parseSupportRequestPrefill({ category, subject: "Help with this page", contextUrl: "/settings" });
+    const html = renderToStaticMarkup(createElement(SupportForm, { prefill }));
+    assert.ok(html.includes(`value="${category}" selected=""`));
+    assert.ok(html.includes('value="Help with this page"'));
+    assert.ok(html.includes('value="/settings"'));
+    assert.ok(html.includes('aria-describedby="support-topic-hint"'));
+    const hint = html.match(/<small id="support-topic-hint">([^<]+)<\/small>/)?.[1];
+    assert.ok(hint);
+    hints.add(hint);
+  }
+  assert.equal(hints.size, SUPPORT_REQUEST_CATEGORIES.length);
 });
 
 test("support request route requires auth, validates input, and saves through Supabase", () => {

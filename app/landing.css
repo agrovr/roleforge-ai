@@ -10,6 +10,11 @@ html.rf-polish-ready :where(.landing-page) :is(.steps, .faq-grid, .cta-band)[dat
   contain-intrinsic-size: auto 900px;
 }
 
+/* These short introductory sections determine every subsequent anchor offset. */
+:where(.landing-page).page-shell > :is(#example, #how, .logos) {
+  content-visibility: visible;
+}
+
 /* Keep the landing scroll range stable while below-the-fold sections are skipped. */
 :where(.landing-page).page-shell > #studio { contain-intrinsic-size: auto 1020px; }
 :where(.landing-page).page-shell > #templates { contain-intrinsic-size: auto 690px; }
@@ -63,6 +68,12 @@ html.rf-polish-ready :where(.landing-page) :is(.steps, .faq-grid, .cta-band)[dat
   :where(.landing-page).page-shell > #pricing { contain-intrinsic-size: auto 751px; }
   :where(.landing-page).page-shell > #faq { contain-intrinsic-size: auto 730px; }
   :where(.landing-page).page-shell > #final-cta { contain-intrinsic-size: auto 454px; }
+}
+
+@media (min-width: 1101px) and (max-width: 1180px) {
+  :where(.landing-page).page-shell > #studio { contain-intrinsic-size: auto 989px; }
+  :where(.landing-page).page-shell > #templates { contain-intrinsic-size: auto 648px; }
+  :where(.landing-page).page-shell > #final-cta { contain-intrinsic-size: auto 492px; }
 }
 
 :where(.landing-page).page-shell {
@@ -6069,3 +6080,54 @@ html[data-theme="dark"] :where(.landing-page) .template-card {
     text-align: left;
   }
 }
+
+.review-example-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: clamp(14px, 2vw, 20px);
+}
+.review-example-grid article {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: clamp(20px, 3vw, 26px);
+  border: 1px dashed var(--line-2);
+  border-radius: 18px;
+  background: var(--surface);
+}
+.review-example-grid .review-example-draft {
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--line));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-soft) 44%, var(--surface)), var(--surface));
+}
+.review-example-grid header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.review-example-grid h3 {
+  margin: 0;
+  font: 800 .68rem var(--font-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.review-example-grid header span {
+  padding: 4px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  font-size: .72rem;
+}
+.review-example-grid p { margin: 0; line-height: 1.6; }
+.review-example-grid mark { color: inherit; background: var(--accent-soft); }
+.review-example-grid ul {
+  display: grid;
+  gap: 6px;
+  margin: auto 0 0;
+  padding: 14px 0 0 18px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-2);
+  font-size: .85rem;
+}
+.review-example-draft li::marker { content: "✓  "; color: var(--good); }
+.review-example-caption { margin-top: 16px; color: var(--ink-3); font-size: .82rem; }

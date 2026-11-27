@@ -5,6 +5,14 @@
 .public-info-tabs a[aria-current="page"] { background: var(--ink-0); color: var(--bg); }
 .public-info-page .legal-shell, .public-info-page .not-found-shell, html[data-theme="dark"] .public-info-page .legal-shell, html[data-theme="dark"] .public-info-page .not-found-shell { background: transparent; }
 .public-info-page :focus-visible { outline: 2px solid var(--brand-dark); outline-offset: 3px; }
+.public-info-page .legal-shell > section,
+.public-info-page .legal-shell > .legal-index {
+  width: min(1120px, 100%);
+  margin-inline: auto;
+}
+.public-info-page .legal-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
 .public-info-page .not-found-actions .primary-button,
 html[data-theme="dark"] .public-info-page .not-found-actions .primary-button { color: var(--on-brand); background: var(--brand); border-color: var(--brand); }
 .public-info-page .not-found-actions .primary-button:hover,
