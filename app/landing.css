@@ -70,6 +70,12 @@ html.rf-polish-ready :where(.landing-page) :is(.steps, .faq-grid, .cta-band)[dat
   :where(.landing-page).page-shell > #final-cta { contain-intrinsic-size: auto 454px; }
 }
 
+@media (min-width: 1101px) and (max-width: 1180px) {
+  :where(.landing-page).page-shell > #studio { contain-intrinsic-size: auto 989px; }
+  :where(.landing-page).page-shell > #templates { contain-intrinsic-size: auto 648px; }
+  :where(.landing-page).page-shell > #final-cta { contain-intrinsic-size: auto 492px; }
+}
+
 :where(.landing-page).page-shell {
   position: relative;
   z-index: 2;
