@@ -10,6 +10,11 @@ html.rf-polish-ready :where(.landing-page) :is(.steps, .faq-grid, .cta-band)[dat
   contain-intrinsic-size: auto 900px;
 }
 
+/* These short introductory sections determine every subsequent anchor offset. */
+:where(.landing-page).page-shell > :is(#example, #how, .logos) {
+  content-visibility: visible;
+}
+
 /* Keep the landing scroll range stable while below-the-fold sections are skipped. */
 :where(.landing-page).page-shell > #studio { contain-intrinsic-size: auto 1020px; }
 :where(.landing-page).page-shell > #templates { contain-intrinsic-size: auto 690px; }
