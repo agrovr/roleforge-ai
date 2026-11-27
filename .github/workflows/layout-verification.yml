@@ -3,6 +3,7 @@ name: Production layout verification
 on:
   pull_request:
     paths:
+      - app/**
       - scripts/smoke_layout.mjs
       - scripts/smoke_browser_session.mjs
       - .github/workflows/layout-verification.yml
