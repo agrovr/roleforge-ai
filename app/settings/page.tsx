@@ -31,7 +31,6 @@ import { loadAccountEntitlement } from "../lib/entitlements";
 import {
   RESUME_TEMPLATE_COOKIE,
   getResumeTemplate,
-  resumeTemplateStudioHref,
 } from "../lib/resumeTemplates";
 import { settingsDocumentCounts, settingsDocumentSummaries, settingsProjectStageSummaries, settingsProjectSummaries } from "../lib/settingsProjects";
 import { getConfiguredSiteOrigin } from "../lib/siteUrl";
@@ -41,7 +40,6 @@ import { createRoleForgeServerClient } from "../lib/supabase/server";
 import { deleteSavedProject, loadSavedRuns } from "../lib/supabase/savedProjects";
 import {
   loadAccountUsage,
-  monthlyRunAllowanceLabel,
   monthlyRunAllowanceSentence,
   runWord,
   usageProgressPercent,
@@ -318,9 +316,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
   const accountCreatedLabel = accountSecurityDateLabel(user.created_at);
   const profileNotice = accountNotice(accountParam);
   const profileNoticeArea = accountNoticeArea(accountParam);
-  const planFeatures = premiumActive
-    ? ["Unlimited runs", "DOCX and TXT exports", premiumEnding && premiumEndLabel ? `Access until ${premiumEndLabel}` : "PDF export included"]
-    : [monthlyRunAllowanceLabel(usage.monthlyRunLimit), "PDF export", "Saved project sync"];
   const exportRows: ExportRow[] = [
     { label: "PDF", enabled: entitlement.exportFormats.pdf, included: "Included", locked: "Unavailable" },
     { label: "DOCX", enabled: entitlement.exportFormats.docx, included: "Included with Premium", locked: "Premium" },
@@ -453,111 +448,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
           detail: "Ask about checkout, invoices, or Premium access from a support request linked to this page.",
         },
       ];
-  const billingTimelineItems: Array<{
-    icon: RoleForgeIconName;
-    label: string;
-    value: string;
-    detail: string;
-    tone: "good" | "ready" | "warn";
-  }> = [
-    {
-      icon: premiumActive ? "check" : checkoutReady ? "lock" : "mail",
-      label: "Today",
-      value: premiumEnding ? "Premium ending" : premiumActive ? "Premium active" : checkoutReady ? "Free plan" : "Free studio",
-      detail: premiumActive
-        ? "Premium access is active on this account."
-        : checkoutReady
-          ? "Free access is active; Premium can start from secure Stripe checkout."
-          : "Free access is active while Premium checkout is unavailable.",
-      tone: premiumEnding ? "warn" : premiumActive || checkoutReady ? "good" : "ready",
-    },
-    {
-      icon: premiumEnding ? "lock" : premiumActive ? "download" : "check",
-      label: premiumEnding ? "Access end" : premiumActive ? "Renewal" : "Upgrade",
-      value: billingDateLabel || (premiumActive ? "Open billing" : checkoutReady ? "Optional" : "Unavailable"),
-      detail: premiumEnding && premiumEndLabel
-        ? `DOCX, TXT, and unlimited runs remain available until ${premiumEndLabel}.`
-        : premiumActive
-          ? "Stripe shows the next charge date, receipts, and payment method details."
-          : checkoutReady
-            ? "Monthly and yearly Premium options are available from this panel."
-            : "The signed-in free studio remains available without billing.",
-      tone: premiumEnding ? "warn" : premiumActive || checkoutReady ? "good" : "ready",
-    },
-    {
-      icon: "settings",
-      label: premiumActive ? "Billing portal" : "Checkout",
-      value: portalReady ? "Ready" : showCheckoutHeaderAction ? "Ready" : "Unavailable",
-      detail: portalReady
-        ? "Manage billing opens Stripe for cancellation, invoices, and payment methods."
-        : showCheckoutHeaderAction
-          ? "Start Premium opens Stripe checkout and returns here after payment."
-          : premiumActive
-            ? "Contact support if Stripe billing management should be available."
-            : "Contact support if Premium checkout should be available.",
-      tone: portalReady || showCheckoutHeaderAction ? "good" : premiumActive ? "warn" : "ready",
-    },
-    {
-      icon: "mail",
-      label: "Support trail",
-      value: latestSupportRequest ? latestSupportRequest.referenceLabel : "Ready",
-      detail: latestSupportRequest
-        ? `${latestSupportRequest.statusLabel} billing or account context is saved for support.`
-        : "Support requests from this panel include account context and safe references.",
-      tone: latestSupportRequest ? "good" : "ready",
-    },
-  ];
-  const premiumDocumentExportsActive = entitlement.exportFormats.docx && entitlement.exportFormats.txt;
-  const planAccessItems: Array<{
-    icon: RoleForgeIconName;
-    label: string;
-    value: string;
-    detail: string;
-    tone: "good" | "ready" | "warn";
-  }> = [
-    {
-      icon: "check",
-      label: "Tailoring runs",
-      value: usage.monthlyRunLimit === null ? "Unlimited" : `${usage.remainingRuns} ${remainingRunWord} left`,
-      detail: usage.monthlyRunLimit === null
-        ? `${usage.monthlyRuns} ${usedRunWord} completed this month with no plan cap.`
-        : monthlyRunAllowanceSentence(usage.monthlyRunLimit),
-      tone: usage.monthlyRunLimit === null ? "good" : (usage.remainingRuns ?? 0) > 0 ? "ready" : "warn",
-    },
-    {
-      icon: entitlement.exportFormats.pdf ? "check" : "lock",
-      label: "PDF export",
-      value: entitlement.exportFormats.pdf ? "Active" : "Unavailable",
-      detail: entitlement.exportFormats.pdf
-        ? "Completed runs can export PDF from Studio, History, and Settings."
-        : "PDF export is not available for the current entitlement.",
-      tone: entitlement.exportFormats.pdf ? "good" : "warn",
-    },
-    {
-      icon: premiumDocumentExportsActive ? "check" : "lock",
-      label: "DOCX and TXT",
-      value: premiumDocumentExportsActive ? "Active" : "Premium",
-      detail: premiumDocumentExportsActive
-        ? "Premium document formats are available for completed runs."
-        : checkoutReady
-          ? "Upgrade to unlock DOCX and TXT exports for completed runs."
-          : "DOCX and TXT remain locked while this account is on Free.",
-      tone: premiumDocumentExportsActive ? "good" : "warn",
-    },
-    {
-      icon: portalReady || showCheckoutHeaderAction ? "settings" : "mail",
-      label: "Billing path",
-      value: portalReady ? "Portal ready" : showCheckoutHeaderAction ? "Checkout ready" : premiumActive ? "Support needed" : "Free plan",
-      detail: portalReady
-        ? "Stripe billing management can open from this panel."
-        : showCheckoutHeaderAction
-          ? "Secure Stripe checkout can open from this panel."
-          : premiumActive
-            ? "Premium access is active, but billing management needs support right now."
-            : "Free access is active; contact support if billing looks wrong.",
-      tone: portalReady || showCheckoutHeaderAction ? "good" : premiumActive ? "warn" : "ready",
-    },
-  ];
   const hasDisplayName = Boolean(displayName.trim());
   const accountHealthItems: Array<{
     icon: RoleForgeIconName;
@@ -612,70 +502,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
       href: "#support",
       action: latestSupportRequest ? "View request" : "Open support",
       tone: latestSupportRequest || supportRequestCount ? "good" : "ready",
-    },
-  ];
-  const latestProjectSummary = recentProjectSummaries[0] ?? null;
-  const latestDocumentSummary = recentDocumentSummaries[0] ?? null;
-  const hasRunsRemaining = usage.monthlyRunLimit === null || (usage.remainingRuns ?? 0) > 0;
-  const settingsActivityItems: Array<{
-    icon: RoleForgeIconName;
-    label: string;
-    value: string;
-    detail: string;
-    href: string;
-    action: string;
-    tone: "good" | "ready" | "warn";
-  }> = [
-    {
-      icon: latestProjectSummary ? "chart" : "file",
-      label: "Latest project",
-      value: latestProjectSummary?.title ?? "No saved project yet",
-      detail: latestProjectSummary?.detail ?? "Run the studio once and completed work will appear in Settings.",
-      href: latestProjectSummary?.href ?? "/app",
-      action: latestProjectSummary ? "Restore" : "Start in studio",
-      tone: latestProjectSummary ? "good" : "ready",
-    },
-    {
-      icon: "download",
-      label: "Latest document",
-      value: latestDocumentSummary?.title ?? documentReadyLabel,
-      detail: latestDocumentSummary
-        ? `${latestDocumentSummary.label} export · ${latestDocumentSummary.detail}`
-        : documentLockedLabel,
-      href: latestDocumentSummary?.url ?? "#exports",
-      action: latestDocumentSummary ? "Open file" : "View exports",
-      tone: latestDocumentSummary ? "good" : documentCounts.locked ? "warn" : "ready",
-    },
-    {
-      icon: hasRunsRemaining ? "sparkle" : "lock",
-      label: "Usage",
-      value: usageUsedLabel,
-      detail: usage.monthlyRunLimit === null
-        ? "Premium has no monthly run cap."
-        : `${usageHelperLabel}. Window resets ${usageResetLabel || "at the next monthly reset"}.`,
-      href: "#usage",
-      action: "Check usage",
-      tone: hasRunsRemaining ? "good" : "warn",
-    },
-    {
-      icon: "lock",
-      label: "Billing",
-      value: premiumEnding ? "Premium ending" : billingLabel,
-      detail: premiumActive ? billingDetail : checkoutReady ? "Stripe checkout is available from this account." : "Free plan is active with PDF export.",
-      href: "#billing",
-      action: premiumActive ? "Manage plan" : "Review plan",
-      tone: premiumEnding ? "warn" : premiumActive || checkoutReady ? "good" : "ready",
-    },
-    {
-      icon: "mail",
-      label: "Support",
-      value: latestSupportRequest?.referenceLabel ?? "No recent request",
-      detail: latestSupportRequest
-        ? `${latestSupportRequest.statusLabel} · ${latestSupportRequest.subject}`
-        : "Support requests can attach account context when something needs attention.",
-      href: latestSupportRequest ? "#support" : supportHistoryHref,
-      action: latestSupportRequest ? "View request" : "Open support",
-      tone: latestSupportRequest ? "good" : "ready",
     },
   ];
   const securityReviewItems: Array<{
@@ -951,124 +777,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
         <SettingsSectionNav />
 
         <section className="settings-page-main">
-          <div className="settings-page-hero">
-            <div>
-              <div className="eyebrow">Workspace settings</div>
-              <h1>Settings</h1>
-              <p>Manage your account, saved projects, export access, and plan state.</p>
-            </div>
-            <div className="settings-hero-status">
-              <span className={`settings-status-pill ${premiumEnding ? "ready" : premiumActive ? "good" : "ready"}`}>{displayPlanLabel}</span>
-              <div className="settings-plan-includes" aria-label={`${planLabel} plan includes`}>
-                {planFeatures.map((feature) => (
-                  <span key={feature}>{feature}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <nav className="settings-workspace-actions" aria-label="Workspace quick actions">
-            <Link className="settings-workspace-action" href="/app">
-              <span><RoleForgeIcon name="file" size={16} /></span>
-              <strong>Start a resume</strong>
-              <small>Open the studio with your current template.</small>
-            </Link>
-            <a className="settings-workspace-action" href="#projects">
-              <span><RoleForgeIcon name="chart" size={16} /></span>
-              <strong>Review projects</strong>
-              <small>{projectCount} {projectCountLabel.toLowerCase()} and {runCount} {runCountLabel.toLowerCase()} saved.</small>
-            </a>
-            <a className="settings-workspace-action" href="/api/account/export">
-              <span><RoleForgeIcon name="download" size={16} /></span>
-              <strong>Export account</strong>
-              <small>Download account, project, run, and support-reference details.</small>
-            </a>
-            <a className="settings-workspace-action" href="#support">
-              <span><RoleForgeIcon name="mail" size={16} /></span>
-              <strong>Support history</strong>
-              <small>{supportRequestCount} {supportRequestCountLabel.toLowerCase()} saved with your account.</small>
-            </a>
-            <a className="settings-workspace-action" href="#billing">
-              <span><RoleForgeIcon name="settings" size={16} /></span>
-              <strong>Plan and billing</strong>
-              <small>{premiumActive ? billingLabel : checkoutReady ? "Premium checkout available" : "Free studio available"}</small>
-            </a>
-          </nav>
-
-          <div className="settings-overview-frame">
-            <section className="settings-account-overview" aria-label="Account overview">
-              <div className="settings-overview-identity">
-                <div className="studio-account-button settings-overview-avatar" aria-hidden="true">
-                  <AccountAvatar initials={accountInitials} imageUrl={accountImageUrl} />
-                </div>
-                <div>
-                  <span className="settings-overview-kicker">Signed in as</span>
-                  <strong>{displayName || "RoleForge user"}</strong>
-                  <small>{user.email}</small>
-                </div>
-              </div>
-              <div className="settings-overview-status" aria-label="Workspace status">
-                <a href="#billing">
-                  <span>Plan</span>
-                  <strong>{displayPlanLabel}</strong>
-                  <small>{settingsAccountPlanCaption}</small>
-                </a>
-                <a href="#usage">
-                  <span>Usage</span>
-                  <strong>{settingsAccountUsageValue}</strong>
-                  <small>{settingsAccountUsageCaption}</small>
-                </a>
-                <a href="#projects">
-                  <span>Projects</span>
-                  <strong>{projectCount}</strong>
-                  <small>{runCount} {runCountLabel.toLowerCase()} saved</small>
-                </a>
-                <a href="#exports">
-                  <span>Exports</span>
-                  <strong>{settingsAccountExportValue}</strong>
-                  <small>{settingsAccountExportCaption}</small>
-                </a>
-                <a href="#support">
-                  <span>Support</span>
-                  <strong>{supportOverviewValue}</strong>
-                  <small>{supportOverviewCaption}</small>
-                </a>
-              </div>
-              <div className="settings-overview-actions" aria-label="Account overview actions">
-                <a href="#account"><RoleForgeIcon name="settings" size={14} /> Edit profile</a>
-                <a href="#billing"><RoleForgeIcon name="lock" size={14} /> Billing</a>
-                <a href="#projects"><RoleForgeIcon name="chart" size={14} /> Projects</a>
-                <a href="#support"><RoleForgeIcon name="mail" size={14} /> Support</a>
-                <Link href={resumeTemplateStudioHref(selectedTemplate.slug)}><RoleForgeIcon name="file" size={14} /> Studio</Link>
-              </div>
-            </section>
-          </div>
-
-          <section className="settings-activity-panel" aria-label="Recent account activity">
-            <div className="settings-activity-head">
-              <div>
-                <span className="settings-overview-kicker">Recent activity</span>
-                <h2>What changed lately</h2>
-              </div>
-              <p>Projects, documents, usage, billing, and support are summarized from your current account records.</p>
-            </div>
-            <div className="settings-activity-list">
-              {settingsActivityItems.map((item) => (
-                <a className={`settings-activity-item ${item.tone}`} href={item.href} key={item.label}>
-                  <span className="settings-activity-icon" aria-hidden="true">
-                    <RoleForgeIcon name={item.icon} size={16} />
-                  </span>
-                  <span className="settings-activity-copy">
-                    <span>{item.label}</span>
-                    <strong>{item.value}</strong>
-                    <small>{item.detail}</small>
-                  </span>
-                  <span className="settings-activity-action">{item.action}</span>
-                </a>
-              ))}
-            </div>
-          </section>
-
+          <h1 className="settings-accessible-title">Settings</h1>
           <section className="settings-account-health" aria-label="Workspace health">
             <div className="settings-account-health-head">
               <div>
@@ -1087,8 +796,8 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     <span>{item.label}</span>
                     <strong>{item.value}</strong>
                     <small>{item.detail}</small>
+                    <span className="settings-account-health-action">{item.action}</span>
                   </span>
-                  <span className="settings-account-health-action">{item.action}</span>
                 </a>
               ))}
             </div>
@@ -1685,27 +1394,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                   </article>
                 </div>
               )}
-              <div className="settings-plan-access" aria-label="Plan access checklist">
-                <div className="settings-plan-access-head">
-                  <span className="settings-price-kicker">Access checklist</span>
-                  <strong>What is active right now</strong>
-                  <small>{premiumEnding && premiumEndLabel ? `Premium access remains active until ${premiumEndLabel}.` : billingDetail}</small>
-                </div>
-                <div className="settings-plan-access-grid">
-                  {planAccessItems.map((item) => (
-                    <article className={`settings-plan-access-item ${item.tone}`} key={item.label}>
-                      <span className="settings-plan-access-icon" aria-hidden="true">
-                        <RoleForgeIcon name={item.icon} size={15} />
-                      </span>
-                      <div>
-                        <span>{item.label}</span>
-                        <strong>{item.value}</strong>
-                        <small>{item.detail}</small>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </div>
               <div className="settings-plan-info" aria-label="Plan information">
                 {planInformationItems.map((item) => (
                   <div className="settings-plan-info-item" key={item.label}>
@@ -1713,20 +1401,6 @@ export default async function SettingsPage({ searchParams }: { searchParams: Set
                     <strong>{item.value}</strong>
                     <small>{item.detail}</small>
                   </div>
-                ))}
-              </div>
-              <div className="settings-billing-timeline" aria-label="Billing timeline">
-                {billingTimelineItems.map((item) => (
-                  <article className={`settings-billing-timeline-item ${item.tone}`} key={item.label}>
-                    <span className="settings-billing-timeline-icon" aria-hidden="true">
-                      <RoleForgeIcon name={item.icon} size={14} />
-                    </span>
-                    <div>
-                      <span>{item.label}</span>
-                      <strong>{item.value}</strong>
-                      <small>{item.detail}</small>
-                    </div>
-                  </article>
                 ))}
               </div>
               <div className="settings-billing-control-list" aria-label="Billing controls and access details">

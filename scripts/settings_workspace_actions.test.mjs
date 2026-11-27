@@ -5,17 +5,10 @@ import test from "node:test";
 const settingsPage = readFileSync("app/settings/page.tsx", "utf8");
 const stylesheet = [readFileSync("app/globals.css", "utf8"), readFileSync("app/settings/settings.css", "utf8")].join("\n");
 
-test("settings page exposes top-level workspace quick actions", () => {
-  assert.match(settingsPage, /settings-workspace-actions/);
-  assert.match(settingsPage, /aria-label="Workspace quick actions"/);
-  assert.match(settingsPage, /href="\/app"/);
-  assert.match(settingsPage, /Start a resume/);
-  assert.match(settingsPage, /href="#projects"/);
-  assert.match(settingsPage, /Review projects/);
-  assert.match(settingsPage, /href="\/api\/account\/export"/);
-  assert.match(settingsPage, /Export account/);
-  assert.match(settingsPage, /href="#billing"/);
-  assert.match(settingsPage, /Plan and billing/);
+test("workspace actions remain reachable from the profile and section navigation", () => {
+  assert.match(settingsPage, /<SettingsSectionNav/);
+  assert.match(settingsPage, /className="settings-profile-actions"[\s\S]*?href="\/app"[\s\S]*?href="\/api\/account\/export"/);
+  for (const section of ["projects", "billing", "support"]) assert.ok(settingsPage.includes(`id="${section}"`));
 });
 
 test("settings workspace quick actions are compact and overflow-safe", () => {

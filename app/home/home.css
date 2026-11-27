@@ -3,7 +3,7 @@
 .home-page .site-header { position: relative; padding: 10px 14px; border: 1px solid var(--line); border-radius: 22px; background: var(--surface); }
 .home-page .site-header .brand { padding: 0; }
 .home-account { padding: 12px; font-size: .85rem; font-weight: 750; white-space: nowrap; }
-.home-greeting { display: grid; grid-template-columns: minmax(0,1fr) 290px; align-items: center; gap: 32px; padding-top: 12px; }
+.home-greeting { display: grid; grid-template-columns: minmax(0,1fr) minmax(min(100%,296px),.5fr); align-items: start; gap: clamp(20px,3vw,40px); padding-top: 12px; }
 .home-eyebrow { color: var(--brand-dark); font-size: .7rem; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
 .home-page h1 { margin: 10px 0 16px; font: 650 clamp(2.5rem,5.4vw,4rem)/1.03 var(--font-display); letter-spacing: -.025em; overflow-wrap: anywhere; }
 .home-page h2 { margin: 6px 0; font: 650 clamp(1.7rem,3vw,2.1rem)/1.12 var(--font-display); overflow-wrap: anywhere; }
@@ -26,7 +26,7 @@
 .home-resume pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 8px/1.65 Georgia,serif; }
 .home-resume > span { display: block; margin-top: 42px; font: 600 .85rem/1.6 var(--font-sans); }
 .home-continue-details { min-width: 0; display: grid; gap: 14px; align-content: start; }
-.home-continue-details dl { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; margin: 0; }
+.home-continue-details dl { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,240px),1fr)); gap: 14px; margin: 0; }
 .home-continue-details dl > div { border-top: 1px solid var(--line); padding-top: 10px; }
 .home-continue-details dt { color: var(--ink-3); font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; }
 .home-continue-details dd { margin: 5px 0 0; font-size: .88rem; font-weight: 700; overflow-wrap: anywhere; }
@@ -36,7 +36,7 @@
 .home-button:hover { background: var(--surface-2); color: var(--ink-0); }
 .home-page .home-primary { color: var(--on-brand); background: var(--brand); border-color: var(--brand); }
 .home-page .home-primary:hover { background: var(--brand-hover); color: var(--on-brand); }
-.home-start-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
+.home-start-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
 .home-start-grid > a { display: grid; align-content: start; padding: 23px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; text-decoration: none; color: var(--ink-0); }
 .home-start-grid > a:hover { border-color: var(--line-2); }
 .home-start-grid p { font-size: .9rem; margin: 0 0 18px; }
@@ -46,7 +46,7 @@
 .home-filters button[aria-pressed="true"] { background: var(--brand-soft); color: var(--brand-dark); border-color: var(--brand); }
 .home-filters button span { font-size: .74rem; font-variant-numeric: tabular-nums; }
 .home-page .home-filter-help { font-size: .8rem; margin-top: 14px; }
-.home-project-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; }
+.home-project-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,240px),1fr)); gap: 14px; }
 .home-project { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
 .home-project > .home-resume { margin: 22px 36px 0; height: 210px; padding: 20px; border-radius: 4px 4px 0 0; }
 .home-project-info { border-top: 1px solid var(--line); padding: 20px; }
@@ -63,5 +63,9 @@
 .home-load { margin-top: 22px; }
 .home-page :focus-visible { outline: 2px solid var(--brand-dark); outline-offset: 3px; }
 @media (max-width: 640px) { .home-account { display: none; } }
-@media (max-width: 940px) { .home-project-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .home-greeting { grid-template-columns: minmax(0,1fr) 250px; gap: 20px; } .home-start-grid { gap: 12px; } .home-start-grid > a { padding: 18px; } }
-@media (max-width: 640px) { .home-content { gap: 28px; } .home-greeting, .home-start-grid, .home-project-grid { grid-template-columns: minmax(0,1fr); } .home-continue-body { grid-template-columns: minmax(0,1fr); gap: 20px; } .home-continue-body > .home-resume { width: 160px; height: 180px; justify-self: center; } .home-continue-details dl { grid-template-columns: minmax(0,1fr); gap: 12px; } .home-account { padding: 10px 4px; font-size: .75rem; } .home-page .site-header { padding: 8px 10px; } .home-page .site-header .brand-name { font-size: .84rem; } .home-section-heading > span { line-height: 1.5; } }
+@media (max-width: 940px) { .home-start-grid { gap: 12px; } .home-start-grid > a { padding: 18px; } }
+@media (max-width: 640px) { .home-content { gap: 28px; } .home-continue-body { grid-template-columns: minmax(0,1fr); gap: 20px; } .home-continue-body > .home-resume { width: 160px; height: 180px; justify-self: center; } .home-continue-details dl { grid-template-columns: minmax(0,1fr); gap: 12px; } .home-account { padding: 10px 4px; font-size: .75rem; } .home-page .site-header { padding: 8px 10px; } .home-page .site-header .brand-name { font-size: .84rem; } .home-section-heading > span { line-height: 1.5; } }
+
+@media (max-width: 860px) {
+  .home-greeting, .home-start-grid { grid-template-columns: minmax(0, 1fr); }
+}

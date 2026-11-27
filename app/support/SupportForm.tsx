@@ -3,10 +3,20 @@
 import { useState } from "react";
 import { flushSync } from "react-dom";
 import { RoleForgeIcon } from "../components/RoleForgeIcons";
-import { SUPPORT_REQUEST_CATEGORIES, supportCategoryLabel, supportRequestFieldErrors, type SupportRequestPrefill } from "../lib/supportRequests";
+import { SUPPORT_REQUEST_CATEGORIES, supportCategoryLabel, supportRequestFieldErrors, type SupportRequestCategory, type SupportRequestPrefill } from "../lib/supportRequests";
+
+const topicGuidance: Record<SupportRequestCategory, string> = {
+  workflow: "Tell us which Studio step you were on and include the request ID if one appeared.",
+  exports: "Include the export format and what happened when you tried to download it.",
+  billing: "Tell us whether the issue involves checkout, a subscription change, or Premium access.",
+  privacy: "Describe the account data or privacy setting you need help with.",
+  account: "Describe the sign-in or profile step where you got stuck.",
+  "saved-projects": "Include the project name and the action you were trying to take.",
+  other: "Tell us where you were in RoleForge and what you expected to happen.",
+};
 
 export function SupportForm({ prefill }: { prefill: SupportRequestPrefill }) {
-  const [values, setValues] = useState({ category: prefill.category as string, subject: prefill.subject, message: "", contextUrl: prefill.contextUrl ?? "" });
+  const [values, setValues] = useState({ category: prefill.category, subject: prefill.subject, message: "", contextUrl: prefill.contextUrl ?? "" });
   const [checked, setChecked] = useState(false);
   const [pending, setPending] = useState(false);
   const prefillKey = JSON.stringify([prefill.category, prefill.subject, prefill.contextUrl]);
@@ -18,7 +28,7 @@ export function SupportForm({ prefill }: { prefill: SupportRequestPrefill }) {
   }
   const errors = checked ? supportRequestFieldErrors(values) : {};
   const count = Object.keys(errors).length;
-  function update(field: keyof typeof values, value: string) { setValues((previous) => ({ ...previous, [field]: value })); }
+  function update<K extends keyof typeof values>(field: K, value: (typeof values)[K]) { setValues((previous) => ({ ...previous, [field]: value })); }
   return <form className="support-form" action="/api/support-requests" method="post" noValidate aria-busy={pending} onSubmit={(event) => {
     if (pending) { event.preventDefault(); return; }
     const nextErrors = supportRequestFieldErrors(values);
@@ -31,9 +41,10 @@ export function SupportForm({ prefill }: { prefill: SupportRequestPrefill }) {
     flushSync(() => setPending(true));
   }}>
     <label htmlFor="support-category">Topic</label>
-    <select id="support-category" name="category" required value={values.category} onChange={(event) => update("category", event.target.value)} aria-invalid={Boolean(errors.category)} aria-describedby={errors.category ? "support-category-error" : undefined}>
+    <select id="support-category" name="category" required value={values.category} onChange={(event) => update("category", event.target.value as SupportRequestCategory)} aria-invalid={Boolean(errors.category)} aria-describedby={errors.category ? "support-topic-hint support-category-error" : "support-topic-hint"}>
       {SUPPORT_REQUEST_CATEGORIES.map((category) => <option key={category} value={category}>{supportCategoryLabel(category)}</option>)}
     </select>
+    <small id="support-topic-hint">{topicGuidance[values.category]}</small>
     {errors.category && <p className="support-field-error" id="support-category-error" role="alert">{errors.category}</p>}
     <label htmlFor="support-subject">Subject</label>
     <input id="support-subject" name="subject" minLength={4} maxLength={120} required value={values.subject} onChange={(event) => update("subject", event.target.value)} placeholder="Export download is not updating" aria-invalid={Boolean(errors.subject)} aria-describedby={errors.subject ? "support-subject-error" : undefined} />

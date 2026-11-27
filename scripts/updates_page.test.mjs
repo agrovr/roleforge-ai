@@ -90,8 +90,8 @@ test("updates timeline has overflow-safe responsive cards", () => {
   assert.match(stylesheet, /\.updates-ledger\s+a\s*\{(?=[^}]*display:\s*grid)(?=[^}]*border-radius:\s*14px)(?=[^}]*transition:\s*border-color 170ms ease,\s*box-shadow 170ms ease,\s*transform 170ms ease)[^}]*\}/s);
   assert.match(stylesheet, /\.updates-ledger\s+small\s*\{(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*pretty)[^}]*\}/s);
   assert.match(stylesheet, /\.help-signal-card,\s*\.updates-signal-card\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*38px\s+minmax\(0,\s*1fr\))[^}]*\}/s);
-  assert.match(stylesheet, /\.updates-timeline\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\))(?=[^}]*gap:\s*14px)(?=[^}]*min-width:\s*0)[^}]*\}/s);
-  assert.match(stylesheet, /\.updates-card\s*\{(?=[^}]*container:\s*updates-card\s*\/\s*inline-size)(?=[^}]*grid-template-columns:\s*48px\s+minmax\(0,\s*1fr\))(?=[^}]*scroll-margin-block-start:\s*92px)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
+  assert.match(stylesheet, /\.updates-timeline\s*\{(?=[^}]*display:\s*grid)(?=[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\))(?=[^}]*gap:\s*14px)(?=[^}]*min-width:\s*0)[^}]*\}/s);
+  assert.match(stylesheet, /\.updates-card\s*\{(?=[^}]*container:\s*updates-card\s*\/\s*inline-size)(?=[^}]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(min\(100%,\s*260px\),\s*1fr\)\))(?=[^}]*scroll-margin-block-start:\s*92px)(?=[^}]*overflow:\s*hidden)[^}]*\}/s);
   assert.match(stylesheet, /\.updates-card-meta\s*\{(?=[^}]*display:\s*flex)(?=[^}]*flex-wrap:\s*wrap)(?=[^}]*min-width:\s*0)[^}]*\}/s);
   assert.match(stylesheet, /\.updates-card\s+h2\s*\{(?=[^}]*font-size:\s*1\.72rem)(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*balance)[^}]*\}/s);
   assert.match(stylesheet, /\.updates-card\s+li\s*\{(?=[^}]*grid-template-columns:\s*16px\s+minmax\(0,\s*1fr\))(?=[^}]*overflow-wrap:\s*anywhere)(?=[^}]*text-wrap:\s*pretty)[^}]*\}/s);

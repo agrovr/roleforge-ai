@@ -34,3 +34,50 @@ html[data-theme="dark"] .rf-settings-page .settings-project-item.is-changed { bo
   .rf-settings-page .settings-profile-edit-row input:not([type="checkbox"]) { width: 100%; }
   .rf-settings-page .settings-save-bar li { gap: 8px; font-size: .78rem; }
 }
+
+.settings-direction-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 155px), 1fr));
+  gap: 8px;
+}
+.settings-direction-list button {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink-0);
+  text-align: left;
+  cursor: pointer;
+}
+.settings-direction-list button[aria-pressed="true"] {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+.settings-direction-list small { color: var(--ink-2); }
+
+.settings-accessible-title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.rf-settings-page .settings-task-shortcuts { display: flex; flex-wrap: wrap; gap: 5px; }
+.rf-settings-page .settings-account-health-card {
+  grid-template-columns: 34px minmax(0, 1fr);
+  min-height: 0;
+  align-content: start;
+  padding: 14px;
+  gap: 10px;
+}
+.rf-settings-page .settings-account-health-icon { width: 34px; height: 34px; border-radius: 50%; }
+.rf-settings-page .settings-account-health-copy { display: grid; gap: 3px; }
+.rf-settings-page .settings-account-health-copy .settings-account-health-action {
+  margin-top: 3px;
+  color: var(--brand-dark);
+  text-transform: none;
+  letter-spacing: normal;
+}

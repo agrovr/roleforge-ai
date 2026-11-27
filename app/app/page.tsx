@@ -4,9 +4,8 @@ import Link from "next/link";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AccountAvatar } from "../components/AccountAvatar";
 import { AccountReferenceCopyButton } from "../components/AccountReferenceCopyButton";
-import { Brand } from "../components/Brand";
+import { SiteHeader } from "../components/SiteHeader";
 import { RoleForgeIcon, type RoleForgeIconName } from "../components/RoleForgeIcons";
-import { ThemeToggle } from "../components/ThemeToggle";
 import { PasteResumeInput, StudioFirstRunGuide } from "../components/StudioFirstRun";
 import { StudioGatewayFooter, StudioGatewayHeader } from "../components/StudioGatewayChrome";
 import { loadAccountStatus } from "../lib/accountStatusClient";
@@ -1457,6 +1456,7 @@ export default function Page() {
     let frame = 0;
     function focusJobTarget() {
       if (window.location.hash !== "#target") return;
+      setActiveTab("gap");
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         const editor = document.getElementById("target");
@@ -3491,15 +3491,7 @@ export default function Page() {
     ? `${reviewedSuggestionCount}/${suggestionCards.length} reviewed${editSuggestionCount ? ` · ${editSuggestionCount} to edit` : ""}`
     : "Ready after a completed run";
 
-  const intakePanel = (
-<section className="studio-card rf-workflow-card">
-              <div className="studio-card-head">
-                <div>
-                  <div className="eyebrow">New run</div>
-                  <h2 className="panel-title">Resume intake · role target</h2>
-                </div>
-              </div>
-              <div className="rf-workflow-panel rf-intake-grid" aria-label="Workflow controls">
+  const resumeUploadCard = (
                 <article className="rf-intake-card rf-intake-resume">
                   <h3 className="rf-intake-card-header">Select Resume</h3>
                   <div className="rf-intake-card-body">
@@ -3526,7 +3518,7 @@ export default function Page() {
                       />
                       <span className="rf-file-icon"><RoleForgeIcon name="file" size={24} /></span>
                       <span className="rf-file-copy">
-                        <strong>{file ? file.name : "Choose a resume file"}</strong>
+                        <strong>{file ? file.name : "Drop your resume here"}</strong>
                         <small id="resumeUploadHint" aria-live="polite">{uploadStatusCopy}</small>
                       </span>
                       <span className="rf-file-action">{file ? "Replace file" : "Choose File"}</span>
@@ -3534,6 +3526,18 @@ export default function Page() {
                     {allowedUploadFormats.includes("txt") && <PasteResumeInput key={fileInputVersion} maxBytes={maxUploadBytes} onUse={selectResumeFile} />}
                   </div>
                 </article>
+  );
+
+  const intakePanel = (
+<section className="studio-card rf-workflow-card">
+              <div className="studio-card-head">
+                <div>
+                  <div className="eyebrow">New run</div>
+                  <h2 className="panel-title">Resume intake · role target</h2>
+                </div>
+              </div>
+              <div className="rf-workflow-panel rf-intake-grid" aria-label="Workflow controls">
+                {resumeUploadCard}
 
                 <article className="rf-intake-card rf-intake-target-card">
                   <h3 className="rf-intake-card-header">
@@ -3812,13 +3816,7 @@ export default function Page() {
   return (
     <main className={`page-shell rf-studio-page${hasActiveWorkspace ? "" : " rf-first-run"}`}>
       <div className="rf-studio-shell">
-        <header className="rf-studio-topbar" aria-label="Studio controls">
-          <div className="rf-studio-breadcrumb">
-            <Brand href="/" label="RoleForge AI home" />
-            <span className="breadcrumb-current">Resumes</span>
-            <span className="breadcrumb-separator" aria-hidden="true">/</span>
-            <strong title={activeTitle}>{topbarLabel}</strong>
-          </div>
+        <SiteHeader className="rf-studio-topbar studio-header" active="studio" signedIn={signedIn} context={topbarLabel}>
           <div className="rf-studio-top-actions">
             <button
               className="ghost-button studio-top-button"
@@ -3844,7 +3842,6 @@ export default function Page() {
                 <RoleForgeIcon name="download" size={16} /> {topExportLabel}
               </button>
             )}
-            <ThemeToggle />
             <div className="studio-account-menu" id="account" ref={accountMenuRef}>
               <button
                 className="studio-account-button"
@@ -4080,7 +4077,19 @@ export default function Page() {
               ) : null}
             </div>
           </div>
-        </header>
+        </SiteHeader>
+        {!hasTailoredDraft && <ol className="studio-run-progress" aria-label="Resume workflow progress">{[
+          { label: "Upload", done: previewUploadState === "ready" && Boolean(uploadMeta), href: hasTailoredDraft ? "#preview" : "#input", available: true },
+          { label: "Target", done: hasTarget && !targetInvalid, href: "#target", available: true },
+          { label: "Tailor", done: hasTailoredDraft, href: hasTailoredDraft ? "#suggestions" : "#preflight", available: hasActiveWorkspace || targetRailActive },
+          { label: "Export", done: selectedDownloadReady, href: "#preview", available: hasTailoredDraft },
+        ].map((step, index, steps) => {
+          const current = !step.done && steps.slice(0, index).every((previous) => previous.done);
+          const content = <><span aria-hidden="true">{step.done ? <RoleForgeIcon name="check" size={14} /> : index + 1}</span><strong>{step.label}</strong><small>{step.done ? "Ready" : current ? "Next" : "Waiting"}</small></>;
+          return <li key={step.label} className={step.done ? "complete" : ""}>{step.available
+            ? <a href={step.href} aria-current={current ? "step" : undefined}>{content}</a>
+            : <span className="studio-run-locked" aria-disabled="true">{content}</span>}</li>;
+        })}</ol>}
         <div className="rf-studio-layout">
           <aside className="rf-studio-rail" aria-label="Studio sections">
             <div className="rail-section-title">Build</div>
@@ -4111,15 +4120,10 @@ export default function Page() {
           </aside>
 
           <section className="rf-studio-main" id="editor" ref={editorSectionRef} tabIndex={-1}>
-            {!hasActiveWorkspace && <div className="studio-first-welcome"><div className="eyebrow">{hasActiveWorkspace ? "Prepare your next run" : "First run"}</div><h1>Start with your resume.</h1><p>Upload your resume, then add the role you are targeting. Review the generated draft before you export.</p></div>}
-            <div className="studio-run-summary"><span>{accountUsageValue} · {accountUsageCaption}</span><Link href="/home">Your projects →</Link></div>
-            <ol className="studio-run-progress" aria-label="Resume workflow progress">{[
-              { label: "Upload", done: previewUploadState === "ready" && Boolean(uploadMeta), href: "#input" },
-              { label: "Target", done: hasTarget && !targetInvalid, href: "#target" },
-              { label: "Tailor", done: hasTailoredDraft, href: "#preflight" },
-              { label: "Export", done: selectedDownloadReady, href: hasActiveWorkspace ? "#preview" : "#preflight" },
-            ].map((step, index, steps) => <li key={step.label} className={step.done ? "complete" : ""}><a href={step.href} aria-current={!step.done && steps.slice(0, index).every((previous) => previous.done) ? "step" : undefined}><span aria-hidden="true">{step.done ? "✓" : index + 1}</span><strong>{step.label}</strong><small>{step.done ? "Ready" : steps.slice(0, index).every((previous) => previous.done) ? "Next" : "Waiting"}</small></a></li>)}</ol>
-            {!hasTailoredDraft ? intakePanel : null}
+            {!hasActiveWorkspace && <div className="studio-first-welcome"><div className="eyebrow">First run</div><h1>Start with your resume.</h1><p>Upload the resume you already send out. Add the role you are targeting next, then review the generated draft before you export.</p></div>}
+            {hasActiveWorkspace && !hasTailoredDraft && <div className="studio-run-summary"><span>{accountUsageValue} · {accountUsageCaption}</span><Link href="/home">Your projects →</Link></div>}
+
+            {!hasTailoredDraft ? (!hasActiveWorkspace && !targetRailActive ? <div className="studio-first-upload">{resumeUploadCard}<div className="studio-run-summary">{accountPlanValue} · {accountUsageValue} · {accountUsageCaption}</div></div> : intakePanel) : null}
             {!hasActiveWorkspace && <StudioFirstRunGuide selected={selectedTemplateSlug} onSelect={(slug) => { setSelectedTemplateSlug(slug); saveResumeTemplatePreference(slug); }} />}
             {hasActiveWorkspace && <>
             <div className="rf-studio-hero">

@@ -334,6 +334,35 @@ function RoleStrip() {
   );
 }
 
+function ReviewExample() {
+  return (
+    <section className="section section-alt" id="example" aria-labelledby="example-title">
+      <div className="section-inner">
+        <div className="section-head">
+          <div>
+            <div className="eyebrow">The review</div>
+            <h2 className="display h2" id="example-title">You see the change. <em>Then</em> you decide.</h2>
+          </div>
+          <p className="lede">Compare the original wording with a suggested draft before exporting your resume.</p>
+        </div>
+        <div className="review-example-grid">
+          <article>
+            <header><h3>Your original</h3><span>Kept visible</span></header>
+            <p>Responsible for launch coordination and working with different teams on product releases.</p>
+            <ul><li>Opens with a responsibility</li><li>The action is buried in “coordination”</li><li>“Launch” and “releases” overlap</li></ul>
+          </article>
+          <article className="review-example-draft">
+            <header><h3>Suggested draft</h3><span>Awaiting your review</span></header>
+            <p><mark>Coordinated product launches</mark> across teams.</p>
+            <ul><li>Leads with the action</li><li>Keeps the cross-team scope</li><li>Uses only details in the original</li></ul>
+          </article>
+        </div>
+        <p className="review-example-caption">Illustrative example. Your draft uses your own resume and target role.</p>
+      </div>
+    </section>
+  );
+}
+
 function HowItWorks() {
   const steps = [
     ["upload", "Upload your resume", "Drop in a DOCX, PDF, or TXT resume. RoleForge reads the current structure, headings, and content before generating changes."],
@@ -690,6 +719,7 @@ export default async function Landing({ searchParams }: { searchParams?: Promise
       />
       <Hero studioHref={links.studioHref} />
       <RoleStrip />
+      <ReviewExample />
       <HowItWorks />
       <StudioPreview studioHref={links.studioHref} />
       <Templates />

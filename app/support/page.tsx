@@ -10,12 +10,8 @@ import { isSupportAdminUser } from "../lib/supportAdmin";
 import {
   loadSupportRequests,
   parseSupportRequestPrefill,
-  supportCategoryLabel,
   supportRequestHref,
   supportRequestReference,
-  supportStatusLabel,
-  type SupportRequestCategory,
-  type SupportRequestStatus,
 } from "../lib/supportRequests";
 import { createRoleForgeServerClient } from "../lib/supabase/server";
 
@@ -28,145 +24,6 @@ export const metadata: Metadata = {
 };
 
 type SupportSearchParams = Promise<Record<string, string | string[] | undefined>>;
-
-const supportGuides = [
-  {
-    title: "Workflow or export problem",
-    detail: "Include the file type, selected export format, and any request id shown in the Studio.",
-    icon: "file" as const,
-    href: supportRequestHref({
-      category: "workflow",
-      subject: "Workflow or export issue",
-      contextUrl: "/support#request",
-    }),
-  },
-  {
-    title: "Billing or Premium issue",
-    detail: "Mention whether checkout, billing management, or Premium access sync is the part that looks wrong.",
-    icon: "lock" as const,
-    href: supportRequestHref({
-      category: "billing",
-      subject: "Billing or Premium access",
-      contextUrl: "/settings#billing",
-    }),
-  },
-  {
-    title: "Saved project issue",
-    detail: "Share the project name and whether restore, rename, stage, delete, or exports look wrong.",
-    icon: "settings" as const,
-    href: supportRequestHref({
-      category: "saved-projects",
-      subject: "Saved project issue",
-      contextUrl: "/settings#projects",
-    }),
-  },
-  {
-    title: "Privacy or data request",
-    detail: "Use this for account exports, communication preferences, deletion questions, or privacy policy follow-up.",
-    icon: "lock" as const,
-    href: supportRequestHref({
-      category: "privacy",
-      subject: "Privacy or data request",
-      contextUrl: "/settings#data-privacy",
-    }),
-  },
-  {
-    title: "Sign-in or profile access",
-    detail: "Use this when login, email changes, security details, or account deletion controls need attention.",
-    icon: "mail" as const,
-    href: supportRequestHref({
-      category: "account",
-      subject: "Account access question",
-      contextUrl: "/settings#account",
-    }),
-  },
-] as const;
-
-const supportTriageItems: Array<{
-  category: SupportRequestCategory;
-  detail: string;
-  evidence: string;
-  icon: "file" | "lock" | "settings" | "mail";
-}> = [
-  {
-    category: "workflow",
-    detail: "Upload, Tailor, generated assets, or export creation stopped before finishing.",
-    evidence: "Include the request id when shown, file type, selected template, and the last workflow step you tried.",
-    icon: "file",
-  },
-  {
-    category: "exports",
-    detail: "A ready PDF, DOCX, or TXT download is missing, expired, locked, or attached to the wrong run.",
-    evidence: "Include export format, saved project name, and whether the issue happens from Studio, History, or Settings.",
-    icon: "file",
-  },
-  {
-    category: "billing",
-    detail: "Checkout, billing management, cancellation, or Premium access does not match the account state.",
-    evidence: "Include whether the issue is checkout, portal, subscription status, or Premium entitlement sync.",
-    icon: "lock",
-  },
-  {
-    category: "privacy",
-    detail: "Account exports, communication preferences, deletion controls, or privacy policy details need review.",
-    evidence: "Include the settings section, requested data action, and whether you already downloaded your account record.",
-    icon: "lock",
-  },
-  {
-    category: "account",
-    detail: "Sign-in, email changes, profile details, security metadata, or account deletion controls need attention.",
-    evidence: "Include sign-in method, account email, and the settings section where the issue appears.",
-    icon: "mail",
-  },
-  {
-    category: "saved-projects",
-    detail: "Restore, rename, stage, delete, or saved document history behaves unexpectedly.",
-    evidence: "Include project name, application stage, export format, and whether the run is local or account-saved.",
-    icon: "settings",
-  },
-];
-
-const supportLifecycle: Array<{
-  status: SupportRequestStatus;
-  detail: string;
-}> = [
-  {
-    status: "open",
-    detail: "Your request is saved with an RF reference and visible in Support and Settings history.",
-  },
-  {
-    status: "reviewing",
-    detail: "The request has enough account context to investigate the workflow, billing, or saved-project state.",
-  },
-  {
-    status: "closed",
-    detail: "The request is resolved or no longer needs action; the reference remains in account history.",
-  },
-];
-
-const supportAfterSubmit = [
-  "The request is saved to your signed-in account with an RF reference.",
-  "Support history appears on this page and in Settings.",
-  "If the support channel is configured, RoleForge sends the request details for operator review.",
-] as const;
-
-const supportRoutingSteps = [
-  {
-    label: "1. Saved first",
-    detail: "Every signed-in request is written to Supabase support history with the account id and RF reference.",
-    icon: "lock" as const,
-  },
-  {
-    label: "2. Optional alert",
-    detail: "Set a webhook or Resend email env vars in production to send the same request packet to an operator channel.",
-    icon: "mail" as const,
-  },
-  {
-    label: "3. Tracked status",
-    detail: "Requests move through open, reviewing, and closed while the reference stays visible to the account.",
-    icon: "chart" as const,
-  },
-] as const;
 
 function getParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
@@ -265,16 +122,15 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
       <section className="legal-hero support-hero" aria-labelledby="support-title">
         <div>
           <div className="eyebrow">Support</div>
-          <h1 id="support-title" className="display">Get help with your workflow.</h1>
+          <h1 id="support-title" className="display">Send a request with real context.</h1>
           <p>
-            Send account-linked details for saved projects, billing, exports, or resume runs so the issue can be traced without posting private files publicly.
+            Each request gets an RF reference. You can find it again in Support or Settings.
           </p>
         </div>
         <div className="legal-hero-card support-hero-card" aria-label="Support summary">
           <RoleForgeIcon name="mail" size={18} />
           <span>Signed-in requests are saved to your account</span>
-          <span>Requests appear in Support and Settings history</span>
-          <span>Operator review uses the account-safe request packet</span>
+          <span>Include the page or request ID when reporting an issue</span>
           <span>Never paste full payment card details or private credentials</span>
         </div>
       </section>
@@ -290,58 +146,7 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
         </section>
       ) : null}
 
-      <section className="support-routing-strip" aria-label="Where support requests go">
-        <div className="support-routing-head">
-          <span className="eyebrow">Ticket routing</span>
-          <strong>Where a support request goes after submit.</strong>
-          <p>
-            The account history is the durable record. Operator alerts are available once the production webhook URL is configured.
-          </p>
-        </div>
-        <div className="support-routing-steps">
-          {supportRoutingSteps.map((step) => (
-            <article className="support-routing-step" key={step.label}>
-              <span aria-hidden="true"><RoleForgeIcon name={step.icon} size={15} /></span>
-              <div>
-                <strong>{step.label}</strong>
-                <p>{step.detail}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <section className="support-layout" aria-label="Support request workspace">
-        <div className="support-guides">
-          {supportGuides.map((guide) => (
-            <Link className="support-guide-card" href={guide.href} key={guide.title}>
-              <span><RoleForgeIcon name={guide.icon} size={16} /></span>
-              <strong>{guide.title}</strong>
-              <p>{guide.detail}</p>
-              <small>Prefill request</small>
-            </Link>
-          ))}
-
-          <section className="support-triage-card" aria-label="Support triage guide">
-            <div className="support-triage-head">
-              <span className="eyebrow">Before sending</span>
-              <strong>Send the details that make the issue traceable.</strong>
-            </div>
-            <div className="support-triage-list">
-              {supportTriageItems.map((item) => (
-                <article className="support-triage-item" key={item.category}>
-                  <span aria-hidden="true"><RoleForgeIcon name={item.icon} size={14} /></span>
-                  <div>
-                    <strong>{supportCategoryLabel(item.category)}</strong>
-                    <p>{item.detail}</p>
-                    <small>{item.evidence}</small>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-        </div>
-
         <section className="support-request-card" id="request" aria-label="Support request form">
           <div className="support-request-head">
             <span className="eyebrow">Request help</span>
@@ -372,6 +177,20 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
             </div>
           ) : null}
 
+          {signedIn ? (
+            <SupportForm prefill={prefill} />
+          ) : (
+            <div className="support-signin-card">
+              <strong>Use your account session</strong>
+              <p>Support requests are saved with the signed-in account so billing, export access, and saved project context can be checked safely.</p>
+              <Link className="primary-button support-submit" href={`/login?next=${signInNext}&account=signin-required`}>
+                Sign in for support <RoleForgeIcon name="arrow" size={14} />
+              </Link>
+            </div>
+          )}
+
+        </section>
+        <aside className="support-context" aria-label="Request details">
           <section className="support-packet-card" aria-label="Support request packet">
             <div className="support-packet-head">
               <span className="eyebrow">Request packet</span>
@@ -391,39 +210,6 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
               ))}
             </div>
           </section>
-
-          <section className="support-response-card" aria-label="Support request lifecycle">
-            <div className="support-response-head">
-              <span className="eyebrow">After submit</span>
-              <strong>Track the request from your account.</strong>
-              <p>Support requests keep a visible account history first. When notification routing is configured, the same request is also sent for operator review.</p>
-            </div>
-            <ul className="support-after-submit-list" aria-label="What happens after sending a support request">
-              {supportAfterSubmit.map((item) => (
-                <li key={item}><RoleForgeIcon name="check" size={13} />{item}</li>
-              ))}
-            </ul>
-            <div className="support-response-list">
-              {supportLifecycle.map((item) => (
-                <article className="support-response-item" key={item.status}>
-                  <span className={`support-status-badge ${item.status}`}>{supportStatusLabel(item.status)}</span>
-                  <small>{item.detail}</small>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          {signedIn ? (
-            <SupportForm prefill={prefill} />
-          ) : (
-            <div className="support-signin-card">
-              <strong>Use your account session</strong>
-              <p>Support requests are saved with the signed-in account so billing, export access, and saved project context can be checked safely.</p>
-              <Link className="primary-button support-submit" href={`/login?next=${signInNext}&account=signin-required`}>
-                Sign in for support <RoleForgeIcon name="arrow" size={14} />
-              </Link>
-            </div>
-          )}
 
           {signedIn ? (
             <section className="support-history" aria-label="Recent support requests">
@@ -456,7 +242,7 @@ export default async function SupportPage({ searchParams }: { searchParams: Supp
               )}
             </section>
           ) : null}
-        </section>
+        </aside>
       </section>
 
       <section className="legal-footer-card" aria-label="Support footer">

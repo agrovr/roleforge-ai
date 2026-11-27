@@ -166,10 +166,10 @@
 }
 
 .updates-timeline {
-  width: min(1280px, 100%);
+  width: min(1120px, 100%);
   max-width: 100%;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   min-width: 0;
   margin: 0 auto;
@@ -179,11 +179,11 @@
   container: updates-card / inline-size;
   min-width: 0;
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 18px;
   align-items: start;
   overflow: hidden;
-  padding: 18px;
+  padding: 22px;
   border: 1px solid color-mix(in srgb, var(--brand) 18%, var(--line));
   border-radius: 14px;
   scroll-margin-block-start: 92px;
@@ -232,6 +232,7 @@
 
 .updates-card-meta {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 8px;
   min-width: 0;
@@ -271,8 +272,8 @@
 
 .updates-card ul {
   display: grid;
-  gap: 8px;
-  margin: 14px 0 0;
+  gap: 9px;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
@@ -281,6 +282,10 @@
   display: grid;
   grid-template-columns: 16px minmax(0, 1fr);
   gap: 8px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
   color: var(--ink-2);
   font-size: 0.9rem;
   font-weight: 720;

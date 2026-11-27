@@ -250,7 +250,7 @@
 .login-preview-sheet {
   display: grid;
   min-width: 0;
-  grid-template-columns: repeat(3, minmax(min(100%, 130px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
   border: 1px solid var(--line);
   border-radius: 14px;
   overflow: hidden;
@@ -600,11 +600,6 @@ html[data-theme="dark"] .login-session-strip span {
     margin-top: 0;
   }
 
-  .login-studio-preview,
-  .login-session-strip {
-    display: none;
-  }
-
   .login-preview-top {
     align-items: flex-start;
     flex-direction: column;
@@ -615,18 +610,8 @@ html[data-theme="dark"] .login-session-strip span {
     text-align: left;
   }
 
-  .login-preview-sheet {
-    grid-template-columns: 1fr;
-  }
-
   .login-preview-sheet div {
     min-height: auto;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .login-preview-sheet div:last-child {
-    border-bottom: 0;
   }
 
   .login-card {

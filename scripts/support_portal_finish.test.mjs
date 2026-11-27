@@ -10,7 +10,7 @@ const stylesheet = stylesFor("public-pages.css", "support/support.css");
 test("support portal finish keeps the customer support workspace polished", () => {
   assert.match(supportPage, /support-request-card/);
   assert.match(supportPage, /support-packet-card/);
-  assert.match(supportPage, /support-response-card/);
+  assert.match(supportPage, /<SupportForm[\s\S]*?<aside className="support-context"[\s\S]*?support-packet-card[\s\S]*?support-history/);
   assert.match(supportPage, /support-history/);
   assert.match(stylesheet, /\/\* Support portal finish: clearer request packet, form depth, and traceable history\. \*\//);
   assert.match(stylesheet, /\.support-shell\s*\{(?=[^}]*--support-portal-rail:\s*linear-gradient\(90deg)(?=[^}]*--support-portal-glint:\s*linear-gradient\(112deg)[^}]*\}/s);

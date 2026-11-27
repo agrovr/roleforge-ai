@@ -34,7 +34,7 @@ test("collapsed login layouts place authentication before secondary proof", () =
   assert.ok(cardIndex < supportingIndex);
   assert.match(globals, /\.login-panel\s*\{(?=[^}]*grid-template-areas:\s*"copy card"\s*"supporting card")(?=[^}]*row-gap:\s*18px)[^}]*\}/s);
   assert.match(globals, /@media\s*\(max-width:\s*1040px\)[\s\S]*?\.login-panel\s*\{(?=[^}]*grid-template-areas:\s*"copy"\s*"card"\s*"supporting")(?=[^}]*row-gap:\s*28px)[^}]*\}/s);
-  assert.match(globals, /@media\s*\(max-width:\s*760px\)[\s\S]*?\.login-studio-preview,\s*\.login-session-strip\s*\{[^}]*display:\s*none[^}]*\}/s);
+  assert.doesNotMatch(globals, /\.login-studio-preview[^{}]*\{[^}]*display:\s*none/);
 });
 
 test("login protected preview avoids decorative rails and keeps dark mode support", () => {
