@@ -24,10 +24,28 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Verify deployed layouts with proposed assertions
+      - name: Build the candidate for layout verification
+        if: github.event_name == 'pull_request'
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: http://localhost:3100
+          NEXT_PUBLIC_BACKEND_URL: https://roleforge-api-224015900616.us-central1.run.app
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.ROLEFORGE_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.ROLEFORGE_SUPABASE_PUBLISHABLE_KEY }}
+      - name: Start the candidate on the runner
+        if: github.event_name == 'pull_request'
+        run: |
+          npm run start -- --hostname 127.0.0.1 --port 3100 > "$RUNNER_TEMP/layout-server.log" 2>&1 &
+          curl --fail --silent --show-error --retry 30 --retry-connrefused --retry-delay 1 http://localhost:3100/help -o /dev/null
+        env:
+          NEXT_PUBLIC_SITE_URL: http://localhost:3100
+          NEXT_PUBLIC_BACKEND_URL: https://roleforge-api-224015900616.us-central1.run.app
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.ROLEFORGE_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.ROLEFORGE_SUPABASE_PUBLISHABLE_KEY }}
+      - name: Verify layouts against the candidate or deployed site
         run: npm run smoke:layout -- --require-chrome --require-signed-in-layout
         env:
-          ROLEFORGE_SITE_URL: https://roleforgeai.vercel.app
+          ROLEFORGE_SITE_URL: ${{ github.event_name == 'pull_request' && 'http://localhost:3100' || 'https://roleforgeai.vercel.app' }}
           ROLEFORGE_SMOKE_COOKIE: ${{ secrets.ROLEFORGE_SMOKE_COOKIE }}
           ROLEFORGE_SUPABASE_URL: ${{ vars.ROLEFORGE_SUPABASE_URL }}
           ROLEFORGE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.ROLEFORGE_SUPABASE_PUBLISHABLE_KEY }}
